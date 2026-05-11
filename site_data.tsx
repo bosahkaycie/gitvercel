@@ -67,7 +67,7 @@ export const SERVICES: Service[] = [
     title: 'Technical integrity for a safer energy future',
     description: 'Providing high-fidelity engineering and advanced geosolutions for Swamp, Land, and Offshore operations, ensuring safety and operational excellence.',
     icon: '',
-    image: DigiTwinImg,
+    image: SliderImg,
     items: [
       'Swamp & Land Operations',
       'Offshore Engineering Support',
@@ -307,7 +307,7 @@ export const TEAM: TeamMember[] = [
 
 
 export const ASSETS = {
-  front: DigiTwinImg,
+  front: SliderImg,
   team: TeamImg
 };
 
