@@ -97,32 +97,26 @@ const Careers: React.FC = () => {
             <p className="text-slate-600 mt-4 text-lg">Explore our active vacancies across Nigeria.</p>
           </div>
 
-          <div className="space-y-4">
-            {[
-              { role: 'Senior Geotechnical Engineer', location: 'Port Harcourt', type: 'Full-Time' },
-              { role: 'Reality Capture Specialist (Leica Systems)', location: 'Lagos / Field', type: 'Contract' },
-              { role: 'Pipeline Integrity Lead', location: 'Swamp Operations', type: 'Full-Time' }
-            ].map((job, idx) => (
-              <div key={idx} className="bg-white p-8 flex flex-col md:flex-row justify-between items-start md:items-center border border-slate-200 hover:shadow-lg transition-shadow reveal stagger-1">
-                <div className="mb-6 md:mb-0 space-y-2">
-                  <h3 className="text-xl font-bold text-slate-900">{job.role}</h3>
-                  <div className="flex items-center space-x-3 text-slate-500 font-bold text-xs uppercase tracking-wider">
-                    <span>{job.location}</span>
-                    <span className="w-1 h-1 bg-slate-300 rounded-none"></span>
-                    <span>{job.type}</span>
-                  </div>
-                </div>
-                <a href={`#/contact?job=${encodeURIComponent(job.role)}`} className="inline-flex items-center text-emerald-700 font-bold hover:text-emerald-900 transition-colors group">
-                  Apply Now <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-                </a>
-              </div>
-            ))}
+          <div className="bg-white border border-slate-200 p-12 text-center space-y-6 shadow-sm reveal">
+            <div className="mx-auto w-16 h-16 bg-slate-50 border border-slate-200 flex items-center justify-center">
+              <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-2xl font-bold text-slate-900 tracking-tight">No Active Vacancies</h3>
+              <p className="text-slate-600 max-w-lg mx-auto text-base">
+                We currently do not have any open positions. However, we are always eager to discover exceptional minds. You can submit your CV below for future consideration.
+              </p>
+            </div>
           </div>
 
-          <div className="mt-16 p-10 md:p-12 bg-white border border-slate-200 text-center shadow-sm">
-            <h3 className="text-2xl font-bold text-slate-900 mb-4 tracking-tight">No match for your skills?</h3>
-            <p className="text-slate-600 mb-8 font-normal text-lg">We are always looking for exceptional talent in engineering and geosolutions. Send us your CV for future consideration.</p>
-            <a href="mailto:careers@polarisigl.com" className="inline-flex items-center px-8 py-4 bg-emerald-950 text-white font-bold hover:bg-emerald-800 transition-colors">
+          <div className="mt-8 p-10 md:p-12 bg-white border border-slate-200 text-center shadow-sm reveal">
+            <h3 className="text-xl font-bold text-slate-900 mb-4 tracking-tight">Submit Your CV</h3>
+            <p className="text-slate-600 mb-8 font-normal text-base">
+              Send your CV and a brief cover letter to our recruitment team for future openings in engineering, surveying, reality capture, and swamp/offshore operations.
+            </p>
+            <a href="mailto:careers@polarisigl.com" className="inline-flex items-center px-8 py-3.5 bg-emerald-750 text-white font-bold hover:bg-emerald-850 transition-colors">
               Submit CV <span className="ml-2">→</span>
             </a>
           </div>
