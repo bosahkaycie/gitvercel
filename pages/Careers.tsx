@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import EngineerImg from '../assets/image.png';
+import EngineerImg from '../assets/teaching.jpeg';
 import CareersBg from '../assets/inspiring_next_gen.jpeg';
 
 const Careers: React.FC = () => {
