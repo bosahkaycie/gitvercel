@@ -230,15 +230,28 @@ const Careers: React.FC = () => {
 
       {/* Careers CV Submission Modal */}
       {isFormModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-4 animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 animate-fade-in">
           <div className="relative w-full max-w-2xl bg-white shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
             
-            {/* Modal Header */}
-            <div className="bg-emerald-950 px-8 py-6 text-white flex justify-between items-center">
-              <div>
-                <h3 className="text-xl font-bold tracking-tight">Submit Your CV</h3>
-                <p className="text-slate-300 text-xs mt-1">Polaris Integrated Talent Acquisition</p>
+            {/* Modal Header with Image */}
+            <div className="relative h-44 flex flex-col justify-end p-8 text-white overflow-hidden">
+              {/* Background Image */}
+              <img 
+                src={EngineerImg} 
+                alt="PIGL Recruitment" 
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              {/* Dark Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+              
+              {/* Content */}
+              <div className="relative z-10">
+                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Careers Portal</span>
+                <h3 className="text-2xl font-black tracking-tight mt-1">Submit Your CV</h3>
+                <p className="text-slate-200 text-xs mt-1 font-medium">Polaris Integrated & GeoSolutions Limited</p>
               </div>
+
+              {/* Close Button */}
               <button 
                 onClick={() => {
                   setIsFormModalOpen(false);
@@ -247,10 +260,10 @@ const Careers: React.FC = () => {
                   setResumeFile(null);
                   setShowEmails(false);
                 }}
-                className="text-white/60 hover:text-white transition-colors p-1"
+                className="absolute top-4 right-4 z-20 text-white hover:text-emerald-400 transition-colors p-2 bg-slate-950/40 backdrop-blur-sm"
                 aria-label="Close modal"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
 
