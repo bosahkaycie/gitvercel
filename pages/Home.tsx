@@ -600,7 +600,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* 7. News highlights */}
-      <section id="community" className="py-24 md:py-32 bg-white reveal">
+      <section id="community" className="hidden md:block py-24 md:py-32 bg-white reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-end mb-16">
             <div className="space-y-4">
