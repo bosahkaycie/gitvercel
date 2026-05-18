@@ -6,11 +6,26 @@ const Footer: React.FC = () => {
   const [email, setEmail] = React.useState('');
   const [subscribed, setSubscribed] = React.useState(false);
 
-  const handleSubscribeSubmit = (e: React.FormEvent) => {
+  const handleSubscribeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
+
+    // Immediate state feedback for best-in-class UX latency
     setSubscribed(true);
+    const submittedEmail = email;
     setEmail('');
+
+    try {
+      await fetch('/subscribe.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: submittedEmail })
+      });
+    } catch (err) {
+      console.warn("Mailing subscription notification error:", err);
+    }
     
     // Auto reset back to normal after 5 seconds
     setTimeout(() => {
