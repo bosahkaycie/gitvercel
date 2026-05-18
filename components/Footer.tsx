@@ -30,8 +30,8 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-8 text-emerald-600">Our Expertise</h4>
-            <ul className="space-y-4 text-slate-600 font-bold text-xs uppercase tracking-widest">
+            <h4 className="text-sm font-bold mb-6 text-emerald-700">Our Expertise</h4>
+            <ul className="space-y-3 text-slate-600 font-semibold text-[13px]">
               <li><a href="#/services" className="hover:text-emerald-700 transition-colors">3D Reality Capture & Laser Scanning</a></li>
               <li><a href="#/services" className="hover:text-emerald-700 transition-colors">Geosolutions</a></li>
               <li><a href="#/services" className="hover:text-emerald-700 transition-colors">Pipeline Integrity</a></li>
@@ -40,8 +40,8 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-8 text-emerald-600">Company</h4>
-            <ul className="space-y-4 text-slate-600 font-bold text-xs uppercase tracking-widest">
+            <h4 className="text-sm font-bold mb-6 text-emerald-700">Company</h4>
+            <ul className="space-y-3 text-slate-600 font-semibold text-[13px]">
               <li><a href="#/about" className="hover:text-emerald-700 transition-colors">About Us</a></li>
               <li><a href="#/projects" className="hover:text-emerald-700 transition-colors">Our Projects</a></li>
               <li><a href="#/news" className="hover:text-emerald-700 transition-colors">News & Insights</a></li>
@@ -53,19 +53,19 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-8 text-emerald-600">Connect</h4>
-            <address className="not-italic space-y-6">
-              <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Office</p>
-                <p className="text-slate-600 text-xs font-bold leading-relaxed">
+            <h4 className="text-sm font-bold mb-6 text-emerald-700">Connect</h4>
+            <address className="not-italic space-y-5">
+              <div className="space-y-0.5">
+                <p className="text-[11px] font-bold text-slate-400">Office</p>
+                <p className="text-slate-600 text-[13px] font-semibold leading-relaxed">
                   #3, Diamond Close, Port Harcourt,<br />
                   Rivers State, Nigeria
                 </p>
               </div>
-              <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Direct</p>
-                <p className="text-slate-600 text-xs font-bold">+234-(0) 809 7081 333</p>
-                <p className="text-slate-600 text-xs font-bold">info@polarisigl.com</p>
+              <div className="space-y-0.5">
+                <p className="text-[11px] font-bold text-slate-400">Direct</p>
+                <p className="text-slate-600 text-[13px] font-semibold">+234-(0) 809 7081 333</p>
+                <p className="text-slate-600 text-[13px] font-semibold">info@polarisigl.com</p>
               </div>
             </address>
           </div>
@@ -83,7 +83,7 @@ const Footer: React.FC = () => {
               placeholder="Email address" 
               className="flex-grow px-6 py-4 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 transition-colors"
             />
-            <button className="px-8 py-4 bg-slate-900 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-600 transition-all">
+            <button className="px-8 py-4 bg-slate-900 text-white font-bold text-sm hover:bg-emerald-600 transition-all">
               Subscribe
             </button>
           </form>
