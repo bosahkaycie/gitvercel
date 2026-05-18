@@ -231,10 +231,10 @@ const Careers: React.FC = () => {
       {/* Careers CV Submission Modal */}
       {isFormModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="relative w-full max-w-2xl bg-white shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
+          <div className="relative w-full max-w-md bg-white shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[95vh]">
             
             {/* Modal Header with Image */}
-            <div className="relative h-44 flex flex-col justify-end p-8 text-white overflow-hidden">
+            <div className="relative h-28 flex flex-col justify-end p-5 text-white overflow-hidden">
               {/* Background Image */}
               <img 
                 src={EngineerImg} 
@@ -242,13 +242,12 @@ const Careers: React.FC = () => {
                 className="absolute inset-0 w-full h-full object-cover"
               />
               {/* Dark Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent"></div>
               
               {/* Content */}
               <div className="relative z-10">
-                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Careers Portal</span>
-                <h3 className="text-2xl font-black tracking-tight mt-1">Submit Your CV</h3>
-                <p className="text-slate-200 text-xs mt-1 font-medium">Polaris Integrated & GeoSolutions Limited</p>
+                <h3 className="text-lg font-black tracking-tight">Submit Your CV</h3>
+                <p className="text-slate-200 text-[10px] mt-0.5 font-medium">Polaris Integrated & GeoSolutions Limited</p>
               </div>
 
               {/* Close Button */}
@@ -260,68 +259,68 @@ const Careers: React.FC = () => {
                   setResumeFile(null);
                   setShowEmails(false);
                 }}
-                className="absolute top-4 right-4 z-20 text-white hover:text-emerald-400 transition-colors p-2 bg-slate-950/40 backdrop-blur-sm"
+                className="absolute top-3 right-3 z-20 text-white hover:text-emerald-400 transition-colors p-1.5 bg-slate-950/40 backdrop-blur-sm"
                 aria-label="Close modal"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
 
             {/* Scrollable Container */}
-            <div className="p-8 overflow-y-auto flex-grow space-y-6">
+            <div className="p-5 overflow-y-auto flex-grow space-y-4">
               
               {status === 'idle' && (
-                <form onSubmit={handleFormSubmit} className="space-y-6">
-                  <div className="space-y-4">
+                <form onSubmit={handleFormSubmit} className="space-y-4">
+                  <div className="space-y-3">
                     
                     {/* Name Input */}
                     <div>
-                      <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Full Name</label>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Full Name</label>
                       <input 
                         type="text" 
                         required
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
                         placeholder="John Doe"
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-emerald-700 font-bold text-slate-800 text-sm placeholder:text-slate-400 placeholder:font-normal"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-emerald-700 font-bold text-slate-800 text-xs placeholder:text-slate-400 placeholder:font-normal"
                       />
                     </div>
 
                     {/* Email Input */}
                     <div>
-                      <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Email Address</label>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Email Address</label>
                       <input 
                         type="email" 
                         required
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
                         placeholder="john@example.com"
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-emerald-700 font-bold text-slate-800 text-sm placeholder:text-slate-400 placeholder:font-normal"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-emerald-700 font-bold text-slate-800 text-xs placeholder:text-slate-400 placeholder:font-normal"
                       />
                     </div>
 
                     {/* Phone Input */}
                     <div>
-                      <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Phone Number</label>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Phone Number</label>
                       <input 
                         type="tel" 
                         required
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                         placeholder="+234 809 708 1333"
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-emerald-700 font-bold text-slate-800 text-sm placeholder:text-slate-400 placeholder:font-normal"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-emerald-700 font-bold text-slate-800 text-xs placeholder:text-slate-400 placeholder:font-normal"
                       />
                     </div>
 
                     {/* File Upload Region */}
                     <div>
-                      <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Upload Resume (PDF, DOC, DOCX - Max 10MB)</label>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Upload Resume (PDF, DOC, DOCX - Max 10MB)</label>
                       <div 
                         onDragEnter={handleDrag}
                         onDragOver={handleDrag}
                         onDragLeave={handleDrag}
                         onDrop={handleDrop}
-                        className={`w-full p-8 border-2 border-dashed rounded-none transition-colors text-center cursor-pointer ${
+                        className={`w-full p-4 border-2 border-dashed rounded-none transition-colors text-center cursor-pointer ${
                           dragActive ? 'border-emerald-700 bg-emerald-50/30' : 'border-slate-300 hover:border-emerald-700 bg-slate-50'
                         }`}
                       >
@@ -333,26 +332,26 @@ const Careers: React.FC = () => {
                           onChange={handleFileChange}
                           className="hidden"
                         />
-                        <label htmlFor="file-upload" className="cursor-pointer space-y-3 block">
+                        <label htmlFor="file-upload" className="cursor-pointer space-y-2 block">
                           {!resumeFile ? (
                             <>
-                              <div className="mx-auto w-12 h-12 bg-white border border-slate-200 flex items-center justify-center text-slate-400">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6m-3-3v6m-9 1V4a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
+                              <div className="mx-auto w-8 h-8 bg-white border border-slate-200 flex items-center justify-center text-slate-400">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6m-3-3v6m-9 1V4a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg>
                               </div>
                               <div>
-                                <span className="text-emerald-700 font-bold text-sm block">Click to upload</span>
-                                <span className="text-slate-400 text-xs">or drag and drop your file here</span>
+                                <span className="text-emerald-700 font-bold text-xs block">Click to upload</span>
+                                <span className="text-slate-400 text-[10px]">or drag and drop here</span>
                               </div>
                             </>
                           ) : (
-                            <div className="flex items-center justify-between bg-white border border-slate-200 p-4">
-                              <div className="flex items-center space-x-3 text-left">
-                                <div className="w-10 h-10 bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 font-bold text-xs uppercase">
+                            <div className="flex items-center justify-between bg-white border border-slate-200 p-2.5">
+                              <div className="flex items-center space-x-2 text-left">
+                                <div className="w-8 h-8 bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 font-bold text-[10px] uppercase">
                                   {resumeFile.name.split('.').pop()}
                                 </div>
-                                <div>
-                                  <span className="font-bold text-slate-800 text-sm block truncate max-w-[200px] sm:max-w-none">{resumeFile.name}</span>
-                                  <span className="text-slate-400 text-xs">{(resumeFile.size / (1024 * 1024)).toFixed(2)} MB</span>
+                                <div className="min-w-0 flex-1">
+                                  <span className="font-bold text-slate-800 text-xs block truncate max-w-[150px]">{resumeFile.name}</span>
+                                  <span className="text-slate-400 text-[10px]">{(resumeFile.size / (1024 * 1024)).toFixed(2)} MB</span>
                                 </div>
                               </div>
                               <button 
@@ -363,7 +362,7 @@ const Careers: React.FC = () => {
                                 }}
                                 className="text-slate-400 hover:text-rose-600 transition-colors p-1"
                               >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                               </button>
                             </div>
                           )}
@@ -374,17 +373,17 @@ const Careers: React.FC = () => {
                   </div>
 
                   {/* Form Footer Buttons */}
-                  <div className="flex justify-end space-x-4 pt-4 border-t border-slate-100">
+                  <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
                     <button
                       type="button"
                       onClick={() => setIsFormModalOpen(false)}
-                      className="px-6 py-3 border-2 border-slate-200 text-slate-600 hover:border-slate-900 hover:text-slate-950 font-bold text-xs uppercase tracking-widest transition-colors"
+                      className="px-5 py-2 border-2 border-slate-200 text-slate-600 hover:border-slate-900 hover:text-slate-950 font-bold text-[10px] uppercase tracking-widest transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="px-8 py-3 bg-emerald-950 text-white font-bold hover:bg-emerald-800 transition-colors"
+                      className="px-6 py-2 bg-emerald-950 text-white font-bold hover:bg-emerald-800 transition-colors text-[10px] uppercase tracking-widest"
                     >
                       Submit CV
                     </button>
