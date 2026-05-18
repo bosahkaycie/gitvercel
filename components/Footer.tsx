@@ -3,6 +3,20 @@ import LogoImg from '../assets/LOGO.png';
 import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
 
 const Footer: React.FC = () => {
+  const [email, setEmail] = React.useState('');
+  const [subscribed, setSubscribed] = React.useState(false);
+
+  const handleSubscribeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setSubscribed(true);
+    setEmail('');
+    
+    // Auto reset back to normal after 5 seconds
+    setTimeout(() => {
+      setSubscribed(false);
+    }, 5000);
+  };
   return (
     <footer className="bg-slate-50 text-slate-900 pt-24 pb-12 border-t border-slate-200 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -77,16 +91,28 @@ const Footer: React.FC = () => {
             <h4 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">Stay updated</h4>
             <p className="text-slate-600 text-sm font-normal">Receive our latest insights and project updates directly in your inbox.</p>
           </div>
-          <form className="flex w-full lg:max-w-md" onSubmit={(e) => e.preventDefault()}>
-            <input 
-              type="email" 
-              placeholder="Email address" 
-              className="flex-grow px-6 py-4 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 transition-colors"
-            />
-            <button className="px-8 py-4 bg-slate-900 text-white font-bold text-sm hover:bg-emerald-600 transition-all">
-              Subscribe
-            </button>
-          </form>
+          {subscribed ? (
+            <div className="flex items-center space-x-3 text-emerald-800 bg-emerald-50 px-6 py-4 border border-emerald-200 animate-fade-in w-full lg:max-w-md">
+              <svg className="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-xs font-bold tracking-wide">Thank you! You have been successfully subscribed to our updates.</span>
+            </div>
+          ) : (
+            <form className="flex w-full lg:max-w-md" onSubmit={handleSubscribeSubmit}>
+              <input 
+                type="email" 
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email address" 
+                className="flex-grow px-6 py-4 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 transition-colors text-sm font-semibold"
+              />
+              <button type="submit" className="px-8 py-4 bg-slate-900 text-white font-bold text-sm hover:bg-emerald-600 transition-all">
+                Subscribe
+              </button>
+            </form>
+          )}
         </div>
 
         <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500 font-medium">
