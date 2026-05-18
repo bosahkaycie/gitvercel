@@ -4,6 +4,7 @@ import LogoLightImg from '../assets/logo_light.png';
 import BootsImg from '../assets/IMG_6170.jpg';
 import { SERVICES, PROJECTS } from '../site_data';
 import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
+import ProfileCoverImg from '../assets/PIGL COMPANY PROFILE.jpg';
 
 interface NavbarProps {
   currentPath?: string;
@@ -12,6 +13,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
@@ -183,15 +185,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                   <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </button>
                 {/* Download Profile Icon */}
-                <a 
-                  href={ProfilePDF}
-                  download="PIGL_Company_Profile.pdf"
+                <button 
+                  onClick={() => setIsDownloadModalOpen(true)}
                   title="Download Profile"
                   aria-label="Download Profile"
                   className={`p-1 transition-colors flex items-center justify-center ${useDarkText ? 'text-slate-800 hover:text-emerald-700' : 'text-white hover:text-white/80'}`}
                 >
                   <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                </a>
+                </button>
               </div>
 
               <a
@@ -408,14 +409,15 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                 <span className="font-bold text-[10px] uppercase tracking-widest">Profile</span>
               </button>
             </div>
-             <a
-              href={ProfilePDF}
-              download="PIGL_Company_Profile.pdf"
-              onClick={() => setIsOpen(false)}
+             <button
+              onClick={() => {
+                setIsOpen(false);
+                setIsDownloadModalOpen(true);
+              }}
               className="w-full text-center py-3.5 bg-emerald-750 text-white font-black text-sm uppercase tracking-widest hover:bg-emerald-850 transition-all block mb-3"
             >
               Company Profile
-            </a>
+            </button>
 
             <a
               href="#/contact"
@@ -427,6 +429,60 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
           </div>
         </div>
       </div>
+
+      {/* Download Profile Confirmation Modal */}
+      {isDownloadModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-fade-in">
+          <div className="relative w-full max-w-lg bg-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-slate-100 overflow-hidden flex flex-col sm:flex-row">
+            {/* Close Button */}
+            <button 
+              onClick={() => setIsDownloadModalOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-900 transition-colors z-10 p-1"
+              aria-label="Close modal"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            
+            {/* Image Preview Block */}
+            <div className="w-full sm:w-5/12 bg-slate-50 flex items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-slate-100">
+              <img 
+                src={ProfileCoverImg} 
+                alt="PIGL Company Profile Cover" 
+                className="w-full max-w-[140px] sm:max-w-none h-auto object-contain shadow-lg border border-slate-200 transform hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            
+            {/* Content & Action Buttons */}
+            <div className="w-full sm:w-7/12 p-8 flex flex-col justify-between">
+              <div className="space-y-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-700">Publication</p>
+                <h3 className="text-xl font-black text-slate-950 tracking-tight leading-snug">Company Profile</h3>
+                <p className="text-sm font-normal text-slate-500 leading-relaxed">
+                  Would you like to download our comprehensive corporate profile presentation?
+                </p>
+              </div>
+              
+              <div className="mt-8 space-y-3">
+                <a
+                  href={ProfilePDF}
+                  download="PIGL_Company_Profile.pdf"
+                  onClick={() => setIsDownloadModalOpen(false)}
+                  className="w-full inline-flex items-center justify-center py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs uppercase tracking-widest transition-colors duration-300"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                  Confirm Download
+                </a>
+                <button
+                  onClick={() => setIsDownloadModalOpen(false)}
+                  className="w-full py-3.5 border-2 border-slate-200 text-slate-600 hover:text-slate-950 hover:border-slate-950 font-black text-xs uppercase tracking-widest transition-colors duration-300"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
