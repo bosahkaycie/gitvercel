@@ -260,7 +260,7 @@ const Home: React.FC = () => {
               onClick={() => document.getElementById('core-values')?.scrollIntoView({ behavior: 'smooth' })}
               className="sub-nav-font text-slate-600 hover:text-emerald-700 transition-colors whitespace-nowrap"
             >
-              Our organisation
+              Our Organisation
             </button>
             <button 
               onClick={() => document.getElementById('community')?.scrollIntoView({ behavior: 'smooth' })}
@@ -539,7 +539,7 @@ const Home: React.FC = () => {
       {/* 5. Our organisation */}
       <section id="core-values" className="py-24 md:py-32 bg-white reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-16 tracking-tight">Our organisation</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-16 tracking-tight">Our Organisation</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
             {/* Purpose */}
