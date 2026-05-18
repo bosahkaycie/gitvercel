@@ -182,28 +182,17 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                 >
                   <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </button>
-                {/* User Icon */}
-                <button 
-                  aria-label="User profile" 
-                  className={`p-1 transition-colors ${useDarkText ? 'text-slate-800 hover:text-emerald-700' : 'text-white hover:text-white/80'}`}
-                  onClick={() => alert('User portal coming soon!')}
+                {/* Download Profile Icon */}
+                <a 
+                  href={ProfilePDF}
+                  download="PIGL_Company_Profile.pdf"
+                  title="Download Profile"
+                  aria-label="Download Profile"
+                  className={`p-1 transition-colors flex items-center justify-center ${useDarkText ? 'text-slate-800 hover:text-emerald-700' : 'text-white hover:text-white/80'}`}
                 >
-                  <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                </button>
+                  <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                </a>
               </div>
-
-              <a
-                href={ProfilePDF}
-                download="PIGL_Company_Profile.pdf"
-                className={`ml-4 px-5 py-2.5 rounded-none font-bold text-sm tracking-wider transition-all border-2 flex items-center ${
-                  useDarkText 
-                    ? 'border-emerald-700 bg-emerald-700 text-white hover:bg-emerald-800 hover:border-emerald-800' 
-                    : 'border-white bg-white text-emerald-950 hover:bg-slate-100 hover:border-slate-100'
-                }`}
-              >
-                <svg className="w-[15px] h-[15px] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                Company Profile
-              </a>
 
               <a
                 href="#/contact"
