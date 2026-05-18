@@ -208,7 +208,7 @@ const Careers: React.FC = () => {
             <div className="flex justify-center">
               <button 
                 onClick={() => setIsFormModalOpen(true)}
-                className="inline-flex items-center justify-center px-8 py-3.5 bg-emerald-750 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-850 transition-colors"
+                className="inline-flex items-center justify-center px-8 py-3.5 bg-emerald-950 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-800 transition-colors"
               >
                 Submit CV <span className="ml-2">→</span>
               </button>
@@ -371,7 +371,7 @@ const Careers: React.FC = () => {
                     </button>
                     <button
                       type="submit"
-                      className="px-8 py-3 bg-emerald-750 text-white font-bold hover:bg-emerald-850 transition-colors"
+                      className="px-8 py-3 bg-emerald-950 text-white font-bold hover:bg-emerald-800 transition-colors"
                     >
                       Submit CV
                     </button>
@@ -527,7 +527,7 @@ const Careers: React.FC = () => {
                         setResumeFile(null);
                         setShowEmails(false);
                       }}
-                      className="px-8 py-3.5 bg-emerald-750 text-white font-bold hover:bg-emerald-850 transition-colors uppercase tracking-widest text-xs"
+                      className="px-8 py-3.5 bg-emerald-950 text-white font-bold hover:bg-emerald-800 transition-colors uppercase tracking-widest text-xs"
                     >
                       Close Window
                     </button>
