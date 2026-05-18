@@ -1,15 +1,119 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { SERVICES, PROJECTS } from '../site_data';
-import BootsImg from '../assets/boots_on_ground.jpeg';
+import BootsImg from '../assets/IMG_6170.jpg';
 import TeamLargeImg from '../assets/team_large.jpeg';
 import CareersBg from '../assets/1770736125265.jpeg';
 import TechEdgeImg from '../assets/IMG_6228.jpg';
-import NiesImg from '../assets/nies.JPG';
+import TechDrillImg from '../assets/new drill.png';
+import TechRealityImg from '../assets/newreality.jpg';
+import TechSubImg from '../assets/sub.png';
+import NiesImg from '../assets/nies new.png';
 import VideoShowcase from '../components/VideoShowcase';
+
+const CountUp: React.FC<{ end: number; duration?: number; suffix?: string }> = ({ end, duration = 2000, suffix = '' }) => {
+  const [count, setCount] = useState(0);
+  const elementRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    let startTime: number | null = null;
+    let animationFrameId: number;
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = timestamp - startTime;
+      const percentage = Math.min(progress / duration, 1);
+      
+      const easeOutQuad = (t: number) => t * (2 - t);
+      const currentCount = Math.floor(easeOutQuad(percentage) * end);
+      
+      setCount(currentCount);
+
+      if (progress < duration) {
+        animationFrameId = requestAnimationFrame(animate);
+      } else {
+        setCount(end);
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          animationFrameId = requestAnimationFrame(animate);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (elementRef.current) {
+      observer.observe(elementRef.current);
+    }
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      observer.disconnect();
+    };
+  }, [end, duration]);
+
+  return <span ref={elementRef}>{count}{suffix}</span>;
+};
 
 const Home: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
+  const techEdgeImages = [
+    { src: TechEdgeImg, alt: "Leica 3D Laser Scanning & Reality Capture" },
+    { src: TechDrillImg, alt: "Millimeter-Accurate Facility Tie-Ins & Geotechnical Exploration" },
+    { src: TechRealityImg, alt: "High-Fidelity 3D Reality Modeling & Surveys" },
+    { src: TechSubImg, alt: "Subsea Seabed Surveying & Marine Geophysics" }
+  ];
+
+  const [currentTechSlide, setCurrentTechSlide] = useState(0);
+
+  // States & Effects for 'Our industries' Auto-Sliding Carousel
+  const [visibleCards, setVisibleCards] = useState(3);
+  const [currentIndustrySlide, setCurrentIndustrySlide] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setVisibleCards(1);
+      } else if (window.innerWidth < 1024) {
+        setVisibleCards(2);
+      } else {
+        setVisibleCards(3);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const maxIndex = SERVICES.length - visibleCards;
+    if (currentIndustrySlide > maxIndex) {
+      setCurrentIndustrySlide(Math.max(0, maxIndex));
+    }
+  }, [visibleCards, currentIndustrySlide]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndustrySlide((prev) => {
+        const maxIndex = SERVICES.length - visibleCards;
+        return prev >= maxIndex ? 0 : prev + 1;
+      });
+    }, 4500); // Smooth leftward slide transitions every 4.5 seconds
+
+    return () => clearInterval(timer);
+  }, [visibleCards]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTechSlide(prev => (prev === techEdgeImages.length - 1 ? 0 : prev + 1));
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [techEdgeImages.length]);
 
   const slides = SERVICES.map(service => ({
     title: service.title,
@@ -62,27 +166,32 @@ const Home: React.FC = () => {
       <h1 className="sr-only">Polaris Integrated & GeoSolutions Limited (PIGL)</h1>
 
       {/* Hero Slider Section */}
-      <section className="relative h-[85vh] md:h-[calc(100vh-56px)] overflow-hidden bg-emerald-950">
+      <section className="relative h-[85vh] md:h-[calc(100vh-56px)] overflow-hidden bg-slate-950">
         {slides.map((slide, index) => (
           <div
             key={slide.id}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
               }`}
           >
-            <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute inset-0 overflow-hidden bg-slate-950">
               <img
                 src={slide.image}
                 alt={`${slide.title} - Advanced Geosolutions`}
-                className="w-full h-full object-cover"
-                loading="eager"
+                className={`w-full h-full object-cover transition-all duration-1000 ${
+                  index === currentSlide ? 'opacity-100' : 'opacity-0'
+                }`}
+                loading={index === 0 ? "eager" : "lazy"}
+                fetchPriority={index === 0 ? "high" : "low"}
+                decoding="async"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
+              {/* Solid even overlay for pristine text readability and image contrast */}
+              <div className="absolute inset-0 bg-slate-950/35 z-10" />
             </div>
 
-            <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-24 flex flex-col justify-end">
-              <div className="w-full flex flex-col lg:flex-row justify-between lg:items-end gap-10 lg:gap-16">
-                <div key={`${currentSlide}-left`} className={`max-w-3xl lg:max-w-4xl ${index === currentSlide ? 'animate-slide-up delay-200' : 'opacity-0'}`}>
-                  <h2 className="hero-title text-5xl sm:text-6xl lg:text-[4.8rem] text-white drop-shadow-sm">
+            <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 md:pb-12 flex flex-col justify-end z-20">
+              <div className="w-full flex flex-col lg:flex-row justify-between lg:items-center gap-10 lg:gap-16">
+                <div key={`${currentSlide}-left`} className={`max-w-xl lg:max-w-2xl ${index === currentSlide ? 'animate-slide-up delay-200' : 'opacity-0'}`}>
+                  <h2 className="hero-title text-4xl sm:text-5xl lg:text-[4.0rem] text-white drop-shadow-sm font-medium">
                     {slide.title}
                   </h2>
                 </div>
@@ -162,18 +271,80 @@ const Home: React.FC = () => {
             </a>
           </div>
 
-          <h3 className="text-2xl font-bold text-slate-900 mb-8 tracking-tight" id="our-expertise">Our industries</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {SERVICES.slice(0, 3).map((service, idx) => (
-              <a href={`#/services?id=${service.id}`} key={idx} className="group block reveal stagger-1 hover-lift">
-                <div className="relative h-64 md:h-80 overflow-hidden bg-slate-100 mb-6 rounded-none">
-                  <img src={service.image} alt={service.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                </div>
-                <h4 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors">{service.title}</h4>
-                <p className="text-slate-600 font-normal leading-relaxed line-clamp-2">{service.description}</p>
-              </a>
-            ))}
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-2xl font-bold text-slate-900 tracking-tight" id="our-expertise">Our industries</h3>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setCurrentIndustrySlide(prev => Math.max(0, prev - 1))}
+                disabled={currentIndustrySlide === 0}
+                className={`p-2.5 border border-slate-300 rounded-none text-slate-800 hover:border-emerald-700 hover:text-emerald-700 transition-colors bg-white ${
+                  currentIndustrySlide === 0 ? 'opacity-40 cursor-not-allowed' : 'opacity-100'
+                }`}
+                aria-label="Previous Industry"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setCurrentIndustrySlide(prev => Math.min(SERVICES.length - visibleCards, prev + 1))}
+                disabled={currentIndustrySlide >= SERVICES.length - visibleCards}
+                className={`p-2.5 border border-slate-300 rounded-none text-slate-800 hover:border-emerald-700 hover:text-emerald-700 transition-colors bg-white ${
+                  currentIndustrySlide >= SERVICES.length - visibleCards ? 'opacity-40 cursor-not-allowed' : 'opacity-100'
+                }`}
+                aria-label="Next Industry"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
+
+          <div className="overflow-hidden -mx-3">
+            <div 
+              className="flex transition-transform duration-500 ease-in-out"
+              style={{ transform: `translateX(-${currentIndustrySlide * (100 / visibleCards)}%)` }}
+            >
+              {SERVICES.map((service, idx) => (
+                <div 
+                  key={idx} 
+                  className="px-3 flex-shrink-0 flex"
+                  style={{ width: `${100 / visibleCards}%` }}
+                >
+                  <a href={`#/services?id=${service.id}`} className="group block bg-slate-50 border border-slate-200/60 p-6 md:p-8 hover:shadow-xl transition-shadow flex flex-col w-full hover-lift">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 mb-6 rounded-none shrink-0">
+                      <img 
+                        src={service.image} 
+                        alt={service.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                        loading="lazy" 
+                        decoding="async" 
+                      />
+                    </div>
+                    <h4 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors">{service.title}</h4>
+                    <p className="text-slate-600 font-normal leading-relaxed line-clamp-3 text-sm md:text-base flex-grow">{service.description}</p>
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Pagination Indicators */}
+          {SERVICES.length > visibleCards && (
+            <div className="flex justify-center items-center space-x-2 mt-8">
+              {Array.from({ length: SERVICES.length - visibleCards + 1 }).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentIndustrySlide(idx)}
+                  className={`h-1.5 transition-all duration-500 rounded-none ${
+                    currentIndustrySlide === idx ? 'w-8 bg-emerald-600' : 'w-2 bg-slate-300 hover:bg-slate-400'
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -182,14 +353,18 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
             <div className="space-y-4 md:space-y-6">
-              <span className="text-5xl md:text-6xl font-black text-emerald-600 block tracking-tighter">0 LTI</span>
+              <span className="text-5xl md:text-6xl font-black text-emerald-600 block tracking-tighter">
+                0<span className="text-3xl md:text-4xl ml-2 font-black uppercase tracking-normal">LTI</span>
+              </span>
               <div className="space-y-2 md:space-y-3">
                 <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">500k+ Safe Man-Hours</h3>
                 <p className="text-slate-600 text-base md:text-lg leading-relaxed font-normal">Unwavering commitment to safety across all swamp and offshore operations.</p>
               </div>
             </div>
             <div className="space-y-4 md:space-y-6">
-              <span className="text-5xl md:text-6xl font-black text-emerald-600 block tracking-tighter">100%</span>
+              <span className="text-5xl md:text-6xl font-black text-emerald-600 block tracking-tighter">
+                <CountUp end={100} suffix="%" />
+              </span>
               <div className="space-y-2 md:space-y-3">
                 <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">NCDMB Compliant</h3>
                 <p className="text-slate-600 text-base md:text-lg leading-relaxed font-normal">PIGL is a fully indigenous Nigerian company, committed to local capacity development.</p>
@@ -210,7 +385,7 @@ const Home: React.FC = () => {
       <section id="track-record" className="py-24 md:py-32 bg-white reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-end mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">Examples of our expertise</h2>
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">Our Expertise</h2>
             <a href="#/projects" className="hidden md:inline-flex items-center text-[#F97316] font-bold hover:text-orange-700 transition-colors group text-base">
               All case studies <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
             </a>
@@ -221,7 +396,7 @@ const Home: React.FC = () => {
             {PROJECTS.length > 0 && (
               <a href={`#/projects?id=${PROJECTS[0].id}`} className="md:col-span-6 group block">
                 <div className="relative aspect-[16/10] overflow-hidden mb-6 bg-slate-100">
-                  <img src={PROJECTS[0].image} alt={PROJECTS[0].title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <img src={PROJECTS[0].image} alt={PROJECTS[0].title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
                 </div>
                 <div className="space-y-3 pb-8 border-b border-slate-200">
                   <div className="flex items-center space-x-2">
@@ -241,7 +416,7 @@ const Home: React.FC = () => {
               {PROJECTS.slice(1, 3).map((project, idx) => (
                 <a href={`#/projects?id=${project.id}`} key={idx} className="group block">
                   <div className="relative aspect-square overflow-hidden mb-6 bg-slate-100">
-                    <img src={project.image} alt={project.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <img src={project.image} alt={project.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
                   </div>
                   <div className="space-y-3 pb-8 border-b border-slate-200">
                     <div className="flex items-center space-x-2">
@@ -270,13 +445,54 @@ const Home: React.FC = () => {
       <section className="py-24 md:py-32 bg-white reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            {/* Left: Image */}
-            <div className="relative">
-              <img 
-                src={TechEdgeImg} 
-                alt="Technical Edge - High-Fidelity Data" 
-                className="w-full h-auto shadow-2xl"
-              />
+            {/* Left: Image Carousel */}
+            <div className="relative overflow-hidden group shadow-2xl aspect-[4/3] w-full bg-slate-100">
+              {techEdgeImages.map((slide, idx) => (
+                <div
+                  key={idx}
+                  className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                    currentTechSlide === idx ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                  }`}
+                >
+                  <img 
+                    src={slide.src} 
+                    alt={slide.alt} 
+                    className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-[4000ms]"
+                    loading={idx === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                  />
+                </div>
+              ))}
+              
+              {/* Navigation Arrows */}
+              <button
+                onClick={() => setCurrentTechSlide(prev => (prev === 0 ? techEdgeImages.length - 1 : prev - 1))}
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-30 p-2.5 bg-black/30 hover:bg-emerald-700 hover:scale-105 text-white transition-all duration-300 opacity-0 group-hover:opacity-100 focus:outline-none"
+                aria-label="Previous slide"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              <button
+                onClick={() => setCurrentTechSlide(prev => (prev === techEdgeImages.length - 1 ? 0 : prev + 1))}
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-30 p-2.5 bg-black/30 hover:bg-emerald-700 hover:scale-105 text-white transition-all duration-300 opacity-0 group-hover:opacity-100 focus:outline-none"
+                aria-label="Next slide"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" /></svg>
+              </button>
+              
+              {/* Square Pagination Dots */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex space-x-2">
+                {techEdgeImages.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentTechSlide(idx)}
+                    className={`w-2.5 h-2.5 transition-all duration-500 ${
+                      currentTechSlide === idx ? 'bg-emerald-500 w-6' : 'bg-white/60 hover:bg-white'
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Right: Content */}
@@ -316,7 +532,7 @@ const Home: React.FC = () => {
             {/* Purpose */}
             <a href="#/about" className="group block bg-slate-50 border border-slate-100 hover:shadow-xl transition-shadow flex flex-col hover-lift">
               <div className="relative h-[250px] md:h-[350px] w-full overflow-hidden bg-slate-200 shrink-0">
-                <img src={BootsImg} alt="Our Purpose" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <img src={BootsImg} alt="Our Purpose" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" decoding="async" />
               </div>
               <div className="p-8 sm:p-10 flex-grow flex flex-col">
                 <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4 group-hover:text-emerald-700 transition-colors tracking-tight">Creating a Safe and Liveable World</h3>
@@ -332,7 +548,7 @@ const Home: React.FC = () => {
             {/* Team */}
             <a href="#/about" className="group block bg-slate-50 border border-slate-100 hover:shadow-xl transition-shadow flex flex-col hover-lift">
               <div className="relative h-[250px] md:h-[350px] w-full overflow-hidden bg-slate-200 shrink-0">
-                <img src={TeamLargeImg} alt="Leadership" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <img src={TeamLargeImg} alt="Leadership" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" decoding="async" />
               </div>
               <div className="p-8 sm:p-10 flex-grow flex flex-col">
                 <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4 group-hover:text-emerald-700 transition-colors tracking-tight">Our Team</h3>
@@ -374,6 +590,8 @@ const Home: React.FC = () => {
                   src={NiesImg} 
                   alt="PIGL at NIES 2025" 
                   className="relative w-full h-auto rounded-sm shadow-xl"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             </div>
@@ -409,6 +627,8 @@ const Home: React.FC = () => {
             src={CareersBg} 
             alt="Careers Background" 
             className="w-full h-full object-cover opacity-40 grayscale"
+            loading="lazy"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-slate-950/50" />
         </div>

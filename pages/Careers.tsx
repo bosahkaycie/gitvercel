@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import EngineerImg from '../assets/image.png';
+import CareersBg from '../assets/inspiring_next_gen.jpeg';
 
 const Careers: React.FC = () => {
   useEffect(() => {
@@ -26,19 +27,30 @@ const Careers: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-white font-sans">
       
       {/* Clean Hero Header */}
-      <section className="bg-slate-50 pt-32 pb-16 md:pt-40 md:pb-24 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-32 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={CareersBg} 
+            alt="Careers at PIGL" 
+            className="w-full h-full object-cover opacity-35 grayscale-[0.2]"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-900/50 to-transparent"></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex items-center space-x-2 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-10">
-            <a href="#/" className="hover:text-emerald-700 transition-colors">Home</a>
-            <span>/</span>
-            <span className="text-slate-900">Careers</span>
+            <a href="#/" className="hover:text-white transition-colors">Home</a>
+            <span className="text-slate-600">/</span>
+            <span className="text-white">Careers</span>
           </div>
           
           <div className="max-w-4xl">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 leading-tight tracking-tight mb-8">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight mb-8">
               Careers at PIGL
             </h1>
-            <p className="text-xl md:text-2xl text-slate-600 font-normal leading-relaxed">
+            <p className="text-xl md:text-2xl text-slate-300 font-normal leading-relaxed">
               Building the future of Sub-Saharan energy requires the sharpest minds. Come innovate with us and help create a safe and liveable world.
             </p>
           </div>
@@ -71,7 +83,7 @@ const Careers: React.FC = () => {
             </div>
             
             <div className="relative h-[400px] md:h-[600px] bg-slate-100">
-              <img src={EngineerImg} alt="Engineer at work" className="w-full h-full object-cover" />
+              <img src={EngineerImg} alt="Engineer at work" className="w-full h-full object-cover" loading="lazy" decoding="async" />
             </div>
           </div>
         </div>

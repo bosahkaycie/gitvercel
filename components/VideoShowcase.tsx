@@ -37,6 +37,8 @@ const VideoShowcase: React.FC = () => {
                                     src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
                                     alt={video.title}
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                                 {/* Play Button Overlay */}
                                 <div className="absolute inset-0 bg-emerald-950/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">

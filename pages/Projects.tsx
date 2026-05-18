@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PROJECTS } from '../site_data';
 import BrianImg from '../assets/management/brian.png';
 import SteveImg from '../assets/management/steve.png';
+import ProjectsBg from '../assets/slider.jpeg';
 
 const Projects: React.FC = () => {
   const [filter, setFilter] = useState<'All' | 'Integrated' | 'Geosolutions' | 'Civil' | 'Pipeline'>('All');
@@ -52,19 +53,30 @@ const Projects: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-white font-sans">
       
       {/* Clean Hero Header */}
-      <section className="bg-slate-50 pt-32 pb-16 md:pt-40 md:pb-24 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-2 text-sm font-bold text-slate-500 mb-8 tracking-wide">
-            <a href="#/" className="hover:text-emerald-700 transition-colors">Home</a>
-            <span>/</span>
-            <span className="text-emerald-700">Case studies</span>
+      <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-32 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={ProjectsBg} 
+            alt="Executed Projects" 
+            className="w-full h-full object-cover opacity-35 grayscale-[0.2]"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-900/50 to-transparent"></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex items-center space-x-2 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-10">
+            <a href="#/" className="hover:text-white transition-colors">Home</a>
+            <span className="text-slate-600">/</span>
+            <span className="text-white">Case studies</span>
           </div>
           
           <div className="max-w-4xl">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 leading-tight tracking-tight mb-8">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight mb-8">
               Executed Projects
             </h1>
-            <p className="text-xl md:text-2xl text-slate-600 font-normal leading-relaxed">
+            <p className="text-xl md:text-2xl text-slate-300 font-normal leading-relaxed">
               A showcase of operational excellence, precision engineering, and safety-first delivery across the Nigerian energy landscape.
             </p>
           </div>
@@ -106,6 +118,8 @@ const Projects: React.FC = () => {
                         src={project.image}
                         alt={project.title}
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                        loading="lazy"
+                        decoding="async"
                       />
                       <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/10 transition-colors pointer-events-none" />
                     </div>
@@ -173,6 +187,8 @@ const Projects: React.FC = () => {
                             src={project.image} 
                             alt={project.title} 
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                            loading="lazy"
+                            decoding="async"
                           />
                         </div>
                         {/* Technical Tag Overlay */}
@@ -186,12 +202,8 @@ const Projects: React.FC = () => {
                     {/* Data Grid Summary Bar */}
                     <div className="border-t border-b border-slate-200 bg-white">
                       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
-                        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-slate-200">
+                        <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-200">
                           <div className="py-10 pr-6">
-                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Client</h4>
-                            <p className="text-lg font-bold text-slate-900">{project.client}</p>
-                          </div>
-                          <div className="py-10 px-6 lg:px-10">
                             <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Location</h4>
                             <p className="text-lg font-bold text-slate-900">{project.location || 'Nigeria'}</p>
                           </div>
@@ -272,6 +284,8 @@ const Projects: React.FC = () => {
                                   src={project.id === 'p3' ? BrianImg : SteveImg} 
                                   alt="Expert" 
                                   className="w-20 h-20 object-cover rounded-none grayscale"
+                                  loading="lazy"
+                                  decoding="async"
                                 />
                                 <div>
                                   <p className="font-black text-slate-900">{project.id === 'p3' ? "Brian Akpotowo" : "Steve Ubani"}</p>

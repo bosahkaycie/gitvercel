@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { ASSETS } from '../site_data';
+import NewsBg from '../assets/IMG_6614.jpg';
 
 
 const News: React.FC = () => {
@@ -36,26 +37,30 @@ const News: React.FC = () => {
     <div className="flex flex-col bg-white font-sans">
       
       {/* Hero Section - Fugro Style */}
-      <section className="bg-emerald-950 pt-32 pb-16 md:pt-40 md:pb-32 relative overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-20">
+      <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-32 overflow-hidden">
+        <div className="absolute inset-0 z-0">
           <img 
-            src={ASSETS.front} 
+            src={NewsBg} 
             alt="News Background" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover opacity-35 grayscale-[0.2]"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
           />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-900/50 to-transparent"></div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex items-center space-x-2 text-[11px] font-black uppercase tracking-[0.2em] text-emerald-400 mb-10">
+          <div className="flex items-center space-x-2 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-10">
             <a href="#/" className="hover:text-white transition-colors">Home</a>
-            <span className="text-emerald-800">/</span>
+            <span className="text-slate-600">/</span>
             <span className="text-white">News & Insights</span>
           </div>
           
           <div className="max-w-4xl">
-            <h1 className="hero-title text-4xl text-white animate-slide-up">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight mb-8">
               Latest Developments
             </h1>
-            <p className="text-xl md:text-2xl text-emerald-100/80 font-normal leading-relaxed max-w-2xl animate-slide-up delay-100">
+            <p className="text-xl md:text-2xl text-slate-300 font-normal leading-relaxed">
               Stay updated on our 20-year journey of technical excellence, project milestones, and innovations in the African energy sector.
             </p>
           </div>
@@ -156,6 +161,8 @@ const News: React.FC = () => {
                   src={ASSETS.team} 
                   alt="Heritage Work" 
                   className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               <div className="absolute -bottom-8 -left-8 bg-white p-8 border border-slate-200 shadow-xl hidden md:block">

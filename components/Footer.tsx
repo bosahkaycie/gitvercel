@@ -1,4 +1,5 @@
 import React from 'react';
+import LogoImg from '../assets/logo.png';
 
 const Footer: React.FC = () => {
   return (
@@ -6,8 +7,14 @@ const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
           <div className="space-y-6 lg:col-span-1">
-            <div className="flex items-center space-x-3">
-              <span className="text-3xl font-black tracking-tighter text-slate-900">PIGL</span>
+            <div className="flex items-center">
+              <img
+                src={LogoImg}
+                alt="Polaris Integrated & Geosolutions Logo"
+                className="h-10 md:h-12 w-auto object-contain"
+                loading="lazy"
+                decoding="async"
+              />
             </div>
             <p className="text-slate-600 leading-relaxed text-sm max-w-xs font-normal">
               Technical integrity for a safer energy future through high-fidelity engineering and geosolutions across Sub-Saharan Africa.

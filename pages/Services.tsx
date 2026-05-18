@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { SERVICES } from '../site_data';
-import ServiceBg from '../assets/DSC_0090.jpg';
+import ServiceBg from '../assets/newpipeline.png';
 
 const Services: React.FC = () => {
   useEffect(() => {
@@ -44,19 +44,30 @@ const Services: React.FC = () => {
     <div className="flex flex-col bg-white font-sans">
       
       {/* Clean Hero Header */}
-      <section className="bg-slate-50 pt-32 pb-16 md:pt-40 md:pb-24 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-32 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={ServiceBg} 
+            alt="Advanced Geosolutions" 
+            className="w-full h-full object-cover opacity-35 grayscale-[0.2]"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-900/50 to-transparent"></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex items-center space-x-2 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-10">
-            <a href="#/" className="hover:text-emerald-700 transition-colors">Home</a>
-            <span>/</span>
-            <span className="text-slate-900">Services</span>
+            <a href="#/" className="hover:text-white transition-colors">Home</a>
+            <span className="text-slate-600">/</span>
+            <span className="text-white">Services</span>
           </div>
           
           <div className="max-w-4xl">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 leading-tight tracking-tight mb-8">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight mb-8">
               Advanced Geosolutions
             </h1>
-            <p className="text-xl md:text-2xl text-slate-600 font-normal leading-relaxed">
+            <p className="text-xl md:text-2xl text-slate-300 font-normal leading-relaxed">
               Integrated precision engineering services for the future of Energy & Infrastructure. We deliver high-fidelity data and technical assurance for complex operations.
             </p>
           </div>
@@ -74,6 +85,8 @@ const Services: React.FC = () => {
                     src={service.image}
                     alt={`${service.title} - Specialist Engineering by PIGL`}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute top-4 right-4 bg-emerald-700 text-white p-3 shadow-sm">
                     <span className="text-2xl">{service.icon}</span>

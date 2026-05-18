@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import LightLogo from '../assets/fav.jpg';
-import DarkLogo from '../assets/fav_dark.jpg';
-import BootsImg from '../assets/boots_on_ground.jpeg';
+import LogoDarkImg from '../assets/logo.png';
+import LogoLightImg from '../assets/logo_light.png';
+import BootsImg from '../assets/IMG_6170.jpg';
 import { SERVICES, PROJECTS } from '../site_data';
 
 interface NavbarProps {
   currentPath?: string;
+  onSearchClick?: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ currentPath = '' }) => {
+const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -130,15 +131,15 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '' }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <a href="#/" className="flex items-center space-x-2 md:space-x-3 group outline-none" onClick={() => setIsOpen(false)}>
+              <a href="#/" className="flex items-center group outline-none" onClick={() => setIsOpen(false)}>
                 <img
-                  src={useDarkText ? DarkLogo : LightLogo}
-                  alt="PIGL Logo"
-                  className={`w-10 h-10 md:w-12 md:h-12 object-contain transition-all duration-500 ${scrolled || activeDropdown ? 'scale-90 md:scale-100' : ''}`}
+                  src={useDarkText ? LogoDarkImg : LogoLightImg}
+                  alt="Polaris Integrated & Geosolutions Logo"
+                  className="h-10 md:h-12 w-auto object-contain transition-all duration-500"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
                 />
-                <div className="flex flex-col">
-                  <span className={`font-black text-lg md:text-xl leading-none tracking-tight transition-colors duration-500 ${useDarkText ? 'text-emerald-950' : 'text-white'}`}>PIGL</span>
-                </div>
               </a>
             </div>
 
@@ -176,7 +177,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '' }) => {
                 <button 
                   aria-label="Search" 
                   className={`p-1 transition-colors ${useDarkText ? 'text-slate-800 hover:text-emerald-700' : 'text-white hover:text-white/80'}`}
-                  onClick={() => alert('Search feature coming soon!')}
+                  onClick={onSearchClick}
                 >
                   <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </button>
@@ -203,7 +204,16 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '' }) => {
             </div>
 
             {/* Mobile Toggle Button */}
-            <div className="lg:hidden flex items-center">
+            <div className="lg:hidden flex items-center space-x-3">
+              {/* Mobile Search Icon */}
+              <button 
+                onClick={onSearchClick}
+                aria-label="Search" 
+                className={`p-2 transition-colors duration-300 focus:outline-none ${useDarkText ? 'text-emerald-950 hover:text-emerald-700' : 'text-white hover:text-white/80'}`}
+              >
+                <svg className="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              </button>
+              
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={`p-2 transition-colors duration-300 focus:outline-none ${useDarkText ? 'text-emerald-950' : 'text-white'}`}
@@ -296,6 +306,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '' }) => {
                           src={link.featured.image} 
                           alt={link.featured.title} 
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                          loading="lazy"
+                          decoding="async"
                         />
                         <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent z-20">
                           {link.featured.category && (

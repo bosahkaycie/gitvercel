@@ -14,9 +14,11 @@ import HSSE from './pages/HSSE';
 import AIChatbot from './components/AIChatbot';
 import ScrollToTop from './components/ScrollToTop';
 import WhatsAppButton from './components/WhatsAppButton';
+import SearchOverlay from './components/SearchOverlay';
 
 const App: React.FC = () => {
   const [currentPath, setCurrentPath] = useState(window.location.hash || '#/');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -120,13 +122,14 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar currentPath={currentPath} />
+      <Navbar currentPath={currentPath} onSearchClick={() => setIsSearchOpen(true)} />
       <main className="flex-grow">
         {renderPage()}
       </main>
       <Footer />
       <WhatsAppButton />
       <ScrollToTop />
+      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </div>
   );
 };

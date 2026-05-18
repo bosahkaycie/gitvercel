@@ -12,7 +12,7 @@ const WhatsAppButton: React.FC = () => {
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-24 right-8 z-50 group flex items-center"
+      className="fixed bottom-8 right-8 z-50 group flex items-center"
       aria-label="Chat on WhatsApp"
     >
       <div className="bg-white text-emerald-900 px-4 py-2 mr-2 shadow-xl border border-emerald-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:block whitespace-nowrap text-sm font-medium">

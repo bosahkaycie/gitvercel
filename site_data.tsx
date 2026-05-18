@@ -4,10 +4,10 @@ import RealityCaptureImg from './assets/DJI_0191.JPG';
 import GeosolutionsImg from './assets/DJI_0003.jpg';
 import PipelineImg from './assets/DJI_0240.jpg';
 import CivilWorksImg from './assets/road-feat-700x500.jpg';
-import IntegratedImg from './assets/procure.jpg';
+import IntegratedImg from './assets/cabin.png';
 import AkkImg from './assets/akk_pipeline.png';
 import RigImg from './assets/rig_positioning.png';
-import FacilityImg from './assets/dji_fly_20240925_101740_268_1727256105225_photo.jpg';
+import FacilityImg from './assets/new capture.png';
 import DrillingImg from './assets/drilling.png';
 import RoadImg from './assets/road.png';
 import SubImg from './assets/sub.png';
@@ -26,6 +26,7 @@ import TechImg from './assets/IMG_6170.jpg';
 import NextGenImg from './assets/inspiring_next_gen.jpeg';
 import TeamImg from './assets/team.jpeg';
 import DigiTwinImg from './assets/digitwin.png';
+import OceanImg from './assets/new ocean.png';
 
 
 
@@ -64,8 +65,8 @@ export const CORE_VALUES: CoreValue[] = [
 export const SERVICES: Service[] = [
   {
     id: 'oil-and-gas',
-    title: 'Technical integrity for a safer energy future',
-    description: 'Providing high-fidelity engineering and advanced geosolutions for Swamp, Land, and Offshore operations, ensuring safety and operational excellence.',
+    title: 'Subsea Scanning & Seabed Mapping',
+    description: 'Utilizing state-of-the-art multi-beam echo sounders and sub-bottom profilers to unlock deep sub-surface insights for secure offshore pipeline routes, rig positioning, and marine engineering.',
     icon: '',
     image: SliderImg,
     items: [
@@ -103,7 +104,7 @@ export const SERVICES: Service[] = [
   },
   {
     id: 'pipeline',
-    title: 'Pipeline integrity and facility construction',
+    title: 'Pipeline Integrity & Facility Construction',
     description: 'Indigenous leader in pipeline maintenance and facility support, specializing in API-standard welding, fabrication, and comprehensive integrity testing.',
     icon: '',
     image: PipelineImg,
@@ -126,6 +127,19 @@ export const SERVICES: Service[] = [
       'Industrial Water Borehole Drilling',
       'Technical Manpower Supply',
       'Asset Management Solutions'
+    ]
+  },
+  {
+    id: 'deepwater',
+    title: 'Deepwater Offshore & Hydrographic Solutions',
+    description: 'Providing end-to-end hydrographic, oceanographic, and geotechnical support to secure deepwater exploration, pipeline routing, and offshore marine developments.',
+    icon: '',
+    image: OceanImg,
+    items: [
+      'Deepwater Bathymetric Survey',
+      'Sub-Surface Stratum Mapping',
+      'Seabed Feature Classification',
+      'Marine Geotechnical Support'
     ]
   },
 ];
