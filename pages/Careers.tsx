@@ -52,7 +52,11 @@ const Careers: React.FC = () => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.phone || !resumeFile) return;
+    if (!formData.name || !formData.email || !formData.phone) return;
+    if (!resumeFile) {
+      alert("Please upload your resume (PDF, DOC, or DOCX) first.");
+      return;
+    }
 
     setStatus('submitting');
     setUploadProgress(0);
@@ -201,19 +205,13 @@ const Careers: React.FC = () => {
             <p className="text-slate-600 mb-8 font-normal text-base">
               Send your CV and a brief cover letter to our recruitment team for future openings in engineering, surveying, reality capture, and swamp/offshore operations.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex justify-center">
               <button 
                 onClick={() => setIsFormModalOpen(true)}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 bg-emerald-750 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-850 transition-colors"
+                className="inline-flex items-center justify-center px-8 py-3.5 bg-emerald-750 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-850 transition-colors"
               >
-                Apply via Portal <span className="ml-2">→</span>
+                Submit CV <span className="ml-2">→</span>
               </button>
-              <a 
-                href="mailto:careers@polarisigl.com" 
-                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 border-2 border-emerald-950 text-emerald-950 font-black text-xs uppercase tracking-widest hover:bg-emerald-950 hover:text-white transition-colors"
-              >
-                Submit via Email <span className="ml-2">→</span>
-              </a>
             </div>
           </div>
         </div>
@@ -373,8 +371,7 @@ const Careers: React.FC = () => {
                     </button>
                     <button
                       type="submit"
-                      disabled={!resumeFile}
-                      className="px-8 py-3 bg-emerald-750 text-white font-bold hover:bg-emerald-850 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-8 py-3 bg-emerald-750 text-white font-bold hover:bg-emerald-850 transition-colors"
                     >
                       Submit CV
                     </button>
