@@ -74,7 +74,11 @@ const Home: React.FC = () => {
 
   // States & Effects for 'Our industries' Auto-Sliding Carousel
   const [visibleCards, setVisibleCards] = useState(3);
-  const [currentIndustrySlide, setCurrentIndustrySlide] = useState(0);
+  
+  // Extended services for infinite loop
+  const extendedServices = [...SERVICES, ...SERVICES, ...SERVICES];
+  const [currentIndustrySlide, setCurrentIndustrySlide] = useState(SERVICES.length);
+  const [isTransitioning, setIsTransitioning] = useState(true);
 
   useEffect(() => {
     const handleResize = () => {
@@ -91,19 +95,49 @@ const Home: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const handleNext = () => {
+    setCurrentIndustrySlide(prev => prev + 1);
+  };
+
+  const handlePrev = () => {
+    setCurrentIndustrySlide(prev => prev - 1);
+  };
+
+  // Seamless jump effect at borders
   useEffect(() => {
-    const maxIndex = SERVICES.length - visibleCards;
-    if (currentIndustrySlide > maxIndex) {
-      setCurrentIndustrySlide(Math.max(0, maxIndex));
+    const minBound = SERVICES.length;
+    const maxBound = SERVICES.length * 2;
+
+    if (currentIndustrySlide >= maxBound) {
+      const timeout = setTimeout(() => {
+        setIsTransitioning(false);
+        setCurrentIndustrySlide(currentIndustrySlide - SERVICES.length);
+      }, 500); // matches the CSS transition duration
+      return () => clearTimeout(timeout);
     }
-  }, [visibleCards, currentIndustrySlide]);
+
+    if (currentIndustrySlide < minBound) {
+      const timeout = setTimeout(() => {
+        setIsTransitioning(false);
+        setCurrentIndustrySlide(currentIndustrySlide + SERVICES.length);
+      }, 500);
+      return () => clearTimeout(timeout);
+    }
+  }, [currentIndustrySlide]);
+
+  // Restore transition state
+  useEffect(() => {
+    if (!isTransitioning) {
+      const raf = requestAnimationFrame(() => {
+        setIsTransitioning(true);
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [isTransitioning]);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentIndustrySlide((prev) => {
-        const maxIndex = SERVICES.length - visibleCards;
-        return prev >= maxIndex ? 0 : prev + 1;
-      });
+      handleNext();
     }, 4500); // Smooth leftward slide transitions every 4.5 seconds
 
     return () => clearInterval(timer);
@@ -289,11 +323,8 @@ const Home: React.FC = () => {
             <h3 className="text-2xl font-bold text-slate-900 tracking-tight" id="our-expertise">Our industries</h3>
             <div className="flex items-center space-x-2">
               <button
-                onClick={() => setCurrentIndustrySlide(prev => Math.max(0, prev - 1))}
-                disabled={currentIndustrySlide === 0}
-                className={`p-2.5 border border-slate-300 rounded-none text-slate-800 hover:border-emerald-700 hover:text-emerald-700 transition-colors bg-white ${
-                  currentIndustrySlide === 0 ? 'opacity-40 cursor-not-allowed' : 'opacity-100'
-                }`}
+                onClick={handlePrev}
+                className="p-2.5 border border-slate-300 rounded-none text-slate-800 hover:border-emerald-700 hover:text-emerald-700 transition-colors bg-white opacity-100"
                 aria-label="Previous Industry"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -301,11 +332,8 @@ const Home: React.FC = () => {
                 </svg>
               </button>
               <button
-                onClick={() => setCurrentIndustrySlide(prev => Math.min(SERVICES.length - visibleCards, prev + 1))}
-                disabled={currentIndustrySlide >= SERVICES.length - visibleCards}
-                className={`p-2.5 border border-slate-300 rounded-none text-slate-800 hover:border-emerald-700 hover:text-emerald-700 transition-colors bg-white ${
-                  currentIndustrySlide >= SERVICES.length - visibleCards ? 'opacity-40 cursor-not-allowed' : 'opacity-100'
-                }`}
+                onClick={handleNext}
+                className="p-2.5 border border-slate-300 rounded-none text-slate-800 hover:border-emerald-700 hover:text-emerald-700 transition-colors bg-white opacity-100"
                 aria-label="Next Industry"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -317,10 +345,10 @@ const Home: React.FC = () => {
 
           <div className="overflow-hidden -mx-3">
             <div 
-              className="flex transition-transform duration-500 ease-in-out"
+              className={`flex ${isTransitioning ? 'transition-transform duration-500 ease-in-out' : ''}`}
               style={{ transform: `translateX(-${currentIndustrySlide * (100 / visibleCards)}%)` }}
             >
-              {SERVICES.map((service, idx) => (
+              {extendedServices.map((service, idx) => (
                 <div 
                   key={idx} 
                   className="px-3 flex-shrink-0 flex"
@@ -345,20 +373,23 @@ const Home: React.FC = () => {
           </div>
 
           {/* Pagination Indicators */}
-          {SERVICES.length > visibleCards && (
-            <div className="flex justify-center items-center space-x-2 mt-8">
-              {Array.from({ length: SERVICES.length - visibleCards + 1 }).map((_, idx) => (
+          <div className="flex justify-center items-center space-x-2 mt-8">
+            {SERVICES.map((_, idx) => {
+              const activeDotIndex = ((currentIndustrySlide - SERVICES.length) % SERVICES.length + SERVICES.length) % SERVICES.length;
+              return (
                 <button
                   key={idx}
-                  onClick={() => setCurrentIndustrySlide(idx)}
+                  onClick={() => {
+                    setCurrentIndustrySlide(SERVICES.length + idx);
+                  }}
                   className={`h-1.5 transition-all duration-500 rounded-none ${
-                    currentIndustrySlide === idx ? 'w-8 bg-emerald-600' : 'w-2 bg-slate-300 hover:bg-slate-400'
+                    activeDotIndex === idx ? 'w-8 bg-emerald-600' : 'w-2 bg-slate-300 hover:bg-slate-400'
                   }`}
                   aria-label={`Go to slide ${idx + 1}`}
                 />
-              ))}
-            </div>
-          )}
+              );
+            })}
+          </div>
         </div>
       </section>
 
