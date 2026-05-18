@@ -3,6 +3,7 @@ import LogoDarkImg from '../assets/LOGO.png';
 import LogoLightImg from '../assets/logo_light.png';
 import BootsImg from '../assets/IMG_6170.jpg';
 import { SERVICES, PROJECTS } from '../site_data';
+import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
 
 interface NavbarProps {
   currentPath?: string;
@@ -190,6 +191,19 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                   <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                 </button>
               </div>
+
+              <a
+                href={ProfilePDF}
+                download="PIGL_Company_Profile.pdf"
+                className={`ml-4 px-5 py-2.5 rounded-none font-bold text-sm tracking-wider transition-all border-2 flex items-center ${
+                  useDarkText 
+                    ? 'border-emerald-700 bg-emerald-700 text-white hover:bg-emerald-800 hover:border-emerald-800' 
+                    : 'border-white bg-white text-emerald-950 hover:bg-slate-100 hover:border-slate-100'
+                }`}
+              >
+                <svg className="w-[15px] h-[15px] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                Company Profile
+              </a>
 
               <a
                 href="#/contact"
@@ -405,6 +419,15 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                 <span className="font-bold text-[10px] uppercase tracking-widest">Profile</span>
               </button>
             </div>
+             <a
+              href={ProfilePDF}
+              download="PIGL_Company_Profile.pdf"
+              onClick={() => setIsOpen(false)}
+              className="w-full text-center py-3.5 bg-emerald-750 text-white font-black text-sm uppercase tracking-widest hover:bg-emerald-850 transition-all block mb-3"
+            >
+              Company Profile
+            </a>
+
             <a
               href="#/contact"
               onClick={() => setIsOpen(false)}

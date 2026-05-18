@@ -9,6 +9,7 @@ import TechRealityImg from '../assets/newreality.jpg';
 import TechSubImg from '../assets/sub.png';
 import NiesImg from '../assets/nies new.png';
 import VideoShowcase from '../components/VideoShowcase';
+import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
 
 const CountUp: React.FC<{ end: number; duration?: number; suffix?: string }> = ({ end, duration = 2000, suffix = '' }) => {
   const [count, setCount] = useState(0);
@@ -202,14 +203,27 @@ const Home: React.FC = () => {
                     <p className="text-lg sm:text-xl lg:text-[22px] text-white font-normal drop-shadow-md leading-relaxed">
                       {slide.description}
                     </p>
-                    <div 
-                      className="flex items-center space-x-6 group cursor-pointer w-fit"
-                      onClick={() => setIsVideoModalOpen(true)}
-                    >
-                      <div className="flex items-center justify-center w-12 h-12 lg:w-16 lg:h-16 border border-white group-hover:bg-white group-hover:text-emerald-900 transition-all duration-300 rounded-none text-white">
-                        <svg className="w-5 h-5 lg:w-6 lg:h-6 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 md:gap-8 pt-2">
+                      <div 
+                        className="flex items-center space-x-4 group cursor-pointer w-fit"
+                        onClick={() => setIsVideoModalOpen(true)}
+                      >
+                        <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 border border-white/60 group-hover:bg-white group-hover:text-emerald-950 transition-all duration-300 rounded-none text-white">
+                          <svg className="w-4 h-4 lg:w-5 lg:h-5 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                        </div>
+                        <span className="text-white font-bold text-xs lg:text-sm uppercase tracking-widest group-hover:text-emerald-400 transition-colors">Watch our story</span>
                       </div>
-                      <span className="text-white font-normal text-sm lg:text-lg group-hover:text-emerald-400 transition-colors">Watch our story</span>
+
+                      <a 
+                        href={ProfilePDF}
+                        download="PIGL_Company_Profile.pdf"
+                        className="flex items-center space-x-4 group cursor-pointer w-fit"
+                      >
+                        <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 border border-white/60 group-hover:bg-white group-hover:text-emerald-950 transition-all duration-300 rounded-none text-white">
+                          <svg className="w-4 h-4 lg:w-5 lg:h-5 fill-none stroke-current" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        </div>
+                        <span className="text-white font-bold text-xs lg:text-sm uppercase tracking-widest group-hover:text-emerald-400 transition-colors">Company Profile</span>
+                      </a>
                     </div>
                   </div>
                 </div>

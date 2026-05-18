@@ -2,6 +2,7 @@ import React from 'react';
 import { TEAM } from '../site_data';
 import BootsImg from '../assets/IMG_6170.jpg';
 import AboutBg from '../assets/teaching.jpeg';
+import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
 
 const About: React.FC = () => {
   React.useEffect(() => {
@@ -94,6 +95,16 @@ const About: React.FC = () => {
                   <p className="text-3xl font-bold text-slate-900 leading-none">NCDMB</p>
                   <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest mt-2">Compliant Partner</p>
                 </div>
+              </div>
+              <div className="pt-6">
+                <a
+                  href={ProfilePDF}
+                  download="PIGL_Company_Profile.pdf"
+                  className="inline-flex items-center px-8 py-3.5 border-2 border-emerald-950 text-emerald-950 font-bold hover:bg-emerald-950 hover:text-white transition-colors"
+                >
+                  <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                  Download Company Profile
+                </a>
               </div>
             </div>
             <div className="relative h-[400px] md:h-[600px] bg-slate-100">
