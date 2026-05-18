@@ -455,7 +455,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
             {/* Content & Action Buttons */}
             <div className="w-full sm:w-7/12 p-8 flex flex-col justify-between">
               <div className="space-y-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-700">Publication</p>
                 <h3 className="text-xl font-black text-slate-950 tracking-tight leading-snug">Company Profile</h3>
                 <p className="text-sm font-normal text-slate-500 leading-relaxed">
                   Would you like to download our comprehensive corporate profile presentation?
