@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import LogoDarkImg from '../assets/logo.png';
+import LogoDarkImg from '../assets/LOGO.png';
 import LogoLightImg from '../assets/logo_light.png';
 import BootsImg from '../assets/IMG_6170.jpg';
 import { SERVICES, PROJECTS } from '../site_data';
