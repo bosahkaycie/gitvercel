@@ -512,7 +512,6 @@ const Home: React.FC = () => {
             {/* Right: Content */}
             <div className="space-y-8">
               <div className="space-y-4">
-                <span className="text-emerald-600 font-bold text-xs uppercase tracking-[0.2em] block">Technical Edge</span>
                 <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight leading-[1.1]">
                   High-Fidelity Data for Complex Environments
                 </h2>
