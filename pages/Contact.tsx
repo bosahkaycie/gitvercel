@@ -1,5 +1,6 @@
 import React from 'react';
 import ContactBg from '../assets/slider.jpeg';
+import { CONTACT_CONFIG } from '../site_data';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = React.useState({
@@ -127,24 +128,32 @@ const Contact: React.FC = () => {
                   <div className="flex items-start space-x-6 bg-slate-50 p-6 border border-slate-200">
                     <div className="text-2xl">📍</div>
                     <address className="not-italic text-lg text-slate-700 leading-relaxed font-medium">
-                      #3, Diamond Close, Castle & Green Estate,<br />
-                      Off Eneka Link Road, Port Harcourt,<br />
-                      Rivers State, Nigeria
+                      {CONTACT_CONFIG.address}
                     </address>
                   </div>
                   
                   <div className="flex items-start space-x-6 bg-slate-50 p-6 border border-slate-200">
                     <div className="text-2xl">📞</div>
                     <div className="text-lg text-slate-700 font-medium">
-                      <p>+234-(0) 809 7081 333</p>
+                      <a href={`tel:${CONTACT_CONFIG.phoneRaw}`} className="hover:text-emerald-700 transition-colors">
+                        {CONTACT_CONFIG.phone}
+                      </a>
                     </div>
                   </div>
                   
                   <div className="flex items-start space-x-6 bg-slate-50 p-6 border border-slate-200">
                     <div className="text-2xl">📧</div>
                     <div className="text-lg text-slate-700 font-medium">
-                      <p>info@polarisigl.com</p>
-                      <p>support@polarisigl.com</p>
+                      <p>
+                        <a href={`mailto:${CONTACT_CONFIG.emailInfo}`} className="hover:text-emerald-700 transition-colors">
+                          {CONTACT_CONFIG.emailInfo}
+                        </a>
+                      </p>
+                      <p>
+                        <a href={`mailto:${CONTACT_CONFIG.emailSupport}`} className="hover:text-emerald-700 transition-colors">
+                          {CONTACT_CONFIG.emailSupport}
+                        </a>
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -165,115 +174,132 @@ const Contact: React.FC = () => {
 
             {/* Form */}
             <div className="bg-slate-50 p-8 md:p-12 border border-slate-200">
-              <h3 className="text-3xl font-bold text-slate-900 mb-8 tracking-tight">Send a Message</h3>
-
-              {status.message && (
-                <div className={`p-6 mb-8 flex items-center space-x-4 border ${status.type === 'success'
-                  ? 'bg-emerald-50 border-emerald-500 text-emerald-900'
-                  : 'bg-red-50 border-red-500 text-red-900'
-                  }`}>
-                  <span className="text-xl">
-                    {status.type === 'success' ? '✅' : '⚠️'}
-                  </span>
-                  <p className="font-bold text-sm tracking-wide">{status.message}</p>
-                </div>
-              )}
-
-              <form className="space-y-6" onSubmit={handleSubmit}>
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className={`text-xs font-bold uppercase tracking-wider ${errors.name ? 'text-red-600' : 'text-slate-700'}`}>
-                      Full Name {errors.name && '*'}
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={(e) => {
-                        handleChange(e);
-                        if (errors.name) setErrors({ ...errors, name: false });
-                      }}
-                      className={`w-full px-6 py-4 bg-white border outline-none transition-colors ${errors.name ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700'
-                        }`}
-                      placeholder="John Doe"
-                      required
-                    />
+              {status.type === 'success' ? (
+                <div className="flex flex-col items-center justify-center text-center py-12 space-y-6">
+                  <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-200 shadow-sm">
+                    <span className="text-4xl text-emerald-600">✅</span>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <label className={`text-xs font-bold uppercase tracking-wider ${errors.email ? 'text-red-600' : 'text-slate-700'}`}>
-                      Email Address {errors.email && '*'}
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={(e) => {
-                        handleChange(e);
-                        if (errors.email) setErrors({ ...errors, email: false });
-                      }}
-                      className={`w-full px-6 py-4 bg-white border outline-none transition-colors ${errors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700'
-                        }`}
-                      placeholder="john@example.com"
-                      required
-                    />
+                  <div className="space-y-2 max-w-md">
+                    <h3 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Message Sent!</h3>
+                    <p className="text-slate-600 font-medium leading-relaxed">
+                      {status.message}
+                    </p>
                   </div>
-                </div>
-                
-                {/* Honeypot field - Hidden from humans, bots will fill it */}
-                <div className="hidden" aria-hidden="true">
-                  <input
-                    type="text"
-                    name="website"
-                    value={formData.website}
-                    onChange={handleChange}
-                    tabIndex={-1}
-                    autoComplete="off"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Service Required</label>
-                  <select
-                    name="service"
-                    value={formData.service}
-                    onChange={handleChange}
-                    className="w-full px-6 py-4 bg-white border border-slate-300 focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 outline-none transition-colors appearance-none"
+                  <button
+                    onClick={() => setStatus({ type: null, message: '' })}
+                    className="px-8 py-3 bg-emerald-950 text-white font-bold hover:bg-emerald-800 transition-colors uppercase tracking-wider text-xs"
                   >
-                    <option>Geosolutions Services</option>
-                    <option>Integrated Services</option>
-                    <option>Pipeline Construction</option>
-                    <option>Civil Works</option>
-                    <option>Other Enquiry</option>
-                  </select>
+                    Send Another Message
+                  </button>
                 </div>
-                
-                <div className="space-y-2">
-                  <label className={`text-xs font-bold uppercase tracking-wider ${errors.message ? 'text-red-600' : 'text-slate-700'}`}>
-                    Your Message {errors.message && '*'}
-                  </label>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={(e) => {
-                      handleChange(e);
-                      if (errors.message) setErrors({ ...errors, message: false });
-                    }}
-                    className={`w-full px-6 py-4 bg-white border outline-none transition-colors h-40 ${errors.message ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700'
-                      }`}
-                    placeholder="How can we help you?"
-                    required
-                  ></textarea>
-                </div>
-                
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`w-full py-4 bg-emerald-950 text-white font-bold hover:bg-emerald-800 transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
-                >
-                  {isSubmitting ? 'Sending...' : 'Send Request'}
-                </button>
-              </form>
+              ) : (
+                <>
+                  <h3 className="text-3xl font-bold text-slate-900 mb-8 tracking-tight">Send a Message</h3>
+
+                  {status.message && (
+                    <div className="p-6 mb-8 flex items-center space-x-4 border bg-red-50 border-red-500 text-red-900">
+                      <span className="text-xl">⚠️</span>
+                      <p className="font-bold text-sm tracking-wide">{status.message}</p>
+                    </div>
+                  )}
+
+                  <form className="space-y-6" onSubmit={handleSubmit}>
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <label className={`text-xs font-bold uppercase tracking-wider ${errors.name ? 'text-red-600' : 'text-slate-700'}`}>
+                          Full Name {errors.name && '*'}
+                        </label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={(e) => {
+                            handleChange(e);
+                            if (errors.name) setErrors({ ...errors, name: false });
+                          }}
+                          className={`w-full px-6 py-4 bg-white border outline-none transition-colors ${errors.name ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700'
+                            }`}
+                          placeholder="John Doe"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className={`text-xs font-bold uppercase tracking-wider ${errors.email ? 'text-red-600' : 'text-slate-700'}`}>
+                          Email Address {errors.email && '*'}
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={(e) => {
+                            handleChange(e);
+                            if (errors.email) setErrors({ ...errors, email: false });
+                          }}
+                          className={`w-full px-6 py-4 bg-white border outline-none transition-colors ${errors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700'
+                            }`}
+                          placeholder="john@example.com"
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Honeypot field - Hidden from humans, bots will fill it */}
+                    <div className="hidden" aria-hidden="true">
+                      <input
+                        type="text"
+                        name="website"
+                        value={formData.website}
+                        onChange={handleChange}
+                        tabIndex={-1}
+                        autoComplete="off"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Service Required</label>
+                      <select
+                        name="service"
+                        value={formData.service}
+                        onChange={handleChange}
+                        className="w-full px-6 py-4 bg-white border border-slate-300 focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 outline-none transition-colors appearance-none"
+                      >
+                        <option>Geosolutions Services</option>
+                        <option>Integrated Services</option>
+                        <option>Pipeline Construction</option>
+                        <option>Civil Works</option>
+                        <option>Other Enquiry</option>
+                      </select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className={`text-xs font-bold uppercase tracking-wider ${errors.message ? 'text-red-600' : 'text-slate-700'}`}>
+                        Your Message {errors.message && '*'}
+                      </label>
+                      <textarea
+                        name="message"
+                        value={formData.message}
+                        onChange={(e) => {
+                          handleChange(e);
+                          if (errors.message) setErrors({ ...errors, message: false });
+                        }}
+                        className={`w-full px-6 py-4 bg-white border outline-none transition-colors h-40 ${errors.message ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700'
+                          }`}
+                        placeholder="How can we help you?"
+                        required
+                      ></textarea>
+                    </div>
+                    
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className={`w-full py-4 bg-emerald-950 text-white font-bold hover:bg-emerald-800 transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    >
+                      {isSubmitting ? 'Sending...' : 'Send Request'}
+                    </button>
+                  </form>
+                </>
+              )}
             </div>
           </div>
         </div>

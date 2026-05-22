@@ -6,6 +6,7 @@ export interface Service {
   items: string[];
   icon: string;
   image: string;
+  category: 'Geosolutions' | 'Integrated';
 }
 
 export interface Project {

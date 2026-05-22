@@ -1,8 +1,9 @@
 
 import React from 'react';
+import { CONTACT_CONFIG } from '../site_data';
 
 const WhatsAppButton: React.FC = () => {
-  const phoneNumber = "2348097081333";
+  const phoneNumber = CONTACT_CONFIG.phoneRaw.replace('+', '');
   const message = "Hello PIGL, I would like to inquire about your engineering and geosolutions services.";
   const encodedMessage = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;

@@ -61,30 +61,23 @@ const Careers: React.FC = () => {
     setStatus('submitting');
     setUploadProgress(0);
     
-    // Phase 1: Upload file
-    setSubmissionPhase('Uploading resume binary...');
-    for (let p = 0; p <= 45; p += 5) {
+    // Phase 1: Upload resume
+    setSubmissionPhase('Uploading resume...');
+    for (let p = 0; p <= 35; p += 5) {
       setUploadProgress(p);
-      await new Promise(r => setTimeout(r, 100));
+      await new Promise(r => setTimeout(r, 80));
     }
 
-    // Phase 2: Payload Verification
-    setSubmissionPhase('Verifying payload security...');
-    for (let p = 45; p <= 75; p += 5) {
+    // Phase 2: Verify document structure
+    setSubmissionPhase('Verifying document structure...');
+    for (let p = 35; p <= 70; p += 5) {
       setUploadProgress(p);
-      await new Promise(r => setTimeout(r, 120));
+      await new Promise(r => setTimeout(r, 90));
     }
 
-    // Phase 3: Deliver Notifications to Directors
-    setSubmissionPhase('Delivering notifications to directors (info & bosahkc)...');
-    for (let p = 75; p <= 95; p += 5) {
-      setUploadProgress(p);
-      await new Promise(r => setTimeout(r, 150));
-    }
-
-    // Phase 4: Confirming Receipts
-    setSubmissionPhase('Generating candidate confirmation receipt...');
-    for (let p = 95; p <= 100; p += 1) {
+    // Phase 3: Finalizing application
+    setSubmissionPhase('Finalizing application...');
+    for (let p = 70; p <= 100; p += 5) {
       setUploadProgress(p);
       await new Promise(r => setTimeout(r, 100));
     }
@@ -410,124 +403,17 @@ const Careers: React.FC = () => {
 
               {/* Success state */}
               {status === 'success' && (
-                <div className="py-6 space-y-6">
+                <div className="py-8 space-y-6">
                   <div className="text-center space-y-4">
                     <div className="mx-auto w-16 h-16 bg-emerald-50 border border-emerald-100 rounded-none flex items-center justify-center text-emerald-600 text-3xl font-bold">
                       ✓
                     </div>
                     <div className="space-y-2">
-                      <h4 className="text-2xl font-black text-slate-950 tracking-tight">Application Sent!</h4>
-                      <p className="text-slate-600 max-w-lg mx-auto text-sm leading-relaxed">
-                        Thank you, <strong>{formData.name}</strong>. Your CV has been successfully uploaded and processed. Auto-routing systems have dispatched branded emails.
+                      <h4 className="text-2xl font-black text-slate-950 tracking-tight">Application Submitted</h4>
+                      <p className="text-slate-600 max-w-sm mx-auto text-sm leading-relaxed">
+                        Thank you, <strong>{formData.name}</strong>. Your CV has been successfully uploaded. Our recruitment team will review your application and get in touch if your qualifications match our active or future project profiles.
                       </p>
                     </div>
-                  </div>
-
-                  {/* Toggle log preview */}
-                  <div className="border border-slate-200">
-                    <button 
-                      onClick={() => setShowEmails(!showEmails)}
-                      className="w-full bg-slate-50 px-6 py-4 flex justify-between items-center text-slate-700 font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-colors"
-                    >
-                      <span>📩 View HTML Email Receipt Previews</span>
-                      <svg className={`w-4 h-4 transform transition-transform duration-300 ${showEmails ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" /></svg>
-                    </button>
-
-                    {showEmails && (
-                      <div className="border-t border-slate-200">
-                        {/* Tab Headers */}
-                        <div className="flex border-b border-slate-200 bg-slate-50/50">
-                          <button
-                            onClick={() => setActiveEmailTab('recruiter')}
-                            className={`flex-1 py-3 text-[10px] font-black uppercase tracking-wider text-center border-r border-slate-200 transition-colors ${
-                              activeEmailTab === 'recruiter' ? 'bg-white text-emerald-700 border-b-2 border-b-emerald-700' : 'text-slate-500 hover:text-slate-800'
-                            }`}
-                          >
-                            To Directors (info / bosahkc)
-                          </button>
-                          <button
-                            onClick={() => setActiveEmailTab('candidate')}
-                            className={`flex-1 py-3 text-[10px] font-black uppercase tracking-wider text-center transition-colors ${
-                              activeEmailTab === 'candidate' ? 'bg-white text-emerald-700 border-b-2 border-b-emerald-700' : 'text-slate-500 hover:text-slate-800'
-                            }`}
-                          >
-                            To Candidate ({formData.email})
-                          </button>
-                        </div>
-
-                        {/* Tab Content */}
-                        <div className="p-4 bg-slate-100 max-h-[350px] overflow-y-auto font-sans">
-                          {activeEmailTab === 'recruiter' ? (
-                            <div className="bg-white border border-slate-200 shadow-sm rounded p-6 text-slate-800">
-                              <div style={{ borderTop: '4px solid #047857', paddingTop: '15px' }}>
-                                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                                  <h2 style={{ color: '#022c22', fontWeight: 900, margin: 0, fontSize: '18px' }}>POLARIS INTEGRATED</h2>
-                                  <p style={{ color: '#047857', fontSize: '9px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.15em', margin: '2px 0 0 0' }}>&amp; GeoSolutions Limited</p>
-                                </div>
-                                <h3 style={{ fontSize: '15px', fontWeight: 'bold', color: '#0f172a', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px', marginBottom: '15px' }}>New Candidate Application</h3>
-                                <p style={{ fontSize: '13px', color: '#475569', lineHeight: '1.5', marginBottom: '15px' }}>
-                                  A new candidate has submitted their resume via the PIGL Careers Portal. Details:
-                                </p>
-                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', marginBottom: '20px' }}>
-                                  <tbody>
-                                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                      <td style={{ padding: '8px 0', color: '#64748b', fontWeight: 'bold' }}>FULL NAME</td>
-                                      <td style={{ padding: '8px 0', color: '#0f172a', fontWeight: 'bold', textAlign: 'right' }}>{formData.name}</td>
-                                    </tr>
-                                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                      <td style={{ padding: '8px 0', color: '#64748b', fontWeight: 'bold' }}>EMAIL ADDRESS</td>
-                                      <td style={{ padding: '8px 0', color: '#047857', fontWeight: 'bold', textAlign: 'right' }}>{formData.email}</td>
-                                    </tr>
-                                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                      <td style={{ padding: '8px 0', color: '#64748b', fontWeight: 'bold' }}>PHONE NUMBER</td>
-                                      <td style={{ padding: '8px 0', color: '#0f172a', fontWeight: 'bold', textAlign: 'right' }}>{formData.phone}</td>
-                                    </tr>
-                                    <tr>
-                                      <td style={{ padding: '8px 0', color: '#64748b', fontWeight: 'bold' }}>ATTACHED RESUME</td>
-                                      <td style={{ padding: '8px 0', color: '#e11d48', fontWeight: 'bold', textAlign: 'right' }}>📎 {resumeFile?.name}</td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                                <div style={{ backgroundColor: '#f0fdf4', borderLeft: '4px solid #22c55e', padding: '10px', fontSize: '11px', color: '#166534', marginBottom: '20px' }}>
-                                  <strong>Note:</strong> Resume binary verified and safely archived in PIGL ATS.
-                                </div>
-                                <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '15px', textAlign: 'center', fontSize: '10px', color: '#94a3b8', fontWeight: 'bold' }}>
-                                  Polaris Integrated &amp; GeoSolutions Limited &copy; {new Date().getFullYear()}
-                                </div>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="bg-white border border-slate-200 shadow-sm rounded p-6 text-slate-800">
-                              <div style={{ borderTop: '4px solid #047857', paddingTop: '15px' }}>
-                                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                                  <h2 style={{ color: '#022c22', fontWeight: 900, margin: 0, fontSize: '18px' }}>POLARIS INTEGRATED</h2>
-                                  <p style={{ color: '#047857', fontSize: '9px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.15em', margin: '2px 0 0 0' }}>&amp; GeoSolutions Limited</p>
-                                </div>
-                                <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: '#022c22', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px', marginBottom: '15px', textAlign: 'center' }}>Application Received</h3>
-                                <p style={{ fontSize: '13px', color: '#0f172a', fontWeight: 'bold', marginBottom: '10px' }}>Dear {formData.name},</p>
-                                <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.6', marginBottom: '15px' }}>
-                                  Thank you for submitting your resume to Polaris Integrated &amp; GeoSolutions Limited (PIGL). We have successfully received your application.
-                                </p>
-                                <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.6', marginBottom: '15px' }}>
-                                  Our Recruitment directors review candidate submissions regularly. If your qualifications match any of our swamp, land, or offshore operations profiles, we will contact you directly for a technical interview.
-                                </p>
-                                <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '12px', marginBottom: '20px', fontSize: '11px' }}>
-                                  <h4 style={{ margin: '0 0 6px 0', color: '#0f172a' }}>Application Summary:</h4>
-                                  <p style={{ margin: '3px 0' }}><strong>Email:</strong> {formData.email}</p>
-                                  <p style={{ margin: '3px 0' }}><strong>Phone:</strong> {formData.phone}</p>
-                                  <p style={{ margin: '3px 0' }}><strong>File:</strong> 📎 {resumeFile?.name}</p>
-                                </div>
-                                <p style={{ fontSize: '12px', color: '#475569', lineHeight: '1.6', margin: '0 0 20px 0' }}>
-                                  Best regards,<br />
-                                  <strong>The Talent Acquisition Team</strong><br />
-                                  Polaris Integrated &amp; GeoSolutions Limited
-                                </p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   <div className="flex justify-center pt-4">

@@ -11,6 +11,14 @@ import NiesImg from '../assets/nies new.png';
 import VideoShowcase from '../components/VideoShowcase';
 import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
 
+// Static assets for the hero slider slides (independent of divisions/services list)
+import SliderImg from '../assets/slider.jpeg';
+import RealityCaptureImg from '../assets/DJI_0191.JPG';
+import GeosolutionsImg from '../assets/DJI_0003.jpg';
+import PipelineImg from '../assets/DJI_0240.jpg';
+import IntegratedImg from '../assets/cabin.png';
+
+
 const CountUp: React.FC<{ end: number; duration?: number; suffix?: string }> = ({ end, duration = 2000, suffix = '' }) => {
   const [count, setCount] = useState(0);
   const elementRef = useRef<HTMLSpanElement>(null);
@@ -62,6 +70,15 @@ const CountUp: React.FC<{ end: number; duration?: number; suffix?: string }> = (
 const Home: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [navScrolled, setNavScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setNavScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const techEdgeImages = [
     { src: TechEdgeImg, alt: "Leica 3D Laser Scanning & Reality Capture" },
@@ -150,12 +167,38 @@ const Home: React.FC = () => {
     return () => clearInterval(timer);
   }, [techEdgeImages.length]);
 
-  const slides = SERVICES.map(service => ({
-    title: service.title,
-    description: service.description,
-    image: service.image,
-    id: service.id
-  }));
+  const slides = [
+    {
+      id: 'oil-and-gas',
+      title: 'Technical integrity for a safer energy future',
+      description: 'Providing high-fidelity engineering and advanced geosolutions for Swamp, Land, and Offshore operations, ensuring safety and operational excellence.',
+      image: SliderImg
+    },
+    {
+      id: 'reality-capture',
+      title: '3D Reality Capture & Laser Scanning',
+      description: 'PIGL delivers high-fidelity 3D Laser Scanning and Digital Twin solutions for precision engineering in Nigeria.',
+      image: RealityCaptureImg
+    },
+    {
+      id: 'geosolutions',
+      title: 'Geotechnical & Marine Survey',
+      description: 'Advanced geophysical surveys and high-accuracy bathymetric mapping for complex offshore and land engineering challenges across Sub-Saharan Africa.',
+      image: GeosolutionsImg
+    },
+    {
+      id: 'pipeline',
+      title: 'Pipeline integrity and facility construction',
+      description: 'Indigenous leader in pipeline maintenance and facility support, specializing in API-standard welding, fabrication, and comprehensive integrity testing.',
+      image: PipelineImg
+    },
+    {
+      id: 'integrated',
+      title: 'Integrated Project Management',
+      description: 'Bespoke end-to-end technical support for the oil and gas sector, combining engineering, procurement, and field supervision.',
+      image: IntegratedImg
+    }
+  ];
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -268,36 +311,73 @@ const Home: React.FC = () => {
       </section>
 
       {/* Sub-Navigation Bar */}
-      <div className="w-full bg-white border-b border-slate-200 hidden md:block z-20 relative">
+      <div className={`w-full bg-white border-b border-slate-200 hidden md:block z-40 sticky transition-all duration-500 shadow-sm ${
+        navScrolled ? 'top-[64px] lg:top-[80px]' : 'top-[80px] lg:top-[104px]'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center h-14 overflow-x-auto no-scrollbar">
           <span className="sub-nav-font font-bold text-slate-800 mr-8 whitespace-nowrap">Jump to</span>
           <div className="flex items-center space-x-6 lg:space-x-8">
             <button 
-              onClick={() => document.getElementById('what-we-do')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => {
+                const element = document.getElementById('what-we-do');
+                if (element) {
+                  const offset = window.innerWidth >= 1024 ? 136 : 120;
+                  const y = element.getBoundingClientRect().top + window.pageYOffset - offset;
+                  window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+              }}
               className="sub-nav-font text-slate-600 hover:text-emerald-700 transition-colors whitespace-nowrap"
             >
               What we do
             </button>
             <button 
-              onClick={() => document.getElementById('our-industries')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => {
+                const element = document.getElementById('our-industries');
+                if (element) {
+                  const offset = window.innerWidth >= 1024 ? 136 : 120;
+                  const y = element.getBoundingClientRect().top + window.pageYOffset - offset;
+                  window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+              }}
               className="sub-nav-font text-slate-600 hover:text-emerald-700 transition-colors whitespace-nowrap"
             >
               Our industries
             </button>
             <button 
-              onClick={() => document.getElementById('track-record')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => {
+                const element = document.getElementById('track-record');
+                if (element) {
+                  const offset = window.innerWidth >= 1024 ? 136 : 120;
+                  const y = element.getBoundingClientRect().top + window.pageYOffset - offset;
+                  window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+              }}
               className="sub-nav-font text-slate-600 hover:text-emerald-700 transition-colors whitespace-nowrap"
             >
               Case studies
             </button>
             <button 
-              onClick={() => document.getElementById('core-values')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => {
+                const element = document.getElementById('core-values');
+                if (element) {
+                  const offset = window.innerWidth >= 1024 ? 136 : 120;
+                  const y = element.getBoundingClientRect().top + window.pageYOffset - offset;
+                  window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+              }}
               className="sub-nav-font text-slate-600 hover:text-emerald-700 transition-colors whitespace-nowrap"
             >
               Our Organisation
             </button>
             <button 
-              onClick={() => document.getElementById('community')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => {
+                const element = document.getElementById('community');
+                if (element) {
+                  const offset = window.innerWidth >= 1024 ? 136 : 120;
+                  const y = element.getBoundingClientRect().top + window.pageYOffset - offset;
+                  window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+              }}
               className="sub-nav-font text-emerald-700 hover:text-emerald-900 transition-colors font-bold whitespace-nowrap"
             >
               News highlights
@@ -354,7 +434,7 @@ const Home: React.FC = () => {
                   className="px-3 flex-shrink-0 flex"
                   style={{ width: `${100 / visibleCards}%` }}
                 >
-                  <a href={`#/services?id=${service.id}`} className="group block bg-slate-50 border border-slate-200/60 p-6 md:p-8 hover:shadow-xl transition-shadow flex flex-col w-full hover-lift">
+                  <a href={`#/services/detail?id=${service.id}`} className="group block bg-slate-50 border border-slate-200/60 p-6 md:p-8 hover:shadow-xl transition-shadow flex flex-col w-full hover-lift">
                     <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 mb-6 rounded-none shrink-0">
                       <img 
                         src={service.image} 

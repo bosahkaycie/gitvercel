@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { SERVICES, PROJECTS, CORE_VALUES } from '../constants';
+import { SERVICES, PROJECTS, CORE_VALUES, CONTACT_CONFIG } from '../site_data';
 
 const AIChatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -179,7 +179,7 @@ const AIChatbot: React.FC = () => {
       setMessages(prev => [...prev, { role: 'model', text: aiText, links: suggestedLinks }]);
     } catch (error: any) {
       console.error('Chatbot Error:', error);
-      let errorMessage = "I hit a snag. 😅 Reach us at info@polarisigl.com while I fix myself!";
+      let errorMessage = `I hit a snag. 😅 Reach us at ${CONTACT_CONFIG.emailInfo} while I fix myself!`;
       if (error.message?.includes('API Key')) errorMessage += " (Configuration Error: API Key missing)";
       else if (error.message?.includes('fetch')) errorMessage += " (Network Error: Please check connection)";
       else errorMessage += ` (Error: ${error.message || 'Unknown'})`;
@@ -313,7 +313,7 @@ const AIChatbot: React.FC = () => {
           </form>
 
           <div className="mt-4 flex items-center justify-center space-x-6 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            <a href="tel:+2348097081333" className="hover:text-emerald-600 flex items-center">
+            <a href={`tel:${CONTACT_CONFIG.phoneRaw}`} className="hover:text-emerald-600 flex items-center">
               <span className="mr-1.5">📞</span> Phone
             </a>
             <span className="opacity-20">|</span>

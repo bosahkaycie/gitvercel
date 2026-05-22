@@ -16,17 +16,34 @@ const Projects: React.FC = () => {
   };
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.hash.split('?')[1]);
-    const id = params.get('id');
-    if (id) {
-      setExpandedId(id);
-      setTimeout(() => {
-        const element = document.getElementById(`case-study-${id}`);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const handleHashChange = () => {
+      const params = new URLSearchParams(window.location.hash.split('?')[1]);
+      const id = params.get('id');
+      if (id) {
+        setExpandedId(id);
+        setTimeout(() => {
+          const element = document.getElementById(`case-study-${id}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 500);
+      }
+      
+      const filterParam = params.get('filter');
+      if (filterParam) {
+        const validCategories = ['All', 'Integrated', 'Geosolutions', 'Civil', 'Pipeline'];
+        if (validCategories.includes(filterParam)) {
+          setFilter(filterParam as any);
         }
-      }, 500);
-    }
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    handleHashChange(); // Run initially on mount
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
   }, []);
 
   useEffect(() => {

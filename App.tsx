@@ -5,11 +5,13 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
+import ServiceDetail from './pages/ServiceDetail';
 import Projects from './pages/Projects';
 import Contact from './pages/Contact';
 import Careers from './pages/Careers';
 import News from './pages/News';
 import HSSE from './pages/HSSE';
+import { SERVICES } from './site_data';
 
 import AIChatbot from './components/AIChatbot';
 import ScrollToTop from './components/ScrollToTop';
@@ -76,25 +78,39 @@ const App: React.FC = () => {
       '#/contact': 'Contact PIGL | Expert Engineering Consultations Nigeria'
     };
 
-    document.title = pageTitles[currentPath] || 'Polaris Integrated and Geosolutions Ltd (PIGL)';
+    let activeTitle = pageTitles[currentPath] || 'Polaris Integrated and Geosolutions Ltd (PIGL)';
+    let activeDesc = metaDescriptions[currentPath] || metaDescriptions['#/'];
+
+    if (currentPath === '#/services/detail') {
+      const hashParts = window.location.hash.split('?');
+      const params = new URLSearchParams(hashParts[1] || '');
+      const id = params.get('id');
+      const service = SERVICES.find(s => s.id === id);
+      if (service) {
+        activeTitle = `${service.title} | PIGL Specialist Engineering`;
+        activeDesc = service.description;
+      }
+    }
+
+    document.title = activeTitle;
 
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', metaDescriptions[currentPath] || metaDescriptions['#/']);
+      metaDescription.setAttribute('content', activeDesc);
     }
 
     // Update Social Tags too for a beautiful, unique sharing experience
     const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', document.title);
+    if (ogTitle) ogTitle.setAttribute('content', activeTitle);
 
     const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute('content', metaDescriptions[currentPath] || metaDescriptions['#/']);
+    if (ogDesc) ogDesc.setAttribute('content', activeDesc);
 
     const twitterTitle = document.querySelector('meta[property="twitter:title"]');
-    if (twitterTitle) twitterTitle.setAttribute('content', document.title);
+    if (twitterTitle) twitterTitle.setAttribute('content', activeTitle);
 
     const twitterDesc = document.querySelector('meta[property="twitter:description"]');
-    if (twitterDesc) twitterDesc.setAttribute('content', metaDescriptions[currentPath] || metaDescriptions['#/']);
+    if (twitterDesc) twitterDesc.setAttribute('content', activeDesc);
   }, [currentPath]);
 
   const renderPage = () => {
@@ -105,6 +121,8 @@ const App: React.FC = () => {
         return <About />;
       case '#/services':
         return <Services />;
+      case '#/services/detail':
+        return <ServiceDetail />;
       case '#/projects':
         return <Projects />;
       case '#/careers':

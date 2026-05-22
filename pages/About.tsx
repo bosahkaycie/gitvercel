@@ -1,5 +1,5 @@
 import React from 'react';
-import { TEAM } from '../site_data';
+import { TEAM, CORE_VALUES } from '../site_data';
 import BootsImg from '../assets/IMG_6170.jpg';
 import AboutBg from '../assets/teaching.jpeg';
 import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
@@ -140,12 +140,38 @@ const About: React.FC = () => {
         </div>
       </section>
 
+      {/* Core Values Section */}
+      <section id="values" className="py-20 md:py-32 bg-white border-b border-slate-200 reveal">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mb-16">
+            <span className="text-emerald-700 font-bold uppercase tracking-wider text-sm mb-4 block">Our Philosophy</span>
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">Core Values Driving PIGL</h2>
+            <p className="text-slate-600 text-lg mt-4 font-normal">
+              At the heart of all our operations across Sub-Saharan Africa are four primary values that guarantee technical precision and delivery.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {CORE_VALUES.map((value, idx) => (
+              <div key={idx} className="bg-slate-50 p-8 border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col space-y-4">
+                <div className="w-12 h-12 bg-emerald-50 rounded-lg flex items-center justify-center border border-emerald-100 text-2xl">
+                  {value.icon}
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 tracking-tight">{value.title}</h3>
+                <p className="text-slate-600 text-sm leading-relaxed font-normal flex-grow">
+                  {value.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* HSE Policy Section */}
       <section id="hse" className="py-20 md:py-32 bg-white reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
             <div className="order-2 lg:order-1 relative h-[400px] md:h-[600px] bg-slate-100">
-              <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=1200" alt="HSE Commitment" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+              <img src={BootsImg} alt="HSE Commitment" className="w-full h-full object-cover" loading="lazy" decoding="async" />
             </div>
             <div className="order-1 lg:order-2 space-y-8">
               <span className="text-emerald-700 font-bold uppercase tracking-wider text-sm">Commitment to Safety</span>

@@ -1,9 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ASSETS } from '../site_data';
 import NewsBg from '../assets/IMG_6614.jpg';
 
 
 const News: React.FC = () => {
+  const [navScrolled, setNavScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setNavScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   useEffect(() => {
     const observerOptions = {
       threshold: 0.1,
@@ -68,7 +78,9 @@ const News: React.FC = () => {
       </section>
 
       {/* Sticky Sub-Navigation */}
-      <div className="w-full bg-white border-b border-slate-200 sticky top-16 md:top-[72px] z-30 hidden md:block">
+      <div className={`w-full bg-white border-b border-slate-200 sticky z-30 hidden md:block transition-all duration-500 shadow-sm ${
+        navScrolled ? 'top-[64px] lg:top-[80px]' : 'top-[80px] lg:top-[104px]'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center h-14">
           <span className="sub-nav-font font-bold text-slate-800 mr-8 whitespace-nowrap">Jump to</span>
           <div className="flex items-center space-x-8">
@@ -79,8 +91,8 @@ const News: React.FC = () => {
                   const id = item.toLowerCase().replace(' ', '-');
                   const element = document.getElementById(id);
                   if (element) {
-                    const yOffset = -120; // Adjust for sticky header
-                    const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                    const offset = window.innerWidth >= 1024 ? 136 : 120;
+                    const y = element.getBoundingClientRect().top + window.pageYOffset - offset;
                     window.scrollTo({ top: y, behavior: 'smooth' });
                   }
                 }}

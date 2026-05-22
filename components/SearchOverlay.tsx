@@ -108,7 +108,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
           title: service.title,
           description: service.description,
           category: 'Services',
-          link: `#/services?id=${service.id}`,
+          link: `#/services/detail?id=${service.id}`,
           badgeColor: 'bg-emerald-50 text-emerald-800 border border-emerald-100'
         });
       }
@@ -116,7 +116,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
 
     // 2. Search Projects
     PROJECTS.forEach(project => {
-      const matchText = `${project.title} ${project.description} ${project.category} ${project.location} ${project.scope?.join(' ') || ''}`;
+      const matchText = `${project.title} ${project.description} ${project.category} ${project.location} ${project.scope || ''}`;
       if (matchesTerms(matchText)) {
         searchResults.push({
           title: project.title,

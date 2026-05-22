@@ -27,6 +27,9 @@ import NextGenImg from './assets/inspiring_next_gen.jpeg';
 import TeamImg from './assets/team.jpeg';
 import DigiTwinImg from './assets/digitwin.png';
 import OceanImg from './assets/new ocean.png';
+import SeismicSurveyImg from './assets/seismic_survey.png';
+import AssetManagementImg from './assets/asset_management.png';
+import GeomaticsSurveyImg from './assets/geomatics_survey.png';
 
 
 
@@ -39,109 +42,226 @@ export const COLORS = {
   background: '#F8FAFC'
 };
 
+export const CONTACT_CONFIG = {
+  phone: '+234-(0) 809 7081 333',
+  phoneRaw: '+2348097081333',
+  emailInfo: 'info@polarisigl.com',
+  emailSupport: 'support@polarisigl.com',
+  address: '#3, Diamond Close, Castle & Green Estate, Off Eneka Link Road, Port Harcourt, Rivers State, Nigeria',
+  addressShort: '#3, Diamond Close, Port Harcourt, Rivers State, Nigeria',
+  linkedin: 'https://www.linkedin.com/company/polarisigl/',
+  youtube: 'https://www.youtube.com/embed/sExrHCIGkH0'
+};
+
 export const CORE_VALUES: CoreValue[] = [
   {
     title: 'Professionalism',
     description: 'We adhere to the highest industry standards, delivering excellence through expertise and discipline.',
-    icon: ''
+    icon: '⚙️'
   },
   {
     title: 'Innovation',
     description: 'Embracing the latest technology like 3D Reality Capture to solve complex engineering challenges.',
-    icon: ''
+    icon: '💡'
   },
   {
     title: 'Integrity',
     description: 'Honesty and transparency in all our dealings with clients, stakeholders, and host communities.',
-    icon: ''
+    icon: '🛡️'
   },
   {
     title: 'Safety First',
     description: 'Unwavering commitment to 100% safety compliance and ISO certified management systems.',
-    icon: ''
+    icon: '⛑️'
   }
 ];
 
 export const SERVICES: Service[] = [
+  // Geosolution Services
   {
-    id: 'oil-and-gas',
-    title: 'Subsea Scanning & Seabed Mapping',
-    description: 'Utilizing state-of-the-art multi-beam echo sounders and sub-bottom profilers to unlock deep sub-surface insights for secure offshore pipeline routes, rig positioning, and marine engineering.',
-    icon: '',
-    image: SliderImg,
+    id: 'geophysical-surveys',
+    title: 'Geophysical Surveys',
+    description: 'High-resolution marine and land geophysics including sub-bottom profiling, seismic refraction, magnetics, and electrical resistivity for engineering, hazard detection, and geological mapping.',
     items: [
-      'Swamp & Land Operations',
-      'Offshore Engineering Support',
-      'Technical Integrity Management',
-      'Operational Excellence'
-    ]
+      'Sub-bottom Profiling & Hydrography',
+      'Side Scan Sonar Surveys',
+      'Electrical Resistivity Tomography',
+      'Seismic Refraction & MASW'
+    ],
+    icon: '🌐',
+    image: SubImg,
+    category: 'Geosolutions'
+  },
+  {
+    id: 'geotechnical-services',
+    title: 'Geotechnical Services',
+    description: 'Comprehensive soil and rock mechanics investigations, featuring high-capacity in-situ testing (CPT, SPT), laboratory analysis, and engineering reports for deep foundation designs.',
+    items: [
+      'Cone Penetration Testing (CPT)',
+      'Soil Boring & Standard Penetration',
+      'Laboratory Soil & Rock Testing',
+      'Foundation & Slope Stability Analysis'
+    ],
+    icon: '🔬',
+    image: GeosolutionsImg,
+    category: 'Geosolutions'
+  },
+  {
+    id: 'climate-environmental-metocean',
+    title: 'Climate, Environmental & Metocean Solutions',
+    description: 'Providing critical meteorological, oceanographic, and environmental studies. We deliver data-driven insights to protect coastal infrastructure and ensure environmental compliance.',
+    items: [
+      'Metocean Data Acquisition',
+      'Environmental Impact Assessments (EIA)',
+      'Coastal Erosion & Wave Modeling',
+      'Environmental Monitoring & Auditing'
+    ],
+    icon: '🌊',
+    image: OceanImg,
+    category: 'Geosolutions'
+  },
+  {
+    id: 'geomatics-services',
+    title: 'Geomatics Services',
+    description: 'Pioneering spatial engineering through precision land surveying, geodetic positioning, geographical information systems (GIS), and high-resolution UAV aerial mapping.',
+    items: [
+      'Geodetic & Control Surveys',
+      'UAV Aerial Mapping & Photogrammetry',
+      'GIS Mapping & Spatial Analysis',
+      'Topographic & Cadastral Surveys'
+    ],
+    icon: '📐',
+    image: GeomaticsSurveyImg,
+    category: 'Geosolutions'
+  },
+  {
+    id: 'seismic-services',
+    title: 'Seismic Services',
+    description: 'Expert seismic data acquisition, advanced processing, and geophysical interpretation to characterize complex subsurface geologic structures for energy developments.',
+    items: [
+      'Seismic Data Acquisition',
+      'Subsurface Structural Mapping',
+      'Shallow Gas Hazard Detection',
+      'Geophysical Interpretation'
+    ],
+    icon: '📉',
+    image: SeismicSurveyImg,
+    category: 'Geosolutions'
+  },
+  {
+    id: 'oilfield-services',
+    title: 'Oilfield Services',
+    description: 'High-assurance technical support for swamp, nearshore, and deepwater exploration. Providing precise rig positioning, tug management, and anchor handling services.',
+    items: [
+      'Offshore Rig Positioning',
+      'Tug Management & Anchor Tracking',
+      'Barge & Vessel Marine Support',
+      'Swamp & Offshore Drilling Support'
+    ],
+    icon: '⚓',
+    image: RigImg,
+    category: 'Geosolutions'
+  },
+  {
+    id: 'onshore-nearshore-geotechnical',
+    title: 'Onshore and Nearshore Geotechnical Services',
+    description: 'Specialized shallow-water and nearshore drilling. We supply vital soil characterization for ports, jetties, marine terminals, and nearshore energy infrastructure.',
+    items: [
+      'Nearshore Marine Soil Boring',
+      'Shallow-water CPT Operations',
+      'Beach & Estuary Soil Sampling',
+      'Jetty & Port Foundation Studies'
+    ],
+    icon: '🏖️',
+    image: DrillingImg,
+    category: 'Geosolutions'
+  },
+  {
+    id: 'asset-integrity-services',
+    title: 'Asset Integrity Services',
+    description: 'Rigorous technical assurance for operational assets. We provide non-destructive testing (NDT), corrosion monitoring, and advanced structural health inspections.',
+    items: [
+      'Non-Destructive Testing (NDT)',
+      'Corrosion Monitoring & Audits',
+      'Structural Health Inspections',
+      'Pipeline Scanning & Integrity Checks'
+    ],
+    icon: '🛡️',
+    image: TechImg,
+    category: 'Geosolutions'
+  },
+
+  // Integrated Services
+  {
+    id: 'pipeline-construction',
+    title: 'Pipeline Construction',
+    description: 'API-standard pipeline laying, fabrication, and comprehensive welding support in challenging swamp, nearshore, and land terrains, backed by stringent hydrostatic testing.',
+    items: [
+      'Welding & Precision Fabrication',
+      'Pipeline Laying & Route Clearance',
+      'Hydrostatic & NDT Testing',
+      'Cathodic Protection Systems'
+    ],
+    icon: '🔧',
+    image: PipelineImg,
+    category: 'Integrated'
+  },
+  {
+    id: 'facility-maintenance',
+    title: 'Facility Maintenance',
+    description: 'Comprehensive preventive, corrective, and mechanical maintenance of processing facilities, flow stations, valves, storage terminals, and active pipeline networks.',
+    items: [
+      'Flow Station Maintenance',
+      'Valve & Flange Servicing',
+      'Mechanical & Structural Repairs',
+      'Cathodic Protection Maintenance'
+    ],
+    icon: '🛠',
+    image: FacilityImg,
+    category: 'Integrated'
+  },
+  {
+    id: 'asset-management',
+    title: 'Asset Management',
+    description: 'End-to-end technical support for physical assets, including high-caliber manpower supply, engineering procurement, industrial water drilling, and operations optimization.',
+    items: [
+      'Technical Manpower Supply',
+      'Engineering Procurement Support',
+      'Industrial Water Borehole Drilling',
+      'Operational Asset Support'
+    ],
+    icon: '📈',
+    image: AssetManagementImg,
+    category: 'Integrated'
   },
   {
     id: 'reality-capture',
-    title: '3D Reality Capture & Laser Scanning',
-    description: 'PIGL delivers high-fidelity 3D Laser Scanning and Digital Twin solutions for precision engineering in Nigeria.',
-    icon: '',
-    image: RealityCaptureImg,
+    title: 'Reality Capture',
+    description: 'Precision 3D Laser Scanning, digital twin modeling, dimension control, and intelligent As-Built digitalization for brownfield modifications and structural assurance.',
     items: [
       '3D Laser Scanning & Digital Twins',
-      'Advanced Reality Capture Solutions',
-      'UAV Aerial Mapping & Photogrammetry',
-      'Dimension Control & Alignment'
-    ]
+      'Intelligent As-Built 3D Modeling',
+      'Dimension Control & Alignment',
+      'UAV Reality Capture Surveys'
+    ],
+    icon: '📸',
+    image: DigiTwinImg,
+    category: 'Integrated'
   },
   {
-    id: 'geosolutions',
-    title: 'Geotechnical & Marine Survey',
-    description: 'Advanced geophysical surveys and high-accuracy bathymetric mapping for complex offshore and land engineering challenges across Sub-Saharan Africa.',
-    icon: '',
-    image: GeosolutionsImg,
+    id: 'civil-works',
+    title: 'Civil Works',
+    description: 'Premium industrial civil engineering solutions, including site preparation, piling and foundation engineering, structural concrete, and access road construction/rehabilitation.',
     items: [
-      'Geotechnical & Soil Investigation',
-      'Bathymetric & Marine Survey',
-      'Sub-bottom Profiling & Hydrography',
-      'Offshore Positioning Services'
-    ]
-  },
-  {
-    id: 'pipeline',
-    title: 'Pipeline Integrity & Facility Construction',
-    description: 'Indigenous leader in pipeline maintenance and facility support, specializing in API-standard welding, fabrication, and comprehensive integrity testing.',
-    icon: '',
-    image: PipelineImg,
-    items: [
-      'Welding & Precision Fabrication',
-      'Pipeline Grinding & Maintenance',
-      'Cathodic Protection Systems',
-      'Hydrostatic & NDT Testing',
-      'Facility Integrity Management'
-    ]
-  },
-  {
-    id: 'integrated',
-    title: 'Integrated Project Management',
-    description: 'Bespoke end-to-end technical support for the oil and gas sector, combining engineering, procurement, and field supervision.',
-    icon: '',
-    image: IntegratedImg,
-    items: [
-      'Engineering Procurement',
-      'Industrial Water Borehole Drilling',
-      'Technical Manpower Supply',
-      'Asset Management Solutions'
-    ]
-  },
-  {
-    id: 'deepwater',
-    title: 'Deepwater Offshore & Hydrographic Solutions',
-    description: 'Providing end-to-end hydrographic, oceanographic, and geotechnical support to secure deepwater exploration, pipeline routing, and offshore marine developments.',
-    icon: '',
-    image: OceanImg,
-    items: [
-      'Deepwater Bathymetric Survey',
-      'Sub-Surface Stratum Mapping',
-      'Seabed Feature Classification',
-      'Marine Geotechnical Support'
-    ]
-  },
+      'Site Preparation & Leveling',
+      'Piling & Foundation Works',
+      'Access Road Construction & Repair',
+      'Industrial Drainage Systems'
+    ],
+    icon: '🚜',
+    image: CivilWorksImg,
+    category: 'Integrated'
+  }
 ];
 
 export const PROJECTS: Project[] = [

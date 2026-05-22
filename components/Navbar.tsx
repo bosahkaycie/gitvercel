@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import LogoDarkImg from '../assets/LOGO.png';
 import LogoLightImg from '../assets/logo_light.png';
 import BootsImg from '../assets/IMG_6170.jpg';
-import { SERVICES, PROJECTS } from '../site_data';
+import { SERVICES, PROJECTS, CONTACT_CONFIG } from '../site_data';
 import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
 import ProfileCoverImg from '../assets/PIGL COMPANY PROFILE.jpg';
+import { Service, Project } from '../types';
 
 interface NavbarProps {
   currentPath?: string;
@@ -17,9 +18,32 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+  const [hoveredService, setHoveredService] = useState<Service>(SERVICES[0]);
+  const [hoveredProject, setHoveredProject] = useState<Project>(PROJECTS[0]);
+
+  const menuDescriptions: Record<string, string> = {
+    // About us - Company
+    'Company Overview': 'Our history, expertise and operational footprint',
+    'Our Philosophy': 'Our vision, mission and strategic objectives',
+    'Core Values': 'Professionalism, innovation, integrity and safety',
+    'Management Team': 'Experienced leaders driving project excellence',
+    
+    // About us - Commitment
+    'HSSE & Quality Policy': 'Commitment to zero injuries & high-quality assurance',
+    'Certifications': 'ISO 9001:2015, ISO 45001:2018 and regulatory permits',
+    'Safety Performance': 'Track record of 500k+ safe man-hours & zero LTI',
+
+    // Projects - Capabilities
+    '3D Reality Capture & Laser Scanning': 'High-precision digitization & dimension control',
+    'Geotechnical & Marine': 'Sub-surface soil boring, CPT & marine surveys',
+    'Pipeline Integrity': 'API-standard fabrication, welding & hydrostatic tests',
+    'Civil Works': 'Access road rehab, piling & foundational concrete',
+    'Integrated Project Management': 'Bespoke engineering procurement & water drilling',
+    'Digital Twins': 'Intelligent as-built digitalization & brownfield mods'
+  };
 
   // Pages that have a light background (white/gray) at the top, requiring dark navbar text
-  const lightBgRoutes = ['#/white-page-example'];
+  const lightBgRoutes: string[] = [];
   const isLightPage = lightBgRoutes.includes(currentPath);
 
   // Text should be dark if scrolled (white navbar), if on a light page, or if a mega menu is open
@@ -55,7 +79,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
           links: [
             { label: 'Company Overview', href: '#/about?section=heritage' },
             { label: 'Our Philosophy', href: '#/about?section=vision' },
-            { label: 'Core Values', href: '#/about?section=vision' },
+            { label: 'Core Values', href: '#/about?section=values' },
             { label: 'Management Team', href: '#/about?section=management' },
           ]
         },
@@ -78,7 +102,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
         title: SERVICES[0].title,
         description: SERVICES[0].description,
         image: SERVICES[0].image,
-        link: `#/services?id=${SERVICES[0].id}`
+        link: `#/services/detail?id=${SERVICES[0].id}`
       }
     },
     {
@@ -97,12 +121,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
         {
           title: 'Capabilities',
           links: [
-            { label: '3D Reality Capture & Laser Scanning', href: '#/projects' },
-            { label: 'Geotechnical & Marine', href: '#/projects' },
-            { label: 'Pipeline Integrity', href: '#/projects' },
-            { label: 'Civil Works', href: '#/projects' },
-            { label: 'Integrated Project Management', href: '#/projects' },
-            { label: 'Digital Twins', href: '#/projects' }
+            { label: '3D Reality Capture & Laser Scanning', href: '#/projects?filter=Integrated' },
+            { label: 'Geotechnical & Marine', href: '#/projects?filter=Geosolutions' },
+            { label: 'Pipeline Integrity', href: '#/projects?filter=Pipeline' },
+            { label: 'Civil Works', href: '#/projects?filter=Civil' },
+            { label: 'Integrated Project Management', href: '#/projects?filter=Integrated' },
+            { label: 'Digital Twins', href: '#/projects?filter=Integrated' }
           ]
         }
       ]
@@ -240,7 +264,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
         {/* Mega Menu Dropdown Panels */}
         <div 
           className={`absolute top-full left-0 w-full bg-white border-t border-b border-slate-200 overflow-hidden transition-all duration-500 ease-in-out ${
-            activeDropdown ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+            activeDropdown ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
           }`}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -261,19 +285,37 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                         {link.sections.map((section, idx) => (
                           <div key={idx}>
                             <h4 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-4">{section.title}</h4>
-                            <ul className="space-y-3">
-                              {section.links.map((sublink, subIdx) => (
-                                <li key={subIdx}>
-                                  <a 
-                                    href={sublink.href} 
-                                    className="text-[15px] text-slate-700 font-bold link-underline hover:text-emerald-600 transition-colors flex items-center group"
-                                    onClick={() => setActiveDropdown(null)}
-                                  >
-                                    <span className="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 text-emerald-500 mr-0 group-hover:mr-2">→</span>
-                                    {sublink.label}
-                                  </a>
-                                </li>
-                              ))}
+                            <ul className="space-y-1">
+                              {section.links.map((sublink, subIdx) => {
+                                const desc = menuDescriptions[sublink.label];
+                                return (
+                                  <li key={subIdx} className="group">
+                                    <a 
+                                      href={sublink.href} 
+                                      className="flex items-start px-3 py-2 hover:bg-slate-50/80 transition-all rounded-md"
+                                      onClick={() => setActiveDropdown(null)}
+                                      onMouseEnter={() => {
+                                        if (link.layout === 'projects') {
+                                          if (subIdx === 0) setHoveredProject(PROJECTS[2]); // p3
+                                          else if (subIdx === 1) setHoveredProject(PROJECTS[1]); // p2
+                                          else if (subIdx === 2) setHoveredProject(PROJECTS[0]); // p1
+                                          else if (subIdx === 3) setHoveredProject(PROJECTS[5]); // p6
+                                          else if (subIdx === 4) setHoveredProject(PROJECTS[3]); // p4
+                                          else if (subIdx === 5) setHoveredProject(PROJECTS[7]); // p8
+                                        }
+                                      }}
+                                    >
+                                      <span className="w-0 overflow-hidden group-hover:w-3.5 transition-all duration-300 text-emerald-500 mr-0 group-hover:mr-1.5 flex-shrink-0 font-black mt-0.5">→</span>
+                                      <div className="flex flex-col">
+                                        <span className="text-[14px] text-slate-800 font-semibold group-hover:text-emerald-700 transition-colors leading-tight">{sublink.label}</span>
+                                        {desc && (
+                                          <span className="text-[11px] text-slate-400 font-medium leading-normal mt-0.5 group-hover:text-slate-500 transition-colors line-clamp-1">{desc}</span>
+                                        )}
+                                      </div>
+                                    </a>
+                                  </li>
+                                );
+                              })}
                             </ul>
                           </div>
                         ))}
@@ -282,21 +324,49 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
 
                     {/* Layout for Services mapping */}
                     {link.layout === 'services' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                        {SERVICES.map((service, idx) => (
-                          <div key={idx} className="group">
-                            <a 
-                              href={`#/services?id=${service.id}`} 
-                              className="block py-2 text-[15px] text-slate-700 font-medium hover:text-emerald-600 transition-colors"
-                              onClick={() => setActiveDropdown(null)}
-                            >
-                              <div className="flex items-center">
-                                <span className="w-6 text-xl mr-3 opacity-50 group-hover:opacity-100 transition-opacity">{service.icon}</span>
-                                {service.title}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                          <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-4 border-b border-slate-100 pb-2">Geosolution Services</h4>
+                          <div className="space-y-1">
+                            {SERVICES.filter(s => s.category === 'Geosolutions').map((service, idx) => (
+                              <div key={idx} className="group">
+                                <a 
+                                  href={`#/services/detail?id=${service.id}`} 
+                                  className="flex items-start px-3 py-2 hover:bg-slate-50/80 transition-all rounded-md"
+                                  onClick={() => setActiveDropdown(null)}
+                                  onMouseEnter={() => setHoveredService(service)}
+                                >
+                                  <span className="w-0 overflow-hidden group-hover:w-3.5 transition-all duration-300 text-emerald-500 mr-0 group-hover:mr-1.5 flex-shrink-0 font-black mt-0.5">→</span>
+                                  <div className="flex flex-col">
+                                    <span className="text-[14px] text-slate-800 font-semibold group-hover:text-emerald-700 transition-colors leading-tight">{service.title}</span>
+                                    <span className="text-[11px] text-slate-400 font-medium leading-normal mt-0.5 group-hover:text-slate-500 transition-colors line-clamp-1">{service.description}</span>
+                                  </div>
+                                </a>
                               </div>
-                            </a>
+                            ))}
                           </div>
-                        ))}
+                        </div>
+                        <div>
+                          <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-4 border-b border-slate-100 pb-2">Integrated Services</h4>
+                          <div className="space-y-1">
+                            {SERVICES.filter(s => s.category === 'Integrated').map((service, idx) => (
+                              <div key={idx} className="group">
+                                <a 
+                                  href={`#/services/detail?id=${service.id}`} 
+                                  className="flex items-start px-3 py-2 hover:bg-slate-50/80 transition-all rounded-md"
+                                  onClick={() => setActiveDropdown(null)}
+                                  onMouseEnter={() => setHoveredService(service)}
+                                >
+                                  <span className="w-0 overflow-hidden group-hover:w-3.5 transition-all duration-300 text-emerald-500 mr-0 group-hover:mr-1.5 flex-shrink-0 font-black mt-0.5">→</span>
+                                  <div className="flex flex-col">
+                                    <span className="text-[14px] text-slate-800 font-semibold group-hover:text-emerald-700 transition-colors leading-tight">{service.title}</span>
+                                    <span className="text-[11px] text-slate-400 font-medium leading-normal mt-0.5 group-hover:text-slate-500 transition-colors line-clamp-1">{service.description}</span>
+                                  </div>
+                                </a>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -304,28 +374,82 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                   {/* Featured Content Column */}
                   {link.featured && (
                     <div className="hidden lg:block w-[350px] shrink-0">
-                      <a href={link.featured.link} className="block group relative overflow-hidden h-full rounded-none" onClick={() => setActiveDropdown(null)}>
-                        <div className="absolute inset-0 bg-emerald-950/20 group-hover:bg-emerald-950/10 transition-colors z-10" />
-                        <img 
-                          src={link.featured.image} 
-                          alt={link.featured.title} 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent z-20">
-                          {link.featured.category && (
-                            <span className="text-[10px] font-black uppercase tracking-widest text-orange-400 mb-2 block">
-                              {link.featured.category}
+                      {link.layout === 'services' ? (
+                        <a 
+                          href={`#/services/detail?id=${hoveredService.id}`} 
+                          className="block group relative overflow-hidden h-full rounded-none" 
+                          onClick={() => setActiveDropdown(null)}
+                        >
+                          <div className="absolute inset-0 bg-emerald-950/20 group-hover:bg-emerald-950/10 transition-colors z-10" />
+                          <img 
+                            key={hoveredService.id}
+                            src={hoveredService.image} 
+                            alt={hoveredService.title} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 animate-fade-in"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-20">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-2 block">
+                              {hoveredService.category} Service
                             </span>
-                          )}
-                          <h4 className="text-white font-black text-xl mb-2">{link.featured.title}</h4>
-                          <p className="text-slate-200 text-sm font-medium line-clamp-2">{link.featured.description}</p>
-                          <div className="mt-4 flex items-center text-[11px] font-bold uppercase tracking-widest text-emerald-400 group-hover:text-white transition-colors">
-                            Explore <span className="ml-2">→</span>
+                            <h4 className="text-white font-black text-xl mb-2 min-h-[28px]">{hoveredService.title}</h4>
+                            <p className="text-slate-200 text-sm font-medium line-clamp-3 leading-relaxed min-h-[60px]">{hoveredService.description}</p>
+                            <div className="mt-4 flex items-center text-[11px] font-bold uppercase tracking-widest text-emerald-400 group-hover:text-white transition-colors">
+                              Explore Service Details <span className="ml-2">→</span>
+                            </div>
                           </div>
-                        </div>
-                      </a>
+                        </a>
+                      ) : link.layout === 'projects' ? (
+                        <a 
+                          href={`#/projects`} 
+                          className="block group relative overflow-hidden h-full rounded-none" 
+                          onClick={() => setActiveDropdown(null)}
+                        >
+                          <div className="absolute inset-0 bg-emerald-950/20 group-hover:bg-emerald-950/10 transition-colors z-10" />
+                          <img 
+                            key={hoveredProject.id}
+                            src={hoveredProject.image} 
+                            alt={hoveredProject.title} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 animate-fade-in"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-20">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-orange-400 mb-2 block">
+                              Featured {hoveredProject.category} Project
+                            </span>
+                            <h4 className="text-white font-black text-xl mb-2 min-h-[28px]">{hoveredProject.title}</h4>
+                            <p className="text-slate-200 text-sm font-medium line-clamp-3 leading-relaxed min-h-[60px]">{hoveredProject.description}</p>
+                            <div className="mt-4 flex items-center text-[11px] font-bold uppercase tracking-widest text-emerald-400 group-hover:text-white transition-colors">
+                              Explore Case Studies <span className="ml-2">→</span>
+                            </div>
+                          </div>
+                        </a>
+                      ) : (
+                        <a href={link.featured.link} className="block group relative overflow-hidden h-full rounded-none" onClick={() => setActiveDropdown(null)}>
+                          <div className="absolute inset-0 bg-emerald-950/20 group-hover:bg-emerald-950/10 transition-colors z-10" />
+                          <img 
+                            src={link.featured.image} 
+                            alt={link.featured.title} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent z-20">
+                            {link.featured.category && (
+                              <span className="text-[10px] font-black uppercase tracking-widest text-orange-400 mb-2 block">
+                                {link.featured.category}
+                              </span>
+                            )}
+                            <h4 className="text-white font-black text-xl mb-2">{link.featured.title}</h4>
+                            <p className="text-slate-200 text-sm font-medium line-clamp-2">{link.featured.description}</p>
+                            <div className="mt-4 flex items-center text-[11px] font-bold uppercase tracking-widest text-emerald-400 group-hover:text-white transition-colors">
+                              Explore <span className="ml-2">→</span>
+                            </div>
+                          </div>
+                        </a>
+                      )}
                     </div>
                   )}
                 </div>
@@ -362,18 +486,44 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                 
                 {/* Accordion Content */}
                 {link.type === 'mega' && (
-                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${mobileExpanded === link.name ? 'max-h-[600px] opacity-100 mb-4' : 'max-h-0 opacity-0'}`}>
+                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${mobileExpanded === link.name ? 'max-h-[1000px] opacity-100 mb-4' : 'max-h-0 opacity-0'}`}>
                     <div className="pl-4 border-l-2 border-emerald-100 space-y-4 pt-2">
-                      {link.layout === 'services' && SERVICES.map((service, sIdx) => (
-                        <a 
-                          key={sIdx} 
-                          href={`#/services?id=${service.id}`} 
-                          className="block text-[15px] font-medium text-slate-600 hover:text-emerald-600"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          {service.title}
-                        </a>
-                      ))}
+                      {link.layout === 'services' && (
+                        <div className="space-y-4 w-full">
+                          <div>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Geosolution Services</p>
+                            <div className="space-y-2.5 pl-2 border-l border-slate-100">
+                              {SERVICES.filter(s => s.category === 'Geosolutions').map((service, sIdx) => (
+                                <a 
+                                  key={sIdx} 
+                                  href={`#/services/detail?id=${service.id}`} 
+                                  className="block text-[14px] font-medium text-slate-600 hover:text-emerald-600 flex items-center group"
+                                  onClick={() => setIsOpen(false)}
+                                >
+                                  <span className="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 text-emerald-500 mr-0 group-hover:mr-2 flex-shrink-0">→</span>
+                                  {service.title}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Integrated Services</p>
+                            <div className="space-y-2.5 pl-2 border-l border-slate-100">
+                              {SERVICES.filter(s => s.category === 'Integrated').map((service, sIdx) => (
+                                <a 
+                                  key={sIdx} 
+                                  href={`#/services/detail?id=${service.id}`} 
+                                  className="block text-[14px] font-medium text-slate-600 hover:text-emerald-600 flex items-center group"
+                                  onClick={() => setIsOpen(false)}
+                                >
+                                  <span className="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 text-emerald-500 mr-0 group-hover:mr-2 flex-shrink-0">→</span>
+                                  {service.title}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                       
                       {(link.layout === 'links' || link.layout === 'projects') && link.sections && link.sections.map((section, sIdx) => (
                         <div key={sIdx} className="space-y-2">
@@ -400,11 +550,23 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
           {/* Mobile Bottom Actions */}
           <div className="mt-8 pt-8 border-t border-slate-100 space-y-6">
             <div className="flex items-center justify-between px-4">
-              <button className="flex flex-col items-center space-y-2 text-slate-600 hover:text-emerald-600 transition-colors">
+              <button 
+                onClick={() => {
+                  setIsOpen(false);
+                  onSearchClick?.();
+                }}
+                className="flex flex-col items-center space-y-2 text-slate-600 hover:text-emerald-600 transition-colors"
+              >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 <span className="font-bold text-[10px] uppercase tracking-widest">Search</span>
               </button>
-              <button className="flex flex-col items-center space-y-2 text-slate-600 hover:text-emerald-600 transition-colors">
+              <button 
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsDownloadModalOpen(true);
+                }}
+                className="flex flex-col items-center space-y-2 text-slate-600 hover:text-emerald-600 transition-colors"
+              >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                 <span className="font-bold text-[10px] uppercase tracking-widest">Profile</span>
               </button>
@@ -414,7 +576,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                 setIsOpen(false);
                 setIsDownloadModalOpen(true);
               }}
-              className="w-full text-center py-3.5 bg-emerald-750 text-white font-black text-sm uppercase tracking-widest hover:bg-emerald-850 transition-all block mb-3"
+              className="w-full text-center py-3.5 bg-emerald-700 text-white font-black text-sm uppercase tracking-widest hover:bg-emerald-800 transition-all block mb-3"
             >
               Company Profile
             </button>
