@@ -308,9 +308,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                                       <span className="w-0 overflow-hidden group-hover:w-3.5 transition-all duration-300 text-emerald-500 mr-0 group-hover:mr-1.5 flex-shrink-0 font-black mt-0.5">→</span>
                                       <div className="flex flex-col">
                                         <span className="text-[14px] text-slate-800 font-semibold group-hover:text-emerald-700 transition-colors leading-tight">{sublink.label}</span>
-                                        {desc && (
-                                          <span className="text-[11px] text-slate-400 font-medium leading-normal mt-0.5 group-hover:text-slate-500 transition-colors line-clamp-1">{desc}</span>
-                                        )}
                                       </div>
                                     </a>
                                   </li>
@@ -339,7 +336,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                                   <span className="w-0 overflow-hidden group-hover:w-3.5 transition-all duration-300 text-emerald-500 mr-0 group-hover:mr-1.5 flex-shrink-0 font-black mt-0.5">→</span>
                                   <div className="flex flex-col">
                                     <span className="text-[14px] text-slate-800 font-semibold group-hover:text-emerald-700 transition-colors leading-tight">{service.title}</span>
-                                    <span className="text-[11px] text-slate-400 font-medium leading-normal mt-0.5 group-hover:text-slate-500 transition-colors line-clamp-1">{service.description}</span>
                                   </div>
                                 </a>
                               </div>
@@ -360,7 +356,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                                   <span className="w-0 overflow-hidden group-hover:w-3.5 transition-all duration-300 text-emerald-500 mr-0 group-hover:mr-1.5 flex-shrink-0 font-black mt-0.5">→</span>
                                   <div className="flex flex-col">
                                     <span className="text-[14px] text-slate-800 font-semibold group-hover:text-emerald-700 transition-colors leading-tight">{service.title}</span>
-                                    <span className="text-[11px] text-slate-400 font-medium leading-normal mt-0.5 group-hover:text-slate-500 transition-colors line-clamp-1">{service.description}</span>
                                   </div>
                                 </a>
                               </div>
