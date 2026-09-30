@@ -244,7 +244,7 @@ const Projects: React.FC = () => {
                     className="lg:col-span-3 md:col-span-2 bg-white border border-slate-200 overflow-hidden animate-fade-in"
                   >
                     {/* Breadcrumbs */}
-                    <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 pt-8 pb-4">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-10 lg:px-16 pt-8 pb-4">
                       <nav className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-400">
                         <a href="/" className="hover:text-emerald-700">Home</a>
                         <span>/</span>
@@ -256,7 +256,7 @@ const Projects: React.FC = () => {
                     <ReflectiveEnergyLine dark={false} />
 
                     {/* High-Fidelity Hero Section */}
-                    <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-12 lg:py-16 flex flex-col lg:flex-row gap-16 items-center">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-10 lg:px-16 py-8 sm:py-12 lg:py-16 flex flex-col lg:flex-row gap-8 sm:gap-16 items-center">
                       <div className="lg:w-1/2 space-y-6">
                         <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-500">
                           <span className="text-emerald-700">{project.category}</span>
@@ -290,26 +290,26 @@ const Projects: React.FC = () => {
 
                     {/* Data Grid Summary Bar */}
                     <div className="border-t border-b border-slate-200 bg-slate-50">
-                      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+                      <div className="max-w-7xl mx-auto px-4 sm:px-10 lg:px-16">
                         <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-200">
-                          <div className="py-8 pr-6">
+                          <div className="py-5 sm:py-8 pr-4 sm:pr-6">
                             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Operational Location</h4>
-                            <p className="text-lg font-bold text-slate-900">{project.location || 'Nigeria'}</p>
+                            <p className="text-base sm:text-lg font-bold text-slate-900">{project.location || 'Nigeria'}</p>
                           </div>
-                          <div className="py-8 px-6 lg:px-10">
+                          <div className="py-5 sm:py-8 px-0 md:px-6 lg:px-10">
                             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Sector Discipline</h4>
-                            <p className="text-lg font-bold text-slate-900">{project.category}</p>
+                            <p className="text-base sm:text-lg font-bold text-slate-900">{project.category}</p>
                           </div>
-                          <div className="py-8 pl-6 lg:pl-10">
+                          <div className="py-5 sm:py-8 pl-0 md:pl-6 lg:pl-10">
                             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Delivery Timeline</h4>
-                            <p className="text-lg font-bold text-slate-900">{project.year || '2024'}</p>
+                            <p className="text-base sm:text-lg font-bold text-slate-900">{project.year || '2024'}</p>
                           </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Main Content Narrative */}
-                    <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-16 lg:py-24">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-10 lg:px-16 py-10 sm:py-16 lg:py-24">
                       <div className="flex flex-col lg:flex-row gap-16">
                         {/* Narrative Column */}
                         <div className="lg:w-2/3 space-y-16">
@@ -420,7 +420,7 @@ const Projects: React.FC = () => {
                     </div>
 
                     {/* Bottom Back Action */}
-                    <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-10 border-t border-slate-100 flex justify-center">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-10 lg:px-16 py-10 border-t border-slate-100 flex justify-center">
                       <button 
                         onClick={() => {
                           setExpandedId(null);

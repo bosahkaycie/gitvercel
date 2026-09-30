@@ -196,19 +196,19 @@ const AIChatbot: React.FC = () => {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 w-16 h-16 bg-emerald-600 text-white rounded-full shadow-2xl z-[60] flex items-center justify-center hover:bg-orange-600 hover:scale-110 transition-all duration-300"
+        className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 w-14 h-14 sm:w-16 sm:h-16 bg-emerald-600 text-white rounded-full shadow-2xl z-[60] flex items-center justify-center hover:bg-orange-600 hover:scale-110 transition-all duration-300"
       >
         {isOpen ? (
-          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          <svg className="w-7 h-7 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
         ) : (
           <div className="relative">
-            <span className="font-black text-xl">Z</span>
+            <span className="font-black text-lg sm:text-xl">Z</span>
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-ping"></span>
           </div>
         )}
       </button>
 
-      <div className={`fixed bottom-24 right-6 w-[90vw] sm:w-[420px] h-[650px] max-h-[75vh] bg-white shadow-3xl z-[60] flex flex-col rounded-[2.5rem] overflow-hidden border border-slate-200 transition-all duration-500 transform ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95 pointer-events-none'}`}>
+      <div className={`fixed bottom-20 sm:bottom-24 right-3 sm:right-6 w-[calc(100vw-1.5rem)] sm:w-[420px] max-w-[420px] h-[650px] max-h-[82vh] sm:max-h-[75vh] bg-white shadow-3xl z-[60] flex flex-col rounded-2xl sm:rounded-[2.5rem] overflow-hidden border border-slate-200 transition-all duration-500 transform ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95 pointer-events-none'}`}>
         <div className="bg-emerald-950 p-6 text-white flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 bg-gradient-to-tr from-emerald-500 to-emerald-700 flex items-center justify-center font-black rounded-xl text-lg">P</div>
@@ -292,7 +292,7 @@ const AIChatbot: React.FC = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={isListening ? "Listening..." : "Message Polaris Assistant..."}
-                className={`w-full pl-6 pr-14 py-4 bg-slate-50 border ${isListening ? 'border-emerald-500 ring-2 ring-emerald-500/10' : 'border-slate-100'} focus:outline-none focus:ring-2 focus:ring-emerald-500/20 text-sm font-medium rounded-full placeholder-slate-400 transition-all`}
+                className={`w-full pl-6 pr-14 py-4 bg-slate-50 border ${isListening ? 'border-emerald-500 ring-2 ring-emerald-500/10' : 'border-slate-100'} focus:outline-none focus:ring-2 focus:ring-emerald-500/20 text-base sm:text-sm font-medium rounded-full placeholder-slate-400 transition-all`}
               />
               <button
                 type="button"

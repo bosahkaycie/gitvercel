@@ -111,16 +111,16 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
       {/* ========================================================================= */}
       {/* Right 50%: Administrative Sign-In Form */}
       {/* ========================================================================= */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-16 bg-slate-950">
-        <div className="w-full max-w-md space-y-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-12 lg:p-16 bg-slate-950">
+        <div className="w-full max-w-md space-y-6 sm:space-y-8">
           
           {/* Mobile Header Logo (Visible on mobile/tablets) */}
           <div className="lg:hidden text-center">
-            <a href="/" className="inline-block mb-4">
+            <a href="/" className="inline-block mb-3">
               <img
                 src={LogoLightImg}
                 alt="PIGL"
-                className="h-12 mx-auto object-contain"
+                className="h-11 sm:h-12 mx-auto object-contain"
               />
             </a>
             <h2 className="text-xl font-bold text-white tracking-tight">
@@ -142,7 +142,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
           </div>
 
           {/* Login Card */}
-          <div className="bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl space-y-6">
+          <div className="bg-slate-900 border border-slate-800 p-5 sm:p-8 rounded-xl sm:rounded-2xl shadow-2xl space-y-6">
             
             {error && (
               <div className="p-3.5 rounded-lg bg-rose-950/70 border border-rose-800 text-rose-300 text-xs flex items-start space-x-2">
@@ -162,7 +162,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@polarisigl.com"
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-colors font-medium placeholder-slate-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-base sm:text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-colors font-medium placeholder-slate-500"
                 />
               </div>
 
@@ -185,7 +185,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-colors font-medium placeholder-slate-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-base sm:text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-colors font-medium placeholder-slate-500"
                 />
               </div>
 

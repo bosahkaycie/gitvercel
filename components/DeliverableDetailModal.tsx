@@ -49,14 +49,14 @@ const DeliverableDetailModal: React.FC<DeliverableDetailModalProps> = ({
         <div className="h-1.5 w-full bg-gradient-to-r from-emerald-800 via-emerald-600 to-emerald-400" />
 
         {/* Modal Header */}
-        <div className="p-6 sm:p-8 border-b border-slate-100 flex items-start justify-between bg-slate-50/70">
-          <div className="space-y-1.5 pr-4">
-            <div className="flex items-center space-x-2 text-xs font-mono font-bold tracking-wider text-emerald-700 uppercase">
+        <div className="p-4 sm:p-7 border-b border-slate-100 flex items-start justify-between bg-slate-50/70">
+          <div className="space-y-1 pr-3">
+            <div className="flex flex-wrap items-center gap-1.5 text-xs font-mono font-bold tracking-wider text-emerald-700 uppercase">
               <span>{serviceTitle}</span>
               <span className="text-slate-400">•</span>
               <span className="text-slate-500 font-semibold">{division}</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-snug">
+            <h3 className="text-lg sm:text-2xl font-bold text-slate-900 tracking-tight leading-snug">
               {deliverable.title}
             </h3>
           </div>
@@ -74,14 +74,14 @@ const DeliverableDetailModal: React.FC<DeliverableDetailModalProps> = ({
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-slate-700 text-sm sm:text-base leading-relaxed">
+        <div className="p-4 sm:p-7 overflow-y-auto space-y-5 sm:space-y-6 text-slate-700 text-sm sm:text-base leading-relaxed">
           {/* Main Technical Scope & Description */}
           <div>
             <h4 className="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-2.5 flex items-center space-x-2">
               <span className="w-1.5 h-1.5 bg-emerald-600 rounded-none"></span>
               <span>Technical Scope & Methodology</span>
             </h4>
-            <p className="text-slate-700 leading-relaxed font-normal bg-slate-50/60 p-4 border border-slate-100">
+            <p className="text-slate-700 leading-relaxed font-normal bg-slate-50/60 p-3.5 sm:p-4 border border-slate-100 text-xs sm:text-sm">
               {deliverable.description}
             </p>
           </div>
@@ -93,7 +93,7 @@ const DeliverableDetailModal: React.FC<DeliverableDetailModalProps> = ({
                 <span className="w-1.5 h-1.5 bg-slate-800 rounded-none"></span>
                 <span>Deliverable Output & Documentation</span>
               </h4>
-              <div className="bg-slate-50 p-4 border border-slate-200/80 flex items-start space-x-3">
+              <div className="bg-slate-50 p-3.5 sm:p-4 border border-slate-200/80 flex items-start space-x-3">
                 <span className="text-emerald-700 font-bold text-base mt-0.5">📋</span>
                 <p className="text-xs sm:text-sm text-slate-800 font-medium leading-relaxed">
                   {deliverable.deliverablesOutput}
@@ -109,7 +109,7 @@ const DeliverableDetailModal: React.FC<DeliverableDetailModalProps> = ({
                 <span className="w-1.5 h-1.5 bg-slate-800 rounded-none"></span>
                 <span>Applicable Standards & Compliance</span>
               </h4>
-              <div className="bg-emerald-50/60 p-3.5 border border-emerald-100 flex items-center space-x-2.5 text-xs text-emerald-950 font-semibold">
+              <div className="bg-emerald-50/60 p-3 sm:p-3.5 border border-emerald-100 flex items-center space-x-2.5 text-xs text-emerald-950 font-semibold">
                 <span className="text-emerald-700 font-black">✓</span>
                 <span>{deliverable.standards}</span>
               </div>
@@ -118,16 +118,16 @@ const DeliverableDetailModal: React.FC<DeliverableDetailModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-6 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <p className="text-xs text-slate-500 font-normal">
+        <div className="p-4 sm:p-6 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <p className="text-[11px] sm:text-xs text-slate-500 font-normal">
             Conforms to NUPRC & ISO 9001:2015 QA protocols.
           </p>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-600 hover:text-slate-900 border border-slate-300 hover:bg-white transition-colors"
+              className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-600 hover:text-slate-900 border border-slate-300 hover:bg-white transition-colors text-center"
             >
               Close
             </button>
@@ -138,7 +138,7 @@ const DeliverableDetailModal: React.FC<DeliverableDetailModalProps> = ({
                   onInquire(deliverable.title);
                   onClose();
                 }}
-                className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider bg-emerald-700 text-white hover:bg-emerald-800 transition-colors inline-flex items-center space-x-1.5 shadow-sm"
+                className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider bg-emerald-700 text-white hover:bg-emerald-800 transition-colors inline-flex items-center justify-center space-x-1.5 shadow-sm text-center"
               >
                 <span>Scope Deliverable</span>
                 <span>→</span>

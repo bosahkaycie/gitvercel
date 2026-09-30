@@ -217,25 +217,25 @@ const Footer: React.FC = () => {
               <span className="text-xs font-bold tracking-wide">Thank you! You have been successfully subscribed to our updates.</span>
             </div>
           ) : (
-            <form className="flex w-full lg:max-w-md" onSubmit={handleSubscribeSubmit}>
+            <form className="flex flex-col sm:flex-row w-full lg:max-w-md gap-2 sm:gap-0" onSubmit={handleSubscribeSubmit}>
               <input 
                 type="email" 
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email address" 
-                className="flex-grow px-6 py-4 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 transition-colors text-sm font-semibold"
+                className="flex-grow px-4 sm:px-6 py-3.5 sm:py-4 bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 transition-colors text-base sm:text-sm font-semibold"
               />
-              <button type="submit" className="px-8 py-4 bg-slate-900 text-white font-bold text-sm hover:bg-emerald-600 transition-all">
+              <button type="submit" className="px-6 sm:px-8 py-3.5 sm:py-4 bg-slate-900 text-white font-bold text-sm hover:bg-emerald-600 transition-all text-center">
                 Subscribe
               </button>
             </form>
           )}
         </div>
 
-        <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500 font-medium">
+        <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500 font-medium text-center md:text-left gap-4 md:gap-0">
           <p>© {new Date().getFullYear()} Polaris Integrated & Geosolutions Ltd. All rights reserved.</p>
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-2 mt-6 md:mt-0">
+          <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-6 sm:gap-x-8 gap-y-2 mt-4 md:mt-0">
             {(navConfig?.footer?.bottom_links && navConfig.footer.bottom_links.length > 0
               ? navConfig.footer.bottom_links.filter(l => l.is_active)
               : [

@@ -1113,7 +1113,7 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
                     </span>
                   </div>
 
-                  <div className={`border rounded-xl overflow-hidden max-h-60 overflow-y-auto ${
+                  <div className={`border rounded-xl max-h-60 overflow-auto ${
                     isDark ? 'border-slate-800' : 'border-slate-200'
                   }`}>
                     <table className="w-full text-left text-xs">

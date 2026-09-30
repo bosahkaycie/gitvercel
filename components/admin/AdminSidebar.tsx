@@ -121,6 +121,16 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
     if (onCloseMobile) onCloseMobile();
   };
 
+  React.useEffect(() => {
+    if (mobileOpen) {
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalStyle;
+      };
+    }
+  }, [mobileOpen]);
+
   const sidebarContent = (
     <div className={`flex flex-col h-full max-h-screen select-none border-r transition-all duration-300 ${
       isDark 

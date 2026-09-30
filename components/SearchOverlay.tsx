@@ -245,7 +245,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-[100] bg-slate-950/20 backdrop-blur-[2px] flex justify-center items-start pt-[12vh] px-4 transition-all duration-300 animate-fade-in"
+      className="fixed inset-0 z-[100] bg-slate-950/40 backdrop-blur-[3px] flex justify-center items-start pt-6 sm:pt-[12vh] px-3 sm:px-4 transition-all duration-300 animate-fade-in"
       onClick={onClose}
     >
       {/* Spotlight Window Card */}
@@ -255,8 +255,8 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
       >
         
         {/* Search Header Input bar */}
-        <div className="flex items-center px-4 py-3.5 border-b border-slate-100">
-          <svg className="w-5 h-5 text-emerald-800 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center px-3.5 sm:px-4 py-3 sm:py-3.5 border-b border-slate-100">
+          <svg className="w-5 h-5 text-emerald-800 mr-2.5 sm:mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -265,7 +265,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
             value={query}
             onChange={handleQueryChange}
             placeholder="Spotlight Search..."
-            className="w-full bg-transparent text-slate-800 placeholder-slate-400 text-[17px] font-normal focus:outline-none"
+            className="w-full bg-transparent text-slate-800 placeholder-slate-400 text-base sm:text-[17px] font-normal focus:outline-none"
           />
           
           <div className="flex items-center space-x-1.5 ml-2">
@@ -280,7 +280,16 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
                 </svg>
               </button>
             )}
-            <span className="text-xs uppercase font-bold tracking-wider text-slate-500 border border-slate-200 px-2 py-0.5 rounded bg-slate-50">ESC</span>
+            <span className="hidden sm:inline-block text-xs uppercase font-bold tracking-wider text-slate-500 border border-slate-200 px-2 py-0.5 rounded bg-slate-50">ESC</span>
+            <button 
+              onClick={onClose} 
+              className="sm:hidden p-1 text-slate-400 hover:text-slate-800" 
+              aria-label="Close search"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         </div>
 

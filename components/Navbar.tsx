@@ -71,6 +71,18 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [activeDropdown]);
 
+  // Lock background scrolling when mobile menu or modal is open
+  useEffect(() => {
+    if (isOpen || isDownloadModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, isDownloadModalOpen]);
+
   const dynamicNavLinks = (navConfig?.header || [])
     .filter(item => item.is_active)
     .sort((a, b) => a.order - b.order)
@@ -647,47 +659,47 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
       {/* Download Profile Confirmation Modal */}
       {isDownloadModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-fade-in">
-          <div className="relative w-full max-w-lg bg-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-slate-100 overflow-hidden flex flex-col sm:flex-row">
+          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-slate-100 rounded-2xl sm:rounded-none flex flex-col sm:flex-row">
             {/* Close Button */}
             <button 
               onClick={() => setIsDownloadModalOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-900 transition-colors z-10 p-1"
+              className="absolute top-3 right-3 text-slate-400 hover:text-slate-900 transition-colors z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/80 sm:bg-transparent"
               aria-label="Close modal"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
             
             {/* Image Preview Block */}
-            <div className="w-full sm:w-5/12 bg-slate-50 flex items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-slate-100">
+            <div className="w-full sm:w-5/12 bg-slate-50 flex items-center justify-center p-4 sm:p-6 border-b sm:border-b-0 sm:border-r border-slate-100">
               <img 
                 src={ProfileCoverImg} 
                 alt="PIGL Company Profile Cover" 
-                className="w-full max-w-[140px] sm:max-w-none h-auto object-contain shadow-lg border border-slate-200 transform hover:scale-105 transition-transform duration-300"
+                className="w-full max-w-[120px] sm:max-w-none h-auto object-contain shadow-lg border border-slate-200 transform hover:scale-105 transition-transform duration-300"
               />
             </div>
             
             {/* Content & Action Buttons */}
-            <div className="w-full sm:w-7/12 p-8 flex flex-col justify-between">
-              <div className="space-y-4">
-                <h3 className="text-xl font-black text-slate-950 tracking-tight leading-snug">Company Profile</h3>
-                <p className="text-sm font-normal text-slate-500 leading-relaxed">
+            <div className="w-full sm:w-7/12 p-5 sm:p-8 flex flex-col justify-between">
+              <div className="space-y-3 sm:space-y-4">
+                <h3 className="text-lg sm:text-xl font-black text-slate-950 tracking-tight leading-snug">Company Profile</h3>
+                <p className="text-xs sm:text-sm font-normal text-slate-500 leading-relaxed">
                   Would you like to download our comprehensive corporate profile presentation?
                 </p>
               </div>
               
-              <div className="mt-8 space-y-3">
+              <div className="mt-6 sm:mt-8 space-y-2.5 sm:space-y-3">
                 <a
                   href={ProfilePDF}
                   download="PIGL_Company_Profile.pdf"
                   onClick={() => setIsDownloadModalOpen(false)}
-                  className="w-full inline-flex items-center justify-center py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs uppercase tracking-widest transition-colors duration-300"
+                  className="w-full inline-flex items-center justify-center py-3 sm:py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs uppercase tracking-widest transition-colors duration-300 rounded sm:rounded-none"
                 >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                   Confirm Download
                 </a>
                 <button
                   onClick={() => setIsDownloadModalOpen(false)}
-                  className="w-full py-3.5 border-2 border-slate-200 text-slate-600 hover:text-slate-950 hover:border-slate-950 font-black text-xs uppercase tracking-widest transition-colors duration-300"
+                  className="w-full py-3 sm:py-3.5 border-2 border-slate-200 text-slate-600 hover:text-slate-950 hover:border-slate-950 font-black text-xs uppercase tracking-widest transition-colors duration-300 rounded sm:rounded-none"
                 >
                   Cancel
                 </button>

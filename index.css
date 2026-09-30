@@ -5,6 +5,9 @@ html, body {
     width: 100%;
     margin: 0;
     padding: 0;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
 }
 
 body {
@@ -15,13 +18,18 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Fugro-style Typography */
+/* Fluid Responsive Typography */
 .hero-title {
     font-family: 'Inter', sans-serif;
     font-weight: 500;
-    font-size: 4.0rem;
+    font-size: clamp(2.25rem, 5.5vw, 4.0rem);
     line-height: 1.1;
     letter-spacing: -0.01em;
+}
+
+/* Mobile Touch Momentum Scrolling */
+.no-scrollbar, [class*="overflow-x-auto"], [class*="overflow-y-auto"] {
+    -webkit-overflow-scrolling: touch;
 }
 
 .nav-link-font {

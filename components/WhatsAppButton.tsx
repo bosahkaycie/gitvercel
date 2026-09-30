@@ -17,13 +17,13 @@ const WhatsAppButton: React.FC = () => {
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-8 right-8 z-50 group flex items-center print:hidden"
+      className="fixed bottom-5 right-4 sm:bottom-8 sm:right-8 z-50 group flex items-center print:hidden"
       aria-label="Chat on WhatsApp"
     >
       <div className="bg-white text-emerald-900 px-4 py-2 mr-2 shadow-xl border border-emerald-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:block whitespace-nowrap text-sm font-medium">
         Chat with our experts
       </div>
-      <div className="bg-[#25D366] hover:bg-[#128C7E] text-white p-4 shadow-2xl transition-all duration-300 flex items-center justify-center group-hover:scale-110">
+      <div className="bg-[#25D366] hover:bg-[#128C7E] text-white p-3.5 sm:p-4 shadow-2xl transition-all duration-300 flex items-center justify-center group-hover:scale-110">
         <svg 
           className="w-6 h-6" 
           fill="currentColor" 

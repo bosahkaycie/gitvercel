@@ -107,8 +107,12 @@ const VendorRegistration: React.FC = () => {
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    const scaleX = canvas.width / (rect.width || 1);
+    const scaleY = canvas.height / (rect.height || 1);
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
 
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -123,8 +127,12 @@ const VendorRegistration: React.FC = () => {
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    const scaleX = canvas.width / (rect.width || 1);
+    const scaleY = canvas.height / (rect.height || 1);
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
 
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
@@ -407,36 +415,57 @@ const VendorRegistration: React.FC = () => {
 
         {/* Multi-Step Stepper Header */}
         {currentStep <= 5 && (
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs overflow-x-auto">
-            <div className="flex items-center justify-between min-w-[600px] gap-2">
-              {steps.map((st) => {
-                const isPassed = currentStep > st.num;
-                const isCurrent = currentStep === st.num;
+          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
+            {/* Mobile View: Dynamic Progress Bar & Step Name */}
+            <div className="sm:hidden space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-emerald-700">
+                  Step {currentStep} of {steps.length}: {steps[currentStep - 1]?.code}
+                </span>
+                <span className="text-xs font-bold text-slate-800 truncate max-w-[50%]">
+                  {steps[currentStep - 1]?.label}
+                </span>
+              </div>
+              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div 
+                  className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(currentStep / steps.length) * 100}%` }}
+                />
+              </div>
+            </div>
 
-                return (
-                  <div key={st.num} className="flex-1 flex items-center space-x-2">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-xs shrink-0 transition-all ${
-                      isPassed ? 'bg-emerald-600 text-white' :
-                      isCurrent ? 'bg-slate-900 text-emerald-400 ring-2 ring-emerald-500/50' :
-                      'bg-slate-100 text-slate-400 border border-slate-200'
-                    }`}>
-                      {isPassed ? '✓' : st.num}
-                    </div>
-                    <div className="overflow-hidden">
-                      <p className={`text-[10px] font-mono uppercase tracking-wider font-bold truncate ${
-                        isCurrent ? 'text-emerald-700' : 'text-slate-400'
+            {/* Tablet & Desktop View: Multi-Step Stepper */}
+            <div className="hidden sm:block overflow-x-auto">
+              <div className="flex items-center justify-between min-w-[600px] gap-2">
+                {steps.map((st) => {
+                  const isPassed = currentStep > st.num;
+                  const isCurrent = currentStep === st.num;
+
+                  return (
+                    <div key={st.num} className="flex-1 flex items-center space-x-2">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-xs shrink-0 transition-all ${
+                        isPassed ? 'bg-emerald-600 text-white' :
+                        isCurrent ? 'bg-slate-900 text-emerald-400 ring-2 ring-emerald-500/50' :
+                        'bg-slate-100 text-slate-400 border border-slate-200'
                       }`}>
-                        {st.code}
-                      </p>
-                      <p className={`text-xs font-bold truncate ${
-                        isCurrent ? 'text-slate-900' : isPassed ? 'text-slate-700' : 'text-slate-400'
-                      }`}>
-                        {st.label}
-                      </p>
+                        {isPassed ? '✓' : st.num}
+                      </div>
+                      <div className="overflow-hidden">
+                        <p className={`text-[10px] font-mono uppercase tracking-wider font-bold truncate ${
+                          isCurrent ? 'text-emerald-700' : 'text-slate-400'
+                        }`}>
+                          {st.code}
+                        </p>
+                        <p className={`text-xs font-bold truncate ${
+                          isCurrent ? 'text-slate-900' : isPassed ? 'text-slate-700' : 'text-slate-400'
+                        }`}>
+                          {st.label}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
@@ -452,7 +481,7 @@ const VendorRegistration: React.FC = () => {
         )}
 
         {/* Form Body Box */}
-        <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-10 shadow-xs">
+        <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-10 shadow-xs">
           
           {/* STEP 1: SECTION A - VENDOR IDENTIFICATION */}
           {currentStep === 1 && (
