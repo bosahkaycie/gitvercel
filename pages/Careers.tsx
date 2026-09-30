@@ -1,17 +1,20 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useJobOpenings, submitJobApplication } from '../hooks/useSupabaseData';
 import EngineerImg from '../assets/teaching.jpeg';
 import CareersBg from '../assets/inspiring_next_gen.jpeg';
+import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 
 const Careers: React.FC = () => {
-  const [isFormModalOpen, setIsFormModalOpen] = React.useState(false);
-  const [formData, setFormData] = React.useState({ name: '', email: '', phone: '' });
-  const [resumeFile, setResumeFile] = React.useState<File | null>(null);
-  const [dragActive, setDragActive] = React.useState(false);
-  const [uploadProgress, setUploadProgress] = React.useState(0);
-  const [submissionPhase, setSubmissionPhase] = React.useState('');
-  const [status, setStatus] = React.useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-  const [showEmails, setShowEmails] = React.useState(false);
-  const [activeEmailTab, setActiveEmailTab] = React.useState<'recruiter' | 'candidate'>('recruiter');
+  const { jobs, loading: jobsLoading } = useJobOpenings();
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<{ id?: string; title?: string } | null>(null);
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', coverLetter: '' });
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [submissionPhase, setSubmissionPhase] = useState('');
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -59,30 +62,38 @@ const Careers: React.FC = () => {
     }
 
     setStatus('submitting');
-    setUploadProgress(0);
-    
-    // Phase 1: Upload resume
-    setSubmissionPhase('Uploading resume...');
-    for (let p = 0; p <= 35; p += 5) {
-      setUploadProgress(p);
-      await new Promise(r => setTimeout(r, 80));
-    }
+    setUploadProgress(20);
+    setSubmissionPhase('Uploading application dossier...');
 
-    // Phase 2: Verify document structure
-    setSubmissionPhase('Verifying document structure...');
-    for (let p = 35; p <= 70; p += 5) {
-      setUploadProgress(p);
-      await new Promise(r => setTimeout(r, 90));
-    }
+    try {
+      const result = await submitJobApplication({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        job_id: selectedJob?.id,
+        job_title: selectedJob?.title || 'General Application',
+        cover_letter: formData.coverLetter,
+        resume_file: resumeFile
+      });
 
-    // Phase 3: Finalizing application
-    setSubmissionPhase('Finalizing application...');
-    for (let p = 70; p <= 100; p += 5) {
-      setUploadProgress(p);
-      await new Promise(r => setTimeout(r, 100));
-    }
+      setUploadProgress(70);
+      setSubmissionPhase('Registering candidate credentials...');
+      await new Promise(r => setTimeout(r, 200));
 
-    setStatus('success');
+      setUploadProgress(100);
+      setSubmissionPhase('Application successfully received.');
+
+      if (result.success) {
+        setStatus('success');
+      } else {
+        setStatus('error');
+        setErrorMessage(result.error || 'Failed to submit application. Please try again.');
+      }
+    } catch (err: any) {
+      console.error(err);
+      setStatus('error');
+      setErrorMessage(err.message || 'An unexpected error occurred.');
+    }
   };
 
   useEffect(() => {
@@ -122,8 +133,8 @@ const Careers: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-900/50 to-transparent"></div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex items-center space-x-2 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-10">
-            <a href="#/" className="hover:text-white transition-colors">Home</a>
+          <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-8">
+            <a href="/" className="hover:text-white transition-colors">Home</a>
             <span className="text-slate-600">/</span>
             <span className="text-white">Careers</span>
           </div>
@@ -136,6 +147,11 @@ const Careers: React.FC = () => {
               Building the future of Sub-Saharan energy requires the sharpest minds. Come innovate with us and help create a safe and liveable world.
             </p>
           </div>
+        </div>
+
+        {/* Continuous Reflective Energy Line at the base of the Hero & Breadcrumb section */}
+        <div className="absolute bottom-0 left-0 right-0 z-20">
+          <ReflectiveEnergyLine dark={true} />
         </div>
       </section>
 
@@ -174,36 +190,72 @@ const Careers: React.FC = () => {
       {/* Openings Section */}
       <section className="py-20 md:py-32 bg-slate-50 border-y border-slate-200 reveal">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-16">
+          <div className="mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">Current Openings</h2>
-            <p className="text-slate-600 mt-4 text-lg">Explore our active vacancies across Nigeria.</p>
+            <p className="text-slate-600 mt-2 text-base">Explore active career opportunities across our Nigerian operations.</p>
           </div>
 
-          <div className="bg-white border border-slate-200 p-12 text-center space-y-6 shadow-sm reveal">
-            <div className="mx-auto w-16 h-16 bg-slate-50 border border-slate-200 flex items-center justify-center">
-              <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-2xl font-bold text-slate-900 tracking-tight">No Active Vacancies</h3>
-              <p className="text-slate-600 max-w-lg mx-auto text-base">
-                We currently do not have any open positions. However, we are always eager to discover exceptional minds. You can submit your CV below for future consideration.
-              </p>
-            </div>
-          </div>
+          {jobs && jobs.length > 0 ? (
+            <div className="space-y-4 mb-12">
+              {jobs.map((job) => (
+                <div
+                  key={job.id}
+                  className="p-6 bg-white border border-slate-200 hover:border-slate-300 transition-all shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 text-xs">
+                      <span className="font-bold text-emerald-800 uppercase tracking-wider">
+                        {job.department}
+                      </span>
+                      <span className="text-slate-400">•</span>
+                      <span className="text-slate-500 font-medium">{job.location}</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900">{job.title}</h3>
+                    <p className="text-xs text-slate-600 max-w-xl line-clamp-2">{job.description}</p>
+                  </div>
 
-          <div className="mt-8 p-10 md:p-12 bg-white border border-slate-200 text-center shadow-sm reveal">
-            <h3 className="text-xl font-bold text-slate-900 mb-4 tracking-tight">Submit Your CV</h3>
-            <p className="text-slate-600 mb-8 font-normal text-base">
-              Send your CV and a brief cover letter to our recruitment team for future openings in engineering, surveying, reality capture, and swamp/offshore operations.
+                  <button
+                    onClick={() => {
+                      setSelectedJob({ id: job.id, title: job.title });
+                      setIsFormModalOpen(true);
+                    }}
+                    className="px-5 py-2.5 bg-emerald-900 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shrink-0"
+                  >
+                    Apply Now →
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white border border-slate-200 p-12 text-center space-y-6 shadow-sm mb-8">
+              <div className="mx-auto w-16 h-16 bg-slate-50 border border-slate-200 flex items-center justify-center">
+                <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-bold text-slate-900 tracking-tight">No Active Vacancies</h3>
+                <p className="text-slate-600 max-w-lg mx-auto text-base">
+                  We currently do not have any open positions. However, we are always eager to discover exceptional minds. You can submit your CV below for future consideration.
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div className="p-8 md:p-10 bg-white border border-slate-200 text-center shadow-sm">
+            <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">General Talent Network Submission</h3>
+            <p className="text-slate-600 mb-6 font-normal text-sm max-w-lg mx-auto">
+              Send your CV directly to our engineering desk for consideration in surveying, geophysics, marine operations, and reality capture.
             </p>
             <div className="flex justify-center">
               <button 
-                onClick={() => setIsFormModalOpen(true)}
-                className="inline-flex items-center justify-center px-8 py-3.5 bg-emerald-950 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-800 transition-colors"
+                onClick={() => {
+                  setSelectedJob(null);
+                  setIsFormModalOpen(true);
+                }}
+                className="inline-flex items-center justify-center px-8 py-3 bg-emerald-950 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-800 transition-colors"
               >
-                Submit CV <span className="ml-2">→</span>
+                Submit General CV <span className="ml-2">→</span>
               </button>
             </div>
           </div>
@@ -228,29 +280,27 @@ const Careers: React.FC = () => {
             
             {/* Modal Header with Image */}
             <div className="relative h-28 flex flex-col justify-end p-5 text-white overflow-hidden">
-              {/* Background Image */}
               <img 
                 src={EngineerImg} 
                 alt="PIGL Recruitment" 
                 className="absolute inset-0 w-full h-full object-cover"
               />
-              {/* Dark Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
               
-              {/* Content */}
               <div className="relative z-10">
-                <h3 className="text-lg font-black tracking-tight">Submit Your CV</h3>
-                <p className="text-slate-200 text-[10px] mt-0.5 font-medium">Polaris Integrated & GeoSolutions Limited</p>
+                <h3 className="text-lg font-black tracking-tight">
+                  {selectedJob?.title ? `Apply: ${selectedJob.title}` : 'Submit Your CV'}
+                </h3>
+                <p className="text-slate-200 text-xs mt-0.5 font-medium">Polaris Integrated & GeoSolutions Limited</p>
               </div>
 
-              {/* Close Button */}
               <button 
                 onClick={() => {
                   setIsFormModalOpen(false);
                   setStatus('idle');
-                  setFormData({ name: '', email: '', phone: '' });
+                  setFormData({ name: '', email: '', phone: '', coverLetter: '' });
                   setResumeFile(null);
-                  setShowEmails(false);
+                  setSelectedJob(null);
                 }}
                 className="absolute top-3 right-3 z-20 text-white hover:text-emerald-400 transition-colors p-1.5 bg-slate-950/40 backdrop-blur-sm"
                 aria-label="Close modal"
@@ -305,6 +355,18 @@ const Careers: React.FC = () => {
                       />
                     </div>
 
+                    {/* Cover Letter */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1.5">Brief Note / Professional Summary (Optional)</label>
+                      <textarea
+                        rows={2}
+                        value={formData.coverLetter}
+                        onChange={(e) => setFormData({...formData, coverLetter: e.target.value})}
+                        placeholder="Highlight your key engineering background, years of experience, or equipment proficiencies..."
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-emerald-700 font-medium text-slate-800 text-xs placeholder:text-slate-400"
+                      />
+                    </div>
+
                     {/* File Upload Region */}
                     <div>
                       <label className="block text-xs font-bold text-slate-700 mb-1.5">Upload Resume (PDF, DOC, DOCX - Max 10MB)</label>
@@ -333,18 +395,18 @@ const Careers: React.FC = () => {
                               </div>
                               <div>
                                 <span className="text-emerald-700 font-bold text-xs block">Click to upload</span>
-                                <span className="text-slate-400 text-[10px]">or drag and drop here</span>
+                                <span className="text-slate-500 text-xs">or drag and drop here</span>
                               </div>
                             </>
                           ) : (
                             <div className="flex items-center justify-between bg-white border border-slate-200 p-2.5">
                               <div className="flex items-center space-x-2 text-left">
-                                <div className="w-8 h-8 bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 font-bold text-[10px] uppercase">
+                                <div className="w-8 h-8 bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 font-bold text-xs uppercase">
                                   {resumeFile.name.split('.').pop()}
                                 </div>
                                 <div className="min-w-0 flex-1">
                                   <span className="font-bold text-slate-800 text-xs block truncate max-w-[150px]">{resumeFile.name}</span>
-                                  <span className="text-slate-400 text-[10px]">{(resumeFile.size / (1024 * 1024)).toFixed(2)} MB</span>
+                                  <span className="text-slate-500 text-xs">{(resumeFile.size / (1024 * 1024)).toFixed(2)} MB</span>
                                 </div>
                               </div>
                               <button 
@@ -378,7 +440,7 @@ const Careers: React.FC = () => {
                       type="submit"
                       className="px-6 py-2 bg-emerald-950 text-white font-bold hover:bg-emerald-800 transition-colors text-xs"
                     >
-                      Submit CV
+                      Submit Application
                     </button>
                   </div>
                 </form>
@@ -423,7 +485,6 @@ const Careers: React.FC = () => {
                         setStatus('idle');
                         setFormData({ name: '', email: '', phone: '' });
                         setResumeFile(null);
-                        setShowEmails(false);
                       }}
                       className="px-8 py-3 bg-emerald-950 text-white font-bold hover:bg-emerald-800 transition-colors text-xs"
                     >

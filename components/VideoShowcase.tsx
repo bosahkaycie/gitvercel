@@ -23,7 +23,7 @@ const VideoShowcase: React.FC = () => {
         <section className="py-20 md:py-32 bg-white border-t border-slate-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16 space-y-4">
-                    <span className="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] md:text-xs">20 Years of Excellence</span>
+                    <span className="text-orange-600 font-bold uppercase tracking-wider text-xs">20 Years of Excellence</span>
                     <h2 className="text-3xl md:text-5xl font-black text-slate-900 leading-tight">Celebrating Our <span className="text-emerald-600 italic">Legacy</span></h2>
                     <p className="text-slate-500 max-w-2xl mx-auto text-sm md:text-lg font-light">Witness the journey, the people, and the milestones that have defined Polaris Integrated and Geosolutions Limited over two decades.</p>
                 </div>
@@ -50,7 +50,7 @@ const VideoShowcase: React.FC = () => {
                                 </div>
                                 {/* Native Branding Corner */}
                                 <div className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <div className="bg-emerald-600 text-white text-[8px] font-black uppercase tracking-widest px-2 py-1">20th ANNIVERSARY</div>
+                                    <div className="bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider px-2.5 py-1">20th ANNIVERSARY</div>
                                 </div>
                             </div>
                             <div className="space-y-2">
@@ -87,7 +87,7 @@ const VideoShowcase: React.FC = () => {
 
                         {/* Video branding top bar */}
                         <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-emerald-950 to-transparent z-[5] pointer-events-none px-6 flex items-center">
-                            <span className="text-emerald-400 font-black text-[10px] uppercase tracking-[0.4em]">{activeVideo.title}</span>
+                            <span className="text-emerald-400 font-bold text-xs uppercase tracking-wider">{activeVideo.title}</span>
                         </div>
 
                         <iframe

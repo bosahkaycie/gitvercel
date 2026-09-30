@@ -2,8 +2,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { SERVICES, PROJECTS, CORE_VALUES, CONTACT_CONFIG } from '../site_data';
+import { useSiteSettings } from '../hooks/useSupabaseData';
 
 const AIChatbot: React.FC = () => {
+  const { settings } = useSiteSettings();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'model'; text: string; links?: { label: string; href: string }[] }[]>([
     { role: 'model', text: "Hello! Welcome to Polaris Integrated and Geosolutions Limited. I'm Polaris Assistant, your dedicated digital receptionist. How can I assist you today? 👋" }
@@ -132,8 +134,8 @@ const AIChatbot: React.FC = () => {
         PRIMARY OBJECTIVES:
         1. ASSIST: Answer questions about PIGL using the provided context.
         2. LEAD CAPTURE: If a user has a specific business inquiry or request, naturally ask for their name and email/phone so a human representative can follow up. 
-           - Example: "I'd love to have one of our engineers reach out to you about that. May I get your name and email address?"
-        3. ROUTE: Guide users to relevant sections of the site (#/services, #/projects, #/contact).
+        - Example: "I'd love to have one of our engineers reach out to you about that. May I get your name and email address?"
+        3. ROUTE: Guide users to relevant sections of the site (/services, /projects, /contact).
 
         STRICT CONVERSATIONAL RULES:
         - Keep responses concise but polished.
@@ -171,15 +173,15 @@ const AIChatbot: React.FC = () => {
 
       const suggestedLinks: { label: string; href: string }[] = [];
       const lowerText = aiText.toLowerCase();
-      if (lowerText.includes('service') || lowerText.includes('solutions')) suggestedLinks.push({ label: 'Explore Services', href: '#/services' });
-      if (lowerText.includes('project') || lowerText.includes('case study')) suggestedLinks.push({ label: 'View Projects', href: '#/projects' });
-      if (lowerText.includes('career') || lowerText.includes('job')) suggestedLinks.push({ label: 'Careers', href: '#/careers' });
-      if (lowerText.includes('contact') || lowerText.includes('call') || lowerText.includes('office')) suggestedLinks.push({ label: 'Get in Touch', href: '#/contact' });
+      if (lowerText.includes('service') || lowerText.includes('solutions')) suggestedLinks.push({ label: 'Explore Services', href: '/services' });
+      if (lowerText.includes('project') || lowerText.includes('case study')) suggestedLinks.push({ label: 'View Projects', href: '/projects' });
+      if (lowerText.includes('career') || lowerText.includes('job')) suggestedLinks.push({ label: 'Careers', href: '/careers' });
+      if (lowerText.includes('contact') || lowerText.includes('call') || lowerText.includes('office')) suggestedLinks.push({ label: 'Get in Touch', href: '/contact' });
 
       setMessages(prev => [...prev, { role: 'model', text: aiText, links: suggestedLinks }]);
     } catch (error: any) {
       console.error('Chatbot Error:', error);
-      let errorMessage = `I hit a snag. 😅 Reach us at ${CONTACT_CONFIG.emailInfo} while I fix myself!`;
+      let errorMessage = `I hit a snag. 😅 Reach us at ${settings?.email_info || CONTACT_CONFIG.emailInfo} while I fix myself!`;
       if (error.message?.includes('API Key')) errorMessage += " (Configuration Error: API Key missing)";
       else if (error.message?.includes('fetch')) errorMessage += " (Network Error: Please check connection)";
       else errorMessage += ` (Error: ${error.message || 'Unknown'})`;
@@ -214,7 +216,7 @@ const AIChatbot: React.FC = () => {
               <p className="font-black text-sm tracking-tight">Polaris Assistant</p>
               <div className="flex items-center space-x-1.5">
                 <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
-                <span className="text-[9px] text-emerald-400 font-bold uppercase tracking-widest">PIGL Digital Reception</span>
+                <span className="text-xs text-emerald-300 font-bold uppercase tracking-wider">PIGL Digital Reception</span>
               </div>
             </div>
           </div>
@@ -227,7 +229,7 @@ const AIChatbot: React.FC = () => {
           {/* Quick Actions */}
           {messages.length === 1 && (
             <div className="flex flex-col space-y-2 animate-in slide-in-from-bottom-2 duration-700">
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest ml-1 mb-1">Quick Actions</p>
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider ml-1 mb-1">Quick Actions</p>
               <div className="flex flex-wrap gap-2">
                 {[
                   { label: "Request a Quote", text: "I'd like to request a quote for a project." },
@@ -240,7 +242,7 @@ const AIChatbot: React.FC = () => {
                     onClick={() => {
                       setInput(action.text);
                     }}
-                    className="px-4 py-2 bg-white border border-slate-200 text-[11px] font-bold text-emerald-900 rounded-full hover:border-emerald-500 hover:bg-emerald-50 transition-all shadow-sm"
+                    className="px-4 py-2 bg-white border border-slate-200 text-xs font-semibold text-emerald-900 rounded-full hover:border-emerald-500 hover:bg-emerald-50 transition-all shadow-sm"
                   >
                     {action.label}
                   </button>
@@ -252,14 +254,14 @@ const AIChatbot: React.FC = () => {
           {messages.map((msg, idx) => (
             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[88%] p-5 shadow-sm ${msg.role === 'user' ? 'bg-emerald-600 text-white rounded-[1.8rem] rounded-tr-sm font-medium' : 'bg-white border border-slate-100 text-slate-800 rounded-[1.8rem] rounded-tl-sm'}`}>
-                <p className="text-[14px] leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>
                 {msg.links && msg.links.length > 0 && (
                   <div className="mt-4 flex flex-wrap gap-2">
                     {msg.links.map((link, lIdx) => (
                       <a
                         key={lIdx}
                         href={link.href}
-                        className="px-4 py-2 bg-emerald-50 text-emerald-900 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 hover:text-white transition-all rounded-full border border-emerald-100"
+                        className="px-4 py-2 bg-emerald-50 text-emerald-900 text-xs font-bold uppercase tracking-wider hover:bg-emerald-700 hover:text-white transition-all rounded-full border border-emerald-100"
                         onClick={() => { if (link.href.startsWith('#')) setIsOpen(false); }}
                       >
                         {link.label}
@@ -290,7 +292,7 @@ const AIChatbot: React.FC = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={isListening ? "Listening..." : "Message Polaris Assistant..."}
-                className={`w-full pl-6 pr-14 py-4 bg-slate-50 border ${isListening ? 'border-emerald-500 ring-2 ring-emerald-500/10' : 'border-slate-100'} focus:outline-none focus:ring-2 focus:ring-emerald-500/20 text-[14px] font-medium rounded-full placeholder-slate-400 transition-all`}
+                className={`w-full pl-6 pr-14 py-4 bg-slate-50 border ${isListening ? 'border-emerald-500 ring-2 ring-emerald-500/10' : 'border-slate-100'} focus:outline-none focus:ring-2 focus:ring-emerald-500/20 text-sm font-medium rounded-full placeholder-slate-400 transition-all`}
               />
               <button
                 type="button"
@@ -312,12 +314,12 @@ const AIChatbot: React.FC = () => {
             </button>
           </form>
 
-          <div className="mt-4 flex items-center justify-center space-x-6 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-            <a href={`tel:${CONTACT_CONFIG.phoneRaw}`} className="hover:text-emerald-600 flex items-center">
+          <div className="mt-4 flex items-center justify-center space-x-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <a href={`tel:${settings?.phone_raw || CONTACT_CONFIG.phoneRaw}`} className="hover:text-emerald-600 flex items-center">
               <span className="mr-1.5">📞</span> Phone
             </a>
             <span className="opacity-20">|</span>
-            <a href="#/contact" className="hover:text-emerald-600 flex items-center">
+            <a href="/contact" className="hover:text-emerald-600 flex items-center">
               <span className="mr-1.5">🤝</span> Quote
             </a>
           </div>

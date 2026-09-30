@@ -11,6 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.*
+!.env.example
 
 # Editor directories and files
 .vscode/*
@@ -24,4 +27,8 @@ dist-ssr
 *.sw?
 .vercel
 scratch/
+*.tar.gz
+test.mp4
+ground_intel_loop.mp4
+.agents/
 

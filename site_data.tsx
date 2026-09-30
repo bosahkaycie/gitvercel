@@ -1,12 +1,19 @@
  
-import { Service, Project, TeamMember, LinkedInPost, CoreValue } from './types';
-import RealityCaptureImg from './assets/DJI_0191.JPG';
+import { Service, Project, TeamMember, LinkedInPost, CoreValue, Partner, SubService } from './types';
+import RealityCaptureImg from './assets/digital_intel_scanner.jpg';
+import MarineIntelImg from './assets/marine_intel_metocean.jpg';
+import GroundIntelImg from './assets/cpt.png';
+import SpatialIntelImg from './assets/geomatics_survey.png';
+import AssetIntegrityImg from './assets/IMG_6170.jpg';
+import PipelineImg from './assets/newpipeline.png';
+import RigImg from './assets/rig_positioning.png';
+import WaterTreatmentImg from './assets/drilling.png';
+import ProcurementImg from './assets/procure.jpg';
+
 import GeosolutionsImg from './assets/DJI_0003.jpg';
-import PipelineImg from './assets/DJI_0240.jpg';
 import CivilWorksImg from './assets/road-feat-700x500.jpg';
 import IntegratedImg from './assets/cabin.png';
 import AkkImg from './assets/akk_pipeline.png';
-import RigImg from './assets/rig_positioning.png';
 import FacilityImg from './assets/new capture.png';
 import DrillingImg from './assets/drilling.png';
 import RoadImg from './assets/road.png';
@@ -21,7 +28,6 @@ import LayefaImg from './assets/management/layefa.png';
 import UjuImg from './assets/management/uju.png';
 import BrianImg from './assets/management/brian.png';
 import SteveImg from './assets/management/steve.png';
-import HbdImg from './assets/HBD.jpg';
 import TechImg from './assets/IMG_6170.jpg';
 import NextGenImg from './assets/inspiring_next_gen.jpeg';
 import TeamImg from './assets/team.jpeg';
@@ -30,10 +36,22 @@ import OceanImg from './assets/new ocean.png';
 import SeismicSurveyImg from './assets/seismic_survey.png';
 import AssetManagementImg from './assets/asset_management.png';
 import GeomaticsSurveyImg from './assets/geomatics_survey.png';
+import Iso9001Img from './assets/Q-Mark (ISO 9001).png';
+import Iso45001Img from './assets/Q-Mark (ISO 45001).png';
 
-
-
-
+// Authentic Field Operations & Asset Photography
+import OpLogisticsBaseImg from './assets/operations/pigl_logistics_base_aerial.jpg';
+import OpMarineCrewImg from './assets/operations/pigl_marine_crew_vessel.jpg';
+import OpWeldingImg from './assets/operations/pigl_pipeline_marine_welding.jpg';
+import OpGeomaticsImg from './assets/operations/pigl_geomatics_survey_quay.jpg';
+import OpWinchPiglImg from './assets/operations/pigl_offshore_winch_pigl_container.jpg';
+import OpOffshoreBargeImg from './assets/operations/pigl_offshore_geotech_drilling_barge.jpg';
+import OpSubbottomSb216Img from './assets/operations/pigl_subbottom_profiler_sb216s.jpg';
+import OpDrillCrewCasingImg from './assets/operations/pigl_offshore_drill_crew_casing.jpg';
+import OpLaserCoolerImg from './assets/operations/pigl_3d_laser_scan_facility_cooler.jpg';
+import OpLaserManifoldImg from './assets/operations/pigl_3d_laser_scan_manifold_station.jpg';
+import OpRealityJettyImg from './assets/operations/pigl_3d_reality_capture_jetty_plant.jpg';
+import OpPipelineSwampCatImg from './assets/operations/pigl_pipeline_construction_swamp_cat.jpg';
 
 export const COLORS = {
   primary: '#064E3B',
@@ -55,270 +73,346 @@ export const CONTACT_CONFIG = {
 
 export const CORE_VALUES: CoreValue[] = [
   {
-    title: 'Professionalism',
-    description: 'We adhere to the highest industry standards, delivering excellence through expertise and discipline.',
+    title: 'Technical Integrity',
+    description: 'Uncompromising engineering precision, transparent methodologies, and reliable data that clients and partners can always trust.',
     icon: '⚙️'
   },
   {
-    title: 'Innovation',
-    description: 'Embracing the latest technology like 3D Reality Capture to solve complex engineering challenges.',
+    title: 'Safety First (HSSE)',
+    description: 'Safety is built into every project, maintaining strict health, safety, and environmental standards to protect our personnel, assets, and host communities.',
+    icon: '⛑️'
+  },
+  {
+    title: 'Innovation & Technology',
+    description: 'Deploying high-precision 3D laser scanners, oceanographic buoys, and digital modeling tools to solve everyday energy challenges efficiently.',
     icon: '💡'
   },
   {
-    title: 'Integrity',
-    description: 'Honesty and transparency in all our dealings with clients, stakeholders, and host communities.',
+    title: 'Client Collaboration',
+    description: 'Building long-term, transparent relationships with national and international energy companies as a dependable indigenous technical partner.',
     icon: '🛡️'
-  },
-  {
-    title: 'Safety First',
-    description: 'Unwavering commitment to 100% safety compliance and ISO certified management systems.',
-    icon: '⛑️'
   }
 ];
 
-export const SERVICES: Service[] = [
-  // Geosolution Services
-  {
-    id: 'geophysical-surveys',
-    title: 'Geophysical Surveys',
-    description: 'High-resolution marine and land geophysics including sub-bottom profiling, seismic refraction, magnetics, and electrical resistivity for engineering, hazard detection, and geological mapping.',
-    items: [
-      'Sub-bottom Profiling & Hydrography',
-      'Side Scan Sonar Surveys',
-      'Electrical Resistivity Tomography',
-      'Seismic Refraction & MASW'
-    ],
-    icon: '🌐',
-    image: SubImg,
-    category: 'Geosolutions'
-  },
-  {
-    id: 'geotechnical-services',
-    title: 'Geotechnical Services',
-    description: 'Comprehensive soil and rock mechanics investigations, featuring high-capacity in-situ testing (CPT, SPT), laboratory analysis, and engineering reports for deep foundation designs.',
-    items: [
-      'Cone Penetration Testing (CPT)',
-      'Soil Boring & Standard Penetration',
-      'Laboratory Soil & Rock Testing',
-      'Foundation & Slope Stability Analysis'
-    ],
-    icon: '🔬',
-    image: GeosolutionsImg,
-    category: 'Geosolutions'
-  },
-  {
-    id: 'climate-environmental-metocean',
-    title: 'Climate, Environmental & Metocean Solutions',
-    description: 'Providing critical meteorological, oceanographic, and environmental studies. We deliver data-driven insights to protect coastal infrastructure and ensure environmental compliance.',
-    items: [
-      'Metocean Data Acquisition',
-      'Environmental Impact Assessments (EIA)',
-      'Coastal Erosion & Wave Modeling',
-      'Environmental Monitoring & Auditing'
-    ],
-    icon: '🌊',
-    image: OceanImg,
-    category: 'Geosolutions'
-  },
-  {
-    id: 'geomatics-services',
-    title: 'Geomatics Services',
-    description: 'Pioneering spatial engineering through precision land surveying, geodetic positioning, geographical information systems (GIS), and high-resolution UAV aerial mapping.',
-    items: [
-      'Geodetic & Control Surveys',
-      'UAV Aerial Mapping & Photogrammetry',
-      'GIS Mapping & Spatial Analysis',
-      'Topographic & Cadastral Surveys'
-    ],
-    icon: '📐',
-    image: GeomaticsSurveyImg,
-    category: 'Geosolutions'
-  },
+// Services Under Ground Intelligence
+export const GROUND_INTELLIGENCE_SERVICES: SubService[] = [
   {
     id: 'seismic-services',
     title: 'Seismic Services',
-    description: 'Expert seismic data acquisition, advanced processing, and geophysical interpretation to characterize complex subsurface geologic structures for energy developments.',
-    items: [
-      'Seismic Data Acquisition',
-      'Subsurface Structural Mapping',
-      'Shallow Gas Hazard Detection',
-      'Geophysical Interpretation'
-    ],
-    icon: '📉',
-    image: SeismicSurveyImg,
-    category: 'Geosolutions'
+    description: '2D and 3D digital seismic surveys, data harvesting, node deployment and life of field surveys to support ongoing operations and foundation design.',
+    icon: '📊'
   },
   {
-    id: 'oilfield-services',
-    title: 'Oilfield Services',
-    description: 'High-assurance technical support for swamp, nearshore, and deepwater exploration. Providing precise rig positioning, tug management, and anchor handling services.',
-    items: [
-      'Offshore Rig Positioning',
-      'Tug Management & Anchor Tracking',
-      'Barge & Vessel Marine Support',
-      'Swamp & Offshore Drilling Support'
-    ],
-    icon: '⚓',
-    image: RigImg,
-    category: 'Geosolutions'
+    id: 'seabed-mapping',
+    title: 'Seabed Mapping',
+    description: 'Our geophysical surveys provide detailed information on the seabed and sub-seabed conditions.',
+    icon: '🗺️'
   },
   {
-    id: 'onshore-nearshore-geotechnical',
-    title: 'Onshore and Nearshore Geotechnical Services',
-    description: 'Specialized shallow-water and nearshore drilling. We supply vital soil characterization for ports, jetties, marine terminals, and nearshore energy infrastructure.',
-    items: [
-      'Nearshore Marine Soil Boring',
-      'Shallow-water CPT Operations',
-      'Beach & Estuary Soil Sampling',
-      'Jetty & Port Foundation Studies'
-    ],
-    icon: '🏖️',
-    image: DrillingImg,
-    category: 'Geosolutions'
+    id: 'geotechnical-sampling',
+    title: 'Geotechnical Sampling',
+    description: 'We collect data from seabed sampling and in-situ testing to provide insights on soil characteristics.',
+    icon: '🧪'
   },
   {
-    id: 'asset-integrity-services',
-    title: 'Asset Integrity Services',
-    description: 'Rigorous technical assurance for operational assets. We provide non-destructive testing (NDT), corrosion monitoring, and advanced structural health inspections.',
+    id: 'asset-inspection',
+    title: 'Asset Inspection',
+    description: 'Our accurate, high-resolution inspection services provide insights to support offshore asset management.',
+    icon: '🔍'
+  },
+  {
+    id: 'hydrographic-survey',
+    title: 'Hydrographic Survey',
+    description: 'Our hydrographic survey services provide high precision seabed maps.',
+    icon: '📐'
+  },
+  {
+    id: 'search-and-salvage',
+    title: 'Search and Salvage',
+    description: 'Location and recovery of lost assets in shallow coastal waters down to the deepest depths of the ocean.',
+    icon: '⚓'
+  },
+  {
+    id: 'environmental-survey',
+    title: 'Environmental survey',
+    description: 'We support the understanding of complex marine ecosystems using habitat classification, statistical analyses, and in-depth data interpretation.',
+    icon: '🌿'
+  }
+];
+
+// Mapping for backward compatibility from old service URLs to the new architecture
+export const LEGACY_SERVICE_MAP: Record<string, string> = {
+  // Legacy aliases to 5 Canonical Platforms
+  'reality-capture': 'digital-intelligence',
+  '3d-laser-scanning': 'digital-intelligence',
+  'digital-twins': 'digital-intelligence',
+  'geophysical-surveys': 'offshore-intelligence',
+  'marine-intelligence': 'offshore-intelligence',
+  'climate-environmental-metocean': 'offshore-intelligence',
+  'metocean': 'offshore-intelligence',
+  'hydrographic-survey': 'ground-intelligence',
+  'geotechnical-services': 'ground-intelligence',
+  'onshore-nearshore-geotechnical': 'ground-intelligence',
+  'seismic-services': 'ground-intelligence',
+  'seabed-mapping': 'ground-intelligence',
+  'geotechnical-sampling': 'ground-intelligence',
+  'asset-inspection': 'ground-intelligence',
+  'search-and-salvage': 'ground-intelligence',
+  'environmental-survey': 'ground-intelligence',
+  'geomatics-services': 'ground-intelligence',
+  'spatial-intelligence': 'ground-intelligence',
+  'geomatics': 'ground-intelligence',
+  'pipeline-construction': 'integrated-engineering-construction',
+  'infrastructure-construction': 'integrated-engineering-construction',
+  'civil-works': 'integrated-engineering-construction',
+  'oilfield-services': 'integrated-engineering-construction',
+  'field-operations': 'integrated-engineering-construction',
+  'asset-integrity-services': 'industrial-environmental-technologies',
+  'asset-integrity-management': 'industrial-environmental-technologies',
+  'asset-integrity': 'industrial-environmental-technologies',
+  'facility-maintenance': 'industrial-environmental-technologies',
+  'asset-management': 'industrial-environmental-technologies',
+  'water-environmental-solutions': 'industrial-environmental-technologies',
+  'engineering-procurement': 'industrial-environmental-technologies',
+  'produced-water-treatment': 'industrial-environmental-technologies',
+  'industrial-water-treatment': 'industrial-environmental-technologies',
+  'water-treatment-plants': 'industrial-environmental-technologies',
+  'valves-and-actuators': 'industrial-environmental-technologies',
+  'flow-control-and-automation': 'industrial-environmental-technologies'
+};
+
+export const SERVICES: Service[] = [
+  // 1. GROUND INTELLIGENCE
+  {
+    id: 'ground-intelligence',
+    serviceNumber: '01',
+    title: 'Ground Intelligence',
+    tagline: 'Understand the ground, build with confidence.',
+    description: 'We perform detailed soil and rock investigations, ground strength testing, foundation studies, and land surveying across Nigeria, providing clear data before construction begins.',
     items: [
-      'Non-Destructive Testing (NDT)',
-      'Corrosion Monitoring & Audits',
-      'Structural Health Inspections',
-      'Pipeline Scanning & Integrity Checks'
+      'Seismic Services (2D/3D digital seismic surveys, node deployment & harvesting)',
+      'Seabed Mapping & Sub-Seabed Geophysical Surveys',
+      'Geotechnical Sampling & In-Situ Soil Mechanics Testing',
+      'Asset Inspection for Offshore Asset Management & Integrity',
+      'Hydrographic Survey & High-Precision Seabed Bathymetry',
+      'Search and Salvage Operations in Shallow & Deep Waters',
+      'Environmental Survey, Ecosystem Habitat Classification & Data Interpretation',
+      'Hydraulic Cone Penetration Testing (20-Ton CPT & CPTu profiling)'
     ],
-    icon: '🛡️',
-    image: TechImg,
-    category: 'Geosolutions'
+    subServices: GROUND_INTELLIGENCE_SERVICES,
+    icon: '🔬',
+    image: OpDrillCrewCasingImg,
+    division: 'Ground Intelligence'
   },
 
-  // Integrated Services
+  // 2. DIGITAL INTELLIGENCE
   {
-    id: 'pipeline-construction',
-    title: 'Pipeline Construction',
-    description: 'API-standard pipeline laying, fabrication, and comprehensive welding support in challenging swamp, nearshore, and land terrains, backed by stringent hydrostatic testing.',
+    id: 'digital-intelligence',
+    serviceNumber: '02',
+    title: 'Digital Intelligence',
+    tagline: 'Capture reality, create certainty.',
+    description: 'We use high-precision 3D laser scanners to create exact digital computer models of industrial facilities, offshore platforms, and equipment, helping teams plan modifications and prevent installation clashes.',
     items: [
-      'Welding & Precision Fabrication',
-      'Pipeline Laying & Route Clearance',
-      'Hydrostatic & NDT Testing',
-      'Cathodic Protection Systems'
-    ],
-    icon: '🔧',
-    image: PipelineImg,
-    category: 'Integrated'
-  },
-  {
-    id: 'facility-maintenance',
-    title: 'Facility Maintenance',
-    description: 'Comprehensive preventive, corrective, and mechanical maintenance of processing facilities, flow stations, valves, storage terminals, and active pipeline networks.',
-    items: [
-      'Flow Station Maintenance',
-      'Valve & Flange Servicing',
-      'Mechanical & Structural Repairs',
-      'Cathodic Protection Maintenance'
-    ],
-    icon: '🛠',
-    image: FacilityImg,
-    category: 'Integrated'
-  },
-  {
-    id: 'asset-management',
-    title: 'Asset Management',
-    description: 'End-to-end technical support for physical assets, including high-caliber manpower supply, engineering procurement, industrial water drilling, and operations optimization.',
-    items: [
-      'Technical Manpower Supply',
-      'Engineering Procurement Support',
-      'Industrial Water Borehole Drilling',
-      'Operational Asset Support'
-    ],
-    icon: '📈',
-    image: AssetManagementImg,
-    category: 'Integrated'
-  },
-  {
-    id: 'reality-capture',
-    title: 'Reality Capture',
-    description: 'Precision 3D Laser Scanning, digital twin modeling, dimension control, and intelligent As-Built digitalization for brownfield modifications and structural assurance.',
-    items: [
-      '3D Laser Scanning & Digital Twins',
-      'Intelligent As-Built 3D Modeling',
-      'Dimension Control & Alignment',
-      'UAV Reality Capture Surveys'
+      'High-precision 3D terrestrial and mobile laser scanning',
+      'Point-cloud processing, registration, and 3D modeling',
+      'As-built 3D CAD and BIM computer models',
+      'Dimensional control and clash detection before site installation',
+      'Digital twins and virtual walkthroughs for operating facilities',
+      'Facility modifications, pipe fitting, and tie-in planning',
+      'Structural deformation monitoring and geometric checks'
     ],
     icon: '📸',
-    image: DigiTwinImg,
-    category: 'Integrated'
+    image: OpLaserManifoldImg,
+    division: 'Digital Intelligence'
+  },
+
+  // 3. INTEGRATED ENGINEERING & CONSTRUCTION SOLUTIONS
+  {
+    id: 'integrated-engineering-construction',
+    serviceNumber: '03',
+    title: 'Integrated Engineering & Construction Solutions',
+    tagline: 'From engineering insight to physical infrastructure and field delivery.',
+    description: 'We build pipelines, perform certified welding and integrity pressure testing, construct civil infrastructure, and manage field operations across land, swamp, and offshore locations.',
+    items: [
+      'Pipeline fabrication, pipe laying, and certified welding',
+      'Hydrostatic pressure testing and corrosion protection',
+      'Site preparation, piling, and heavy industrial foundations',
+      'Structural concrete and civil infrastructure construction',
+      'Access road construction and swamp terrain rehabilitation',
+      'Swamp, coastal, and offshore field operations support',
+      'Rig positioning and vessel navigation support',
+      'Tugboat management, anchor handling, and logistics'
+    ],
+    icon: '🔧',
+    image: OpPipelineSwampCatImg,
+    division: 'Integrated Engineering & Construction Solutions'
+  },
+
+  // 4. INDUSTRIAL & ENVIRONMENTAL TECHNOLOGIES
+  {
+    id: 'industrial-environmental-technologies',
+    serviceNumber: '04',
+    title: 'Industrial & Environmental Technologies',
+    tagline: 'Treat water, control flow, and protect asset integrity.',
+    description: 'We deliver environmental water treatment systems that remove oil and impurities, supply automated industrial valves, and perform equipment inspections to keep facilities running safely.',
+    items: [
+      'Produced water and industrial wastewater treatment systems',
+      'Oil separation units and filtration skids for environmental compliance',
+      'Water treatment plants and subsurface reinjection systems',
+      'Industrial valves and automated actuator control packages',
+      'Flow control valve servicing, calibration, and maintenance',
+      'Non-destructive testing, ultrasonic testing, and radiographic inspections',
+      'Corrosion monitoring, wall-thickness measurement, and fitness reviews',
+      'Flow station mechanical maintenance and facility upgrades'
+    ],
+    icon: '💧',
+    image: WaterTreatmentImg,
+    division: 'Industrial & Environmental Technologies',
+    partnerBadge: {
+      partnerName: 'CoaleXpert & NPK Automation',
+      role: 'Industrial & Environmental Technology Partners'
+    }
+  },
+
+  // 5. OFFSHORE INTELLIGENCE
+  {
+    id: 'offshore-intelligence',
+    serviceNumber: '05',
+    title: 'Offshore Intelligence',
+    tagline: 'From seabed conditions to ocean dynamics.',
+    description: 'We provide marine geophysical surveys, seabed depth mapping, underwater hazard detection, and continuous weather buoys across coastal, nearshore, and deepwater energy corridors.',
+    items: [
+      'Marine geophysical surveys and seabed acoustic mapping',
+      'High-resolution hydrographic depth mapping and bathymetry',
+      'Sub-bottom profiling, side-scan sonar, and underwater surveys',
+      'Oceanographic weather buoys, wave monitoring, and current telemetry',
+      'Meteorological observation stations and environmental logging',
+      'Marine environmental compliance and water quality monitoring',
+      'Subsea pipeline route surveys and seabed clearance',
+      'Real-time environmental data transmission for offshore operations'
+    ],
+    icon: '🌊',
+    image: OpOffshoreBargeImg,
+    division: 'Offshore Intelligence',
+    partnerBadge: {
+      partnerName: 'Frankstar Technology',
+      role: 'Strategic MetOcean Technology Partner'
+    }
+  }
+];
+
+export const PARTNERS: Partner[] = [
+  {
+    id: 'frankstar',
+    name: 'Frankstar Technology',
+    role: 'Strategic MetOcean & Marine Intelligence Partner',
+    specialty: 'Oceanographic Observation, MetOcean Buoys & Real-Time Telemetry',
+    description: 'Through our partnership with Frankstar Technology, PIGL provides oceanographic weather buoys, wave monitoring, current profiling, and real-time marine weather data to support safe coastal and offshore operations.',
+    capabilities: [
+      'Oceanographic weather buoys for wave, current, and tidal monitoring',
+      'Meteorological weather stations and data loggers',
+      'Real-time environmental data transmission',
+      'Water quality monitoring and underwater sensors',
+      'Marine operational safety monitoring'
+    ],
+    website: 'https://www.frankstartech.com/',
+    serviceId: 'offshore-intelligence',
+    serviceTitle: 'Offshore Intelligence'
   },
   {
-    id: 'civil-works',
-    title: 'Civil Works',
-    description: 'Premium industrial civil engineering solutions, including site preparation, piling and foundation engineering, structural concrete, and access road construction/rehabilitation.',
-    items: [
-      'Site Preparation & Leveling',
-      'Piling & Foundation Works',
-      'Access Road Construction & Repair',
-      'Industrial Drainage Systems'
+    id: 'coalexpert',
+    name: 'CoaleXpert',
+    role: 'Strategic Water & Process-Treatment Technology Partner',
+    specialty: 'Advanced Produced-Water Treatment, Oil Separation & Modular Systems',
+    description: 'Through our alliance with CoaleXpert, PIGL delivers high-efficiency produced water treatment systems that remove oil and solid particles, ensuring environmental compliance and safe water reinjection for oil and gas facilities.',
+    capabilities: [
+      'Produced water treatment and oil separation systems',
+      'Modular treatment skids and plants',
+      'Water filtration for subsurface reinjection and reuse',
+      'Environmental regulatory compliance support',
+      'Plant optimization and technical field support'
     ],
-    icon: '🚜',
-    image: CivilWorksImg,
-    category: 'Integrated'
+    website: 'https://coalexpert.pro/',
+    serviceId: 'industrial-environmental-technologies',
+    serviceTitle: 'Industrial & Environmental Technologies'
+  },
+  {
+    id: 'npk',
+    name: 'NPK Automation',
+    role: 'Qualified Flow Control & Automation Partner',
+    specialty: 'Engineered Valves, Actuators & Automated Flow-Control Packages',
+    description: 'In collaboration with NPK Automation, PIGL supplies, tests, and maintains certified industrial valves, automated actuators, and shutdown packages for critical energy infrastructure.',
+    capabilities: [
+      'Certified industrial valves including ball, gate, globe, and check valves',
+      'Electric, pneumatic, and hydraulic actuator systems',
+      'Automated valve packages and emergency shutdown controls',
+      'Valve assembly, hydro-testing, and calibration',
+      'Inspection, lifecycle maintenance, and spare parts support'
+    ],
+    serviceId: 'industrial-environmental-technologies',
+    serviceTitle: 'Industrial & Environmental Technologies'
   }
 ];
 
 export const PROJECTS: Project[] = [
   {
     id: 'p1',
-    title: 'AKK Gas Pipeline Survey',
+    title: 'AKK Gas Pipeline Survey & ROW Execution',
     client: 'Brentex / Dover',
-    category: 'Pipeline',
-    description: 'Comprehensive surveying and geotechnical investigation for the 40" x 311M mainline installation.',
-    image: AkkImg,
-    scope: 'Land survey and soil characterization for high-pressure gas infrastructure.',
+    category: 'Intelligence',
+    serviceCapability: 'Spatial Intelligence / Ground Intelligence',
+    description: 'Comprehensive route surveying, geodetic positioning, and geotechnical investigation for the 40" x 311km mainline installation across northern Nigeria.',
+    image: OpPipelineSwampCatImg,
+    scope: 'Land survey, geodetic control network, and soil characterization for high-pressure gas infrastructure.',
     challenge: 'Navigating diverse terrains and ensuring data precision across a 311km pipeline route with tight environmental constraints.',
-    solution: 'Deployment of high-accuracy GNSS systems and multi-disciplinary survey teams to provide real-time Geo-data integration.',
-    equipment: ['Trimble R12 GNSS', 'Resistivity Meters'],
+    solution: 'Deployment of high-accuracy GNSS RTK systems and multi-disciplinary survey teams to provide real-time Geo-data integration.',
+    equipment: ['Trimble R12 GNSS', 'Electrical Resistivity Tomography', 'In-Situ Soil Samplers'],
     results: 'Project completed ahead of schedule with zero safety incidents.',
-    location: 'Kogi/Kaduna, Nigeria',
+    location: 'Kogi / Kaduna, Nigeria',
     year: '2024'
   },
   {
     id: 'p2',
-    title: 'Offshore Rig Positioning',
+    title: 'Offshore Rig Positioning & Geotechnical Drilling',
     client: 'WAV',
-    category: 'Geosolutions',
-    description: 'Marine survey and precise rig positioning using DGPS systems for offshore swamp operations.',
-    image: RigImg,
-    scope: 'Sub-surface mapping and precise anchoring positioning.',
-    challenge: 'Achieving sub-meter accuracy in a dynamic swamp environment with limited visibility and complex tidal movements.',
+    category: 'Solutions & Engineering',
+    serviceCapability: 'Marine Intelligence / Field Operations',
+    description: 'High-precision marine survey, seabed soil boring, and real-time rig positioning using DGPS and subsea acoustic telemetry.',
+    image: OpOffshoreBargeImg,
+    scope: 'Sub-surface hazard mapping, deep borehole sampling, and precise anchoring positioning for drilling platform.',
+    challenge: 'Achieving sub-meter accuracy in dynamic swamp environments with limited visibility and complex tidal movements.',
     solution: 'Utilizing advanced DGPS and Multibeam systems coupled with expert hydrographers for real-time positioning feedback.',
-    equipment: ['Multibeam Echosounder', 'Gyrocompass Systems'],
-    results: 'High-fidelity alignment achieved for complex sub-sea anchoring.',
+    equipment: ['Multibeam Echosounder', 'Gyrocompass Systems', 'USBL Hydroacoustic Transponders'],
+    results: 'High-fidelity alignment achieved for complex sub-sea anchoring with zero asset clash.',
     location: 'Escravos, Delta State',
     year: '2023'
   },
   {
     id: 'p3',
-    title: 'Facility Reality Capture',
+    title: 'Facility Reality Capture & Digital Twin',
     client: 'Aradel',
-    category: 'Geosolutions',
-    description: 'Full-scale digitization of brownfield assets for intelligent asset management.',
-    image: FacilityImg,
-    scope: '3D Laser Scanning of active processing facilities.',
-    challenge: 'Creating a high-fidelity digital twin of a brownfield asset without interrupting ongoing production operations.',
-    solution: 'Rapid high-definition scanning using advanced 3D laser systems, delivering million-point cloud data with minimal site footprint.',
-    equipment: ['Advanced 3D Laser Scanners', 'High-Precision GNSS'],
+    category: 'Intelligence',
+    serviceCapability: 'Digital Intelligence',
+    description: 'Full-scale 3D laser scanning and digitization of active brownfield processing assets for intelligent asset management and structural assurance.',
+    image: OpLaserManifoldImg,
+    scope: 'High-density 3D Laser Scanning of active oil and gas processing facilities.',
+    challenge: 'Creating a high-fidelity digital twin of an active brownfield asset without interrupting ongoing production operations.',
+    solution: 'Rapid high-definition scanning using Leica 3D laser systems, delivering million-point cloud data with minimal site footprint.',
+    equipment: ['Leica RTC360 3D Laser Scanner', 'High-Precision GNSS', 'Leica Cyclone Suite'],
     results: 'Created detailed Digital Twins reducing maintenance planning time by 30%.',
     location: 'Ogbele Field, Rivers State',
     year: '2024'
   },
   {
     id: 'p4',
-    title: 'Industrial Borehole Drilling',
+    title: 'Industrial Borehole & Hydrogeological Investigation',
     client: 'SIRI GLOBAL',
-    category: 'Integrated',
-    description: 'Design and installation of dual industrial water boreholes at 120M depth.',
+    category: 'Solutions & Engineering',
+    serviceCapability: 'Asset Integrity & Management / Ground Intelligence',
+    description: 'Hydrogeological mapping, geophysical logging, and structural installation of dual industrial water boreholes at 120M depth.',
     image: DrillingImg,
-    scope: 'Water table mapping and structural drilling.',
-    equipment: ['Rotary Drilling Rig', 'Geophysical Logging Tools'],
+    scope: 'Aquifer mapping, structural drilling, and water quality testing.',
+    equipment: ['Rotary Drilling Rig', 'Geophysical Logging Tools', 'Water Testing Lab Probes'],
     results: 'Sustainable high-capacity water source established for facility operations.',
     location: 'Omoku, Rivers State',
     year: '2023',
@@ -327,63 +421,67 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 'p5',
-    title: 'Access Road Maintenance',
+    title: 'Access Road Rehabilitation & Swamp Grading',
     client: 'TotalEnergies',
-    category: 'Civil',
-    description: 'Rehabilitation and structural maintenance of heavy-duty access roads for operational sites.',
+    category: 'Solutions & Engineering',
+    serviceCapability: 'Infrastructure & Construction',
+    description: 'Structural civil engineering and rehabilitation of heavy-duty access roads serving operational energy sites in the Niger Delta.',
     image: RoadImg,
-    scope: 'Grading, drainage clearing, and asphalt reinforcement.',
-    equipment: ['Motor Graders', 'Steam Rollers'],
-    results: 'Restored logistical efficiency for facility transport.',
-    location: 'Onne, Nigeria',
+    scope: 'Grading, drainage clearing, and asphalt reinforcement for heavy industrial loads.',
+    equipment: ['Heavy Motor Graders', 'Compaction Rollers', 'Drainage Formwork'],
+    results: 'Restored logistical efficiency and route reliability for energy facility transport.',
+    location: 'Onne, Rivers State',
     year: '2024',
     challenge: 'Maintaining critical transport routes during peak monsoon season with heavy-duty oilfield traffic.',
     solution: 'Rapid asphalt reinforcement and advanced drainage clearing to prevent water-logging and structural failure.'
   },
   {
     id: 'p6',
-    title: 'Civil Engineering Works',
+    title: 'Civil Infrastructure & Foundation Engineering',
     client: 'Chevron',
-    category: 'Civil',
-    description: 'Site preparation and structural foundations for new industrial facility modules.',
+    category: 'Solutions & Engineering',
+    serviceCapability: 'Infrastructure & Construction',
+    description: 'Site preparation, piling, and structural concrete foundation works for new industrial energy facility modules.',
     image: CivilWorksImg,
-    scope: 'Piling, site clearing, and leveling.',
-    equipment: ['Excavators', 'Piling Rigs'],
-    results: 'Stable foundational base delivered for primary infrastructure.',
-    location: 'Bonny Island, Nigeria',
+    scope: 'Piling, site clearing, soil improvement, and high-strength concrete foundation construction.',
+    equipment: ['Hydraulic Piling Rigs', 'Concrete Mixers & Batching Plants', 'Total Stations'],
+    results: 'Delivered stable, certified foundation base for primary energy processing modules.',
+    location: 'Bonny Island, Rivers State',
     year: '2023',
     challenge: 'Preparing site foundations in high-salinity swamp environments with strict environmental footprint restrictions.',
     solution: 'Precision piling and specialized soil stabilization techniques to support heavy modular units.'
   },
   {
     id: 'p7',
-    title: 'Sub-bottom Profiling',
+    title: 'Marine Sub-Bottom Profiling & Route Survey',
     client: 'Fugro',
-    category: 'Geosolutions',
-    description: 'Marine sub-surface characterization for pipeline route selection.',
-    image: SubImg,
-    scope: 'Acoustic profiling of sea-bed strata.',
-    equipment: ['Sub-bottom Profiler', 'Side Scan Sonar'],
-    results: 'Critical geological data provided for secure pipeline anchoring.',
-    location: 'Gulf of Guinea',
+    category: 'Intelligence',
+    serviceCapability: 'Marine Intelligence',
+    description: 'Marine sub-surface acoustic characterization and shallow gas hazard detection for offshore pipeline route selection.',
+    image: OpSubbottomSb216Img,
+    scope: 'Acoustic profiling of seabed strata, shallow gas detection, and bathymetry using EdgeTech SB-216S Sub-Bottom Profiler.',
+    equipment: ['Sub-bottom Profiler', 'Side Scan Sonar', 'Marine Magnetometer'],
+    results: 'Critical sub-bottom geological intelligence delivered for secure subsea pipeline laying.',
+    location: 'Gulf of Guinea, Nigeria',
     year: '2024',
-    challenge: 'Detecting shallow gas pockets and buried obstructions in deep-water shipping channels.',
-    solution: 'High-frequency acoustic profiling and side-scan sonar integration for a complete sub-surface picture.'
+    challenge: 'Detecting shallow gas pockets and buried obstructions in dynamic shipping channels.',
+    solution: 'High-frequency acoustic profiling and side-scan sonar integration for a comprehensive subsurface picture.'
   },
   {
     id: 'p8',
-    title: 'Chevron Great Hall Facility',
+    title: 'Chevron Great Hall Facility 3D Digitisation',
     client: 'Chevron',
-    category: 'Geosolutions',
-    description: '3D Laser Scanning and Modelling of Chevron Great Hall Facility, Warri.',
+    category: 'Intelligence',
+    serviceCapability: 'Digital Intelligence',
+    description: 'Complete 3D Terrestrial Laser Scanning and As-Built 3D CAD Modelling of Chevron Great Hall Facility.',
     image: GreatHallImg,
-    scope: 'High-definition 3D digitization for facility management.',
-    equipment: ['Advanced 3D Scanners', 'Modelling Software'],
-    results: 'Detailed As-Built 3D Model delivered.',
+    scope: 'High-definition 3D laser scanning and intelligent CAD model generation for structural management.',
+    equipment: ['Advanced 3D Laser Scanners', 'Point Cloud Processing Workstations'],
+    results: 'Delivered complete millimeter-accurate As-Built 3D model for facility planning.',
     location: 'Warri, Delta State',
     year: '2024',
-    challenge: 'Digitizing a highly complex, aging facility with thousands of intricate pipe runs and limited access points.',
-    solution: 'Using advanced laser scanning technology for rapid 3D point cloud generation and intelligent modeling to create a comprehensive digital twin.'
+    challenge: 'Digitizing an active, highly complex facility with intricate pipe runs and restricted access corridors.',
+    solution: 'Non-disruptive laser scanning with multi-station cloud registration for high-density point cloud output.'
   }
 ];
 
@@ -438,20 +536,18 @@ export const TEAM: TeamMember[] = [
   }
 ];
 
-
-
 export const ASSETS = {
   front: SliderImg,
   team: TeamImg
 };
 
 export const STRENGTHS = [
-  'Quality Project Execution',
-  'Satisfied Client Base',
-  'Bespoke Engineering Solutions',
-  'Cost Effective Delivery',
-  'ISO Certified Systems',
-  'State-of-the-Art 3D Reality Capture'
+  'Technical Integrity & Precision',
+  '100% Indigenous Nigerian Capability',
+  'High-Fidelity Reality Capture & Digital Twins',
+  'Specialist Strategic Technology Partnerships',
+  'Dual ISO 9001:2015 & 45001:2018 Certified',
+  'Deep Swamp, Coastal & Offshore Expertise'
 ];
 
 export const HSSE_STATS = [
@@ -463,26 +559,136 @@ export const HSSE_STATS = [
 
 export const HSSE_POLICIES = [
   {
-    title: 'Occupational Health',
+    title: 'Occupational Health & Safety',
     content: 'We prioritize the physical and mental well-being of our workforce through rigorous health screenings and ergonomic field standards.'
   },
   {
-    title: 'Operational Safety',
-    content: 'Our "Stop Work Authority" empowers every employee to halt operations if they perceive a safety risk, ensuring zero compromise.'
+    title: 'Operational Safety & Stop Work Authority',
+    content: 'Our "Stop Work Authority" empowers every employee and contractor to halt operations immediately if an unsafe condition is identified.'
   },
   {
-    title: 'Environmental Protection',
-    content: 'We employ advanced geosolutions to minimize our operational footprint and protect the fragile ecosystems where we work.'
+    title: 'Environmental Protection & Compliance',
+    content: 'We employ advanced engineering and geosolutions to minimize operational footprint and protect fragile Niger Delta ecosystems.'
   },
   {
-    title: 'Quality Excellence',
-    content: 'Quality is not an act, but a habit. Our ISO-aligned processes ensure data fidelity and engineering precision in every deliverable.'
+    title: 'Quality Assurance & ISO Standards',
+    content: 'Quality is embedded in every workflow. Our ISO 9001:2015-aligned processes guarantee data fidelity and engineering precision.'
   }
 ];
 
 export const CERTIFICATIONS = [
-  { title: 'ISO 9001:2015', organization: 'Quality Management Systems', status: 'Certified' },
-  { title: 'ISO 45001:2018', organization: 'Occupational Health & Safety', status: 'Certified' },
-  { title: 'DPR/NUPRC Permit', organization: 'Oil & Gas Service Category', status: 'Active' },
-  { title: 'COREN Certified', organization: 'Council for the Regulation of Engineering in Nigeria', status: 'Active' }
+  { title: 'ISO 9001:2015', organization: 'Quality Management Systems', status: 'Certified', image: Iso9001Img },
+  { title: 'ISO 45001:2018', organization: 'Occupational Health & Safety', status: 'Certified', image: Iso45001Img },
+  { title: 'NUPRC / NMDPRA Permit', organization: 'Oil & Gas Service Category', status: 'Active' },
+  { title: 'NCDMB Certified', organization: 'Nigerian Content Development & Monitoring Board', status: 'Active (100% Indigenous)' },
+  { title: 'COREN Registered', organization: 'Council for the Regulation of Engineering in Nigeria', status: 'Active' }
 ];
+
+export interface OperationPhoto {
+  id: string;
+  title: string;
+  category: 'Offshore & Marine' | '3D Reality Capture' | 'Pipelines & Infrastructure' | 'Ground Truth & Geomatics' | 'Logistics & Safety';
+  image: string;
+  description: string;
+  location?: string;
+}
+
+export const OPERATIONS_GALLERY: OperationPhoto[] = [
+  {
+    id: 'op-barge',
+    title: 'Offshore Geotechnical Drilling Vessel',
+    category: 'Offshore & Marine',
+    image: OpOffshoreBargeImg,
+    description: 'Active offshore soil boring and seabed geotechnical drilling rig operating in deep marine energy corridors.',
+    location: 'Offshore Gulf of Guinea'
+  },
+  {
+    id: 'op-manifold-scan',
+    title: 'High-Density 3D Laser Scanning of Facility Manifold',
+    category: '3D Reality Capture',
+    image: OpLaserManifoldImg,
+    description: 'Precision millimeter-accurate point cloud reality capture on active oil & gas processing manifolds and piping arrays.',
+    location: 'Flowstation Processing Asset'
+  },
+  {
+    id: 'op-swamp-pipeline',
+    title: 'Heavy Swamp Pipeline ROW Execution & Laying',
+    category: 'Pipelines & Infrastructure',
+    image: OpPipelineSwampCatImg,
+    description: 'Caterpillar earthmoving, swamp excavator trenching, and side-boom pipelayer handling heavy-wall coated export line to coast.',
+    location: 'Coastal Pipeline Right-of-Way'
+  },
+  {
+    id: 'op-drill-crew',
+    title: 'Offshore Drill Floor Operations & Casing String',
+    category: 'Offshore & Marine',
+    image: OpDrillCrewCasingImg,
+    description: 'Certified PIGL offshore drilling specialists managing heavy casing installation and deepwater geotechnical sampling.',
+    location: 'Marine Drilling Vessel'
+  },
+  {
+    id: 'op-sb216-profiler',
+    title: 'EdgeTech SB-216S Sub-Bottom Profiler Deployment',
+    category: 'Offshore & Marine',
+    image: OpSubbottomSb216Img,
+    description: 'Deploying high-resolution acoustic sub-bottom towfish for seabed stratigraphy and shallow gas hazard detection.',
+    location: 'Offshore Pipeline Corridor'
+  },
+  {
+    id: 'op-logistics-base',
+    title: 'PIGL Integrated Logistics Yard & Staging Base',
+    category: 'Logistics & Safety',
+    image: OpLogisticsBaseImg,
+    description: 'Aerial drone perspective of the PIGL field equipment yard, operations cabins, and heavy equipment mobilization hub.',
+    location: 'Port Harcourt Regional Operations Base'
+  },
+  {
+    id: 'op-welding',
+    title: 'Certified Offshore Structural & Pipeline Welding',
+    category: 'Pipelines & Infrastructure',
+    image: OpWeldingImg,
+    description: 'API-certified marine welding and fabrication under stringent HSSE and quality assurance protocols.',
+    location: 'Marine Fabrication Works'
+  },
+  {
+    id: 'op-vessel-crew',
+    title: 'Marine Crew Safety Protocol on Platt Joe Joe Lagos',
+    category: 'Logistics & Safety',
+    image: OpMarineCrewImg,
+    description: 'Offshore operations personnel in high-visibility protective gear maintaining Goal Zero standards at sea.',
+    location: 'Vessel Platt Joe Joe Lagos'
+  },
+  {
+    id: 'op-cooler-scan',
+    title: 'Industrial Heat Exchanger 3D Reality Capture',
+    category: '3D Reality Capture',
+    image: OpLaserCoolerImg,
+    description: 'Leica 3D laser scanner surveying overhead process cooling units for clash-free brownfield retrofit engineering.',
+    location: 'Refinery & Petrochemical Facility'
+  },
+  {
+    id: 'op-jetty-reality',
+    title: 'Marine Jetty Multi-Level Reality Capture',
+    category: '3D Reality Capture',
+    image: OpRealityJettyImg,
+    description: 'Comprehensive dimensional control and as-built verification of marine terminal pipe racks and structural steel.',
+    location: 'Marine Terminal Jetty'
+  },
+  {
+    id: 'op-quay-survey',
+    title: 'Harbour Waterfront Geomatic Surveying',
+    category: 'Ground Truth & Geomatics',
+    image: OpGeomaticsImg,
+    description: 'Geomatic engineer establishing high-precision geodetic control using Leica total station at harbour facility.',
+    location: 'Harbour Maritime Quay'
+  },
+  {
+    id: 'op-winch-container',
+    title: 'Offshore Winch & Branded Operations Container',
+    category: 'Logistics & Safety',
+    image: OpWinchPiglImg,
+    description: 'Offshore technician operating hydraulic cable reel winch on deck beside branded PIGL offshore container.',
+    location: 'Offshore Survey Vessel'
+  }
+];
+

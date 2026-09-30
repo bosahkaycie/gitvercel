@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ContactBg from '../assets/slider.jpeg';
+import InfraSketchImg from '../assets/infrastructure_sketch.jpg';
 import { CONTACT_CONFIG } from '../site_data';
+import { submitContactInquiry, useSiteSettings } from '../hooks/useSupabaseData';
+import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 
 const Contact: React.FC = () => {
-  const [formData, setFormData] = React.useState({
+  const { settings } = useSiteSettings();
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     service: 'Geosolutions Services',
@@ -11,12 +15,12 @@ const Contact: React.FC = () => {
     website: '' // Honeypot field
   });
 
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [status, setStatus] = React.useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
-  const [errors, setErrors] = React.useState<{ [key: string]: boolean }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
+  const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
 
-  React.useEffect(() => {
-    const params = new URLSearchParams(window.location.hash.split('?')[1]);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
     const job = params.get('job');
     if (job) {
       setFormData(prev => ({ ...prev, service: job }));
@@ -27,7 +31,7 @@ const Contact: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const observerOptions = {
       threshold: 0.1,
       rootMargin: '0px 0px -50px 0px'
@@ -59,6 +63,11 @@ const Contact: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.website) {
+      // Honeypot triggered
+      return;
+    }
+
     if (!validateForm()) {
       setStatus({ type: 'error', message: 'Please fix the highlighted errors before submitting.' });
       return;
@@ -68,12 +77,15 @@ const Contact: React.FC = () => {
     setStatus({ type: null, message: '' });
 
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await submitContactInquiry({
+        name: formData.name,
+        email: formData.email,
+        service_interest: formData.service,
+        message: formData.message
+      });
       
-      // Simulated success
-      setStatus({ type: 'success', message: 'Thank you! Your message has been sent successfully. We will get back to you shortly.' });
-      setFormData({ name: '', email: '', service: 'Geosolutions Services', message: '', website: '' }); // Reset form
+      setStatus({ type: 'success', message: 'Thank you! Your technical consultation request has been submitted successfully to PIGL. Our engineering desk will review and contact you shortly.' });
+      setFormData({ name: '', email: '', service: 'Geosolutions Services', message: '', website: '' });
     } catch (error) {
       console.error('Submission error:', error);
       setStatus({ type: 'error', message: 'Something went wrong. Please try again later or contact us directly.' });
@@ -99,8 +111,8 @@ const Contact: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-900/50 to-transparent"></div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex items-center space-x-2 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-10">
-            <a href="#/" className="hover:text-white transition-colors">Home</a>
+          <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-8">
+            <a href="/" className="hover:text-white transition-colors">Home</a>
             <span className="text-slate-600">/</span>
             <span className="text-white">Contact</span>
           </div>
@@ -114,10 +126,21 @@ const Contact: React.FC = () => {
             </p>
           </div>
         </div>
+
+        {/* Continuous Reflective Energy Line at the base of the Hero & Breadcrumb section */}
+        <div className="absolute bottom-0 left-0 right-0 z-20">
+          <ReflectiveEnergyLine dark={true} />
+        </div>
       </section>
 
-      <section className="py-20 md:py-32 bg-white flex-grow reveal">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative py-20 md:py-32 bg-white flex-grow reveal overflow-hidden">
+        {/* Subtle Architectural Infrastructure Line-Art Watermark */}
+        <div 
+          className="absolute inset-0 pointer-events-none select-none z-0 bg-no-repeat bg-cover bg-bottom opacity-[0.035] mix-blend-multiply filter grayscale contrast-125"
+          style={{ backgroundImage: `url(${InfraSketchImg})` }}
+          aria-hidden="true"
+        />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
             {/* Contact Info */}
             <div className="space-y-12">
@@ -128,15 +151,15 @@ const Contact: React.FC = () => {
                   <div className="flex items-start space-x-6 bg-slate-50 p-6 border border-slate-200">
                     <div className="text-2xl">📍</div>
                     <address className="not-italic text-lg text-slate-700 leading-relaxed font-medium">
-                      {CONTACT_CONFIG.address}
+                      {settings?.address_hq || CONTACT_CONFIG.address}
                     </address>
                   </div>
                   
                   <div className="flex items-start space-x-6 bg-slate-50 p-6 border border-slate-200">
                     <div className="text-2xl">📞</div>
                     <div className="text-lg text-slate-700 font-medium">
-                      <a href={`tel:${CONTACT_CONFIG.phoneRaw}`} className="hover:text-emerald-700 transition-colors">
-                        {CONTACT_CONFIG.phone}
+                      <a href={`tel:${settings?.phone_raw || CONTACT_CONFIG.phoneRaw}`} className="hover:text-emerald-700 transition-colors">
+                        {settings?.phone || CONTACT_CONFIG.phone}
                       </a>
                     </div>
                   </div>
@@ -145,15 +168,22 @@ const Contact: React.FC = () => {
                     <div className="text-2xl">📧</div>
                     <div className="text-lg text-slate-700 font-medium">
                       <p>
-                        <a href={`mailto:${CONTACT_CONFIG.emailInfo}`} className="hover:text-emerald-700 transition-colors">
-                          {CONTACT_CONFIG.emailInfo}
+                        <a href={`mailto:${settings?.email_info || CONTACT_CONFIG.emailInfo}`} className="hover:text-emerald-700 transition-colors">
+                          {settings?.email_info || CONTACT_CONFIG.emailInfo}
                         </a>
                       </p>
                       <p>
-                        <a href={`mailto:${CONTACT_CONFIG.emailSupport}`} className="hover:text-emerald-700 transition-colors">
-                          {CONTACT_CONFIG.emailSupport}
+                        <a href={`mailto:${settings?.email_support || CONTACT_CONFIG.emailSupport}`} className="hover:text-emerald-700 transition-colors">
+                          {settings?.email_support || CONTACT_CONFIG.emailSupport}
                         </a>
                       </p>
+                      {settings?.email_inquiries && settings.email_inquiries !== settings.email_info && (
+                        <p>
+                          <a href={`mailto:${settings.email_inquiries}`} className="hover:text-emerald-700 transition-colors">
+                            {settings.email_inquiries}
+                          </a>
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

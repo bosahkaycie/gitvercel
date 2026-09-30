@@ -1,19 +1,23 @@
 
 import React from 'react';
 import { CONTACT_CONFIG } from '../site_data';
+import { useSiteSettings } from '../hooks/useSupabaseData';
 
 const WhatsAppButton: React.FC = () => {
-  const phoneNumber = CONTACT_CONFIG.phoneRaw.replace('+', '');
+  const { settings } = useSiteSettings();
+  const rawNumber = (settings?.phone_raw || CONTACT_CONFIG.phoneRaw).replace(/[^0-9]/g, '');
   const message = "Hello PIGL, I would like to inquire about your engineering and geosolutions services.";
   const encodedMessage = encodeURIComponent(message);
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+  const whatsappUrl = settings?.whatsapp_url 
+    ? (settings.whatsapp_url.includes('?') ? `${settings.whatsapp_url}&text=${encodedMessage}` : `${settings.whatsapp_url}?text=${encodedMessage}`)
+    : `https://wa.me/${rawNumber}?text=${encodedMessage}`;
 
   return (
     <a
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-8 right-8 z-50 group flex items-center"
+      className="fixed bottom-8 right-8 z-50 group flex items-center print:hidden"
       aria-label="Chat on WhatsApp"
     >
       <div className="bg-white text-emerald-900 px-4 py-2 mr-2 shadow-xl border border-emerald-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:block whitespace-nowrap text-sm font-medium">

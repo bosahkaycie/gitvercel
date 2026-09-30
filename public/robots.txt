@@ -1,4 +1,21 @@
+# Production robots.txt for Polaris Integrated & GeoSolutions Limited (polarisigl.com)
+
 User-agent: *
 Allow: /
+Allow: /services/
+Allow: /projects/
+Allow: /news/
+Allow: /careers/
+Allow: /about/
+Allow: /contact/
+Allow: /hsse/
+Allow: /vendors/
 
+# Disallow private administration dashboard and API endpoints
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+
+# Crawler Host & Sitemap Directive
+Host: https://polarisigl.com
 Sitemap: https://polarisigl.com/sitemap.xml

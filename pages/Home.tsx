@@ -1,23 +1,42 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SERVICES, PROJECTS } from '../site_data';
+import { SERVICES, PROJECTS, PARTNERS, OPERATIONS_GALLERY } from '../site_data';
 import BootsImg from '../assets/IMG_6170.jpg';
 import TeamLargeImg from '../assets/team_large.jpeg';
 import CareersBg from '../assets/1770736125265.jpeg';
-import TechEdgeImg from '../assets/IMG_6228.jpg';
-import TechDrillImg from '../assets/new drill.png';
-import TechRealityImg from '../assets/newreality.jpg';
-import TechSubImg from '../assets/sub.png';
 import NiesImg from '../assets/nies new.png';
-import VideoShowcase from '../components/VideoShowcase';
 import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
+import FrankstarLogo from '../assets/frankstar_logo.png';
+import FrankstarLoopVideo from '../assets/FRANKSTAR LOOP.mp4';
+import OffshoreIntelVideo from '../assets/OFFSHORE INTELLIGENCE.mp4';
+import DigitalIntelVideo from '../assets/DIGITAL INTELLINGENCE.mp4';
+import GroundIntelImg from '../assets/cpt.png';
+import PipelineImg from '../assets/newpipeline.png';
+import FieldTeamSwampImg from '../assets/pigl_field_team_swamp.jpg';
+import ConferenceKeynoteImg from '../assets/pigl_conference_keynote.jpg';
+import InternationalPartnerImg from '../assets/pigl_international_partner.jpg';
+import ExhibitionConsultingImg from '../assets/pigl_exhibition_consulting.jpg';
+import PipelineClearingAerialImg from '../assets/pigl_pipeline_clearing_aerial.jpg';
+import InfraSketchImg from '../assets/infrastructure_sketch.jpg';
+import DigitalScannerImg from '../assets/digital_intel_scanner.jpg';
+import MarineOperationsImg from '../assets/field_operations_marine.jpg';
+import AssetIntegrityNdtImg from '../assets/asset_integrity_ndt.jpg';
 
-// Static assets for the hero slider slides (independent of divisions/services list)
-import SliderImg from '../assets/slider.jpeg';
-import RealityCaptureImg from '../assets/DJI_0191.JPG';
-import GeosolutionsImg from '../assets/DJI_0003.jpg';
-import PipelineImg from '../assets/DJI_0240.jpg';
-import IntegratedImg from '../assets/cabin.png';
+// Authentic Field Operations & Maritime Photography
+import OpLogisticsBaseImg from '../assets/operations/pigl_logistics_base_aerial.jpg';
+import OpMarineCrewImg from '../assets/operations/pigl_marine_crew_vessel.jpg';
+import OpWeldingImg from '../assets/operations/pigl_pipeline_marine_welding.jpg';
+import OpGeomaticsImg from '../assets/operations/pigl_geomatics_survey_quay.jpg';
+import OpWinchPiglImg from '../assets/operations/pigl_offshore_winch_pigl_container.jpg';
+import OpOffshoreBargeImg from '../assets/operations/pigl_offshore_geotech_drilling_barge.jpg';
+import OpSubbottomSb216Img from '../assets/operations/pigl_subbottom_profiler_sb216s.jpg';
+import OpDrillCrewCasingImg from '../assets/operations/pigl_offshore_drill_crew_casing.jpg';
+import OpLaserCoolerImg from '../assets/operations/pigl_3d_laser_scan_facility_cooler.jpg';
+import OpLaserManifoldImg from '../assets/operations/pigl_3d_laser_scan_manifold_station.jpg';
+import OpRealityJettyImg from '../assets/operations/pigl_3d_reality_capture_jetty_plant.jpg';
+import OpPipelineSwampCatImg from '../assets/operations/pigl_pipeline_construction_swamp_cat.jpg';
 
+import { useSliders, useServices, useBlogPosts, useProjects, usePartners, useSiteSettings } from '../hooks/useSupabaseData';
+import { getYouTubeId, getYouTubeEmbedUrl, getYouTubeThumbnail } from '../utils/video';
 
 const CountUp: React.FC<{ end: number; duration?: number; suffix?: string }> = ({ end, duration = 2000, suffix = '' }) => {
   const [count, setCount] = useState(0);
@@ -68,9 +87,21 @@ const CountUp: React.FC<{ end: number; duration?: number; suffix?: string }> = (
 };
 
 const Home: React.FC = () => {
+  const { sliders } = useSliders();
+  const { services: dynamicServices } = useServices();
+  const { projects: dynamicProjects } = useProjects();
+  const { partners: dynamicPartners } = usePartners();
+  const { posts: blogPosts, loading: blogLoading } = useBlogPosts();
+  const { settings } = useSiteSettings();
+
+  const effectiveServices = dynamicServices && dynamicServices.length > 0 ? dynamicServices : SERVICES;
+  const effectiveProjects = dynamicProjects && dynamicProjects.length > 0 ? dynamicProjects : PROJECTS;
+  const effectivePartners = dynamicPartners && dynamicPartners.length > 0 ? dynamicPartners : PARTNERS;
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
+  const [activeTab, setActiveTab] = useState<'Intelligence' | 'Solutions & Engineering'>('Intelligence');
+  const [galleryFilter, setGalleryFilter] = useState<string>('All');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -80,132 +111,78 @@ const Home: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const techEdgeImages = [
-    { src: TechEdgeImg, alt: "Leica 3D Laser Scanning & Reality Capture" },
-    { src: TechDrillImg, alt: "Millimeter-Accurate Facility Tie-Ins & Geotechnical Exploration" },
-    { src: TechRealityImg, alt: "High-Fidelity 3D Reality Modeling & Surveys" },
-    { src: TechSubImg, alt: "Subsea Seabed Surveying & Marine Geophysics" }
-  ];
+  const [isHeroHovered, setIsHeroHovered] = useState(false);
 
-  const [currentTechSlide, setCurrentTechSlide] = useState(0);
+  const heroSlides = sliders.length > 0 ? sliders.map((s, idx) => {
+    let resolvedVideoUrl = s.video_url;
+    // Map known legacy Frankstar YouTube shortlink to local high-definition video loop if needed
+    if (resolvedVideoUrl && (resolvedVideoUrl.includes('X0d8DmasSiQ') || resolvedVideoUrl.includes('FRANKSTAR LOOP'))) {
+      resolvedVideoUrl = FrankstarLoopVideo;
+    }
 
-  // States & Effects for 'Our industries' Auto-Sliding Carousel
-  const [visibleCards, setVisibleCards] = useState(3);
-  
-  // Extended services for infinite loop
-  const extendedServices = [...SERVICES, ...SERVICES, ...SERVICES];
-  const [currentIndustrySlide, setCurrentIndustrySlide] = useState(SERVICES.length);
-  const [isTransitioning, setIsTransitioning] = useState(true);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setVisibleCards(1);
-      } else if (window.innerWidth < 1024) {
-        setVisibleCards(2);
-      } else {
-        setVisibleCards(3);
-      }
+    return {
+      id: s.id,
+      phase: s.subtitle ? s.subtitle.toUpperCase() : `LIFECYCLE PHASE 0${idx + 1}`,
+      title: s.title,
+      description: s.description || s.subtitle || '',
+      cta_text: s.cta_text || 'Explore Capabilities',
+      cta_url: s.cta_url || '/services',
+      video_url: resolvedVideoUrl,
+      desktop_image: s.desktop_image,
+      mobile_image: s.mobile_image || s.desktop_image
     };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const handleNext = () => {
-    setCurrentIndustrySlide(prev => prev + 1);
-  };
-
-  const handlePrev = () => {
-    setCurrentIndustrySlide(prev => prev - 1);
-  };
-
-  // Seamless jump effect at borders
-  useEffect(() => {
-    const minBound = SERVICES.length;
-    const maxBound = SERVICES.length * 2;
-
-    if (currentIndustrySlide >= maxBound) {
-      const timeout = setTimeout(() => {
-        setIsTransitioning(false);
-        setCurrentIndustrySlide(currentIndustrySlide - SERVICES.length);
-      }, 500); // matches the CSS transition duration
-      return () => clearTimeout(timeout);
-    }
-
-    if (currentIndustrySlide < minBound) {
-      const timeout = setTimeout(() => {
-        setIsTransitioning(false);
-        setCurrentIndustrySlide(currentIndustrySlide + SERVICES.length);
-      }, 500);
-      return () => clearTimeout(timeout);
-    }
-  }, [currentIndustrySlide]);
-
-  // Restore transition state
-  useEffect(() => {
-    if (!isTransitioning) {
-      const raf = requestAnimationFrame(() => {
-        setIsTransitioning(true);
-      });
-      return () => cancelAnimationFrame(raf);
-    }
-  }, [isTransitioning]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      handleNext();
-    }, 4500); // Smooth leftward slide transitions every 4.5 seconds
-
-    return () => clearInterval(timer);
-  }, [visibleCards]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTechSlide(prev => (prev === techEdgeImages.length - 1 ? 0 : prev + 1));
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [techEdgeImages.length]);
-
-  const slides = [
+  }) : [
     {
-      id: 'oil-and-gas',
-      title: 'Technical integrity for a safer energy future',
-      description: 'Providing high-fidelity engineering and advanced geosolutions for Swamp, Land, and Offshore operations, ensuring safety and operational excellence.',
-      image: SliderImg
+      id: 'metocean-hero',
+      phase: 'LIFECYCLE PHASE 01 // SUBSEA & METOCEAN BASELINE',
+      title: 'Continuous Marine & MetOcean Intelligence',
+      description: 'Before offshore design begins, we deploy autonomous telemetry buoys, wave tracking, and acoustic current profilers to map dynamic marine risks across coastal and deepwater corridors.',
+      cta_text: 'Explore MetOcean Baseline',
+      cta_url: '/services/offshore-intelligence',
+      video_url: FrankstarLoopVideo,
+      desktop_image: OpOffshoreBargeImg,
+      mobile_image: OpOffshoreBargeImg
     },
     {
-      id: 'reality-capture',
-      title: '3D Reality Capture & Laser Scanning',
-      description: 'PIGL delivers high-fidelity 3D Laser Scanning and Digital Twin solutions for precision engineering in Nigeria.',
-      image: RealityCaptureImg
+      id: 'ground-intelligence',
+      phase: 'LIFECYCLE PHASE 02 // SUBSURFACE GROUND TRUTH',
+      title: 'Ground Intelligence & Subsurface Characterisation',
+      description: 'Before foundations are poured, we penetrate the earth with 20-ton hydraulic CPT rigs, deep soil boring, and seismic surveys to eliminate geological settlement hazards.',
+      cta_text: 'Explore Ground Truth',
+      cta_url: '/services/ground-intelligence',
+      desktop_image: OpDrillCrewCasingImg,
+      mobile_image: OpDrillCrewCasingImg
     },
     {
-      id: 'geosolutions',
-      title: 'Geotechnical & Marine Survey',
-      description: 'Advanced geophysical surveys and high-accuracy bathymetric mapping for complex offshore and land engineering challenges across Sub-Saharan Africa.',
-      image: GeosolutionsImg
+      id: 'digital-intelligence',
+      phase: 'LIFECYCLE PHASE 03 // 3D REALITY CAPTURE & AS-BUILT INTEGRITY',
+      title: 'Digital Intelligence & 3D Reality Capture',
+      description: 'After assets are built, we capture millimetre-accurate Leica 3D point clouds and digital twins to verify as-built tolerances, detect deformation, and guide clash-free expansions.',
+      cta_text: 'Explore 3D Reality Capture',
+      cta_url: '/services/digital-intelligence',
+      video_url: DigitalIntelVideo,
+      desktop_image: OpLaserManifoldImg,
+      mobile_image: OpLaserManifoldImg
     },
     {
-      id: 'pipeline',
-      title: 'Pipeline integrity and facility construction',
-      description: 'Indigenous leader in pipeline maintenance and facility support, specializing in API-standard welding, fabrication, and comprehensive integrity testing.',
-      image: PipelineImg
-    },
-    {
-      id: 'integrated',
-      title: 'Integrated Project Management',
-      description: 'Bespoke end-to-end technical support for the oil and gas sector, combining engineering, procurement, and field supervision.',
-      image: IntegratedImg
+      id: 'infrastructure-construction',
+      phase: 'LIFECYCLE PHASE 04 // INTEGRATED FIELD DELIVERY & PIPELINES',
+      title: 'Integrated Engineering, Pipelines & Field Delivery',
+      description: 'Connecting engineering insight to physical execution—pipeline fabrication, certified welding, sub-meter rig positioning, and heavy swamp infrastructure delivered with zero LTI.',
+      cta_text: 'Explore Field Delivery',
+      cta_url: '/services/integrated-engineering-construction',
+      desktop_image: OpPipelineSwampCatImg,
+      mobile_image: OpPipelineSwampCatImg
     }
   ];
 
   useEffect(() => {
+    if (isHeroHovered || heroSlides.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 8000);
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 7000);
     return () => clearInterval(timer);
-  }, [slides.length]);
+  }, [heroSlides.length, isHeroHovered]);
 
   useEffect(() => {
     const observerOptions = {
@@ -224,93 +201,241 @@ const Home: React.FC = () => {
     const revealElements = document.querySelectorAll('.reveal');
     revealElements.forEach(el => observer.observe(el));
 
-    // Inject SociableKIT script idempotently
-    const scriptId = 'sociablekit-widget-script';
-    if (!document.getElementById(scriptId)) {
-      const script = document.createElement('script');
-      script.id = scriptId;
-      script.src = "https://widgets.sociablekit.com/linkedin-page-posts/widget.js";
-      script.defer = true;
-      document.head.appendChild(script);
-    }
-
     return () => {
       observer.disconnect();
     };
   }, []);
 
-  return (
-    <div className="flex flex-col font-sans">
-      <h1 className="sr-only">Polaris Integrated & GeoSolutions Limited (PIGL)</h1>
+  const intelligenceServices = effectiveServices.filter(s => 
+    ['Ground Intelligence', 'Digital Intelligence', 'Offshore Intelligence', 'Intelligence'].includes(s.division)
+  );
 
-      {/* Hero Slider Section */}
-      <section className="relative h-[85vh] md:h-[calc(100vh-56px)] overflow-hidden bg-slate-950">
-        {slides.map((slide, index) => (
+  // Continuous left-scrolling marquee for Services Carousel
+  useEffect(() => {
+    const track = document.getElementById('services-carousel-track');
+    if (!track) return;
+    
+    let isHovered = false;
+    let animId: number;
+    const handleMouseEnter = () => { isHovered = true; };
+    const handleMouseLeave = () => { isHovered = false; };
+    
+    track.addEventListener('mouseenter', handleMouseEnter);
+    track.addEventListener('mouseleave', handleMouseLeave);
+    
+    const step = () => {
+      if (!isHovered && track) {
+        track.scrollLeft += 0.8;
+        const halfWidth = track.scrollWidth / 2;
+        if (track.scrollLeft >= halfWidth) {
+          track.scrollLeft -= halfWidth;
+        }
+      }
+      animId = requestAnimationFrame(step);
+    };
+    
+    animId = requestAnimationFrame(step);
+    
+    return () => {
+      cancelAnimationFrame(animId);
+      track.removeEventListener('mouseenter', handleMouseEnter);
+      track.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, []);
+
+  // Close modal on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsVideoModalOpen(false);
+    };
+    if (isVideoModalOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isVideoModalOpen]);
+
+  return (
+    <div className="flex flex-col font-sans bg-white">
+      <h1 className="sr-only">Polaris Integrated & GeoSolutions Limited (PIGL) - Engineering Intelligence & Geosolutions</h1>
+
+      {/* 1. Hero Section with Looping Background Video & Content Slider */}
+      <section 
+        className="relative h-[80vh] sm:h-[86vh] md:h-[calc(100vh-48px)] min-h-[540px] max-h-[960px] overflow-hidden bg-slate-950 group"
+        onMouseEnter={() => setIsHeroHovered(true)}
+        onMouseLeave={() => setIsHeroHovered(false)}
+      >
+        
+        {/* Dynamic Video & Image Backgrounds with Seamless Looping and Smooth Cross-Fades */}
+        <div className="absolute inset-0 overflow-hidden bg-slate-950 pointer-events-none z-0 select-none">
+          {heroSlides.map((slide, idx) => {
+            const isActive = currentSlide === idx;
+            const youtubeId = getYouTubeId(slide.video_url);
+            const isDirectVideo = Boolean(slide.video_url && !youtubeId);
+            const fallbackPoster = youtubeId 
+              ? (getYouTubeThumbnail(slide.video_url) || `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`)
+              : (slide.desktop_image || '/assets/DJI_0003.jpg');
+
+            return (
+              <div
+                key={`bg-${slide.id || idx}`}
+                className={`absolute inset-0 flex items-center justify-center overflow-hidden transition-opacity duration-1000 ease-in-out ${
+                  isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                }`}
+              >
+                {youtubeId ? (
+                  isActive ? (
+                    <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+                      {/* Exact 16:9 Aspect Ratio Embed with Zero Digital Magnification */}
+                      <iframe
+                        src={getYouTubeEmbedUrl(slide.video_url, { autoplay: true, mute: true, loop: true, controls: false }) || ''}
+                        title={slide.title}
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none border-0 aspect-video"
+                        style={{
+                          width: 'max(100%, 177.78vh)',
+                          height: 'max(100%, 56.25vw)',
+                          minWidth: '100%',
+                          minHeight: '100%'
+                        }}
+                        allow="autoplay; encrypted-media"
+                        frameBorder="0"
+                      />
+                    </div>
+                  ) : (
+                    <img
+                      src={fallbackPoster}
+                      alt={slide.title}
+                      className="w-full h-full object-cover"
+                    />
+                  )
+                ) : isDirectVideo ? (
+                  <video
+                    src={slide.video_url}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload={isActive ? "auto" : "metadata"}
+                    poster={slide.desktop_image || fallbackPoster}
+                    className="w-full h-full object-cover pointer-events-none"
+                  />
+                ) : (
+                  <img
+                    src={slide.desktop_image || fallbackPoster}
+                    alt={slide.title}
+                    className={`w-full h-full object-cover pointer-events-none transition-transform duration-[10000ms] ease-out ${
+                      isActive ? 'scale-105' : 'scale-100'
+                    }`}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Global Dark Gradient Scrim */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-900/40 z-10 pointer-events-none" />
+
+        {/* Hero Slider Content */}
+        {heroSlides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-              }`}
+            className={`absolute inset-0 z-20 flex items-end pb-12 sm:pb-18 md:pb-24 transition-opacity duration-1000 ${
+              currentSlide === index ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            }`}
           >
-            <div className="absolute inset-0 overflow-hidden bg-slate-950">
-              <img
-                src={slide.image}
-                alt={`${slide.title} - Advanced Geosolutions`}
-                className={`w-full h-full object-cover transition-all duration-1000 ${
-                  index === currentSlide ? 'opacity-100' : 'opacity-0'
-                }`}
-                loading={index === 0 ? "eager" : "lazy"}
-                fetchPriority={index === 0 ? "high" : "low"}
-                decoding="async"
-              />
-              {/* Solid even overlay for pristine text readability and image contrast */}
-              <div className="absolute inset-0 bg-slate-950/35 z-10" />
-            </div>
-
-            <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 md:pb-12 flex flex-col justify-end z-20">
-              <div className="w-full flex flex-col lg:flex-row justify-between lg:items-center gap-10 lg:gap-16">
-                <div key={`${currentSlide}-left`} className={`max-w-xl lg:max-w-2xl ${index === currentSlide ? 'animate-slide-up delay-200' : 'opacity-0'}`}>
-                  <h2 className="hero-title text-4xl sm:text-5xl lg:text-[4.0rem] text-white drop-shadow-sm font-medium">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-8 lg:gap-12 items-end">
+                
+                {/* Left Side: Refined Headline */}
+                <div className="lg:col-span-7">
+                  <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-tight sm:leading-[1.12] drop-shadow-lg">
                     {slide.title}
                   </h2>
                 </div>
 
-                <div key={`${currentSlide}-right`} className={`max-w-md ${index === currentSlide ? 'animate-slide-up delay-300' : 'opacity-0'}`}>
-                  <div className="w-full h-px bg-white mb-10" />
-                  <div className="space-y-6 lg:space-y-8">
-                    <p className="text-lg sm:text-xl lg:text-[22px] text-white font-normal drop-shadow-md leading-relaxed">
+                {/* Right Side: Divider + Description + Watch our story Play Button */}
+                <div className="lg:col-span-5 flex flex-col justify-end">
+                  <div className="border-t border-white/25 pt-3 sm:pt-4 mb-3 sm:mb-4">
+                    <p className="text-sm sm:text-base md:text-lg text-slate-100 font-normal leading-relaxed drop-shadow line-clamp-3 sm:line-clamp-none">
                       {slide.description}
                     </p>
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 md:gap-8 pt-2">
-                      <div 
-                        className="flex items-center space-x-4 group cursor-pointer w-fit"
-                        onClick={() => setIsVideoModalOpen(true)}
-                      >
-                        <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 border border-white/60 group-hover:bg-white group-hover:text-emerald-950 transition-all duration-300 rounded-none text-white">
-                          <svg className="w-4 h-4 lg:w-5 lg:h-5 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-                        </div>
-                        <span className="text-white font-bold text-xs lg:text-sm uppercase tracking-widest group-hover:text-emerald-400 transition-colors">Watch our story</span>
-                      </div>
+                  </div>
 
-                      <a 
-                        href={ProfilePDF}
-                        download="PIGL_Company_Profile.pdf"
-                        className="flex items-center space-x-4 group cursor-pointer w-fit"
-                      >
-                        <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 border border-white/60 group-hover:bg-white group-hover:text-emerald-950 transition-all duration-300 rounded-none text-white">
-                          <svg className="w-4 h-4 lg:w-5 lg:h-5 fill-none stroke-current" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                        </div>
-                        <span className="text-white font-bold text-xs lg:text-sm uppercase tracking-widest group-hover:text-emerald-400 transition-colors">Company Profile</span>
-                      </a>
-                    </div>
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-5">
+                    <button
+                      onClick={() => setIsVideoModalOpen(true)}
+                      className="inline-flex items-center space-x-2.5 sm:space-x-3 text-white group/btn cursor-pointer focus:outline-none"
+                    >
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 border border-white/80 bg-black/40 backdrop-blur-sm flex items-center justify-center group-hover/btn:bg-white group-hover/btn:text-slate-950 transition-all rounded-sm">
+                        <svg className="w-3.5 h-3.5 fill-current ml-0.5" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                      <span className="text-xs sm:text-base font-medium text-white/95 group-hover/btn:text-emerald-400 transition-colors">
+                        Watch our story (2 mins)
+                      </span>
+                    </button>
+
+                    <a
+                      href={slide.cta_url}
+                      className="text-xs sm:text-sm font-semibold text-emerald-400 hover:text-emerald-300 underline underline-offset-4 tracking-wide transition-colors"
+                    >
+                      {slide.cta_text} →
+                    </a>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
         ))}
+
+        {/* Previous / Next Arrow Controls */}
+        {heroSlides.length > 1 && (
+          <>
+            <button
+              onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
+              className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-950/40 hover:bg-slate-900/80 backdrop-blur-md text-white/80 hover:text-white border border-white/10 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 sm:opacity-75 focus:opacity-100 cursor-pointer shadow-lg hover:scale-105"
+              aria-label="Previous Slide"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
+              className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-950/40 hover:bg-slate-900/80 backdrop-blur-md text-white/80 hover:text-white border border-white/10 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 sm:opacity-75 focus:opacity-100 cursor-pointer shadow-lg hover:scale-105"
+              aria-label="Next Slide"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </>
+        )}
+
+        {/* Hero Slider Dots */}
+        <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center space-x-2 bg-slate-950/60 backdrop-blur-md px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full border border-white/10">
+          {heroSlides.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentSlide(idx)}
+              className={`h-1.5 transition-all duration-500 rounded-full cursor-pointer ${
+                currentSlide === idx ? 'w-6 sm:w-8 bg-emerald-400' : 'w-2 bg-white/40 hover:bg-white'
+              }`}
+              aria-label={`Slide ${idx + 1}`}
+            />
+          ))}
+        </div>
       </section>
 
-      {/* Sub-Navigation Bar */}
+      {/* 2. Sub-Navigation Bar */}
       <div className={`w-full bg-white border-b border-slate-200 hidden md:block z-40 sticky transition-all duration-500 shadow-sm ${
         navScrolled ? 'top-[64px] lg:top-[80px]' : 'top-[80px] lg:top-[104px]'
       }`}>
@@ -319,470 +444,788 @@ const Home: React.FC = () => {
           <div className="flex items-center space-x-6 lg:space-x-8">
             <button 
               onClick={() => {
-                const element = document.getElementById('what-we-do');
+                const element = document.getElementById('about-us');
                 if (element) {
                   const offset = window.innerWidth >= 1024 ? 136 : 120;
                   const y = element.getBoundingClientRect().top + window.pageYOffset - offset;
                   window.scrollTo({ top: y, behavior: 'smooth' });
                 }
               }}
-              className="sub-nav-font text-slate-600 hover:text-emerald-700 transition-colors whitespace-nowrap"
+              className="sub-nav-font text-slate-600 hover:text-emerald-700 transition-colors whitespace-nowrap font-medium"
             >
-              What we do
+              About Us
             </button>
             <button 
               onClick={() => {
-                const element = document.getElementById('our-industries');
+                const element = document.getElementById('pigl-difference');
                 if (element) {
                   const offset = window.innerWidth >= 1024 ? 136 : 120;
                   const y = element.getBoundingClientRect().top + window.pageYOffset - offset;
                   window.scrollTo({ top: y, behavior: 'smooth' });
                 }
               }}
-              className="sub-nav-font text-slate-600 hover:text-emerald-700 transition-colors whitespace-nowrap"
+              className="sub-nav-font text-slate-600 hover:text-emerald-700 transition-colors whitespace-nowrap font-medium"
             >
-              Our industries
+              The PIGL Difference
             </button>
             <button 
               onClick={() => {
-                const element = document.getElementById('track-record');
+                const element = document.getElementById('our-services');
                 if (element) {
                   const offset = window.innerWidth >= 1024 ? 136 : 120;
                   const y = element.getBoundingClientRect().top + window.pageYOffset - offset;
                   window.scrollTo({ top: y, behavior: 'smooth' });
                 }
               }}
-              className="sub-nav-font text-slate-600 hover:text-emerald-700 transition-colors whitespace-nowrap"
+              className="sub-nav-font text-slate-600 hover:text-emerald-700 transition-colors whitespace-nowrap font-medium"
             >
-              Case studies
+              Services & Capabilities
             </button>
             <button 
               onClick={() => {
-                const element = document.getElementById('core-values');
+                const element = document.getElementById('case-studies');
                 if (element) {
                   const offset = window.innerWidth >= 1024 ? 136 : 120;
                   const y = element.getBoundingClientRect().top + window.pageYOffset - offset;
                   window.scrollTo({ top: y, behavior: 'smooth' });
                 }
               }}
-              className="sub-nav-font text-slate-600 hover:text-emerald-700 transition-colors whitespace-nowrap"
+              className="sub-nav-font text-slate-600 hover:text-emerald-700 transition-colors whitespace-nowrap font-medium"
             >
-              Our Organisation
+              Case Studies
             </button>
             <button 
               onClick={() => {
-                const element = document.getElementById('community');
+                const element = document.getElementById('leadership');
                 if (element) {
                   const offset = window.innerWidth >= 1024 ? 136 : 120;
                   const y = element.getBoundingClientRect().top + window.pageYOffset - offset;
                   window.scrollTo({ top: y, behavior: 'smooth' });
                 }
               }}
-              className="sub-nav-font text-emerald-700 hover:text-emerald-900 transition-colors font-bold whitespace-nowrap"
+              className="sub-nav-font text-slate-600 hover:text-emerald-700 transition-colors whitespace-nowrap font-medium"
             >
-              News highlights
+              Leadership
             </button>
           </div>
         </div>
       </div>
 
-      {/* 1. What we do / Our industries */}
-      <section id="what-we-do" className="py-24 md:py-32 bg-white reveal">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-16 lg:mb-24">
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-8 tracking-tight">What we do</h2>
-            <p className="text-lg md:text-xl text-slate-600 font-normal leading-relaxed mb-8">
-              Whatever you're planning, building, or maintaining, we believe understanding the earth is key. At PIGL, we unlock its secrets in the form of high-fidelity Geo-data, which we apply to develop safer, more sustainable, and more efficient operations. It's how we help create a safe and liveable world – together.
-            </p>
-            <a href="#/about" className="inline-flex items-center text-emerald-700 font-bold hover:text-emerald-900 transition-colors group">
-              Read more <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-            </a>
-          </div>
+      {/* 3. Brief About Us Section (Light Theme with Subtle Engineering Topographic Watermark) */}
+      <section id="about-us" className="relative py-20 md:py-28 bg-white border-b border-slate-200 reveal overflow-hidden">
+        {/* Subtle Background Decorations */}
+        <div className="absolute inset-0 bg-topo-pattern pointer-events-none" />
+        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="flex justify-between items-center mb-8">
-            <h3 className="text-2xl font-bold text-slate-900 tracking-tight" id="our-expertise">Our industries</h3>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={handlePrev}
-                className="p-2.5 border border-slate-300 rounded-none text-slate-800 hover:border-emerald-700 hover:text-emerald-700 transition-colors bg-white opacity-100"
-                aria-label="Previous Industry"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                onClick={handleNext}
-                className="p-2.5 border border-slate-300 rounded-none text-slate-800 hover:border-emerald-700 hover:text-emerald-700 transition-colors bg-white opacity-100"
-                aria-label="Next Industry"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-stretch">
+            
+            {/* Left Narrative Content */}
+            <div className="lg:col-span-6 flex flex-col justify-between space-y-6">
+              <div>
+                <div className="flex items-center space-x-2 mb-3">
+                  <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                  <span className="text-emerald-700 font-bold text-xs uppercase tracking-widest block">
+                    About Polaris Integrated & GeoSolutions
+                  </span>
+                </div>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
+                  Two Decades of Indigenous Engineering Excellence
+                </h2>
+                <div className="space-y-4 text-slate-600 text-base sm:text-lg leading-relaxed font-normal">
+                  <p>
+                    Polaris Integrated and GeoSolutions Limited (PIGL) is a 100% indigenous Nigerian engineering and geosolutions firm. We help energy and infrastructure companies understand their ground conditions, map subsea environments, capture accurate 3D facility models, and build dependable assets across Sub-Saharan Africa.
+                  </p>
+                  <p className="text-sm sm:text-base">
+                    Certified to ISO 9001:2015 and ISO 45001:2018 with over 500,000 safe man-hours, our experienced engineers, survey vessels, and specialized ground rigs deliver trusted results from initial site survey to long-term asset operations.
+                  </p>
+                </div>
 
-          <div className="overflow-hidden -mx-3">
-            <div 
-              className={`flex ${isTransitioning ? 'transition-transform duration-500 ease-in-out' : ''}`}
-              style={{ transform: `translateX(-${currentIndustrySlide * (100 / visibleCards)}%)` }}
-            >
-              {extendedServices.map((service, idx) => (
-                <div 
-                  key={idx} 
-                  className="px-3 flex-shrink-0 flex"
-                  style={{ width: `${100 / visibleCards}%` }}
+                {/* Engineering Lifecycle Continuum Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-5">
+                  <div className="p-3.5 bg-slate-50 border border-slate-200/90">
+                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Phase 1: Discover</div>
+                    <div className="text-xs font-bold text-slate-900 mt-1">Site Characterization</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">CPT soil testing, seismic profiling & ocean buoys</div>
+                  </div>
+                  <div className="p-3.5 bg-slate-50 border border-slate-200/90">
+                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Phase 2: Build</div>
+                    <div className="text-xs font-bold text-slate-900 mt-1">Swamp Field Delivery</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">Pipeline construction, certified welding & rig positioning</div>
+                  </div>
+                  <div className="p-3.5 bg-slate-50 border border-slate-200/90">
+                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Phase 3: Verify</div>
+                    <div className="text-xs font-bold text-slate-900 mt-1">3D Reality Capture</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">Millimeter Leica LiDAR & operating digital twins</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 flex flex-wrap items-center gap-4">
+                <a
+                  href="/about"
+                  className="px-7 py-4 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md hover:shadow-lg inline-flex items-center group rounded-none"
                 >
-                  <a href={`#/services/detail?id=${service.id}`} className="group block bg-slate-50 border border-slate-200/60 p-6 md:p-8 hover:shadow-xl transition-shadow flex flex-col w-full hover-lift">
-                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 mb-6 rounded-none shrink-0">
-                      <img 
-                        src={service.image} 
-                        alt={service.title} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                        loading="lazy" 
-                        decoding="async" 
-                      />
-                    </div>
-                    <h4 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors">{service.title}</h4>
-                    <p className="text-slate-600 font-normal leading-relaxed line-clamp-3 text-sm md:text-base flex-grow">{service.description}</p>
-                  </a>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Pagination Indicators */}
-          <div className="flex justify-center items-center space-x-2 mt-8">
-            {SERVICES.map((_, idx) => {
-              const activeDotIndex = ((currentIndustrySlide - SERVICES.length) % SERVICES.length + SERVICES.length) % SERVICES.length;
-              return (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    setCurrentIndustrySlide(SERVICES.length + idx);
-                  }}
-                  className={`h-1.5 transition-all duration-500 rounded-none ${
-                    activeDotIndex === idx ? 'w-8 bg-emerald-600' : 'w-2 bg-slate-300 hover:bg-slate-400'
-                  }`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* 2. Stats Section */}
-      <section className="bg-slate-50 py-24 md:py-32 reveal border-y border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
-            <div className="space-y-4 md:space-y-6">
-              <span className="text-5xl md:text-6xl font-black text-emerald-600 block tracking-tighter">
-                0<span className="text-3xl md:text-4xl ml-2 font-black uppercase tracking-normal">LTI</span>
-              </span>
-              <div className="space-y-2 md:space-y-3">
-                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">500k+ Safe Man-Hours</h3>
-                <p className="text-slate-600 text-base md:text-lg leading-relaxed font-normal">Unwavering commitment to safety across all swamp and offshore operations.</p>
-              </div>
-            </div>
-            <div className="space-y-4 md:space-y-6">
-              <span className="text-5xl md:text-6xl font-black text-emerald-600 block tracking-tighter">
-                <CountUp end={100} suffix="%" />
-              </span>
-              <div className="space-y-2 md:space-y-3">
-                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">NCDMB Compliant</h3>
-                <p className="text-slate-600 text-base md:text-lg leading-relaxed font-normal">PIGL is a fully indigenous Nigerian company, committed to local capacity development.</p>
-              </div>
-            </div>
-            <div className="space-y-4 md:space-y-6">
-              <span className="text-5xl md:text-6xl font-black text-emerald-600 block tracking-tighter">ISO</span>
-              <div className="space-y-2 md:space-y-3">
-                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Triple-Certified Systems</h3>
-                <p className="text-slate-600 text-base md:text-lg leading-relaxed font-normal">Operating under ISO 9001:2015, 14001:2015, and 45001:2018 standards.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Examples of our expertise */}
-      <section id="track-record" className="py-24 md:py-32 bg-white reveal">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-end mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">Our Expertise</h2>
-            <a href="#/projects" className="hidden md:inline-flex items-center text-[#F97316] font-bold hover:text-orange-700 transition-colors group text-base">
-              All case studies <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-            </a>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
-            {/* Featured Project */}
-            {PROJECTS.length > 0 && (
-              <a href={`#/projects?id=${PROJECTS[0].id}`} className="md:col-span-6 group block">
-                <div className="relative aspect-[16/10] overflow-hidden mb-6 bg-slate-100">
-                  <img src={PROJECTS[0].image} alt={PROJECTS[0].title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
-                </div>
-                <div className="space-y-3 pb-8 border-b border-slate-200">
-                  <div className="flex items-center space-x-2">
-                    <span className="w-1.5 h-1.5 bg-slate-300 flex-shrink-0" />
-                    <span className="text-[14px] font-normal text-slate-500">Case study</span>
-                  </div>
-                  <h3 className="text-[24px] md:text-[28px] font-bold text-[#1A202C] leading-tight group-hover:text-[#F97316] transition-colors tracking-tight">
-                    {PROJECTS[0].title}
-                  </h3>
-                  <p className="text-slate-500 font-medium text-[14px]">{PROJECTS[0].location}</p>
-                </div>
-              </a>
-            )}
-
-            {/* Other Projects */}
-            <div className="md:col-span-6 grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-              {PROJECTS.slice(1, 3).map((project, idx) => (
-                <a href={`#/projects?id=${project.id}`} key={idx} className="group block">
-                  <div className="relative aspect-square overflow-hidden mb-6 bg-slate-100">
-                    <img src={project.image} alt={project.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" decoding="async" />
-                  </div>
-                  <div className="space-y-3 pb-8 border-b border-slate-200">
-                    <div className="flex items-center space-x-2">
-                      <span className="w-1.5 h-1.5 bg-slate-300 flex-shrink-0" />
-                      <span className="text-[14px] font-normal text-slate-500">Case study</span>
-                    </div>
-                    <h3 className="text-[18px] md:text-[20px] font-bold text-[#1A202C] leading-snug group-hover:text-[#F97316] transition-colors tracking-tight">
-                      {project.title}
-                    </h3>
-                    <p className="text-slate-500 font-medium text-[14px]">{project.location}</p>
-                  </div>
+                  <span>Know more about us</span>
+                  <span className="ml-2.5 group-hover:translate-x-1 transition-transform">→</span>
                 </a>
-              ))}
+                <a
+                  href="/contact"
+                  className="px-7 py-4 border-2 border-slate-300 hover:border-emerald-700 text-slate-800 hover:text-emerald-700 font-bold text-xs sm:text-sm uppercase tracking-wider transition-all rounded-none"
+                >
+                  Request Consultation
+                </a>
+              </div>
             </div>
-          </div>
 
-          <div className="mt-12 md:hidden">
-            <a href="#/projects" className="inline-flex items-center text-[#F97316] font-bold hover:text-orange-700 transition-colors group">
-              All case studies <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-            </a>
+            {/* Right Video Embed & Verified Credentials Panel */}
+            <div className="lg:col-span-6 flex flex-col justify-between space-y-4 h-full">
+              <div className="relative aspect-video w-full overflow-hidden shadow-xl border border-slate-200 bg-slate-950 group">
+                <iframe
+                  src="https://www.youtube.com/embed/sExrHCIGkH0"
+                  title="PIGL Corporate Documentary & Overview"
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
+
+              {/* Verified Credentials Card filling the remaining height */}
+              <div className="p-6 bg-slate-50 border border-slate-200 shadow-xs flex-1 flex flex-col justify-center">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700">Verified Corporate Credentials</span>
+                  </div>
+                  <span className="text-[11px] font-mono font-bold text-emerald-700">ISO Certified & NCDMB Compliant</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{settings?.stat_years_experience || '20+'}</div>
+                    <div className="text-xs font-bold text-slate-800">Years Industry Leadership</div>
+                    <p className="text-[11px] text-slate-500 leading-snug">Indigenous engineering delivering energy infrastructure across Sub-Saharan Africa.</p>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{settings?.stat_safe_hours || '500k+'}</div>
+                    <div className="text-xs font-bold text-slate-800">Safe Man-Hours</div>
+                    <p className="text-[11px] text-slate-500 leading-snug">Uncompromising Goal Zero LTI culture across swamp and offshore operational sites.</p>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">ISO</div>
+                    <div className="text-xs font-bold text-slate-800">9001:2015 & 45001:2018</div>
+                    <p className="text-[11px] text-slate-500 leading-snug">Audited international quality management and occupational safety systems.</p>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">100%</div>
+                    <div className="text-xs font-bold text-slate-800">Indigenous Firm</div>
+                    <p className="text-[11px] text-slate-500 leading-snug">Committed to local workforce empowerment, training, and host community partnership.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* 4. Technical Edge Section */}
-      <section className="py-24 md:py-32 bg-white reveal">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            {/* Left: Image Carousel */}
-            <div className="relative overflow-hidden group shadow-2xl aspect-[4/3] w-full bg-slate-100">
-              {techEdgeImages.map((slide, idx) => (
-                <div
-                  key={idx}
-                  className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                    currentTechSlide === idx ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                  }`}
-                >
-                  <img 
-                    src={slide.src} 
-                    alt={slide.alt} 
-                    className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-[4000ms]"
-                    loading={idx === 0 ? "eager" : "lazy"}
-                    decoding="async"
-                  />
+      {/* 4. Section: The PIGL Difference */}
+      <section id="pigl-difference" className="relative py-24 md:py-32 bg-slate-50/80 border-b border-slate-200 reveal overflow-hidden">
+        {/* Subtle Background Grid & Light Aura */}
+        <div className="absolute inset-0 bg-tech-grid pointer-events-none opacity-50" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-emerald-600/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-stretch">
+            
+            <div className="lg:col-span-6 flex flex-col justify-between space-y-6">
+              <div>
+                <div className="flex items-center space-x-2 mb-3">
+                  <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                  <span className="text-emerald-700 font-bold text-xs uppercase tracking-widest block">
+                    The Asset Lifecycle Continuum
+                  </span>
                 </div>
-              ))}
-              
-              {/* Navigation Arrows */}
+                <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight mb-4">
+                  One Seamless Journey: From Ground Truth to 3D Reality Capture
+                </h2>
+                <p className="text-slate-600 text-lg leading-relaxed font-normal mb-3">
+                  When site exploration, engineering design, and post-build inspection are handled by disconnected vendors, critical data is lost in translation—leading to foundation settlement, design clashes, and costly offshore delays.
+                </p>
+                <p className="text-slate-600 text-base leading-relaxed font-normal mb-5">
+                  PIGL eliminates hand-off risk by serving as the <strong>single continuous thread of engineering truth</strong> throughout the life of your asset:
+                </p>
+
+                <div className="space-y-3.5">
+                  <div className="flex items-start space-x-3.5 p-3.5 bg-white border border-slate-200 shadow-2xs">
+                    <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-mono font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900">Before Breaking Ground: Site Characterization & Geotechnics</h4>
+                      <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">20-ton hydraulic CPT soundings, deep soil sampling, and MetOcean buoys define soil strength and marine hazard thresholds before design freeze.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3.5 p-3.5 bg-white border border-slate-200 shadow-2xs">
+                    <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-mono font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900">During Execution: Precision Positioning & Swamp Pipeline Delivery</h4>
+                      <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">Certified swamp welding, right-of-way clearing, and sub-meter acoustic rig positioning in Niger Delta mangrove environments.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3.5 p-3.5 bg-white border border-slate-200 shadow-2xs">
+                    <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-mono font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900">After Construction: 3D Reality Capture & Digital Twin Verification</h4>
+                      <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">Millimeter Leica RTC360 LiDAR scans create an immutable digital twin of the built asset—validating as-built tolerances and preventing brownfield clashes.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-wrap items-center gap-4">
+                <a 
+                  href="/about" 
+                  className="inline-flex items-center text-emerald-700 font-bold hover:text-emerald-900 transition-colors group text-sm"
+                >
+                  Discover Our Heritage & Leadership <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Right Graphic Collage with Real High-Res Photos Stretching Full Height */}
+            <div className="lg:col-span-6 h-full">
+              <div className="grid grid-cols-2 gap-4 h-full">
+                {/* Column 1 */}
+                <div className="flex flex-col gap-4 h-full">
+                  {/* 1. Ground Truth / Geotech */}
+                  <div className="flex-1 relative overflow-hidden shadow-md border border-slate-200 group bg-slate-900 min-h-[220px] sm:min-h-[260px]">
+                    <img
+                      src={OpDrillCrewCasingImg}
+                      alt="PIGL Geotechnical Drilling specialists conducting borehole operations"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-3.5 left-3.5 right-3.5 text-white">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block mb-0.5">Phase 1 • Ground Truth</span>
+                      <p className="text-xs font-bold leading-tight truncate">Deep Borehole Casing & Soil Sampling</p>
+                    </div>
+                  </div>
+
+                  {/* 2. 3D Reality Capture Scanner */}
+                  <div className="flex-1 relative overflow-hidden shadow-md border border-slate-200 group bg-slate-900 min-h-[220px] sm:min-h-[260px]">
+                    <img
+                      src={OpLaserManifoldImg}
+                      alt="PIGL Engineers conducting high-density 3D Laser Scanning on process manifold"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-3.5 left-3.5 right-3.5 text-white">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block mb-0.5">Phase 3 • Verify</span>
+                      <p className="text-xs font-bold leading-tight truncate">Facility Manifold 3D Laser Scanning</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 2 */}
+                <div className="flex flex-col gap-4 h-full">
+                  {/* 3. Marine Operations */}
+                  <div className="flex-1 relative overflow-hidden shadow-md border border-slate-200 group bg-slate-900 min-h-[220px] sm:min-h-[260px]">
+                    <img
+                      src={OpOffshoreBargeImg}
+                      alt="PIGL Offshore Geotechnical Drilling Barge and Vessel in open sea"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-3.5 left-3.5 right-3.5 text-white">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block mb-0.5">Phase 1 • Marine</span>
+                      <p className="text-xs font-bold leading-tight truncate">Offshore Geotech Drilling Vessel</p>
+                    </div>
+                  </div>
+
+                  {/* 4. Infrastructure & Pipeline Execution */}
+                  <div className="flex-1 relative overflow-hidden shadow-md border border-slate-200 group bg-slate-900 min-h-[220px] sm:min-h-[260px]">
+                    <img
+                      src={OpPipelineSwampCatImg}
+                      alt="PIGL Heavy Pipeline ROW Construction with CAT pipelayers in swamp terrain"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-3.5 left-3.5 right-3.5 text-white">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block mb-0.5">Phase 2 • Build</span>
+                      <p className="text-xs font-bold leading-tight truncate">Swamp Pipeline ROW Execution</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Section: What We Do - Continuous Carousel */}
+      <section id="our-services" className="relative py-24 md:py-32 bg-white reveal overflow-hidden">
+        {/* Subtle Background Contour Lines & Depth */}
+        <div className="absolute inset-0 bg-contour-lines pointer-events-none opacity-80" />
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          {/* Header with Carousel Navigation Controls */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+            <div className="max-w-2xl">
+              <div className="flex items-center space-x-2 mb-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                <span className="text-emerald-700 font-bold text-xs uppercase tracking-widest">
+                  Core Engineering Platforms
+                </span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">
+                What We Do
+              </h2>
+              <p className="text-slate-600 text-base md:text-lg font-normal leading-relaxed">
+                Converting physical environments, complex subsurfaces, and maritime conditions into high-fidelity data and execution.
+              </p>
+            </div>
+
+            {/* Carousel Controls */}
+            <div className="flex items-center space-x-3 self-start md:self-end">
               <button
-                onClick={() => setCurrentTechSlide(prev => (prev === 0 ? techEdgeImages.length - 1 : prev - 1))}
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-30 p-2.5 bg-black/30 hover:bg-emerald-700 hover:scale-105 text-white transition-all duration-300 opacity-0 group-hover:opacity-100 focus:outline-none"
-                aria-label="Previous slide"
+                onClick={() => {
+                  const container = document.getElementById('services-carousel-track');
+                  if (container) {
+                    container.scrollBy({ left: -380, behavior: 'smooth' });
+                  }
+                }}
+                className="w-11 h-11 border border-slate-300 hover:border-emerald-700 bg-white hover:bg-emerald-50 text-slate-800 hover:text-emerald-700 flex items-center justify-center transition-all shadow-xs"
+                aria-label="Previous service"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
               </button>
               <button
-                onClick={() => setCurrentTechSlide(prev => (prev === techEdgeImages.length - 1 ? 0 : prev + 1))}
-                className="absolute right-3 top-1/2 -translate-y-1/2 z-30 p-2.5 bg-black/30 hover:bg-emerald-700 hover:scale-105 text-white transition-all duration-300 opacity-0 group-hover:opacity-100 focus:outline-none"
-                aria-label="Next slide"
+                onClick={() => {
+                  const container = document.getElementById('services-carousel-track');
+                  if (container) {
+                    container.scrollBy({ left: 380, behavior: 'smooth' });
+                  }
+                }}
+                className="w-11 h-11 border border-slate-300 hover:border-emerald-700 bg-white hover:bg-emerald-50 text-slate-800 hover:text-emerald-700 flex items-center justify-center transition-all shadow-xs"
+                aria-label="Next service"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" /></svg>
               </button>
-              
-              {/* Square Pagination Dots */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex space-x-2">
-                {techEdgeImages.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentTechSlide(idx)}
-                    className={`w-2.5 h-2.5 transition-all duration-500 ${
-                      currentTechSlide === idx ? 'bg-emerald-500 w-6' : 'bg-white/60 hover:bg-white'
-                    }`}
-                    aria-label={`Go to slide ${idx + 1}`}
+            </div>
+          </div>
+
+          {/* Continuous Left Marquee Carousel Track with Subtle Shimmer */}
+          <div
+            id="services-carousel-track"
+            className="flex space-x-6 overflow-x-auto pb-6 scrollbar-none no-scrollbar cursor-grab active:cursor-grabbing select-none"
+          >
+            {[...effectiveServices, ...effectiveServices].map((service, sIdx) => (
+              <div 
+                key={`${service.id}-${sIdx}`} 
+                className="flex-shrink-0 w-[300px] sm:w-[360px] md:w-[390px] group flex flex-col bg-white border border-slate-200 hover:border-emerald-700/60 hover:shadow-2xl transition-all duration-500 overflow-hidden card-shimmer relative"
+              >
+                {/* Engineering Corner Bracket Accent */}
+                <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-emerald-600/30 group-hover:border-emerald-600 transition-colors z-20 pointer-events-none" />
+
+                <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
+                  <img
+                    src={service.image}
+                    alt={`${service.title} - Polaris Integrated & GeoSolutions`}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
                   />
-                ))}
-              </div>
-            </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                </div>
 
-            {/* Right: Content */}
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight leading-[1.1]">
-                  High-Fidelity Data for Complex Environments
-                </h2>
+                <div className="p-6 sm:p-7 flex-grow flex flex-col justify-between space-y-5">
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900 tracking-tight group-hover:text-emerald-700 transition-colors mb-3 leading-snug">
+                      <a href={`/services/${service.id}`}>{service.title}</a>
+                    </h3>
+                    <p className="text-slate-600 text-sm leading-relaxed font-normal mb-2 line-clamp-4">
+                      {service.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <a
+                      href={`/services/${service.id}`}
+                      className="inline-flex items-center text-emerald-700 font-bold hover:text-emerald-900 text-xs sm:text-sm uppercase tracking-wider transition-colors group-hover:translate-x-1 duration-300"
+                    >
+                      Explore Service Specs <span className="ml-2">→</span>
+                    </a>
+                  </div>
+                </div>
               </div>
-              
-              <p className="text-slate-600 text-lg leading-relaxed font-normal">
-                We leverage the industry's most advanced reality capture systems—including Leica 3D Laser Scanners and UAV-based bathymetry—to deliver millimeter-accurate Geo-data. Our digital twin solutions transform physical assets into intelligent, manageable data sets.
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* 6. Section: Executed Projects & Case Studies */}
+      <section id="case-studies" className="relative py-24 md:py-32 bg-slate-50/70 border-t border-b border-slate-200 reveal overflow-hidden">
+        {/* Subtle Engineering Grid Background */}
+        <div className="absolute inset-0 bg-tech-grid pointer-events-none opacity-40" />
+        <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div className="max-w-2xl">
+              <div className="flex items-center space-x-2 mb-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block">
+                  Proven Field Track Record
+                </span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">
+                Executed Projects
+              </h2>
+              <p className="text-slate-600 text-lg font-normal leading-relaxed mt-4">
+                Demonstrating engineering precision, safety, and dependable delivery across major energy assets.
               </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-                <div className="space-y-2">
-                  <h4 className="text-lg font-bold text-slate-900 tracking-tight">Millimeter Accuracy</h4>
-                  <p className="text-slate-500 leading-relaxed text-[15px]">Precision scanning for offshore facility tie-ins.</p>
-                </div>
-                <div className="space-y-2">
-                  <h4 className="text-lg font-bold text-slate-900 tracking-tight">Digital Integration</h4>
-                  <p className="text-slate-500 leading-relaxed text-[15px]">BIM and CAD-ready data for intelligent asset management.</p>
-                </div>
-              </div>
             </div>
+            <a
+              href="/projects"
+              className="inline-flex items-center text-emerald-800 hover:text-emerald-950 font-bold text-sm tracking-wide transition-colors group"
+            >
+              Explore All Case Studies <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+            </a>
+          </div>
+
+          {/* Clean 3-Project Grid with 3-Beat Narrative Arc & Corner Accents */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {effectiveProjects.slice(0, 3).map((project, idx) => (
+              <a
+                key={idx}
+                href={`/projects?id=${project.id}`}
+                className="group border border-slate-200 bg-white flex flex-col hover:border-emerald-700/60 hover:shadow-xl transition-all duration-300 overflow-hidden card-shimmer relative"
+              >
+                {/* Engineering Corner Bracket */}
+                <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-emerald-600/30 group-hover:border-emerald-600 transition-colors z-20 pointer-events-none" />
+
+                <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
+                  <img 
+                    src={project.image} 
+                    alt={project.title} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                    loading="lazy" 
+                    decoding="async" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                </div>
+
+                <div className="p-7 flex-grow flex flex-col justify-between space-y-4">
+                  <div>
+                    <div className="mb-2">
+                      <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        Client: {project.client || 'Energy Sector'}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 leading-snug mb-3 tracking-tight group-hover:text-emerald-800 transition-colors">
+                      {project.title}
+                    </h3>
+
+                    {/* 3-Beat Narrative Arc */}
+                    <div className="space-y-2 mt-3 pt-3 border-t border-slate-100 text-xs">
+                      <div>
+                        <span className="font-mono font-bold text-slate-500 uppercase text-[10px] block">THE CHALLENGE:</span>
+                        <p className="text-slate-600 font-normal leading-relaxed line-clamp-2 mt-0.5">
+                          {project.challenge || project.description}
+                        </p>
+                      </div>
+                      <div className="pt-1.5">
+                        <span className="font-mono font-bold text-emerald-700 uppercase text-[10px] block">OUTCOME ACHIEVED:</span>
+                        <p className="text-slate-800 font-medium leading-relaxed line-clamp-1 mt-0.5">
+                          {project.results || 'Delivered with 100% HSSE compliance and zero asset clashes.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <span className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-800 group-hover:text-emerald-950 group-hover:translate-x-1 transition-all">
+                      Read Project Narrative <span className="ml-1.5">→</span>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+
+          <div className="mt-16 text-center">
+            <a
+              href="/projects"
+              className="inline-flex items-center px-8 py-4 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-md"
+            >
+              View Full Projects & Case Studies Library <span className="ml-2">→</span>
+            </a>
           </div>
         </div>
       </section>
 
-      {/* 5. Our organisation */}
-      <section id="core-values" className="py-24 md:py-32 bg-white reveal">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-16 tracking-tight">Our Organisation</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-            {/* Purpose */}
-            <a href="#/about" className="group block bg-slate-50 border border-slate-100 hover:shadow-xl transition-shadow flex flex-col hover-lift">
-              <div className="relative h-[250px] md:h-[350px] w-full overflow-hidden bg-slate-200 shrink-0">
-                <img src={BootsImg} alt="Our Purpose" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" decoding="async" />
-              </div>
-              <div className="p-8 sm:p-10 flex-grow flex flex-col">
-                <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4 group-hover:text-emerald-700 transition-colors tracking-tight">Creating a Safe and Liveable World</h3>
-                <p className="text-slate-600 font-normal leading-relaxed mb-8 flex-grow">
-                  The work we do every day, from infrastructure development consulting to advanced 3D reality capture, is accelerating our positive impact across the globe. Find out more about how we support renewable energy and coastal resilience projects.
-                </p>
-                <span className="text-emerald-700 font-bold inline-flex items-center group-hover:text-emerald-900 transition-colors">
-                  Read more <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+      {/* 6.5 Live Operational Field Showcase */}
+      <section id="operations-gallery" className="relative py-24 md:py-32 bg-slate-950 text-white reveal overflow-hidden">
+        {/* Subtle dark tech background grid */}
+        <div className="absolute inset-0 bg-tech-grid pointer-events-none opacity-20" />
+        <div className="absolute top-0 right-1/3 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+            <div className="max-w-2xl">
+              <div className="flex items-center space-x-2 mb-3">
+                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span className="text-emerald-400 font-bold text-xs uppercase tracking-widest block">
+                  Field Operations in Action
                 </span>
               </div>
-            </a>
-
-            {/* Team */}
-            <a href="#/about" className="group block bg-slate-50 border border-slate-100 hover:shadow-xl transition-shadow flex flex-col hover-lift">
-              <div className="relative h-[250px] md:h-[350px] w-full overflow-hidden bg-slate-200 shrink-0">
-                <img src={TeamLargeImg} alt="Leadership" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" decoding="async" />
-              </div>
-              <div className="p-8 sm:p-10 flex-grow flex flex-col">
-                <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4 group-hover:text-emerald-700 transition-colors tracking-tight">Our Team</h3>
-                <p className="text-slate-600 font-normal leading-relaxed mb-8 flex-grow">
-                  Meet the dedicated professionals driving innovation, safety, and operational excellence at Polaris Integrated and GeoSolutions Limited.
-                </p>
-                <span className="text-emerald-700 font-bold inline-flex items-center group-hover:text-emerald-900 transition-colors">
-                  Read more <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-                </span>
-              </div>
-            </a>
-          </div>
-
-          {/* Core Values Section */}
-          <div className="mt-24 pt-20 border-t border-slate-200">
-            <div className="max-w-3xl">
-              <span className="text-emerald-700 font-bold text-xs uppercase tracking-[0.2em] block mb-3">Our Foundation</span>
-              <h3 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-6">Our Core Values</h3>
-              <p className="text-slate-600 text-lg leading-relaxed mb-12">
-                At Polaris Integrated & GeoSolutions Limited, our operations are built on four unbreakable pillars of excellence. These values guide our engineers in the field and direct our long-term strategic growth.
+              <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
+                Authentic Engineering & Maritime Delivery
+              </h2>
+              <p className="text-slate-400 text-base md:text-lg font-normal leading-relaxed mt-4">
+                Real operational photographs from active PIGL energy projects across Nigeria—from deepwater geotechnical drilling vessels and high-density 3D laser scan surveys to heavy swamp pipeline construction and certified field fabrication.
               </p>
             </div>
+
+            {/* Category Filter Pills */}
+            <div className="flex flex-wrap gap-2 self-start md:self-end">
+              {(['All', 'Offshore & Marine', '3D Reality Capture', 'Pipelines & Infrastructure', 'Logistics & Safety'] as const).map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setGalleryFilter(cat)}
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all border ${
+                    galleryFilter === cat
+                      ? 'bg-emerald-600 border-emerald-500 text-white shadow-md'
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Responsive Gallery Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {(galleryFilter === 'All' 
+              ? OPERATIONS_GALLERY 
+              : OPERATIONS_GALLERY.filter(item => item.category === galleryFilter)
+            ).map((photo) => (
+              <div
+                key={photo.id}
+                className="group relative bg-slate-900 border border-slate-800 overflow-hidden flex flex-col hover:border-emerald-500/50 hover:shadow-2xl transition-all duration-300"
+              >
+                {/* Engineering Corner Bracket */}
+                <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-emerald-500/40 group-hover:border-emerald-400 transition-colors z-20 pointer-events-none" />
+
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-950">
+                  <img
+                    src={photo.image}
+                    alt={photo.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/25 to-transparent opacity-80 group-hover:opacity-90 transition-opacity pointer-events-none" />
+                  
+                  {photo.location && (
+                    <div className="absolute top-3 left-3 bg-slate-950/85 backdrop-blur-sm border border-white/10 px-2.5 py-1 text-[10px] font-mono text-emerald-400">
+                      📍 {photo.location}
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block mb-1">
+                      {photo.category}
+                    </span>
+                    <h4 className="text-sm sm:text-base font-bold text-white leading-snug group-hover:text-emerald-300 transition-colors">
+                      {photo.title}
+                    </h4>
+                    <p className="text-xs text-slate-400 font-normal leading-relaxed mt-2 line-clamp-3">
+                      {photo.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Section: Operational Stats & Dual ISO Certification */}
+      <section className="relative bg-white py-24 md:py-32 border-b border-slate-200 reveal overflow-hidden">
+        {/* Subtle Architectural Infrastructure Line-Art Watermark */}
+        <div 
+          className="absolute inset-0 pointer-events-none select-none z-0 bg-no-repeat bg-cover bg-center opacity-[0.035] mix-blend-multiply filter grayscale contrast-125"
+          style={{ backgroundImage: `url(${InfraSketchImg})` }}
+          aria-hidden="true"
+        />
+        {/* Subtle Topographic Contour Background */}
+        <div className="absolute inset-0 bg-contour-lines pointer-events-none opacity-40 z-0" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {/* Value 1: Technical Integrity */}
-              <div className="group bg-slate-50 border border-slate-100 hover:border-slate-300 p-8 transition-all hover:shadow-lg relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[3px] bg-emerald-950 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
-                <div className="w-12 h-12 bg-emerald-50 text-emerald-800 flex items-center justify-center mb-6 group-hover:bg-emerald-950 group-hover:text-white transition-all rounded-none">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </div>
-                <h4 className="text-xl font-bold text-slate-900 mb-3 tracking-tight group-hover:text-emerald-800 transition-colors">Technical Integrity</h4>
-                <p className="text-slate-600 text-sm leading-relaxed font-normal">
-                  Uncompromising engineering precision and transparent methodologies, delivering accurate data that serves as a single source of truth.
-                </p>
+            {/* Stat 1 */}
+            <div className="space-y-4 p-6 sm:p-8 bg-slate-50/80 border border-slate-200/80 shadow-xs relative">
+              <div className="flex items-center space-x-3">
+                <span className="text-5xl md:text-6xl font-black text-emerald-700 block tracking-tighter">
+                  0<span className="text-3xl md:text-4xl ml-2 font-bold uppercase tracking-normal">LTI</span>
+                </span>
               </div>
-
-              {/* Value 2: Safety First */}
-              <div className="group bg-slate-50 border border-slate-100 hover:border-slate-300 p-8 transition-all hover:shadow-lg relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[3px] bg-emerald-950 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
-                <div className="w-12 h-12 bg-emerald-50 text-emerald-800 flex items-center justify-center mb-6 group-hover:bg-emerald-950 group-hover:text-white transition-all rounded-none">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
-                <h4 className="text-xl font-bold text-slate-900 mb-3 tracking-tight group-hover:text-emerald-800 transition-colors">Safety & HSSE</h4>
-                <p className="text-slate-600 text-sm leading-relaxed font-normal">
-                  Safety is engineered into our daily operations. We maintain strict HSSE compliance to protect our personnel, assets, and environments.
-                </p>
-              </div>
-
-              {/* Value 3: Technical Innovation */}
-              <div className="group bg-slate-50 border border-slate-100 hover:border-slate-300 p-8 transition-all hover:shadow-lg relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[3px] bg-emerald-950 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
-                <div className="w-12 h-12 bg-emerald-50 text-emerald-800 flex items-center justify-center mb-6 group-hover:bg-emerald-950 group-hover:text-white transition-all rounded-none">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </div>
-                <h4 className="text-xl font-bold text-slate-900 mb-3 tracking-tight group-hover:text-emerald-800 transition-colors">Innovation</h4>
-                <p className="text-slate-600 text-sm leading-relaxed font-normal">
-                  Deploying cutting-edge 3D laser scanners, bathymetry, and subsea digital twin models to solve complex engineering challenges.
-                </p>
-              </div>
-
-              {/* Value 4: Client Centricity */}
-              <div className="group bg-slate-50 border border-slate-100 hover:border-slate-300 p-8 transition-all hover:shadow-lg relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[3px] bg-emerald-950 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
-                <div className="w-12 h-12 bg-emerald-50 text-emerald-800 flex items-center justify-center mb-6 group-hover:bg-emerald-950 group-hover:text-white transition-all rounded-none">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <h4 className="text-xl font-bold text-slate-900 mb-3 tracking-tight group-hover:text-emerald-800 transition-colors">Collaboration</h4>
-                <p className="text-slate-600 text-sm leading-relaxed font-normal">
-                  Building deep, transparent relationships with national and international oil operators, acting as trusted technical advisors.
+              <div className="space-y-2">
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">{settings?.stat_safe_hours || '500k+'} Safe Field Hours</h3>
+                <p className="text-slate-600 text-sm md:text-base leading-relaxed font-normal">
+                  Zero Lost Time Injuries across swamp, coastal, and offshore terrains—proving that complex engineering can return every surveyor and engineer home safely.
                 </p>
               </div>
             </div>
+
+            {/* Stat 2 */}
+            <div className="space-y-4 p-6 sm:p-8 bg-slate-50/80 border border-slate-200/80 shadow-xs">
+              <span className="text-5xl md:text-6xl font-black text-emerald-700 block tracking-tighter">
+                <CountUp end={100} suffix="%" />
+              </span>
+              <div className="space-y-2">
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Indigenous & NCDMB Certified</h3>
+                <p className="text-slate-600 text-sm md:text-base leading-relaxed font-normal">
+                  100% Nigerian ownership and technical stewardship, advancing domestic engineering capacity in geosolutions and infrastructure delivery.
+                </p>
+              </div>
+            </div>
+
+            {/* Stat 3 */}
+            <div className="space-y-4 p-6 sm:p-8 bg-slate-50/80 border border-slate-200/80 shadow-xs">
+              <span className="text-5xl md:text-6xl font-black text-emerald-700 block tracking-tighter">ISO</span>
+              <div className="space-y-2">
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Dual-Certified Systems</h3>
+                <p className="text-slate-600 text-sm md:text-base leading-relaxed font-normal">
+                  Certified to ISO 9001:2015 (Quality Management) and ISO 45001:2018 (Occupational Health & Safety) across all project disciplines.
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* 6. Industry Presence Spotlight */}
-      <section className="py-24 md:py-32 bg-slate-50 reveal">
+      {/* 8. Section: Strategic Technology Partnerships */}
+      <section id="partnerships" className="relative py-24 md:py-32 bg-slate-50/50 reveal overflow-hidden">
+        {/* Subtle Tech Grid */}
+        <div className="absolute inset-0 bg-tech-grid pointer-events-none opacity-40" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="max-w-3xl mb-16">
+            <div className="flex items-center space-x-2 mb-3">
+              <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+              <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block">
+                Global Technology Alliances
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight mb-6">
+              World-Class Technology, Indigenous Mastery
+            </h2>
+            <p className="text-lg md:text-xl text-slate-600 font-normal leading-relaxed">
+              We connect global innovation directly to African energy corridors. Through strategic technology alliances with Frankstar, CoaleXpert, and NPK Automation, we deploy international-grade oceanographic telemetry, modular produced-water treatment, and engineered flow control—backed by 100% indigenous field execution.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {effectivePartners.map((partner) => (
+              <div 
+                key={partner.id} 
+                className="bg-white border border-slate-200 p-8 flex flex-col justify-between hover:shadow-xl hover:border-emerald-700/40 transition-all duration-300 card-shimmer relative"
+              >
+                {/* Engineering Corner Bracket */}
+                <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-emerald-600/30 group-hover:border-emerald-600 transition-colors pointer-events-none" />
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2.5 py-1">
+                      Technology Partner
+                    </span>
+                    {partner.id === 'frankstar' && (
+                      <div className="bg-slate-950 px-2.5 py-1.5 border border-slate-800">
+                        <img 
+                          src={FrankstarLogo} 
+                          alt="Frankstar Technology Logo" 
+                          className="h-5 w-auto object-contain"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-900 tracking-tight">
+                    {partner.name}
+                  </h3>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+                    {partner.specialty}
+                  </p>
+                  <p className="text-slate-600 text-sm leading-relaxed font-normal">
+                    {partner.description}
+                  </p>
+                </div>
+
+                <div className="pt-6 mt-6 border-t border-slate-100">
+                  <a
+                    href={`/partners#${partner.id}`}
+                    className="inline-flex items-center text-emerald-700 font-bold text-xs uppercase tracking-wider hover:text-emerald-900 transition-colors"
+                  >
+                    Partner Details <span className="ml-2">→</span>
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <a
+              href="/partners"
+              className="inline-flex items-center text-sm font-bold text-slate-800 hover:text-emerald-700 transition-colors group"
+            >
+              Explore Our Full Technology Alliance Framework <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* 9. Section: Industry Presence (NIES 2025) */}
+      <section className="py-24 md:py-32 bg-slate-50 border-t border-slate-200 reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
             <div className="lg:w-1/2 space-y-6">
-              <span className="text-emerald-600 font-bold text-xs uppercase tracking-[0.2em] block">Industry Presence</span>
+              <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block">
+                Industry Presence
+              </span>
               <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight">
                 Driving the Energy Conversation at NIES 2025
               </h2>
-              <p className="text-slate-600 text-lg leading-relaxed">
-                PIGL was proud to be featured at the Nigeria International Energy Summit (NIES) 2025. We participated in high-level workshops, sharing our expertise on how 3D reality capture and high-fidelity engineering are accelerating the digital transformation of Africa's energy sector.
+              <p className="text-slate-600 text-lg leading-relaxed font-normal">
+                PIGL was proud to participate in high-level sessions at the Nigeria International Energy Summit (NIES) 2025. We shared our perspective on how 3D reality capture, digital twins, and high-fidelity geosolutions accelerate the sustainable modernization of Africa's energy assets.
               </p>
               <div className="pt-4">
-                <div className="inline-flex items-center space-x-3 text-slate-900 font-bold">
-                  <span className="w-8 h-[2px] bg-emerald-500"></span>
-                  <span>Workshop Participant • Abuja, Nigeria</span>
+                <div className="inline-flex items-center space-x-3 text-slate-900 font-bold text-sm">
+                  <span className="w-8 h-[2px] bg-emerald-600"></span>
+                  <span>Technical Participant • Abuja, Nigeria</span>
                 </div>
               </div>
             </div>
             <div className="lg:w-1/2">
-              <div className="relative group">
-                <div className="absolute -inset-2 bg-emerald-500/10 rounded-sm blur-xl group-hover:blur-2xl transition-all duration-700 opacity-50"></div>
+              <div className="relative group overflow-hidden border border-slate-200 shadow-xl">
                 <img 
                   src={NiesImg} 
                   alt="PIGL at NIES 2025" 
-                  className="relative w-full h-auto rounded-sm shadow-xl"
+                  className="w-full h-auto"
                   loading="lazy"
                   decoding="async"
                 />
@@ -792,56 +1235,201 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 7. News highlights */}
-      <section id="community" className="hidden md:block py-24 md:py-32 bg-white reveal">
+      {/* 10. Blogs & Publications */}
+      <section className="py-20 md:py-28 bg-slate-50 border-t border-slate-200 reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-end mb-16">
-            <div className="space-y-4">
-              <span className="text-emerald-600 font-bold text-xs uppercase tracking-[0.2em] block">Live Updates</span>
-              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">News Highlights</h2>
+          
+          {/* Section Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+            <div className="space-y-3 max-w-2xl">
+              <span className="text-emerald-700 font-bold text-xs uppercase tracking-widest block">
+                News & Publications
+              </span>
+              <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">
+                Blogs & Publications
+              </h2>
+              <p className="text-slate-600 text-sm md:text-base leading-relaxed">
+                Technical articles, project milestones, and engineering perspectives from Polaris Integrated & GeoSolutions.
+              </p>
             </div>
-            <a href="https://www.linkedin.com/company/polarisigl/" target="_blank" rel="noreferrer" className="hidden md:inline-flex items-center px-6 py-3 border border-slate-300 font-bold text-slate-800 hover:border-emerald-700 hover:text-emerald-700 transition-colors bg-white">
-              Follow on LinkedIn
+            
+            <a 
+              href="/blog" 
+              className="inline-flex items-center space-x-2 px-6 py-3 bg-white border border-slate-300 font-bold text-slate-900 hover:border-emerald-600 hover:text-emerald-700 transition-all text-xs uppercase tracking-wider shadow-sm hover:shadow self-start md:self-end"
+            >
+              <span>View All Blogs & Publications</span>
+              <span className="text-emerald-600 font-normal text-base">→</span>
             </a>
           </div>
 
-          {/* SociableKIT Widget Container */}
-          <div className="min-h-[600px] w-full bg-slate-50 border border-slate-100 p-4 md:p-8">
-            <div className="sk-ww-linkedin-page-post" data-embed-id="25680745"></div>
-          </div>
+          {/* Blog Posts Display */}
+          {blogLoading ? (
+            <div className="py-16 text-center text-slate-400">
+              <svg className="animate-spin h-8 w-8 text-emerald-600 mx-auto mb-3" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              <p className="text-xs font-bold uppercase tracking-wider">Loading publications...</p>
+            </div>
+          ) : blogPosts.length > 0 ? (
+            <div className="space-y-8">
+              
+              {/* Featured / Lead Article */}
+              {(() => {
+                const leadPost = blogPosts.find(p => p.featured) || blogPosts[0];
+                const regularPosts = blogPosts.filter(p => p.id !== leadPost.id).slice(0, 3);
+
+                return (
+                  <>
+                    <div className="bg-white border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all group">
+                      <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+                        <div className="lg:col-span-7 relative min-h-[280px] lg:min-h-[380px] overflow-hidden bg-slate-900">
+                          <img 
+                            src={leadPost.featured_image || '/assets/IMG_6170.jpg'} 
+                            alt={leadPost.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </div>
+
+                        <div className="lg:col-span-5 p-8 md:p-10 flex flex-col justify-between">
+                          <div className="space-y-4">
+                            <div className="flex items-center space-x-3 text-xs text-slate-500 font-semibold">
+                              <span>{new Date(leadPost.published_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                              <span>•</span>
+                              <span>{leadPost.read_time || '5 min read'}</span>
+                            </div>
+
+                            <h3 className="text-2xl md:text-3xl font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-tight">
+                              <a href={`/blog/${leadPost.slug}`}>
+                                {leadPost.title}
+                              </a>
+                            </h3>
+
+                            <p className="text-slate-600 text-sm md:text-base leading-relaxed line-clamp-4">
+                              {leadPost.excerpt}
+                            </p>
+                          </div>
+
+                          <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
+                            <div className="text-xs text-slate-500">
+                              <span className="font-semibold text-slate-800">By {leadPost.author}</span>
+                            </div>
+                            <a 
+                              href={`/blog/${leadPost.slug}`}
+                              className="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-emerald-700 hover:text-emerald-800"
+                            >
+                              <span>Read Article</span>
+                              <span>→</span>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Secondary 3-Column Grid */}
+                    {regularPosts.length > 0 && (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                        {regularPosts.map((post) => (
+                          <article 
+                            key={post.id}
+                            className="bg-white border border-slate-200 overflow-hidden shadow-sm hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between group"
+                          >
+                            <div>
+                              <div className="h-48 overflow-hidden bg-slate-900 relative">
+                                <img 
+                                  src={post.featured_image || '/assets/IMG_6170.jpg'} 
+                                  alt={post.title}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                  loading="lazy"
+                                  decoding="async"
+                                />
+                              </div>
+
+                              <div className="p-6 space-y-3">
+                                <div className="flex items-center space-x-2 text-xs text-slate-500">
+                                  <span>{new Date(post.published_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                  <span>•</span>
+                                  <span>{post.read_time || '4 min read'}</span>
+                                </div>
+
+                                <h4 className="font-bold text-slate-900 text-lg leading-snug group-hover:text-emerald-700 transition-colors line-clamp-2">
+                                  <a href={`/blog/${post.slug}`}>
+                                    {post.title}
+                                  </a>
+                                </h4>
+
+                                <p className="text-slate-600 text-xs md:text-sm leading-relaxed line-clamp-3">
+                                  {post.excerpt}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="p-6 pt-0 border-t border-slate-100 flex items-center justify-between text-xs mt-4">
+                              <span className="text-slate-500 font-medium truncate max-w-[130px]">{post.author}</span>
+                              <a 
+                                href={`/blog/${post.slug}`}
+                                className="font-bold text-emerald-700 hover:text-emerald-800 uppercase tracking-wider inline-flex items-center space-x-1"
+                              >
+                                <span>Read</span>
+                                <span>→</span>
+                              </a>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          ) : (
+            <div className="bg-white border border-slate-200 p-12 text-center">
+              <p className="text-slate-500 text-sm">No technical publications are currently live. Check back shortly or visit our blog portal.</p>
+              <a href="/blog" className="mt-4 inline-block px-6 py-2.5 bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider">
+                Visit Insights Hub
+              </a>
+            </div>
+          )}
+
         </div>
       </section>
 
-      {/* 8. Careers Banner */}
+      {/* 11. Careers Banner */}
       <section className="bg-slate-950 py-24 md:py-32 reveal text-center px-4 relative overflow-hidden">
-        {/* Background Image Overlay */}
         <div className="absolute inset-0 z-0">
           <img 
             src={CareersBg} 
             alt="Careers Background" 
-            className="w-full h-full object-cover opacity-40 grayscale"
+            className="w-full h-full object-cover opacity-35 grayscale"
             loading="lazy"
             decoding="async"
           />
-          <div className="absolute inset-0 bg-slate-950/50" />
+          <div className="absolute inset-0 bg-slate-950/60" />
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto">
-          <p className="text-emerald-400 font-bold mb-6 text-sm md:text-base uppercase tracking-widest">Come work with us</p>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-10 leading-tight tracking-tight">Help create an impact on a global scale</h2>
-          <a href="#/careers" className="inline-flex items-center bg-white text-slate-900 font-bold px-10 py-4 hover:bg-emerald-500 hover:text-white transition-colors">
+          <p className="text-emerald-400 font-bold mb-6 text-sm uppercase tracking-widest">Join Our Engineering Team</p>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-10 leading-tight tracking-tight">
+            Help build and protect critical infrastructure
+          </h2>
+          <a 
+            href="/careers" 
+            className="inline-flex items-center bg-white text-slate-900 font-bold px-10 py-4 hover:bg-emerald-500 hover:text-white transition-colors text-sm uppercase tracking-widest"
+          >
             Careers at PIGL <span className="ml-3 font-normal text-xl">→</span>
           </a>
         </div>
       </section>
 
-      {/* Video Modal */}
+      {/* Video Story Modal */}
       {isVideoModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/95 backdrop-blur-sm">
           <div className="relative w-full max-w-5xl aspect-video rounded-none overflow-hidden shadow-2xl bg-black animate-fade-in-scale">
             <button
               onClick={() => setIsVideoModalOpen(false)}
-              className="absolute top-4 right-4 z-10 w-12 h-12 bg-white hover:bg-emerald-500 text-slate-900 hover:text-white rounded-none flex items-center justify-center transition-colors shadow-lg"
+              className="absolute top-4 right-4 z-10 w-12 h-12 bg-white hover:bg-emerald-500 text-slate-900 hover:text-white flex items-center justify-center transition-colors shadow-lg"
               aria-label="Close video"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -863,3 +1451,4 @@ const Home: React.FC = () => {
 };
 
 export default Home;
+

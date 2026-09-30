@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 html, body {
     overflow-x: hidden;
     width: 100%;
@@ -141,6 +143,57 @@ body {
     transform: translateY(0);
 }
 
+/* ==========================================================================
+   CONTINUOUS REFLECTIVE ENERGY LINE
+   ========================================================================== */
+@keyframes reflectiveEnergyFlow {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.energy-line-divider {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  background: rgba(226, 232, 240, 0.7);
+  overflow: hidden;
+  display: block;
+}
+
+.energy-line-divider-dark {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  background: rgba(30, 41, 59, 0.9);
+  overflow: hidden;
+  display: block;
+}
+
+.energy-line-beam {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    90deg, 
+    transparent 0%, 
+    rgba(16, 185, 129, 0.2) 20%, 
+    rgba(52, 211, 153, 0.9) 50%, 
+    rgba(255, 255, 255, 1) 70%, 
+    rgba(52, 211, 153, 0.9) 85%, 
+    transparent 100%
+  );
+  filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.95)) drop-shadow(0 0 12px rgba(52, 211, 153, 0.7));
+  animation: reflectiveEnergyFlow 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+
+
 /* Hero Section Animations */
 @keyframes kenBurns {
     0% {
@@ -173,23 +226,159 @@ body {
     animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Custom premium scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.2);
-    border-radius: 9999px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.4);
+/* Subtle Engineering Topographic & Grid Patterns */
+.bg-topo-pattern {
+  background-image: radial-gradient(#059669 0.75px, transparent 0.75px), radial-gradient(#047857 0.75px, transparent 0.75px);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+  opacity: 0.04;
 }
 
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
-.delay-300 { animation-delay: 0.3s; }
-.delay-500 { animation-delay: 0.5s; }
-.delay-700 { animation-delay: 0.7s; }
+.bg-contour-lines {
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20 Q 25 5, 50 20 T 100 20 M0 40 Q 25 25, 50 40 T 100 40 M0 60 Q 25 45, 50 60 T 100 60 M0 80 Q 25 65, 50 80 T 100 80' fill='none' stroke='%23059669' stroke-width='0.75' opacity='0.06'/%3E%3C/svg%3E");
+}
+
+.bg-tech-grid {
+  background-image: 
+    linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Radar Beacon Micro-Animation */
+@keyframes radarPulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.animate-radar-pulse {
+  animation: radarPulse 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+/* Subtle Card Shimmer Sheen */
+.card-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-shimmer::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 60%
+  );
+  transform: translateX(-100%) rotate(25deg);
+  transition: transform 0.8s ease-in-out;
+  pointer-events: none;
+}
+
+.card-shimmer:hover::after {
+  transform: translateX(100%) rotate(25deg);
+}
+
+/* ==========================================================================
+   SCROLLBAR SUPPRESSION UTILITIES (Smooth scrolling with invisible scrollbar)
+   ========================================================================== */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+.no-scrollbar,
+.scrollbar-none,
+.scrollbar-hide {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}
+
+/* ==========================================================================
+   OFFICIAL COMPLIANCE DOCUMENT PRINT STYLES
+   ========================================================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm 12mm 12mm;
+  }
+
+  html, body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 10.5pt !important;
+    line-height: 1.35 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    width: 100% !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide entire website chrome, navigation, footers, interactive floating widgets, buttons, and search overlays */
+  nav,
+  footer,
+  header,
+  .no-print,
+  [data-print-hidden="true"],
+  button,
+  .whatsapp-button,
+  .scroll-to-top,
+  .search-overlay {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Ensure main container takes full width with zero unnecessary margins */
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    display: block !important;
+  }
+
+  /* Section and Dossier styling */
+  .printable-official-dossier {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+
+  .print-avoid-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .print-page-break {
+    page-break-before: always !important;
+    break-before: always !important;
+  }
+}
+

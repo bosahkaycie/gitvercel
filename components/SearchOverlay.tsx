@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SERVICES, PROJECTS, TEAM } from '../site_data';
+import { SERVICES, PROJECTS, TEAM, PARTNERS } from '../site_data';
 
 interface SearchOverlayProps {
   isOpen: boolean;
@@ -9,7 +9,7 @@ interface SearchOverlayProps {
 interface SearchResult {
   title: string;
   description: string;
-  category: 'Services' | 'Projects' | 'Team' | 'Pages';
+  category: 'Services' | 'Projects' | 'Team' | 'Pages' | 'Partners';
   link: string;
   badgeColor: string;
 }
@@ -108,7 +108,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
           title: service.title,
           description: service.description,
           category: 'Services',
-          link: `#/services/detail?id=${service.id}`,
+          link: `/services/${service.id}`,
           badgeColor: 'bg-emerald-50 text-emerald-800 border border-emerald-100'
         });
       }
@@ -122,13 +122,27 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
           title: project.title,
           description: project.description,
           category: 'Projects',
-          link: `#/projects?id=${project.id}`,
+          link: `/projects?id=${project.id}`,
           badgeColor: 'bg-orange-50 text-orange-800 border border-orange-100'
         });
       }
     });
 
-    // 3. Search Team Members
+    // 3. Search Partners & Technology
+    PARTNERS.forEach(partner => {
+      const matchText = `${partner.name} ${partner.role} ${partner.specialty} ${partner.description} ${partner.capabilities.join(' ')}`;
+      if (matchesTerms(matchText)) {
+        searchResults.push({
+          title: `${partner.name} (${partner.role})`,
+          description: partner.description,
+          category: 'Partners',
+          link: `/partners#${partner.id}`,
+          badgeColor: 'bg-emerald-50 text-emerald-800 border border-emerald-100'
+        });
+      }
+    });
+
+    // 4. Search Team Members
     TEAM.forEach(member => {
       const matchText = `${member.name} ${member.role}`;
       if (matchesTerms(matchText)) {
@@ -136,43 +150,49 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
           title: member.name,
           description: `Executive Management | ${member.role}`,
           category: 'Team',
-          link: `#/about`,
+          link: `/about`,
           badgeColor: 'bg-blue-50 text-blue-800 border border-blue-100'
         });
       }
     });
 
-    // 4. Static Pages / Information Content
+    // 5. Static Pages / Information Content
     const staticPages = [
       {
+        title: 'Partners & Technology',
+        description: 'Discover how PIGL combines indigenous Nigerian engineering execution with specialist global technology partners: Frankstar, CoaleXpert, and NPK.',
+        matchText: 'partners technology alliances frankstar coalexpert npk metocean produced water flanges equipment supply',
+        link: '/partners'
+      },
+      {
         title: 'Careers & Recruiting at PIGL',
-        description: 'Explore active jobs, internships, graduate programs, and apply to join our world-class engineering team.',
+        description: 'Explore active jobs, internships, graduate programs, and apply to join our engineering team.',
         matchText: 'careers jobs join team hiring application internships positions next gen recruiting vacancies work',
-        link: '#/careers'
+        link: '/careers'
       },
       {
         title: 'HSSE & Quality Assurance',
-        description: 'Learn about our 100% safety commitment, ISO 9001, 14001, and 45001 certified management systems, and Stop Work Authority.',
+        description: 'Learn about our 100% safety commitment, ISO 9001 and 45001 certified management systems, and Stop Work Authority.',
         matchText: 'safety hsse health security environment quality iso certification stop work qa qc compliance policy standards excellence',
-        link: '#/hsse'
+        link: '/hsse'
       },
       {
         title: 'Contact Information & Offices',
         description: 'Get in touch for consultations, project estimates, or locate our corporate offices in Port Harcourt, Rivers State.',
         matchText: 'contact phone email address location port harcourt inquiry consult quotation support office map office address',
-        link: '#/contact'
+        link: '/contact'
       },
       {
         title: 'About PIGL, Mission & Core Values',
-        description: 'Discover our 20-year history of technical excellence, our core values of professionalism, innovation, integrity, and safety.',
-        matchText: 'about heritage history values ceo executive ceo management leaders mission vision corporate profiles leadership 20 years',
-        link: '#/about'
+        description: 'Discover our 20-year history of technical excellence, our core values of technical integrity, safety, innovation, and collaboration.',
+        matchText: 'about heritage history values ceo executive management leaders mission vision corporate profiles leadership 20 years',
+        link: '/about'
       },
       {
         title: 'News, Press Releases & Corporate Heritage',
         description: 'Stay updated on project milestones, press releases, technology features, and corporate announcements.',
         matchText: 'news media press releases articles linkedin posts insights updates milestones highlights',
-        link: '#/news'
+        link: '/news'
       }
     ];
 
@@ -200,15 +220,19 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
 
   const handleSelectResult = (link: string) => {
     onClose();
-    window.location.hash = link;
-
-    // Trigger hashchange listener logic immediately
-    const event = new HashChangeEvent('hashchange');
-    window.dispatchEvent(event);
+    if (link.startsWith('/')) {
+      window.history.pushState({}, '', link);
+      window.dispatchEvent(new Event('pushstate-changed'));
+    } else {
+      window.location.hash = link;
+      // Trigger hashchange listener logic immediately
+      const event = new HashChangeEvent('hashchange');
+      window.dispatchEvent(event);
+    }
   };
 
   const handleTrendingClick = (term: string) => {
-    if (term.startsWith('#/')) {
+    if (term.startsWith('#/') || term.startsWith('/')) {
       handleSelectResult(term);
     } else {
       setQuery(term);
@@ -256,7 +280,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
                 </svg>
               </button>
             )}
-            <span className="text-[9px] uppercase font-black tracking-wider text-slate-400 border border-slate-200/85 px-1.5 py-0.5 rounded bg-slate-50">ESC</span>
+            <span className="text-xs uppercase font-bold tracking-wider text-slate-500 border border-slate-200 px-2 py-0.5 rounded bg-slate-50">ESC</span>
           </div>
         </div>
 
@@ -268,42 +292,42 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
           {query.trim() === '' ? (
             /* Popular Suggestions State */
             <div className="p-5 animate-fade-in">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 px-1">Popular Searches</h3>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 px-1">Popular Searches</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <button
                   onClick={() => handleTrendingClick('3D Laser Scanning')}
                   className="flex items-center space-x-3 bg-white hover:bg-slate-50 border border-slate-150 p-3 rounded-lg transition-all duration-300 hover-lift text-left shadow-sm"
                 >
                   <span className="w-1.5 h-1.5 bg-emerald-700 rounded-full"></span>
-                  <span className="text-[13px] text-slate-700 font-bold">3D Laser Scanning</span>
+                  <span className="text-sm text-slate-700 font-semibold">3D Laser Scanning</span>
                 </button>
                 <button
                   onClick={() => handleTrendingClick('Pipeline Integrity')}
                   className="flex items-center space-x-3 bg-white hover:bg-slate-50 border border-slate-150 p-3 rounded-lg transition-all duration-300 hover-lift text-left shadow-sm"
                 >
                   <span className="w-1.5 h-1.5 bg-orange-600 rounded-full"></span>
-                  <span className="text-[13px] text-slate-700 font-bold">Pipeline Integrity</span>
+                  <span className="text-sm text-slate-700 font-semibold">Pipeline Integrity</span>
                 </button>
                 <button
-                  onClick={() => handleTrendingClick('#/careers')}
+                  onClick={() => handleTrendingClick('/careers')}
                   className="flex items-center space-x-3 bg-white hover:bg-slate-50 border border-slate-150 p-3 rounded-lg transition-all duration-300 hover-lift text-left shadow-sm"
                 >
                   <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                  <span className="text-[13px] text-slate-700 font-bold">Careers & Jobs</span>
+                  <span className="text-sm text-slate-700 font-semibold">Careers & Jobs</span>
                 </button>
                 <button
-                  onClick={() => handleTrendingClick('#/hsse')}
+                  onClick={() => handleTrendingClick('/hsse')}
                   className="flex items-center space-x-3 bg-white hover:bg-slate-50 border border-slate-150 p-3 rounded-lg transition-all duration-300 hover-lift text-left shadow-sm"
                 >
                   <span className="w-1.5 h-1.5 bg-slate-500 rounded-full"></span>
-                  <span className="text-[13px] text-slate-700 font-bold">HSSE Commitment</span>
+                  <span className="text-sm text-slate-700 font-semibold">HSSE Commitment</span>
                 </button>
               </div>
             </div>
           ) : results.length > 0 ? (
             /* Active Spotlight Style Results */
             <div className="py-2">
-              <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2 px-4 py-1">
+              <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 px-4 py-1">
                 <span>Suggestions</span>
                 <span>{results.length} found</span>
               </div>
@@ -313,13 +337,13 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
                   onClick={() => handleSelectResult(result.link)}
                   className={`search-result-item flex items-center justify-between px-4 py-3 cursor-pointer transition-all duration-150 ${
                     activeResultIndex === idx
-                      ? 'bg-slate-100 text-slate-900 shadow-inner'
-                      : 'hover:bg-slate-50'
+                       ? 'bg-slate-100 text-slate-900 shadow-inner'
+                       : 'hover:bg-slate-50'
                   }`}
                 >
                   <div className="flex items-center space-x-3 min-w-0 flex-1">
                     {/* Compact Badge */}
-                    <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 shrink-0 rounded ${result.badgeColor}`}>
+                    <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 shrink-0 rounded ${result.badgeColor}`}>
                       {result.category}
                     </span>
                     
@@ -328,7 +352,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
                       <h4 className="text-sm font-bold text-slate-800 truncate">
                         {result.title}
                       </h4>
-                      <p className="text-[11px] text-slate-500 font-normal truncate mt-0.5">
+                      <p className="text-xs text-slate-500 font-normal truncate mt-0.5">
                         {result.description}
                       </p>
                     </div>
@@ -358,15 +382,15 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Modal Status Footer Bar */}
-        <div className="px-4 py-2 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 font-medium">
+        <div className="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500 font-medium">
           <div className="flex items-center space-x-2">
             <span>Use keys</span>
-            <span className="bg-white border border-slate-200 px-1 py-0.5 rounded text-[8px] font-bold">↑</span>
-            <span className="bg-white border border-slate-200 px-1 py-0.5 rounded text-[8px] font-bold">↓</span>
+            <span className="bg-white border border-slate-200 px-1.5 py-0.5 rounded text-xs font-bold font-mono">↑</span>
+            <span className="bg-white border border-slate-200 px-1.5 py-0.5 rounded text-xs font-bold font-mono">↓</span>
             <span>to navigate</span>
           </div>
           <div className="flex items-center space-x-1">
-            <span className="bg-white border border-slate-200 px-1 py-0.5 rounded text-[8px] font-bold">⏎</span>
+            <span className="bg-white border border-slate-200 px-1.5 py-0.5 rounded text-xs font-bold font-mono">⏎</span>
             <span>to open</span>
           </div>
         </div>
