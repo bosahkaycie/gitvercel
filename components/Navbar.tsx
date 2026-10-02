@@ -381,7 +381,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
                           <div className="border-b border-slate-100 pb-2 mb-4">
-                            <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-800">Intelligence Platforms</h4>
+                            <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-800">GeoIntelligence</h4>
                           </div>
                           <div className="space-y-1">
                             {SERVICES.filter(s => ['Ground Intelligence', 'Digital Intelligence', 'Offshore Intelligence', 'Intelligence'].includes(s.division)).map((service, idx) => (
@@ -557,7 +557,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                       {link.layout === 'services' && (
                         <div className="space-y-4 w-full">
                           <div>
-                            <p className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-2">Intelligence Platforms</p>
+                            <p className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-2">GeoIntelligence</p>
                             <div className="space-y-2.5 pl-2 border-l border-slate-100">
                               {SERVICES.filter(s => ['Ground Intelligence', 'Digital Intelligence', 'Offshore Intelligence', 'Intelligence'].includes(s.division)).map((service, sIdx) => (
                                 <a 
