@@ -23,7 +23,7 @@ export interface Service {
   subServices?: SubService[];
   icon: string;
   image: string;
-  division: 'Ground Intelligence' | 'Digital Intelligence' | 'Integrated Engineering & Construction Solutions' | 'Industrial & Environmental Technologies' | 'Offshore Intelligence' | 'Intelligence' | 'Solutions & Engineering';
+  division: 'Geo Data Intelligence' | 'Digital Mapping Intelligence' | 'Marine Intelligence' | 'Asset Integrity Intelligence' | 'Engineering, Industrial & Environmental Solutions' | 'Ground Intelligence' | 'Digital Intelligence' | 'Integrated Engineering & Construction Solutions' | 'Industrial & Environmental Technologies' | 'Offshore Intelligence' | 'Intelligence' | 'Solutions & Engineering' | string;
   partnerBadge?: {
     partnerName: string;
     role: string;
@@ -41,7 +41,7 @@ export interface CMSService {
   id: string;
   slug: string;
   title: string;
-  division: 'Ground Intelligence' | 'Digital Intelligence' | 'Integrated Engineering & Construction Solutions' | 'Industrial & Environmental Technologies' | 'Offshore Intelligence' | 'Intelligence' | 'Solutions & Engineering';
+  division: 'Geo Data Intelligence' | 'Digital Mapping Intelligence' | 'Marine Intelligence' | 'Asset Integrity Intelligence' | 'Engineering, Industrial & Environmental Solutions' | 'Ground Intelligence' | 'Digital Intelligence' | 'Integrated Engineering & Construction Solutions' | 'Industrial & Environmental Technologies' | 'Offshore Intelligence' | 'Intelligence' | 'Solutions & Engineering' | string;
   category: string;
   tagline?: string;
   short_description: string;

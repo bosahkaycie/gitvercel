@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useServices, submitContactInquiry } from '../hooks/useSupabaseData';
-import { PROJECTS, LEGACY_SERVICE_MAP, GROUND_INTELLIGENCE_SERVICES } from '../site_data';
+import { useServices, submitContactInquiry, FALLBACK_SERVICES } from '../hooks/useSupabaseData';
+import { PROJECTS, LEGACY_SERVICE_MAP, GROUND_INTELLIGENCE_SERVICES, SERVICES } from '../site_data';
 import { SERVICE_DETAILS_MAP, SERVICE_GALLERY_PRESETS, getEmbedVideoUrl } from './ServicesDetailsData';
-import { ServiceGalleryImage, ServiceDeliverableItem } from '../types';
+import { ServiceGalleryImage, ServiceDeliverableItem, CMSService } from '../types';
 import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 import NativeVideoPlayer from '../components/NativeVideoPlayer';
 import DeliverableDetailModal from '../components/DeliverableDetailModal';
@@ -126,8 +126,38 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
     id = LEGACY_SERVICE_MAP[id];
   }
 
-  // Find base service
-  const service = services.find((s) => s.slug === id || s.id === id);
+  // Find base service with robust multi-tiered fallback
+  const fallbackCMS = FALLBACK_SERVICES.find((s) => s.slug === id || s.id === id || LEGACY_SERVICE_MAP[s.slug] === id || LEGACY_SERVICE_MAP[s.id] === id);
+  const staticDef = SERVICES.find((s) => s.id === id || LEGACY_SERVICE_MAP[s.id] === id);
+  const service = services.find((s) => s.slug === id || s.id === id || LEGACY_SERVICE_MAP[s.slug] === id || LEGACY_SERVICE_MAP[s.id] === id) || fallbackCMS || (staticDef ? {
+    id: staticDef.id,
+    slug: staticDef.id,
+    title: staticDef.title,
+    division: staticDef.division,
+    category: staticDef.title,
+    tagline: staticDef.tagline,
+    short_description: staticDef.description,
+    full_description: staticDef.description,
+    hero_image: staticDef.image,
+    card_image: staticDef.image,
+    capabilities: staticDef.items || [],
+    subServices: staticDef.subServices || [],
+    operating_environments: ['Onshore', 'Swamp', 'Offshore'],
+    benefits: [
+      'Sub-millimeter accuracy and single source of truth',
+      'Minimizes operational risk and field rework',
+      'Certified to international and statutory standards (NUPRC, ISO)'
+    ],
+    technology: [],
+    methodology: [],
+    equipment: [],
+    gallery: [],
+    status: 'published' as const,
+    display_order: 1,
+    featured: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  } as CMSService : undefined);
   const fallbackDetails = id ? SERVICE_DETAILS_MAP[id] : null;
 
   // Active Lightbox image index state
@@ -186,7 +216,15 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
     const revealElements = document.querySelectorAll('.reveal');
     revealElements.forEach(el => observer.observe(el));
 
-    return () => observer.disconnect();
+    // Safety fallback: ensure all reveal elements become active even if observer is delayed
+    const timer = setTimeout(() => {
+      document.querySelectorAll('.reveal:not(.active)').forEach(el => el.classList.add('active'));
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
   }, [id, service]);
 
   if (loading && !service) {
@@ -235,6 +273,10 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
 
   const [selectedSubServiceScope, setSelectedSubServiceScope] = useState<string>('');
   const [activeDeliverableModal, setActiveDeliverableModal] = useState<ServiceDeliverableItem | null>(null);
+
+  const capabilitiesList: string[] = (service?.capabilities && service.capabilities.length > 0)
+    ? service.capabilities
+    : ((service as any)?.items || fallbackDetails?.methodology || []);
 
   const subServicesList = (service.subServices && service.subServices.length > 0)
     ? service.subServices
@@ -334,7 +376,7 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
                   </span>
                 </div>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  {service.capabilities.map((item, i) => {
+                  {capabilitiesList.map((item, i) => {
                     const deliverableObj = getDeliverableDetails(item, service.slug || service.id);
                     return (
                       <li key={i}>

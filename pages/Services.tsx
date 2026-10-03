@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useServices, submitContactInquiry } from '../hooks/useSupabaseData';
 import { SERVICE_DETAILS_MAP, SERVICE_GALLERY_PRESETS, getEmbedVideoUrl } from './ServicesDetailsData';
-import { GROUND_INTELLIGENCE_SERVICES } from '../site_data';
+import { GROUND_INTELLIGENCE_SERVICES, SERVICES, LEGACY_SERVICE_MAP } from '../site_data';
 import ServiceBg from '../assets/slider.jpeg';
 import GroundIntelImg from '../assets/cpt.png';
 import ScannerImg from '../assets/digital_intel_scanner.jpg';
@@ -13,6 +13,41 @@ import NativeVideoPlayer from '../components/NativeVideoPlayer';
 import DeliverableDetailModal from '../components/DeliverableDetailModal';
 import { getDeliverableDetails } from '../data/serviceDeliverablesData';
 import { ServiceDeliverableItem } from '../types';
+
+// Representative capabilities for high-level service discovery (Section 12 & 13)
+const PLATFORM_REPRESENTATIVE_SERVICES: Record<string, string[]> = {
+  'geo-data-intelligence': [
+    'Geotechnical Investigation',
+    'Geophysical Investigation',
+    'CPT / Site Investigation',
+    'Geospatial Survey'
+  ],
+  'digital-mapping-intelligence': [
+    'Topographic Survey',
+    '3D Reality Capture',
+    'Geomatics',
+    'Digital Engineering'
+  ],
+  'marine-intelligence': [
+    'Marine & Seabed Survey',
+    'Hydrographic Survey',
+    'MetOcean',
+    'Continuous Marine Monitoring'
+  ],
+  'asset-integrity-intelligence': [
+    'Inspection & NDT',
+    'Integrity Monitoring',
+    'Maintenance & Repairs',
+    'ROV & Subsea Integrity'
+  ],
+  'engineering-industrial-environmental-solutions': [
+    'Water Engineering',
+    'Wastewater Treatment',
+    'Produced Water Treatment',
+    'Flow Control & Valve Solutions',
+    'Pipeline & Civil Engineering'
+  ]
+};
 
 const ServiceContactForm: React.FC<{ serviceTitle: string }> = ({ serviceTitle }) => {
   const [formData, setFormData] = useState({ name: '', email: '', company: '', message: '' });
@@ -169,24 +204,41 @@ const Services: React.FC = () => {
   }, [selectedId]);
 
   // View state switcher logic
-  const selectedService = services.find(s => s.id === selectedId || s.slug === selectedId);
-  const selectedDetails = selectedId ? SERVICE_DETAILS_MAP[selectedId] : null;
-  const selectedVideoUrl = selectedService?.video_url || selectedDetails?.video_url || ((selectedService?.slug === 'ground-intelligence' || selectedId === 'ground-intelligence') ? '/assets/videos/ground_intelligence.mp4' : undefined);
+  const resolvedId = selectedId ? (LEGACY_SERVICE_MAP[selectedId] || selectedId) : null;
+  const selectedService = services.find(s => s.id === resolvedId || s.slug === resolvedId || s.id === selectedId || s.slug === selectedId) || SERVICES.find(s => s.id === resolvedId || s.id === selectedId);
+  const selectedDetails = resolvedId ? SERVICE_DETAILS_MAP[resolvedId] : null;
+  const selectedVideoUrl = selectedService?.video_url || selectedDetails?.video_url || ((selectedService?.slug === 'ground-intelligence' || resolvedId === 'geo-data-intelligence') ? '/assets/videos/ground_intelligence.mp4' : undefined);
   const selectedVideoEmbed = selectedVideoUrl ? getEmbedVideoUrl(selectedVideoUrl) : null;
   const selectedGallery = (selectedService?.gallery && selectedService.gallery.length > 0)
     ? selectedService.gallery
-    : (selectedDetails?.gallery || (SERVICE_GALLERY_PRESETS && (SERVICE_GALLERY_PRESETS[selectedService?.slug || ''] || SERVICE_GALLERY_PRESETS[selectedService?.id || ''])) || []);
+    : (selectedDetails?.gallery || (SERVICE_GALLERY_PRESETS && (SERVICE_GALLERY_PRESETS[selectedService?.slug || ''] || (resolvedId ? SERVICE_GALLERY_PRESETS[resolvedId] : []))) || []);
 
-  const intelligenceServices = services.filter(s => 
-    ['Ground Intelligence', 'Digital Intelligence', 'Offshore Intelligence', 'Intelligence'].includes(s.division)
-  );
-  const solutionsServices = services.filter(s => 
-    ['Integrated Engineering & Construction Solutions', 'Industrial & Environmental Technologies', 'Solutions & Engineering'].includes(s.division)
-  );
+  // Canonical 5 Top-Level Service Platforms
+  const canonicalOrder = [
+    'geo-data-intelligence',
+    'digital-mapping-intelligence',
+    'marine-intelligence',
+    'asset-integrity-intelligence',
+    'engineering-industrial-environmental-solutions'
+  ];
+
+  const primaryPlatforms = canonicalOrder.map((slug, idx) => {
+    const fromCMS = services.find(s => s.id === slug || s.slug === slug);
+    const fromStatic = SERVICES.find(s => s.id === slug);
+    if (fromCMS && fromStatic) {
+      return {
+        ...fromStatic,
+        ...fromCMS,
+        serviceNumber: fromStatic.serviceNumber || `0${idx + 1}`,
+        partnerBadge: fromStatic.partnerBadge || (fromCMS as any).partner_badge
+      };
+    }
+    return fromCMS || fromStatic;
+  }).filter(Boolean) as any[];
 
   const selectedSubServices = (selectedService?.subServices && selectedService.subServices.length > 0)
     ? selectedService.subServices
-    : ((selectedService?.slug === 'ground-intelligence' || selectedId === 'ground-intelligence') ? GROUND_INTELLIGENCE_SERVICES : []);
+    : (resolvedId ? (SERVICE_DETAILS_MAP[resolvedId]?.subServices || []) : []);
 
   if (selectedService) {
     return (
@@ -560,230 +612,93 @@ const Services: React.FC = () => {
 
       {/* Main Services Architecture Grid */}
       <section className="py-20 md:py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
           
-          {/* DIVISION A: INTELLIGENCE */}
-          <div className="reveal">
-            <div className="max-w-3xl mb-16 border-l-4 border-emerald-700 pl-6">
-              <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">Division A • Intelligence</span>
-              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">Intelligence Services</h2>
-              <p className="text-lg md:text-xl text-slate-600 leading-relaxed font-normal">
-                High-fidelity data capture, subsurface characterization, marine metocean observation, and precise spatial modeling that de-risk major capital assets.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-              {intelligenceServices.map((service) => {
-                const serviceVideoUrl = service.video_url || SERVICE_DETAILS_MAP[service.slug]?.video_url || SERVICE_DETAILS_MAP[service.id]?.video_url || (service.slug === 'ground-intelligence' ? '/assets/videos/ground_intelligence.mp4' : undefined);
-                return (
-                  <div key={service.id} id={service.slug} className="flex flex-col border border-slate-200 bg-slate-50 hover:shadow-xl transition-shadow p-8 md:p-12 hover-lift">
-                    {serviceVideoUrl ? (
-                      <div className="mb-8">
-                        <NativeVideoPlayer
-                          src={serviceVideoUrl}
-                          poster={service.card_image || service.hero_image}
-                          title={`${service.title} Operational Video`}
-                        />
-                      </div>
-                    ) : (
-                      <a href={`/services/${service.slug}`} className="relative h-64 md:h-[350px] bg-slate-200 mb-8 overflow-hidden group block">
-                        <img
-                          src={service.card_image || service.hero_image}
-                          alt={`${service.title} - PIGL Indigenous Engineering`}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                        <div className="absolute top-4 left-4 bg-emerald-950/90 backdrop-blur-sm text-emerald-300 text-xs font-bold uppercase tracking-wider px-3 py-1.5 border border-emerald-700/50">
-                          PIGL Engineering
-                        </div>
-                        {service.partner_badge && (
-                          <div className="absolute bottom-4 right-4 bg-slate-900/90 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 border border-slate-700">
-                            {service.partner_badge.partnerName}
-                          </div>
-                        )}
-                      </a>
-                    )}
-                    
-                    <div className="mb-4">
-                      <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-1">
-                        Intelligence
-                      </span>
-                      <h3 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight hover:text-emerald-700 transition-colors">
-                        <a href={`/services/${service.slug}`}>{service.title}</a>
-                      </h3>
-                      <p className="text-sm font-semibold text-slate-500 mt-1">
-                        {service.tagline}
-                      </p>
-                    </div>
-
-                    <p className="text-base md:text-lg text-slate-600 font-normal leading-relaxed mb-8 flex-grow">
-                      {service.short_description}
-                    </p>
-
-                    <div className="bg-white p-6 border border-slate-100 mb-8">
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-emerald-700 font-bold text-xs uppercase tracking-wider">
-                          {service.slug === 'ground-intelligence' ? 'Services Under Ground Intelligence:' : 'Core Deliverables & Focal Points:'}
-                        </h4>
-                        <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                          <svg className="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          Click item for scope
-                        </span>
-                      </div>
-                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        {service.capabilities.map((item, i) => {
-                          const deliverableObj = getDeliverableDetails(item, service.slug || service.id);
-                          return (
-                            <li key={i}>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setActiveDeliverableModal(deliverableObj);
-                                  setActiveDeliverableService({ title: service.title, division: service.division });
-                                }}
-                                className="w-full h-full text-left flex items-start justify-between space-x-2 p-2.5 bg-slate-50 hover:bg-emerald-50/30 border border-slate-200/70 hover:border-emerald-600 hover:shadow-sm transition-all group cursor-pointer"
-                              >
-                                <div className="flex items-start space-x-2 min-w-0">
-                                  <span className="flex-shrink-0 w-1.5 h-1.5 bg-emerald-600 group-hover:scale-125 transition-transform rounded-none mt-1.5"></span>
-                                  <span className="text-slate-800 group-hover:text-emerald-950 font-bold text-xs leading-snug line-clamp-2">
-                                    {deliverableObj.title}
-                                  </span>
-                                </div>
-                                <span className="text-slate-300 group-hover:text-emerald-600 transition-colors flex-shrink-0 mt-0.5">
-                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                                  </svg>
-                                </span>
-                              </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-
-                    <div>
-                      <a href={`/services/${service.slug}`} className="inline-flex items-center text-emerald-700 font-bold hover:text-emerald-900 transition-colors group">
-                        Explore Technical Specifications <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-                      </a>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+          <div className="reveal max-w-3xl border-l-4 border-emerald-700 pl-6">
+            <span className="text-emerald-700 font-bold text-xs uppercase tracking-[0.2em] block mb-2">PIGL Master Service Platforms</span>
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">Five Operational Platforms</h2>
+            <p className="text-lg md:text-xl text-slate-600 leading-relaxed font-normal">
+              High-fidelity subsurface intelligence, digital reality capture, marine metocean observation, asset lifecycle integrity, and turnkey industrial infrastructure across Nigeria.
+            </p>
           </div>
 
-          {/* DIVISION B: SOLUTIONS & ENGINEERING */}
-          <div className="reveal">
-            <div className="max-w-3xl mb-16 border-l-4 border-emerald-700 pl-6">
-              <span className="text-emerald-700 font-bold text-xs uppercase tracking-[0.2em] block mb-2">Division B • Solutions & Engineering</span>
-              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">Solutions & Engineering</h2>
-              <p className="text-lg md:text-xl text-slate-600 leading-relaxed font-normal">
-                Hands-on field execution, asset integrity assurance, pipeline and civil construction, industrial produced water treatment, and specialized procurement.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-              {solutionsServices.map((service) => {
-                const serviceVideoUrl = service.video_url || SERVICE_DETAILS_MAP[service.slug]?.video_url || SERVICE_DETAILS_MAP[service.id]?.video_url;
-                return (
-                  <div key={service.id} id={service.slug} className="flex flex-col border border-slate-200 bg-slate-50 hover:shadow-xl transition-shadow p-8 md:p-12 hover-lift">
-                    {serviceVideoUrl ? (
-                      <div className="mb-8">
-                        <NativeVideoPlayer
-                          src={serviceVideoUrl}
-                          poster={service.card_image || service.hero_image}
-                          title={`${service.title} Operational Video`}
-                        />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-14">
+            {primaryPlatforms.map((platform, idx) => {
+              const platformSlug = platform.slug || platform.id;
+              const repItems = PLATFORM_REPRESENTATIVE_SERVICES[platformSlug] || (platform.capabilities ? platform.capabilities.slice(0, 4) : []);
+              const isFullWidth = idx === primaryPlatforms.length - 1 && primaryPlatforms.length % 2 !== 0;
+
+              return (
+                <div 
+                  key={platform.id} 
+                  id={platformSlug} 
+                  className={`flex flex-col border border-slate-200 bg-slate-50 hover:shadow-xl transition-shadow p-8 md:p-12 hover-lift reveal ${
+                    isFullWidth ? 'lg:col-span-2' : ''
+                  }`}
+                >
+                  <a href={`/services/${platformSlug}`} className="relative h-64 md:h-[340px] bg-slate-200 mb-8 overflow-hidden group block">
+                    <img
+                      src={platform.card_image || platform.hero_image || platform.image}
+                      alt={`${platform.title} - PIGL Indigenous Engineering`}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div className="absolute top-4 left-4 bg-emerald-950/90 backdrop-blur-sm text-emerald-300 text-xs font-bold uppercase tracking-wider px-3 py-1.5 border border-emerald-700/50">
+                      PIGL Platform 0{idx + 1}
+                    </div>
+                    {platform.partnerBadge && (
+                      <div className="absolute bottom-4 right-4 bg-slate-900/90 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 border border-slate-700">
+                        {platform.partnerBadge.partnerName || platform.partnerBadge}
                       </div>
-                    ) : (
-                      <a href={`/services/${service.slug}`} className="relative h-64 md:h-[350px] bg-slate-200 mb-8 overflow-hidden group block">
-                        <img
-                          src={service.card_image || service.hero_image}
-                          alt={`${service.title} - PIGL Indigenous Engineering`}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                        <div className="absolute top-4 left-4 bg-emerald-950/90 backdrop-blur-sm text-emerald-300 text-xs font-bold uppercase tracking-wider px-3 py-1.5 border border-emerald-700/50">
-                          PIGL Engineering
-                        </div>
-                        {service.partner_badge && (
-                          <div className="absolute bottom-4 right-4 bg-slate-900/90 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 border border-slate-700">
-                            {service.partner_badge.partnerName}
-                          </div>
-                        )}
-                      </a>
                     )}
-                    
-                    <div className="mb-4">
-                      <span className="text-emerald-700 font-bold text-xs uppercase tracking-widest block mb-1">
-                        {service.category || 'Solutions & Engineering'}
-                      </span>
-                      <h3 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight hover:text-emerald-700 transition-colors">
-                        <a href={`/services/${service.slug}`}>{service.title}</a>
-                      </h3>
+                  </a>
+
+                  <div className="mb-4">
+                    <span className="text-emerald-700 font-bold text-xs uppercase tracking-widest block mb-1">
+                      0{idx + 1} • {platform.division || platform.category || 'Specialist Platform'}
+                    </span>
+                    <h3 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight hover:text-emerald-700 transition-colors">
+                      <a href={`/services/${platformSlug}`}>{platform.title}</a>
+                    </h3>
+                    {platform.tagline && (
                       <p className="text-sm font-semibold text-slate-500 mt-1">
-                        {service.tagline}
+                        {platform.tagline}
                       </p>
+                    )}
+                  </div>
+
+                  <p className="text-base text-slate-600 font-normal leading-relaxed mb-6 flex-grow">
+                    {platform.short_description || platform.description}
+                  </p>
+
+                  {/* Representative Capabilities (Section 12 & 13) */}
+                  <div className="bg-white p-5 border border-slate-200/80 mb-8">
+                    <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                      <h4 className="text-emerald-800 font-bold text-xs uppercase tracking-wider">Representative Capabilities</h4>
+                      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Core Disciplines</span>
                     </div>
-
-                    <p className="text-base md:text-lg text-slate-600 font-normal leading-relaxed mb-8 flex-grow">
-                      {service.short_description}
-                    </p>
-
-                    <div className="bg-white p-6 border border-slate-100 mb-8">
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-emerald-700 font-bold text-xs uppercase tracking-wider">Core Deliverables & Focal Points:</h4>
-                        <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                          <svg className="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          Click item for scope
-                        </span>
-                      </div>
-                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        {service.capabilities.map((item, i) => {
-                          const deliverableObj = getDeliverableDetails(item, service.slug || service.id);
-                          return (
-                            <li key={i}>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setActiveDeliverableModal(deliverableObj);
-                                  setActiveDeliverableService({ title: service.title, division: service.division });
-                                }}
-                                className="w-full h-full text-left flex items-start justify-between space-x-2 p-2.5 bg-slate-50 hover:bg-emerald-50/30 border border-slate-200/70 hover:border-emerald-600 hover:shadow-sm transition-all group cursor-pointer"
-                              >
-                                <div className="flex items-start space-x-2 min-w-0">
-                                  <span className="flex-shrink-0 w-1.5 h-1.5 bg-emerald-600 group-hover:scale-125 transition-transform rounded-none mt-1.5"></span>
-                                  <span className="text-slate-800 group-hover:text-emerald-950 font-bold text-xs leading-snug line-clamp-2">
-                                    {deliverableObj.title}
-                                  </span>
-                                </div>
-                                <span className="text-slate-300 group-hover:text-emerald-600 transition-colors flex-shrink-0 mt-0.5">
-                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                                  </svg>
-                                </span>
-                              </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-
-                    <div>
-                      <a href={`/services/${service.slug}`} className="inline-flex items-center text-emerald-700 font-bold hover:text-emerald-900 transition-colors group">
-                        Explore Technical Specifications <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-                      </a>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {repItems.map((item: string, rIdx: number) => (
+                        <div key={rIdx} className="flex items-start space-x-2 text-xs font-semibold text-slate-800">
+                          <span className="w-1.5 h-1.5 bg-emerald-600 flex-shrink-0 mt-1.5 rounded-none"></span>
+                          <span>{item}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                );
-              })}
-            </div>
+
+                  <div className="pt-2">
+                    <a 
+                      href={`/services/${platformSlug}`} 
+                      className="inline-flex items-center px-6 py-3.5 bg-emerald-800 text-white font-bold text-xs uppercase tracking-widest hover:bg-emerald-900 transition-all group"
+                    >
+                      Explore Platform & Specifications <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
         </div>

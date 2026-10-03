@@ -376,62 +376,154 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                       </div>
                     )}
 
-                    {/* Layout for Services mapping */}
+                    {/* Layout for Services mapping (5 Canonical Platforms) */}
                     {link.layout === 'services' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div>
-                          <div className="border-b border-slate-100 pb-2 mb-4">
-                            <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-800">GeoIntelligence</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {/* 01. Geo Data Intelligence */}
+                        <div 
+                          className="space-y-2 p-3 rounded-md hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                          onMouseEnter={() => {
+                            const found = SERVICES.find(s => s.id === 'geo-data-intelligence');
+                            if (found) setHoveredService(found);
+                          }}
+                        >
+                          <div className="border-b border-slate-100 pb-1.5 flex items-center justify-between">
+                            <a href="/services/geo-data-intelligence" onClick={() => setActiveDropdown(null)} className="text-xs font-bold uppercase tracking-wider text-emerald-800 group-hover:text-emerald-950 flex items-center">
+                              <span>Geo Data Intelligence</span>
+                              <span className="ml-1 text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                            </a>
                           </div>
-                          <div className="space-y-1">
-                            {SERVICES.filter(s => ['Ground Intelligence', 'Digital Intelligence', 'Offshore Intelligence', 'Intelligence'].includes(s.division)).map((service, idx) => (
-                              <div key={idx} className="group">
+                          <ul className="space-y-1 pl-1 border-l border-emerald-100">
+                            {['Geotechnical', 'Geophysical', 'Geospatial'].map((sub, sIdx) => (
+                              <li key={sIdx}>
                                 <a 
-                                  href={`/services/${service.id}`} 
-                                  className="flex items-start px-3 py-2 hover:bg-slate-50/80 transition-all rounded-md"
+                                  href="/services/geo-data-intelligence" 
+                                  className="text-xs text-slate-600 hover:text-emerald-700 block py-0.5 font-medium transition-colors"
                                   onClick={() => setActiveDropdown(null)}
-                                  onMouseEnter={() => setHoveredService(service)}
                                 >
-                                  <div className="flex flex-col">
-                                    <div className="flex items-center">
-                                      <span className="text-sm text-slate-800 font-semibold group-hover:text-emerald-700 transition-colors leading-tight">{service.title}</span>
-                                      {service.partnerBadge && (
-                                        <span className="ml-2 text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-none">Partner</span>
-                                      )}
-                                    </div>
-                                    <span className="text-xs text-slate-500 font-normal mt-0.5 line-clamp-1">{service.tagline}</span>
-                                  </div>
+                                  {sub}
                                 </a>
-                              </div>
+                              </li>
                             ))}
-                          </div>
+                          </ul>
                         </div>
-                        <div>
-                          <div className="border-b border-slate-100 pb-2 mb-4">
-                            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">Engineering & Technology</h4>
+
+                        {/* 02. Digital Mapping Intelligence */}
+                        <div 
+                          className="space-y-2 p-3 rounded-md hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                          onMouseEnter={() => {
+                            const found = SERVICES.find(s => s.id === 'digital-mapping-intelligence');
+                            if (found) setHoveredService(found);
+                          }}
+                        >
+                          <div className="border-b border-slate-100 pb-1.5 flex items-center justify-between">
+                            <a href="/services/digital-mapping-intelligence" onClick={() => setActiveDropdown(null)} className="text-xs font-bold uppercase tracking-wider text-emerald-800 group-hover:text-emerald-950 flex items-center">
+                              <span>Digital Mapping Intelligence</span>
+                              <span className="ml-1 text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                            </a>
                           </div>
-                          <div className="space-y-1">
-                            {SERVICES.filter(s => ['Integrated Engineering & Construction Solutions', 'Industrial & Environmental Technologies', 'Solutions & Engineering'].includes(s.division)).map((service, idx) => (
-                              <div key={idx} className="group">
+                          <ul className="space-y-1 pl-1 border-l border-emerald-100">
+                            {['Topographic Mapping', '3D Reality Capture', 'Geomatics', 'Digital Engineering'].map((sub, sIdx) => (
+                              <li key={sIdx}>
                                 <a 
-                                  href={`/services/${service.id}`} 
-                                  className="flex items-start px-3 py-2 hover:bg-slate-50/80 transition-all rounded-md"
+                                  href="/services/digital-mapping-intelligence" 
+                                  className="text-xs text-slate-600 hover:text-emerald-700 block py-0.5 font-medium transition-colors"
                                   onClick={() => setActiveDropdown(null)}
-                                  onMouseEnter={() => setHoveredService(service)}
                                 >
-                                  <div className="flex flex-col">
-                                    <div className="flex items-center">
-                                      <span className="text-sm text-slate-800 font-semibold group-hover:text-emerald-700 transition-colors leading-tight">{service.title}</span>
-                                      {service.partnerBadge && (
-                                        <span className="ml-2 text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded-none">Partner</span>
-                                      )}
-                                    </div>
-                                    <span className="text-xs text-slate-500 font-normal mt-0.5 line-clamp-1">{service.tagline}</span>
-                                  </div>
+                                  {sub}
                                 </a>
-                              </div>
+                              </li>
                             ))}
+                          </ul>
+                        </div>
+
+                        {/* 03. Marine Intelligence */}
+                        <div 
+                          className="space-y-2 p-3 rounded-md hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                          onMouseEnter={() => {
+                            const found = SERVICES.find(s => s.id === 'marine-intelligence');
+                            if (found) setHoveredService(found);
+                          }}
+                        >
+                          <div className="border-b border-slate-100 pb-1.5 flex items-center justify-between">
+                            <a href="/services/marine-intelligence" onClick={() => setActiveDropdown(null)} className="text-xs font-bold uppercase tracking-wider text-emerald-800 group-hover:text-emerald-950 flex items-center">
+                              <span>Marine Intelligence</span>
+                              <span className="ml-1 text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                            </a>
+                            <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-none">Frankstar</span>
                           </div>
+                          <ul className="space-y-1 pl-1 border-l border-emerald-100">
+                            {['Marine & Seabed Survey', 'Hydrographic Survey', 'Continuous Marine Intelligence', 'MetOcean'].map((sub, sIdx) => (
+                              <li key={sIdx}>
+                                <a 
+                                  href="/services/marine-intelligence" 
+                                  className="text-xs text-slate-600 hover:text-emerald-700 block py-0.5 font-medium transition-colors"
+                                  onClick={() => setActiveDropdown(null)}
+                                >
+                                  {sub}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {/* 04. Asset Integrity Intelligence */}
+                        <div 
+                          className="space-y-2 p-3 rounded-md hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                          onMouseEnter={() => {
+                            const found = SERVICES.find(s => s.id === 'asset-integrity-intelligence');
+                            if (found) setHoveredService(found);
+                          }}
+                        >
+                          <div className="border-b border-slate-100 pb-1.5 flex items-center justify-between">
+                            <a href="/services/asset-integrity-intelligence" onClick={() => setActiveDropdown(null)} className="text-xs font-bold uppercase tracking-wider text-slate-800 group-hover:text-emerald-800 flex items-center">
+                              <span>Asset Integrity Intelligence</span>
+                              <span className="ml-1 text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                            </a>
+                          </div>
+                          <ul className="space-y-1 pl-1 border-l border-slate-200">
+                            {['Inspection & NDT', 'Monitoring', 'Maintenance & Repairs', 'ROV & Subsea'].map((sub, sIdx) => (
+                              <li key={sIdx}>
+                                <a 
+                                  href="/services/asset-integrity-intelligence" 
+                                  className="text-xs text-slate-600 hover:text-emerald-700 block py-0.5 font-medium transition-colors"
+                                  onClick={() => setActiveDropdown(null)}
+                                >
+                                  {sub}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {/* 05. Engineering, Industrial & Environmental Solutions */}
+                        <div 
+                          className="space-y-2 p-3 rounded-md hover:bg-slate-50/80 transition-colors cursor-pointer group md:col-span-2"
+                          onMouseEnter={() => {
+                            const found = SERVICES.find(s => s.id === 'engineering-industrial-environmental-solutions');
+                            if (found) setHoveredService(found);
+                          }}
+                        >
+                          <div className="border-b border-slate-100 pb-1.5 flex items-center justify-between">
+                            <a href="/services/engineering-industrial-environmental-solutions" onClick={() => setActiveDropdown(null)} className="text-xs font-bold uppercase tracking-wider text-slate-800 group-hover:text-emerald-800 flex items-center">
+                              <span>Engineering, Industrial & Environmental Solutions</span>
+                              <span className="ml-1 text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                            </a>
+                            <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-1.5 py-0.2 rounded-none">CoaleXpert • NPK</span>
+                          </div>
+                          <ul className="grid grid-cols-2 gap-x-4 gap-y-1 pl-1 border-l border-slate-200">
+                            {['Water Engineering', 'Wastewater Treatment', 'Produced Water Treatment', 'Flow Control & Valves', 'Pipeline & Civil Engineering'].map((sub, sIdx) => (
+                              <li key={sIdx}>
+                                <a 
+                                  href="/services/engineering-industrial-environmental-solutions" 
+                                  className="text-xs text-slate-600 hover:text-emerald-700 block py-0.5 font-medium transition-colors"
+                                  onClick={() => setActiveDropdown(null)}
+                                >
+                                  {sub}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                       </div>
                     )}
@@ -556,32 +648,121 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                     <div className="pl-4 border-l-2 border-emerald-100 space-y-4 pt-2">
                       {link.layout === 'services' && (
                         <div className="space-y-4 w-full">
+                          {/* 01. Geo Data Intelligence */}
                           <div>
-                            <p className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-2">GeoIntelligence</p>
-                            <div className="space-y-2.5 pl-2 border-l border-slate-100">
-                              {SERVICES.filter(s => ['Ground Intelligence', 'Digital Intelligence', 'Offshore Intelligence', 'Intelligence'].includes(s.division)).map((service, sIdx) => (
+                            <a 
+                              href="/services/geo-data-intelligence"
+                              className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1.5 flex items-center justify-between"
+                              onClick={() => setIsOpen(false)}
+                            >
+                              <span>Geo Data Intelligence</span>
+                              <span className="text-[10px] text-emerald-600 font-normal">View →</span>
+                            </a>
+                            <div className="space-y-2 pl-2 border-l border-slate-200">
+                              {['Geotechnical', 'Geophysical', 'Geospatial'].map((sub, sIdx) => (
                                 <a 
                                   key={sIdx} 
-                                  href={`/services/${service.id}`} 
-                                  className="block text-sm font-medium text-slate-600 hover:text-emerald-600 flex items-center group"
+                                  href="/services/geo-data-intelligence" 
+                                  className="block text-sm font-medium text-slate-600 hover:text-emerald-600"
                                   onClick={() => setIsOpen(false)}
                                 >
-                                  {service.title}
+                                  {sub}
                                 </a>
                               ))}
                             </div>
                           </div>
+
+                          {/* 02. Digital Mapping Intelligence */}
                           <div>
-                            <p className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Engineering & Technology</p>
-                            <div className="space-y-2.5 pl-2 border-l border-slate-100">
-                              {SERVICES.filter(s => ['Integrated Engineering & Construction Solutions', 'Industrial & Environmental Technologies', 'Solutions & Engineering'].includes(s.division)).map((service, sIdx) => (
+                            <a 
+                              href="/services/digital-mapping-intelligence"
+                              className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1.5 flex items-center justify-between"
+                              onClick={() => setIsOpen(false)}
+                            >
+                              <span>Digital Mapping Intelligence</span>
+                              <span className="text-[10px] text-emerald-600 font-normal">View →</span>
+                            </a>
+                            <div className="space-y-2 pl-2 border-l border-slate-200">
+                              {['Topographic Mapping', '3D Reality Capture', 'Geomatics', 'Digital Engineering'].map((sub, sIdx) => (
                                 <a 
                                   key={sIdx} 
-                                  href={`/services/${service.id}`} 
-                                  className="block text-sm font-medium text-slate-600 hover:text-emerald-600 flex items-center group"
+                                  href="/services/digital-mapping-intelligence" 
+                                  className="block text-sm font-medium text-slate-600 hover:text-emerald-600"
                                   onClick={() => setIsOpen(false)}
                                 >
-                                  {service.title}
+                                  {sub}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* 03. Marine Intelligence */}
+                          <div>
+                            <a 
+                              href="/services/marine-intelligence"
+                              className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1.5 flex items-center justify-between"
+                              onClick={() => setIsOpen(false)}
+                            >
+                              <span>Marine Intelligence</span>
+                              <span className="text-[10px] text-emerald-600 font-normal">View →</span>
+                            </a>
+                            <div className="space-y-2 pl-2 border-l border-slate-200">
+                              {['Marine & Seabed Survey', 'Hydrographic Survey', 'Continuous Marine Intelligence', 'MetOcean'].map((sub, sIdx) => (
+                                <a 
+                                  key={sIdx} 
+                                  href="/services/marine-intelligence" 
+                                  className="block text-sm font-medium text-slate-600 hover:text-emerald-600"
+                                  onClick={() => setIsOpen(false)}
+                                >
+                                  {sub}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* 04. Asset Integrity Intelligence */}
+                          <div>
+                            <a 
+                              href="/services/asset-integrity-intelligence"
+                              className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1.5 flex items-center justify-between"
+                              onClick={() => setIsOpen(false)}
+                            >
+                              <span>Asset Integrity Intelligence</span>
+                              <span className="text-[10px] text-emerald-600 font-normal">View →</span>
+                            </a>
+                            <div className="space-y-2 pl-2 border-l border-slate-200">
+                              {['Inspection & NDT', 'Monitoring', 'Maintenance & Repairs', 'ROV & Subsea'].map((sub, sIdx) => (
+                                <a 
+                                  key={sIdx} 
+                                  href="/services/asset-integrity-intelligence" 
+                                  className="block text-sm font-medium text-slate-600 hover:text-emerald-600"
+                                  onClick={() => setIsOpen(false)}
+                                >
+                                  {sub}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* 05. Engineering, Industrial & Environmental Solutions */}
+                          <div>
+                            <a 
+                              href="/services/engineering-industrial-environmental-solutions"
+                              className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1.5 flex items-center justify-between"
+                              onClick={() => setIsOpen(false)}
+                            >
+                              <span>Engineering, Industrial & Environmental</span>
+                              <span className="text-[10px] text-emerald-600 font-normal">View →</span>
+                            </a>
+                            <div className="space-y-2 pl-2 border-l border-slate-200">
+                              {['Water Engineering', 'Wastewater Treatment', 'Produced Water Treatment', 'Flow Control & Valves', 'Pipeline & Civil Engineering'].map((sub, sIdx) => (
+                                <a 
+                                  key={sIdx} 
+                                  href="/services/engineering-industrial-environmental-solutions" 
+                                  className="block text-sm font-medium text-slate-600 hover:text-emerald-600"
+                                  onClick={() => setIsOpen(false)}
+                                >
+                                  {sub}
                                 </a>
                               ))}
                             </div>

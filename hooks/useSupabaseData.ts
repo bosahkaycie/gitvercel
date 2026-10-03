@@ -53,7 +53,7 @@ export const generateUUID = (): string => {
 };
 
 // Fallback seed services derived from current static data
-const FALLBACK_SERVICES: CMSService[] = SERVICES.map((s, idx) => {
+export const FALLBACK_SERVICES: CMSService[] = SERVICES.map((s, idx) => {
   const detail = SERVICE_DETAILS_MAP[s.id] || {
     longDescription: s.description,
     businessValue: 'Guaranteed technical integrity and operational reliability.',
@@ -672,6 +672,18 @@ export const getStoredServices = (): CMSService[] => {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY_SERVICES);
     if (saved) {
       const parsed: CMSService[] = JSON.parse(saved);
+      // Migrate if localStorage has stale legacy service categories or lacks the 5 canonical platforms
+      const hasCanonical = Array.isArray(parsed) && parsed.some(s => 
+        s.id === 'geo-data-intelligence' || 
+        s.id === 'digital-mapping-intelligence' || 
+        s.id === 'marine-intelligence' || 
+        s.id === 'asset-integrity-intelligence' || 
+        s.id === 'engineering-industrial-environmental-solutions'
+      );
+      if (!hasCanonical) {
+        localStorage.removeItem(LOCAL_STORAGE_KEY_SERVICES);
+        return FALLBACK_SERVICES;
+      }
       return parsed.map(s => {
         if (!s.gallery || s.gallery.length === 0) {
           const preset = (SERVICE_GALLERY_PRESETS && (SERVICE_GALLERY_PRESETS[s.slug] || SERVICE_GALLERY_PRESETS[s.id])) || [];
@@ -679,7 +691,7 @@ export const getStoredServices = (): CMSService[] => {
             s.gallery = preset;
           }
         }
-        if (s.slug === 'ground-intelligence' || s.id === 'ground-intelligence') {
+        if (s.slug === 'ground-intelligence' || s.id === 'ground-intelligence' || s.slug === 'geo-data-intelligence' || s.id === 'geo-data-intelligence') {
           if (!s.video_url || s.video_url.includes('G0hu1YqhpEE')) {
             s.video_url = '/assets/videos/ground_intelligence.mp4';
           }
@@ -917,14 +929,25 @@ export const useServices = (adminMode = false) => {
               s.gallery = preset;
             }
           }
-          if (s.slug === 'ground-intelligence' || s.id === 'ground-intelligence') {
+          if (s.slug === 'ground-intelligence' || s.id === 'ground-intelligence' || s.slug === 'geo-data-intelligence') {
             if (!s.video_url || s.video_url.includes('G0hu1YqhpEE')) {
               s.video_url = '/assets/videos/ground_intelligence.mp4';
             }
           }
           return s;
         });
-        setServices(enriched);
+
+        // Merge any canonical platforms from FALLBACK_SERVICES (e.g. asset-integrity-intelligence)
+        // that are not stored in Supabase
+        const existingKeys = new Set<string>();
+        enriched.forEach(s => {
+          if (s.slug) existingKeys.add(s.slug);
+          if (s.id) existingKeys.add(s.id);
+        });
+
+        const missing = FALLBACK_SERVICES.filter(f => !existingKeys.has(f.slug) && !existingKeys.has(f.id));
+        const merged = [...enriched, ...missing];
+        setServices(merged.sort((a, b) => a.display_order - b.display_order));
       } else {
         // If Supabase table is empty, seed with fallback data
         const localData = getStoredServices();
