@@ -211,44 +211,77 @@ PIGL remains committed to delivering world-class engineering solutions while pro
   }
 ];
 
-// Fallback seed sliders
-const FALLBACK_SLIDERS: CMSSlider[] = [
+// Fallback seed sliders representing the authoritative, locally saved hero sequence
+export const FALLBACK_SLIDERS: CMSSlider[] = [
   {
-    id: 's-1',
-    title: 'Pioneering Sub-Surface & Digital Geosolutions',
+    id: '3bd59604-1015-41e0-bcb1-c087fa769342',
+    title: 'Continuous Marine Intelligence',
     subtitle: 'Indigenous Engineering Excellence Across Sub-Saharan Africa',
-    description: 'Delivering high-precision 3D reality capture, marine geophysics, geotechnical soil mechanics, and asset assurance for energy leaders.',
-    desktop_image: '/assets/DJI_0003.jpg',
+    description: 'Continuous Marine Intelligence is a real-time, round-the-clock framework of data collection, analysis, and surveillance used to maintain total situational awareness across maritime domains.',
+    desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790716750733_HERO_2.png',
     mobile_image: '/assets/DJI_0003.jpg',
     video_url: '/assets/FRANKSTAR LOOP.mp4',
     cta_text: 'Explore Our Capabilities',
-    cta_url: '/services',
+    cta_url: '/services/marine-intelligence',
     display_order: 1,
-    is_active: true
+    is_active: true,
+    updated_at: '2026-10-05T15:02:33.715Z'
   },
   {
-    id: 's-2',
-    title: 'Subsea Marine Intelligence & Metocean Systems',
-    subtitle: 'In Partnership with Frankstar Technology',
-    description: 'Deploying oceanographic buoys, multi-beam acoustic bathymetry, and sub-bottom profiling to safeguard offshore marine assets.',
-    desktop_image: '/assets/marine_intel_metocean.jpg',
-    mobile_image: '/assets/marine_intel_metocean.jpg',
-    cta_text: 'Discover Marine Intelligence',
+    id: 'c72b6c96-00ff-48d7-9589-1f2ef3a24aee',
+    title: 'Deep Offshore Intelligence',
+    subtitle: 'Indigenous Engineering Excellence Across Sub-Saharan Africa',
+    description: 'By merging real-time edge computing, AI-driven digital twins, and autonomous monitoring systems, we empower operators to maximize asset production, minimize operational downtime, and navigate complex marine environments safely.',
+    desktop_image: '/assets/DJI_0003.jpg',
+    mobile_image: '/assets/DJI_0003.jpg',
+    video_url: '/assets/OFFSHORE INTELLIGENCE.mp4',
+    cta_text: 'Explore Our Capabilities',
     cta_url: '/services/marine-intelligence',
     display_order: 2,
-    is_active: true
+    is_active: true,
+    updated_at: '2026-09-28T11:38:30.405Z'
   },
   {
-    id: 's-3',
-    title: 'Asset Integrity & Advanced NDT Technologies',
-    subtitle: 'In Partnership with CoaleXpert',
-    description: 'Certified non-destructive testing, acoustic emission structural monitoring, and life-extension assurance for industrial facilities.',
-    desktop_image: '/assets/IMG_6170.jpg',
-    mobile_image: '/assets/IMG_6170.jpg',
-    cta_text: 'View Asset Integrity Solutions',
-    cta_url: '/services/asset-integrity-management',
+    id: '52f9111a-7fc9-4668-9f04-3fdbb37ef77d',
+    title: 'Pipeline & Civil Engineering',
+    subtitle: 'Integrated Infrastructure Delivery',
+    description: 'We deliver integrated pipeline and civil engineering solutions for energy, industrial, and infrastructure projects. Our expertise covers pipeline design and installation, right of way development, earthworks, drainage, foundations, access roads, and associated civil works.',
+    desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1791214469409_Screenshot_2026-10-05_at_4.34.19_PM.png',
+    mobile_image: '/assets/DJI_0003.jpg',
+    video_url: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/media/1791214307405_Pipeline_construction.mp4',
+    cta_text: 'Explore Capabilities',
+    cta_url: '/services/engineering-industrial-environmental-solutions',
     display_order: 3,
-    is_active: true
+    is_active: true,
+    updated_at: '2026-10-05T15:35:22.974Z'
+  },
+  {
+    id: '9f5faf33-0d6b-4373-b86b-c989b330ba60',
+    title: 'Digital Intelligence Reality Capture',
+    subtitle: 'In Partnership with CoaleXpert',
+    description: 'Digital Intelligence Reality Capture is the process of using smart sensors, laser scanners, and artificial intelligence to turn physical spaces into exact digital 3D models.',
+    desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790716979886_leica_rtc360.jpg',
+    mobile_image: '/assets/DJI_0003.jpg',
+    video_url: null,
+    cta_text: 'View Digital Intelligence',
+    cta_url: '/services/digital-mapping-intelligence',
+    display_order: 4,
+    is_active: true,
+    updated_at: '2026-10-05T15:06:27.346Z'
+  },
+  {
+    id: 'dee1a0f3-5f08-4bfd-948e-c5f597b32227',
+    title: 'Deep Offshore Intelligence',
+    subtitle: 'Subsea Infrastructure & Asset Integrity',
+    description: 'Because deepwater environments operate under intense atmospheric pressure, freezing temperatures, and minimal physical accessibility, operators rely on this "intelligence infrastructure" as the primary nervous system for offshore production.',
+    desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790718985902_Screenshot_2026-09-29_at_10.56.16_PM.png',
+    mobile_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790718985902_Screenshot_2026-09-29_at_10.56.16_PM.png',
+    video_url: null,
+    cta_text: 'Explore Offshore Intelligence',
+    cta_url: '/services/marine-intelligence',
+    display_order: 5,
+    is_active: true,
+    updated_at: '2026-10-05T15:07:06.545Z'
   }
 ];
 
@@ -1181,7 +1214,8 @@ export const useSliders = (adminMode = false) => {
   const [sliders, setSliders] = useState<CMSSlider[]>(() => {
     const local = getStoredSliders();
     const deleted = getDeletedSliderIds();
-    const activeOnly = adminMode ? local : local.filter(s => s.is_active);
+    const base = (local && local.length > 0) ? local : FALLBACK_SLIDERS;
+    const activeOnly = adminMode ? base : base.filter(s => s.is_active);
     return activeOnly.filter(s => !deleted.has(s.id)).sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
   });
   const [loading, setLoading] = useState<boolean>(false);
@@ -1218,7 +1252,8 @@ export const useSliders = (adminMode = false) => {
       }
     }
 
-    // 2. Only if local storage is completely empty, fetch initial seeds from Supabase
+    // 2. If no local storage (fresh visitor or deployed instance):
+    // Check if Supabase has updated modern slides (e.g. matching or newer than FALLBACK_SLIDERS)
     const client = getSupabaseClient();
     if (client) {
       try {
@@ -1227,13 +1262,13 @@ export const useSliders = (adminMode = false) => {
           query = query.eq('is_active', true);
         }
         const { data, error: sbError } = await query;
-        if (!sbError && data && data.length > 0) {
-          const seenTitles = new Set<string>();
+        const hasPipelineOrModern = data?.some(s => s.title?.includes('Pipeline') || s.id === '52f9111a-7fc9-4668-9f04-3fdbb37ef77d');
+        if (!sbError && data && data.length > 0 && hasPipelineOrModern) {
+          const seenIds = new Set<string>();
           const unique = (data as CMSSlider[]).filter(s => {
             if (deletedIds.has(s.id)) return false;
-            const key = (s.title || '').trim().toLowerCase();
-            if (seenTitles.has(key)) return false;
-            seenTitles.add(key);
+            if (seenIds.has(s.id)) return false;
+            seenIds.add(s.id);
             return true;
           });
 
@@ -1256,7 +1291,7 @@ export const useSliders = (adminMode = false) => {
       }
     }
 
-    // 3. Fallback default seeds
+    // 3. Fallback default seeds (the authoritative 5 slides)
     const validFallback = FALLBACK_SLIDERS.filter(s => !deletedIds.has(s.id));
     saveStoredSliders(validFallback);
     const filtered = adminMode ? validFallback : validFallback.filter(s => s.is_active);

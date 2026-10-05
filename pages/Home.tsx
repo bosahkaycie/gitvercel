@@ -120,59 +120,80 @@ const Home: React.FC = () => {
       resolvedVideoUrl = FrankstarLoopVideo;
     }
 
+    let targetCtaUrl = s.cta_url || '/services';
+    if (targetCtaUrl.startsWith('/services/')) {
+      const slug = targetCtaUrl.replace('/services/', '');
+      if (LEGACY_SERVICE_MAP[slug]) {
+        targetCtaUrl = `/services/${LEGACY_SERVICE_MAP[slug]}`;
+      }
+    }
+
     return {
       id: s.id,
       phase: s.subtitle ? s.subtitle.toUpperCase() : `LIFECYCLE PHASE 0${idx + 1}`,
       title: s.title,
       description: s.description || s.subtitle || '',
       cta_text: s.cta_text || 'Explore Capabilities',
-      cta_url: s.cta_url || '/services',
+      cta_url: targetCtaUrl,
       video_url: resolvedVideoUrl,
       desktop_image: s.desktop_image,
       mobile_image: s.mobile_image || s.desktop_image
     };
   }) : [
     {
-      id: 'metocean-hero',
-      phase: 'LIFECYCLE PHASE 01 // SUBSEA & METOCEAN BASELINE',
-      title: 'Continuous Marine & MetOcean Intelligence',
-      description: 'Before offshore design begins, we deploy autonomous telemetry buoys, wave tracking, and acoustic current profilers to map dynamic marine risks across coastal and deepwater corridors.',
-      cta_text: 'Explore MetOcean Baseline',
-      cta_url: '/services/offshore-intelligence',
+      id: '3bd59604-1015-41e0-bcb1-c087fa769342',
+      phase: 'LIFECYCLE PHASE 01 // CONTINUOUS MARINE INTELLIGENCE',
+      title: 'Continuous Marine Intelligence',
+      description: 'Continuous Marine Intelligence is a real-time, round-the-clock framework of data collection, analysis, and surveillance used to maintain total situational awareness across maritime domains.',
+      cta_text: 'Explore Our Capabilities',
+      cta_url: '/services/marine-intelligence',
       video_url: FrankstarLoopVideo,
-      desktop_image: OpOffshoreBargeImg,
-      mobile_image: OpOffshoreBargeImg
+      desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790716750733_HERO_2.png',
+      mobile_image: '/assets/DJI_0003.jpg'
     },
     {
-      id: 'ground-intelligence',
-      phase: 'LIFECYCLE PHASE 02 // SUBSURFACE GROUND TRUTH',
-      title: 'Ground Intelligence & Subsurface Characterisation',
-      description: 'Before foundations are poured, we penetrate the earth with 20-ton hydraulic CPT rigs, deep soil boring, and seismic surveys to eliminate geological settlement hazards.',
-      cta_text: 'Explore Ground Truth',
-      cta_url: '/services/ground-intelligence',
-      desktop_image: OpDrillCrewCasingImg,
-      mobile_image: OpDrillCrewCasingImg
+      id: 'c72b6c96-00ff-48d7-9589-1f2ef3a24aee',
+      phase: 'LIFECYCLE PHASE 02 // DEEP OFFSHORE INTELLIGENCE',
+      title: 'Deep Offshore Intelligence',
+      description: 'By merging real-time edge computing, AI-driven digital twins, and autonomous monitoring systems, we empower operators to maximize asset production, minimize operational downtime, and navigate complex marine environments safely.',
+      cta_text: 'Explore Our Capabilities',
+      cta_url: '/services/marine-intelligence',
+      video_url: '/assets/OFFSHORE INTELLIGENCE.mp4',
+      desktop_image: '/assets/DJI_0003.jpg',
+      mobile_image: '/assets/DJI_0003.jpg'
     },
     {
-      id: 'digital-intelligence',
-      phase: 'LIFECYCLE PHASE 03 // 3D REALITY CAPTURE & AS-BUILT INTEGRITY',
-      title: 'Digital Intelligence & 3D Reality Capture',
-      description: 'After assets are built, we capture millimetre-accurate Leica 3D point clouds and digital twins to verify as-built tolerances, detect deformation, and guide clash-free expansions.',
-      cta_text: 'Explore 3D Reality Capture',
-      cta_url: '/services/digital-intelligence',
+      id: '52f9111a-7fc9-4668-9f04-3fdbb37ef77d',
+      phase: 'LIFECYCLE PHASE 03 // PIPELINE & CIVIL ENGINEERING',
+      title: 'Pipeline & Civil Engineering',
+      description: 'We deliver integrated pipeline and civil engineering solutions for energy, industrial, and infrastructure projects. Our expertise covers pipeline design and installation, right of way development, earthworks, drainage, foundations, access roads, and associated civil works.',
+      cta_text: 'Explore Capabilities',
+      cta_url: '/services/engineering-industrial-environmental-solutions',
+      video_url: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/media/1791214307405_Pipeline_construction.mp4',
+      desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1791214469409_Screenshot_2026-10-05_at_4.34.19_PM.png',
+      mobile_image: '/assets/DJI_0003.jpg'
+    },
+    {
+      id: '9f5faf33-0d6b-4373-b86b-c989b330ba60',
+      phase: 'LIFECYCLE PHASE 04 // 3D REALITY CAPTURE & AS-BUILT INTEGRITY',
+      title: 'Digital Intelligence Reality Capture',
+      description: 'Digital Intelligence Reality Capture is the process of using smart sensors, laser scanners, and artificial intelligence to turn physical spaces into exact digital 3D models.',
+      cta_text: 'View Digital Intelligence',
+      cta_url: '/services/digital-mapping-intelligence',
       video_url: DigitalIntelVideo,
-      desktop_image: OpLaserManifoldImg,
-      mobile_image: OpLaserManifoldImg
+      desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790716979886_leica_rtc360.jpg',
+      mobile_image: '/assets/DJI_0003.jpg'
     },
     {
-      id: 'infrastructure-construction',
-      phase: 'LIFECYCLE PHASE 04 // INTEGRATED FIELD DELIVERY & PIPELINES',
-      title: 'Integrated Engineering, Pipelines & Field Delivery',
-      description: 'Connecting engineering insight to physical execution—pipeline fabrication, certified welding, sub-meter rig positioning, and heavy swamp infrastructure delivered with zero LTI.',
-      cta_text: 'Explore Field Delivery',
-      cta_url: '/services/integrated-engineering-construction',
-      desktop_image: OpPipelineSwampCatImg,
-      mobile_image: OpPipelineSwampCatImg
+      id: 'dee1a0f3-5f08-4bfd-948e-c5f597b32227',
+      phase: 'LIFECYCLE PHASE 05 // OFFSHORE INFRASTRUCTURE & NERVOUS SYSTEM',
+      title: 'Deep Offshore Intelligence',
+      description: 'Because deepwater environments operate under intense atmospheric pressure, freezing temperatures, and minimal physical accessibility, operators rely on this "intelligence infrastructure" as the primary nervous system for offshore production.',
+      cta_text: 'Explore Offshore Intelligence',
+      cta_url: '/services/marine-intelligence',
+      video_url: undefined,
+      desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790718985902_Screenshot_2026-09-29_at_10.56.16_PM.png',
+      mobile_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790718985902_Screenshot_2026-09-29_at_10.56.16_PM.png'
     }
   ];
 
