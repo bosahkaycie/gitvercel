@@ -52,14 +52,16 @@ const AdminSliderEditor: React.FC<AdminSliderEditorProps> = ({
     const ytId = getYouTubeId(videoUrl);
     const ytThumbnail = ytId ? (getYouTubeThumbnail(videoUrl) || `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`) : null;
     const cleanVideoUrl = videoUrl ? videoUrl.trim() : null;
-    const fallbackPoster = ytThumbnail || (desktopImage ? desktopImage : (cleanVideoUrl ? '/assets/DJI_0003.jpg' : ''));
+    const cleanDesktopImage = desktopImage.trim() || ytThumbnail || '';
+    const cleanMobileImage = mobileImage.trim() || cleanDesktopImage || '';
+
     const payload = {
       ...(initialData?.id ? { id: initialData.id } : {}),
       title: title.trim(),
       subtitle: subtitle.trim(),
       description: description.trim(),
-      desktop_image: desktopImage || fallbackPoster || '',
-      mobile_image: mobileImage || desktopImage || fallbackPoster || '',
+      desktop_image: cleanDesktopImage,
+      mobile_image: cleanMobileImage,
       video_url: cleanVideoUrl,
       cta_text: ctaText.trim() || 'Explore Capabilities',
       cta_url: ctaUrl.trim() || '/services',

@@ -81,9 +81,8 @@ export const uploadMediaFile = async (
 
   const client = getSupabaseClient();
 
-  // Tier 1: For large files (> 4MB) or if direct client is ready, upload directly to Supabase Storage
-  // (Prevents Vercel 4.5MB serverless payload limit from failing on large video files)
-  if (client && file.size > 4 * 1024 * 1024) {
+  // Tier 1: Direct Supabase Client Upload (Recommended - fast binary streaming for both small and large media up to 50MB)
+  if (client) {
     try {
       const { data, error } = await client.storage
         .from(targetBucket)
@@ -101,15 +100,15 @@ export const uploadMediaFile = async (
           return { url: publicUrlData.publicUrl, path: data.path, error: null };
         }
       } else if (error) {
-        console.warn('Direct upload warning:', error.message);
+        console.warn('Direct upload warning, attempting API fallback:', error.message);
       }
     } catch (directErr) {
       console.warn('Direct Supabase storage upload notice:', directErr);
     }
   }
 
-  // Tier 2: Try secure Serverless Upload Endpoint (/api/upload) for files under 4MB
-  if (file.size <= 4 * 1024 * 1024) {
+  // Tier 2: Try Serverless Upload Endpoint (/api/upload) as reliable fallback for files under 4.5MB
+  if (file.size <= 4.5 * 1024 * 1024) {
     try {
       const base64Data = await fileToBase64(file);
       const response = await fetch('/api/upload', {
@@ -130,31 +129,7 @@ export const uploadMediaFile = async (
         }
       }
     } catch (apiErr) {
-      console.warn('/api/upload attempt bypassed or failed, trying direct Supabase client:', apiErr);
-    }
-  }
-
-  // Tier 3: Direct Supabase Client fallback for files <= 4MB if /api/upload failed
-  if (client) {
-    try {
-      const { data, error } = await client.storage
-        .from(targetBucket)
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: true,
-        });
-
-      if (!error && data?.path) {
-        const { data: publicUrlData } = client.storage
-          .from(targetBucket)
-          .getPublicUrl(data.path);
-
-        if (publicUrlData?.publicUrl) {
-          return { url: publicUrlData.publicUrl, path: data.path, error: null };
-        }
-      }
-    } catch (directErr) {
-      console.warn('Direct Supabase storage upload notice:', directErr);
+      console.warn('/api/upload attempt bypassed or failed:', apiErr);
     }
   }
 

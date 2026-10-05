@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { uploadMediaFile } from '../../lib/supabase';
+import { getYouTubeId, getYouTubeThumbnail } from '../../utils/video';
 
 interface ImageUploaderProps {
   currentUrl?: string;
@@ -26,11 +27,19 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const [preview, setPreview] = useState<string | undefined>(currentUrl);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Synchronize internal preview when external currentUrl changes (typing, presets, or clearing)
+  useEffect(() => {
+    setPreview(currentUrl);
+  }, [currentUrl]);
+
+  const youtubeId = preview ? getYouTubeId(preview) : null;
   const isVideo = Boolean(
-    preview && (
+    !youtubeId && preview && (
       preview.startsWith('data:video') ||
-      /\.(mp4|webm|ogg|mov)($|\?)/i.test(preview) ||
-      bucket === 'videos'
+      preview.startsWith('blob:') ||
+      /\.(mp4|webm|ogg|mov|m4v)($|\?)/i.test(preview) ||
+      bucket === 'videos' ||
+      (accept && accept.includes('video') && !/\.(jpg|jpeg|png|webp|svg|gif)($|\?)/i.test(preview))
     )
   );
 
@@ -98,24 +107,50 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           </div>
         ) : preview ? (
           <div className="relative w-full flex flex-col items-center">
-            <div className={`relative max-h-52 rounded-lg overflow-hidden border shadow-sm mb-2 ${
+            <div className={`relative max-h-52 w-full rounded-lg overflow-hidden border shadow-sm mb-2 flex items-center justify-center ${
               isDark ? 'border-slate-700 bg-black' : 'border-slate-200 bg-black'
             }`}>
-              {isVideo ? (
+              {youtubeId ? (
+                <div className="relative w-full aspect-video max-h-48 overflow-hidden bg-black flex items-center justify-center">
+                  <img
+                    src={getYouTubeThumbnail(preview) || `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`}
+                    alt="YouTube Preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <div className="px-3 py-1.5 rounded-lg bg-red-600/90 text-white font-bold text-xs flex items-center space-x-1.5 shadow-lg">
+                      <span>▶ YouTube Video ({youtubeId})</span>
+                    </div>
+                  </div>
+                </div>
+              ) : isVideo ? (
                 <video
                   src={preview}
                   controls
                   muted
                   playsInline
-                  className="max-h-48 w-auto object-contain mx-auto"
+                  className="max-h-48 w-full object-contain mx-auto"
                 />
               ) : (
                 <img src={preview} alt="Upload Preview" className="max-h-48 w-auto object-cover" />
               )}
             </div>
-            <p className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Click or drag new {isVideo ? 'video' : 'image'} to replace
-            </p>
+            <div className="flex items-center space-x-2">
+              <p className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Click or drag new {youtubeId ? 'video' : isVideo ? 'video' : 'image'} to replace
+              </p>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPreview('');
+                  onUploadComplete('');
+                }}
+                className="text-xs font-bold text-rose-500 hover:text-rose-700 underline"
+              >
+                Clear
+              </button>
+            </div>
           </div>
         ) : (
           <div className="py-3">
@@ -150,7 +185,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
             onClick={(e) => {
               e.stopPropagation();
               navigator.clipboard.writeText(preview);
-              alert('Image URL copied to clipboard!');
+              alert('Media URL copied to clipboard!');
             }}
             className={`px-2 py-0.5 rounded text-xs font-bold uppercase transition-colors ${
               isDark 
@@ -159,6 +194,17 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
             }`}
           >
             Copy
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setPreview('');
+              onUploadComplete('');
+            }}
+            className="px-2 py-0.5 rounded text-xs font-bold uppercase text-rose-500 hover:bg-rose-500/10 transition-colors"
+          >
+            Remove
           </button>
         </div>
       )}

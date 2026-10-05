@@ -10,6 +10,7 @@ import {
   IconCheckCircle,
   IconClose
 } from '../../components/admin/AdminIcons';
+import { getYouTubeId, getYouTubeThumbnail } from '../../utils/video';
 
 interface AdminSlidersProps {
   sliders: CMSSlider[];
@@ -198,19 +199,47 @@ const AdminSliders: React.FC<AdminSlidersProps> = ({
             >
               {/* Image / Video / Gradient Preview Header */}
               <div className="relative h-48 bg-slate-950 overflow-hidden flex items-center justify-center">
-                {slide.desktop_image ? (
+                {slide.video_url ? (
+                  <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
+                    {(() => {
+                      const ytId = getYouTubeId(slide.video_url);
+                      if (ytId) {
+                        return (
+                          <div className="relative w-full h-full">
+                            <img
+                              src={getYouTubeThumbnail(slide.video_url) || `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`}
+                              alt={slide.title}
+                              className="w-full h-full object-cover opacity-85"
+                            />
+                            <div className="absolute inset-0 bg-black/35 flex items-center justify-center">
+                              <div className="w-11 h-11 rounded-full bg-red-600 text-white flex items-center justify-center shadow-xl">
+                                <svg className="w-5 h-5 fill-current ml-0.5" viewBox="0 0 24 24">
+                                  <path d="M8 5v14l11-7z" />
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return (
+                        <video
+                          src={slide.video_url}
+                          muted
+                          loop
+                          autoPlay
+                          playsInline
+                          poster={slide.desktop_image || undefined}
+                          className="w-full h-full object-cover"
+                        />
+                      );
+                    })()}
+                  </div>
+                ) : slide.desktop_image ? (
                   <img
                     src={slide.desktop_image}
                     alt={slide.title}
                     className="w-full h-full object-cover opacity-80"
                   />
-                ) : slide.video_url ? (
-                  <div className="w-full h-full bg-slate-900 flex flex-col items-center justify-center p-4 text-center">
-                    <IconVideo className="w-8 h-8 text-emerald-400 mb-2 opacity-80" />
-                    <span className="text-xs font-mono text-slate-300 truncate max-w-full px-2">
-                      {slide.video_url}
-                    </span>
-                  </div>
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-950 to-emerald-950/40 flex items-center justify-center text-slate-400 text-xs font-mono">
                     Dark Gradient Background
@@ -228,9 +257,9 @@ const AdminSliders: React.FC<AdminSlidersProps> = ({
                   </span>
                 </div>
                 {slide.video_url && (
-                  <div className="absolute bottom-3 left-3 bg-red-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold uppercase flex items-center space-x-1.5 shadow-xs">
+                  <div className="absolute bottom-3 left-3 bg-red-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold uppercase flex items-center space-x-1.5 shadow-md">
                     <IconVideo className="w-3.5 h-3.5" />
-                    <span>Video Hero</span>
+                    <span>{getYouTubeId(slide.video_url) ? 'YouTube Video' : 'MP4/WebM Video'}</span>
                   </div>
                 )}
               </div>
@@ -247,6 +276,15 @@ const AdminSliders: React.FC<AdminSlidersProps> = ({
                   <p className={`text-xs sm:text-sm line-clamp-2 leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                     {slide.description}
                   </p>
+
+                  {slide.video_url && (
+                    <div className={`mt-2 p-2 rounded-lg border text-[11px] font-mono truncate flex items-center space-x-1.5 ${
+                      isDark ? 'bg-slate-950/80 border-slate-800 text-emerald-400' : 'bg-slate-50 border-slate-200 text-emerald-700'
+                    }`}>
+                      <span className="shrink-0 font-sans font-bold">🎬 Video:</span>
+                      <span className="truncate">{slide.video_url}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className={`pt-3 border-t flex items-center justify-between ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>

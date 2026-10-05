@@ -86,6 +86,52 @@ const CountUp: React.FC<{ end: number; duration?: number; suffix?: string }> = (
   return <span ref={elementRef}>{count}{suffix}</span>;
 };
 
+// Robust HTML5 Video Component ensuring compliant autoplay, explicit DOM muting, and lifecycle management
+const HeroSlideVideo: React.FC<{
+  src: string;
+  isActive: boolean;
+  poster?: string;
+  title?: string;
+}> = ({ src, isActive, poster, title }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Critical: Programmatically enforce DOM property muting to satisfy strict modern browser autoplay security policies
+    video.muted = true;
+    video.defaultMuted = true;
+
+    if (isActive) {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          // Normal browser interrupt or policy catch
+          console.warn('Hero video autoplay notice:', err?.message);
+        });
+      }
+    } else {
+      video.pause();
+    }
+  }, [isActive, src]);
+
+  return (
+    <video
+      ref={videoRef}
+      src={src}
+      autoPlay
+      loop
+      muted
+      playsInline
+      preload={isActive ? 'auto' : 'metadata'}
+      poster={poster}
+      aria-label={title || 'Slide background video'}
+      className="w-full h-full object-cover pointer-events-none"
+    />
+  );
+};
+
 const Home: React.FC = () => {
   const { sliders } = useSliders();
   const { services: dynamicServices } = useServices();
@@ -310,13 +356,18 @@ const Home: React.FC = () => {
                 }`}
               >
                 {youtubeId ? (
-                  isActive ? (
-                    <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-                      {/* Exact 16:9 Aspect Ratio Embed with Zero Digital Magnification */}
+                  <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+                    {/* Persistent poster image prevents black flash during YouTube stream initialization */}
+                    <img
+                      src={fallbackPoster}
+                      alt={slide.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    {isActive && (
                       <iframe
                         src={getYouTubeEmbedUrl(slide.video_url, { autoplay: true, mute: true, loop: true, controls: false }) || ''}
                         title={slide.title}
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none border-0 aspect-video"
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none border-0 aspect-video z-1"
                         style={{
                           width: 'max(100%, 177.78vh)',
                           height: 'max(100%, 56.25vw)',
@@ -326,24 +377,14 @@ const Home: React.FC = () => {
                         allow="autoplay; encrypted-media"
                         frameBorder="0"
                       />
-                    </div>
-                  ) : (
-                    <img
-                      src={fallbackPoster}
-                      alt={slide.title}
-                      className="w-full h-full object-cover"
-                    />
-                  )
-                ) : isDirectVideo ? (
-                  <video
+                    )}
+                  </div>
+                ) : isDirectVideo && slide.video_url ? (
+                  <HeroSlideVideo
                     src={slide.video_url}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    preload={isActive ? "auto" : "metadata"}
+                    isActive={isActive}
                     poster={slide.desktop_image || fallbackPoster}
-                    className="w-full h-full object-cover pointer-events-none"
+                    title={slide.title}
                   />
                 ) : (
                   <img

@@ -769,7 +769,7 @@ export const saveStoredBlogs = (blogs: CMSBlogPost[]) => {
 
 export const getStoredSliders = (): CMSSlider[] => {
   try {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY_SLIDERS);
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY_SLIDERS) || localStorage.getItem('pigl_cms_sliders_v2');
     if (saved) {
       const parsed: CMSSlider[] = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
@@ -798,21 +798,23 @@ export const saveStoredSliders = (sliders: CMSSlider[]) => {
   try {
     // Sanitize any massive base64 payloads to protect browser localStorage quota (5MB limit)
     const sanitized = sliders.map(s => {
-      let video_url = s.video_url;
+      let video_url = s.video_url ? s.video_url.trim() : null;
       if (video_url && video_url.startsWith('data:') && video_url.length > 50000) {
-        video_url = undefined;
+        video_url = null;
       }
-      let desktop_image = s.desktop_image;
+      let desktop_image = s.desktop_image || '';
       if (desktop_image && desktop_image.startsWith('data:') && desktop_image.length > 600000) {
         desktop_image = '/assets/DJI_0003.jpg';
       }
-      let mobile_image = s.mobile_image;
+      let mobile_image = s.mobile_image || desktop_image;
       if (mobile_image && mobile_image.startsWith('data:') && mobile_image.length > 600000) {
         mobile_image = desktop_image;
       }
       return { ...s, video_url, desktop_image, mobile_image };
     });
-    localStorage.setItem(LOCAL_STORAGE_KEY_SLIDERS, JSON.stringify(sanitized));
+    const serialized = JSON.stringify(sanitized);
+    localStorage.setItem(LOCAL_STORAGE_KEY_SLIDERS, serialized);
+    localStorage.setItem('pigl_cms_sliders_v2', serialized);
   } catch (e) {
     console.warn('Failed to save local sliders', e);
   }
@@ -1306,7 +1308,8 @@ export const useSliders = (adminMode = false) => {
   const saveSlider = async (slider: Partial<CMSSlider> & { title: string; desktop_image?: string }) => {
     const client = getSupabaseClient();
     const id = (slider.id && isValidUUID(slider.id)) ? slider.id : (slider.id || generateUUID());
-    const fallbackImg = '/assets/DJI_0003.jpg';
+    const cleanVideo = slider.video_url ? slider.video_url.trim() : null;
+    const fallbackImg = cleanVideo ? '' : '/assets/DJI_0003.jpg';
 
     // If previously marked deleted, unmark it
     unmarkSliderAsDeleted(id);
@@ -1316,9 +1319,9 @@ export const useSliders = (adminMode = false) => {
       title: slider.title.trim(),
       subtitle: (slider.subtitle || '').trim(),
       description: (slider.description || '').trim(),
-      desktop_image: slider.desktop_image || slider.mobile_image || fallbackImg,
-      mobile_image: slider.mobile_image || slider.desktop_image || fallbackImg,
-      video_url: slider.video_url ? slider.video_url.trim() : null,
+      desktop_image: slider.desktop_image?.trim() || slider.mobile_image?.trim() || fallbackImg,
+      mobile_image: slider.mobile_image?.trim() || slider.desktop_image?.trim() || fallbackImg,
+      video_url: cleanVideo,
       cta_text: slider.cta_text || 'Explore Capabilities',
       cta_url: slider.cta_url || '/services',
       display_order: slider.display_order ?? (sliders.length + 1),
