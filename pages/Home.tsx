@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SERVICES, PROJECTS, PARTNERS, OPERATIONS_GALLERY } from '../site_data';
+import { SERVICES, PROJECTS, PARTNERS, OPERATIONS_GALLERY, LEGACY_SERVICE_MAP } from '../site_data';
 import BootsImg from '../assets/IMG_6170.jpg';
 import TeamLargeImg from '../assets/team_large.jpeg';
 import CareersBg from '../assets/1770736125265.jpeg';
