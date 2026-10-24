@@ -302,6 +302,28 @@ export const MASTER_SERVICE_DELIVERABLES: Record<string, Record<string, ServiceD
   }
 };
 
+// Aliases for the 4 Authoritative Divisions
+MASTER_SERVICE_DELIVERABLES['geosolutions-engineering-services'] = {
+  ...MASTER_SERVICE_DELIVERABLES['ground-intelligence'],
+  ...MASTER_SERVICE_DELIVERABLES['digital-intelligence']
+};
+MASTER_SERVICE_DELIVERABLES['metocean-marine-solutions'] = {
+  ...MASTER_SERVICE_DELIVERABLES['offshore-intelligence']
+};
+MASTER_SERVICE_DELIVERABLES['integrated-construction-services'] = {
+  ...MASTER_SERVICE_DELIVERABLES['pipeline-integrity'],
+  ...MASTER_SERVICE_DELIVERABLES['civil-works'],
+  ...MASTER_SERVICE_DELIVERABLES['integrated-project-management']
+};
+MASTER_SERVICE_DELIVERABLES['industrial-solutions'] = {
+  ...MASTER_SERVICE_DELIVERABLES['industrial-technologies']
+};
+
+MASTER_SERVICE_DELIVERABLES['ges'] = MASTER_SERVICE_DELIVERABLES['geosolutions-engineering-services'];
+MASTER_SERVICE_DELIVERABLES['mms'] = MASTER_SERVICE_DELIVERABLES['metocean-marine-solutions'];
+MASTER_SERVICE_DELIVERABLES['ics'] = MASTER_SERVICE_DELIVERABLES['integrated-construction-services'];
+MASTER_SERVICE_DELIVERABLES['is'] = MASTER_SERVICE_DELIVERABLES['industrial-solutions'];
+
 /**
  * Normalizes any deliverable (string or object) to a full ServiceDeliverableItem.
  * Resolves against the Master Engineering Knowledge Base if matching text is found.

@@ -1,6 +1,45 @@
 @import "tailwindcss";
 
-html, body {
+html, 
+/* ==========================================================================
+   Global Minimal Micro-Radius Design System (Engineering Precision Aesthetic)
+   Softens harsh 0px corners across controls, inputs, badges and cards
+   ========================================================================== */
+:root {
+  --radius-badge: 4px;
+  --radius-control: 6px;
+  --radius-card: 8px;
+  --radius-modal: 12px;
+}
+
+/* Global Form Controls & Buttons */
+button:not(.rounded-full),
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+select,
+textarea,
+.btn {
+  border-radius: var(--radius-control);
+}
+
+/* Global Micro Badges & Chips */
+.badge-chip,
+[class*="tracking-wider"][class*="text-xs"][class*="uppercase"][class*="bg-"] {
+  border-radius: var(--radius-badge);
+}
+
+/* Interactive Cards, Panels & Modals */
+.hover-lift,
+.service-card,
+.feature-card {
+  border-radius: var(--radius-card);
+}
+
+body {
     overflow-x: hidden;
     width: 100%;
     margin: 0;

@@ -100,18 +100,33 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
 
     const searchResults: SearchResult[] = [];
 
-    // 1. Search Services
+    // 1. Search Services & Service Families
     SERVICES.forEach(service => {
-      const matchText = `${service.title} ${service.description} ${service.items.join(' ')}`;
+      const subText = (service.subServices || []).map(s => `${s.title} ${s.description}`).join(' ');
+      const matchText = `${service.title} ${service.abbreviation || ''} ${service.descriptor || ''} ${service.positioning || ''} ${service.description} ${service.items.join(' ')} ${subText}`;
       if (matchesTerms(matchText)) {
         searchResults.push({
-          title: service.title,
+          title: service.abbreviation ? `${service.title} (${service.abbreviation})` : service.title,
           description: service.description,
           category: 'Services',
           link: `/services/${service.id}`,
           badgeColor: 'bg-emerald-50 text-emerald-800 border border-emerald-100'
         });
       }
+
+      // Index individual service families
+      (service.subServices || []).forEach(sub => {
+        const subMatch = `${sub.title} ${sub.description}`;
+        if (matchesTerms(subMatch)) {
+          searchResults.push({
+            title: `${sub.title} — ${service.abbreviation || service.title}`,
+            description: sub.description,
+            category: 'Services',
+            link: `/services/${service.id}#${sub.id}`,
+            badgeColor: 'bg-emerald-50 text-emerald-800 border border-emerald-100'
+          });
+        }
+      });
     });
 
     // 2. Search Projects

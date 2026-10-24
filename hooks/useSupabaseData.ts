@@ -68,27 +68,35 @@ export const FALLBACK_SERVICES: CMSService[] = SERVICES.map((s, idx) => {
     id: s.id,
     slug: s.id,
     title: s.title,
+    abbreviation: s.abbreviation,
+    descriptor: s.descriptor,
+    positioning: s.positioning,
     division: s.division,
     category: s.title,
     tagline: s.tagline,
+    hero_heading: s.title,
     short_description: s.description,
+    overview_heading: 'Engineering Scope & Problem Resolution',
     full_description: detail.longDescription,
+    engineering_problem_addressed: detail.engineeringProblemAddressed || '',
     business_value: detail.businessValue,
     hero_image: s.image,
     card_image: s.image,
     capabilities: s.items || [],
-    subServices: s.subServices || (detail as any).subServices || (s.id === 'ground-intelligence' ? GROUND_INTELLIGENCE_SERVICES : []),
+    subServices: s.subServices || (detail as any).subServices || [],
     benefits: [
-      'Sub-millimeter accuracy and single source of truth',
-      'Minimizes operational risk and field rework',
-      'Certified to international and statutory standards (NUPRC, ISO)'
+      'High-fidelity engineering data and verified geodetic accuracy',
+      'Minimises operational risk, foundation settlement, and field rework',
+      'Executed to statutory engineering and regulatory standards (NUPRC, ISO, BS, API)'
     ],
     operating_environments: detail.whereWeOperate || ['Onshore', 'Swamp', 'Offshore'],
     technology: detail.equipment || [],
     methodology: detail.methodology || [],
+    standards: detail.standards || [],
     equipment: detail.equipment || [],
+    key_deliverables: detail.keyDeliverables || [],
     gallery: (detail as any).gallery || SERVICE_GALLERY_PRESETS[s.id] || [],
-    video_url: (detail as any).video_url || (s.id === 'ground-intelligence' ? '/assets/videos/ground_intelligence.mp4' : undefined),
+    video_url: (detail as any).video_url || (s.id === 'geosolutions-engineering-services' ? '/assets/videos/ground_intelligence.mp4' : undefined),
     cta_text: 'Request Technical Consultation',
     cta_url: '/contact',
     partner_badge: s.partnerBadge ? {
@@ -229,14 +237,14 @@ export const FALLBACK_SLIDERS: CMSSlider[] = [
   },
   {
     id: 'c72b6c96-00ff-48d7-9589-1f2ef3a24aee',
-    title: 'Deep Offshore Intelligence',
+    title: 'Metocean & Marine Solutions',
     subtitle: 'Indigenous Engineering Excellence Across Sub-Saharan Africa',
     description: 'By merging real-time edge computing, AI-driven digital twins, and autonomous monitoring systems, we empower operators to maximize asset production, minimize operational downtime, and navigate complex marine environments safely.',
     desktop_image: '/assets/DJI_0003.jpg',
     mobile_image: '/assets/DJI_0003.jpg',
     video_url: '/assets/OFFSHORE INTELLIGENCE.mp4',
     cta_text: 'Explore Our Capabilities',
-    cta_url: '/services/marine-intelligence',
+    cta_url: '/services/metocean-marine-solutions',
     display_order: 2,
     is_active: true,
     updated_at: '2026-09-28T11:38:30.405Z'
@@ -250,7 +258,7 @@ export const FALLBACK_SLIDERS: CMSSlider[] = [
     mobile_image: '/assets/DJI_0003.jpg',
     video_url: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/media/1791214307405_Pipeline_construction.mp4',
     cta_text: 'Explore Capabilities',
-    cta_url: '/services/engineering-industrial-environmental-solutions',
+    cta_url: '/services/integrated-construction-services',
     display_order: 3,
     is_active: true,
     updated_at: '2026-10-05T15:35:22.974Z'
@@ -264,21 +272,21 @@ export const FALLBACK_SLIDERS: CMSSlider[] = [
     mobile_image: '/assets/DJI_0003.jpg',
     video_url: null,
     cta_text: 'View Digital Intelligence',
-    cta_url: '/services/digital-mapping-intelligence',
+    cta_url: '/services/geosolutions-engineering-services#geospatial-reality-capture-digital-engineering',
     display_order: 4,
     is_active: true,
     updated_at: '2026-10-05T15:06:27.346Z'
   },
   {
     id: 'dee1a0f3-5f08-4bfd-948e-c5f597b32227',
-    title: 'Deep Offshore Intelligence',
+    title: 'Metocean & Marine Solutions',
     subtitle: 'Subsea Infrastructure & Asset Integrity',
     description: 'Because deepwater environments operate under intense atmospheric pressure, freezing temperatures, and minimal physical accessibility, operators rely on this "intelligence infrastructure" as the primary nervous system for offshore production.',
     desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790718985902_Screenshot_2026-09-29_at_10.56.16_PM.png',
     mobile_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790718985902_Screenshot_2026-09-29_at_10.56.16_PM.png',
     video_url: null,
-    cta_text: 'Explore Offshore Intelligence',
-    cta_url: '/services/marine-intelligence',
+    cta_text: 'Explore Metocean & Marine Solutions',
+    cta_url: '/services/metocean-marine-solutions',
     display_order: 5,
     is_active: true,
     updated_at: '2026-10-05T15:07:06.545Z'
@@ -706,12 +714,19 @@ export const getStoredServices = (): CMSService[] => {
     if (saved) {
       const parsed: CMSService[] = JSON.parse(saved);
       // Migrate if localStorage has stale legacy service categories or lacks the 5 canonical platforms
+      const CANONICAL_IDS = [
+        'geosolutions-engineering-services',
+        'metocean-marine-solutions',
+        'integrated-construction-services',
+        'industrial-solutions',
+        'geo-data-intelligence', 
+        'digital-mapping-intelligence', 
+        'marine-intelligence', 
+        'asset-integrity-intelligence', 
+        'engineering-industrial-environmental-solutions'
+      ];
       const hasCanonical = Array.isArray(parsed) && parsed.some(s => 
-        s.id === 'geo-data-intelligence' || 
-        s.id === 'digital-mapping-intelligence' || 
-        s.id === 'marine-intelligence' || 
-        s.id === 'asset-integrity-intelligence' || 
-        s.id === 'engineering-industrial-environmental-solutions'
+        CANONICAL_IDS.includes(s.id) || CANONICAL_IDS.includes(s.slug)
       );
       if (!hasCanonical) {
         localStorage.removeItem(LOCAL_STORAGE_KEY_SERVICES);
@@ -957,32 +972,64 @@ export const useServices = (adminMode = false) => {
       if (sbError) throw sbError;
 
       if (data && data.length > 0) {
-        const enriched = (data as CMSService[]).map(s => {
-          if (!s.gallery || s.gallery.length === 0) {
-            const preset = (SERVICE_GALLERY_PRESETS && (SERVICE_GALLERY_PRESETS[s.slug] || SERVICE_GALLERY_PRESETS[s.id])) || [];
-            if (preset.length > 0) {
-              s.gallery = preset;
-            }
-          }
-          if (s.slug === 'ground-intelligence' || s.id === 'ground-intelligence' || s.slug === 'geo-data-intelligence') {
-            if (!s.video_url || s.video_url.includes('G0hu1YqhpEE')) {
-              s.video_url = '/assets/videos/ground_intelligence.mp4';
-            }
-          }
-          return s;
+        const localStored = getStoredServices();
+        const localMap = new Map<string, CMSService>();
+        localStored.forEach(l => {
+          if (l.slug) localMap.set(l.slug, l);
+          if (l.id) localMap.set(l.id, l);
         });
 
-        // Merge any canonical platforms from FALLBACK_SERVICES (e.g. asset-integrity-intelligence)
-        // that are not stored in Supabase
+        const enriched = (data as CMSService[]).map(s => {
+          const local = localMap.get(s.slug) || localMap.get(s.id);
+          const merged: CMSService = local ? {
+            ...s,
+            ...local,
+            id: s.id || local.id
+          } : { ...s };
+
+          if (!merged.gallery || merged.gallery.length === 0) {
+            const preset = (SERVICE_GALLERY_PRESETS && (SERVICE_GALLERY_PRESETS[merged.slug] || SERVICE_GALLERY_PRESETS[merged.id])) || [];
+            if (preset.length > 0) {
+              merged.gallery = preset;
+            }
+          }
+          if (merged.slug === 'ground-intelligence' || merged.id === 'ground-intelligence' || merged.slug === 'geo-data-intelligence') {
+            if (!merged.video_url || merged.video_url.includes('G0hu1YqhpEE')) {
+              merged.video_url = '/assets/videos/ground_intelligence.mp4';
+            }
+          }
+          return merged;
+        });
+
+        // Merge any canonical platforms from stored services (or FALLBACK_SERVICES) not in Supabase
         const existingKeys = new Set<string>();
         enriched.forEach(s => {
           if (s.slug) existingKeys.add(s.slug);
           if (s.id) existingKeys.add(s.id);
         });
 
-        const missing = FALLBACK_SERVICES.filter(f => !existingKeys.has(f.slug) && !existingKeys.has(f.id));
-        const merged = [...enriched, ...missing];
-        setServices(merged.sort((a, b) => a.display_order - b.display_order));
+        const sourceList = localStored.length > 0 ? localStored : FALLBACK_SERVICES;
+        const missing = sourceList.filter(f => !existingKeys.has(f.slug) && !existingKeys.has(f.id));
+        const allMerged = [...missing, ...enriched];
+
+        // Ensure the 4 canonical divisions are sorted first in authoritative order
+        const canonicalSlugs = [
+          'geosolutions-engineering-services',
+          'metocean-marine-solutions',
+          'integrated-construction-services',
+          'industrial-solutions'
+        ];
+
+        const sorted = allMerged.sort((a, b) => {
+          const aIndex = canonicalSlugs.indexOf(a.slug);
+          const bIndex = canonicalSlugs.indexOf(b.slug);
+          if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+          if (aIndex !== -1) return -1;
+          if (bIndex !== -1) return 1;
+          return (a.display_order || 99) - (b.display_order || 99);
+        });
+
+        setServices(sorted);
       } else {
         // If Supabase table is empty, seed with fallback data
         const localData = getStoredServices();
@@ -1010,24 +1057,32 @@ export const useServices = (adminMode = false) => {
       id: service.id || `srv-${Date.now()}`,
       slug,
       title: service.title,
-      division: service.division || (['Digital Intelligence', 'Marine Intelligence', 'Ground Intelligence', 'Spatial Intelligence'].includes(service.category) ? 'Intelligence' : 'Solutions & Engineering'),
+      abbreviation: service.abbreviation,
+      descriptor: service.descriptor,
+      positioning: service.positioning,
+      division: service.division || (service.category?.includes('Metocean') ? 'Metocean & Marine Solutions' : service.category?.includes('Construction') ? 'Integrated Construction Services' : service.category?.includes('Industrial') ? 'Industrial Solutions' : 'GeoSolutions & Engineering Services'),
       category: service.category,
       tagline: service.tagline || '',
+      hero_heading: service.hero_heading || service.title,
       short_description: service.short_description || '',
+      overview_heading: service.overview_heading || 'Engineering Scope & Problem Resolution',
       full_description: service.full_description || '',
+      engineering_problem_addressed: service.engineering_problem_addressed !== undefined ? service.engineering_problem_addressed : '',
       business_value: service.business_value || '',
       hero_image: service.hero_image || '/assets/DJI_0003.jpg',
       card_image: service.card_image || service.hero_image || '/assets/DJI_0003.jpg',
       gallery: service.gallery && service.gallery.length > 0 ? service.gallery : preset,
       video_url: service.video_url !== undefined ? service.video_url : (slug === 'ground-intelligence' ? '/assets/videos/ground_intelligence.mp4' : undefined),
       capabilities: service.capabilities || [],
-      subServices: service.subServices || (slug === 'ground-intelligence' ? GROUND_INTELLIGENCE_SERVICES : []),
+      subServices: service.subServices || [],
       benefits: service.benefits || [],
       operating_environments: service.operating_environments || [],
       technology: service.technology || [],
       methodology: service.methodology || [],
+      standards: service.standards || [],
       equipment: service.equipment || [],
-      cta_text: service.cta_text || 'Request Technical Consultation',
+      key_deliverables: service.key_deliverables || [],
+      cta_text: service.cta_text || 'Discuss a Project',
       cta_url: service.cta_url || '/contact',
       partner_badge: service.partner_badge || null,
       display_order: service.display_order ?? (services.length + 1),
@@ -1040,11 +1095,25 @@ export const useServices = (adminMode = false) => {
 
     if (client) {
       try {
-        const { error: saveErr } = await client.from('services').upsert(updated);
+        // Only pass columns confirmed in the Supabase PostgreSQL table
+        const SUPABASE_SERVICE_COLUMNS = new Set([
+          'id', 'slug', 'title', 'division', 'category', 'tagline',
+          'short_description', 'full_description', 'business_value',
+          'hero_image', 'card_image', 'capabilities', 'benefits',
+          'operating_environments', 'technology', 'methodology',
+          'equipment', 'cta_text', 'cta_url', 'partner_badge',
+          'display_order', 'featured', 'status', 'meta_title',
+          'meta_description', 'created_at', 'updated_at', 'gallery', 'video_url'
+        ]);
+        const supabasePayload: Record<string, any> = {};
+        for (const [k, v] of Object.entries(updated)) {
+          if (SUPABASE_SERVICE_COLUMNS.has(k)) {
+            supabasePayload[k] = v;
+          }
+        }
+        const { error: saveErr } = await client.from('services').upsert(supabasePayload);
         if (saveErr) {
-          console.warn('Supabase service save warning (retrying without gallery/video_url if columns not present):', saveErr.message);
-          const { gallery, video_url, ...withoutExtras } = updated;
-          await client.from('services').upsert(withoutExtras);
+          console.warn('Supabase service save warning:', saveErr.message);
         }
       } catch (err) {
         console.warn('Network error saving service to Supabase, continuing with local store:', err);
@@ -4358,12 +4427,11 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
         order: 1,
         is_active: true,
         links: [
-          { id: 'flink-ground', label: 'Ground Intelligence', href: '/services/ground-intelligence', is_active: true, order: 1 },
-          { id: 'flink-digital', label: 'Digital Intelligence', href: '/services/digital-intelligence', is_active: true, order: 2 },
-          { id: 'flink-construction', label: 'Integrated Engineering & Construction Solutions', href: '/services/integrated-engineering-construction', is_active: true, order: 3 },
-          { id: 'flink-environmental', label: 'Industrial & Environmental Technologies', href: '/services/industrial-environmental', is_active: true, order: 4 },
-          { id: 'flink-marine', label: 'Offshore Intelligence', href: '/services/marine-intelligence', is_active: true, order: 5 },
-          { id: 'flink-all-services', label: 'Explore All Services', href: '/services', is_active: true, order: 6 }
+          { id: 'flink-ges', label: 'GeoSolutions & Engineering (GES)', href: '/services/geosolutions-engineering-services', is_active: true, order: 1 },
+          { id: 'flink-mms', label: 'Metocean & Marine Solutions (MMS)', href: '/services/metocean-marine-solutions', is_active: true, order: 2 },
+          { id: 'flink-ics', label: 'Integrated Construction Services (ICS)', href: '/services/integrated-construction-services', is_active: true, order: 3 },
+          { id: 'flink-is', label: 'Industrial Solutions (IS)', href: '/services/industrial-solutions', is_active: true, order: 4 },
+          { id: 'flink-all-services', label: 'Explore All Divisions', href: '/services', is_active: true, order: 5 }
         ]
       },
       {

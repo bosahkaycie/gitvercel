@@ -115,11 +115,17 @@ const AdminServices: React.FC<AdminServicesProps> = ({
 
   const filtered = services
     .filter(s => {
-      const matchesDivision = filterDivision === 'All' || s.division === filterDivision || s.category === filterDivision;
+      const matchesDivision = filterDivision === 'All' || 
+                              s.division === filterDivision || 
+                              s.category === filterDivision ||
+                              (filterDivision === 'GeoSolutions & Engineering Services' && (s.slug === 'geosolutions-engineering-services' || s.division?.includes('GeoSolutions') || s.division?.includes('Ground') || s.division?.includes('Digital') || s.division?.includes('Spatial'))) ||
+                              (filterDivision === 'Metocean & Marine Solutions' && (s.slug === 'metocean-marine-solutions' || s.division?.includes('Metocean') || s.division?.includes('Marine') || s.division?.includes('Offshore'))) ||
+                              (filterDivision === 'Integrated Construction Services' && (s.slug === 'integrated-construction-services' || s.division?.includes('Construction') || s.division?.includes('Infrastructure') || s.division?.includes('Pipeline'))) ||
+                              (filterDivision === 'Industrial Solutions' && (s.slug === 'industrial-solutions' || s.division?.includes('Industrial') || s.division?.includes('Water')));
       const matchesSearch = s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             s.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             s.short_description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            (s.capabilities || []).some(c => c.toLowerCase().includes(searchQuery.toLowerCase()));
+                            (s.capabilities || []).some(c => (typeof c === 'string' ? c : c.title).toLowerCase().includes(searchQuery.toLowerCase()));
       return matchesDivision && matchesSearch;
     })
     .sort((a, b) => a.display_order - b.display_order);
@@ -230,11 +236,10 @@ const AdminServices: React.FC<AdminServicesProps> = ({
         <div className="flex items-center space-x-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
           {[
             'All',
-            'Ground Intelligence',
-            'Digital Intelligence',
-            'Integrated Engineering & Construction Solutions',
-            'Industrial & Environmental Technologies',
-            'Offshore Intelligence'
+            'GeoSolutions & Engineering Services',
+            'Metocean & Marine Solutions',
+            'Integrated Construction Services',
+            'Industrial Solutions'
           ].map((tab) => (
             <button
               key={tab}
@@ -245,7 +250,7 @@ const AdminServices: React.FC<AdminServicesProps> = ({
                   : isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
-              {tab === 'All' ? 'All Divisions' : tab.split(' ')[0] + ' ' + (tab.split(' ')[1] || '')}
+              {tab === 'All' ? 'All Divisions' : tab}
             </button>
           ))}
         </div>

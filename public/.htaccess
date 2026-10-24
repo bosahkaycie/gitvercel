@@ -49,3 +49,19 @@
   RewriteCond %{REQUEST_FILENAME} !-l
   RewriteRule . /index.html [L]
 </IfModule>
+
+# 5. Security Hardening: Block direct access to hidden dotfiles, backups, and sensitive files
+<IfModule mod_authz_core.c>
+  <FilesMatch "(^.|.(bak|config|sql|fla|psd|ini|log|sh|inc|swp|dist|env)|~)$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+  <FilesMatch "(^.|.(bak|config|sql|fla|psd|ini|log|sh|inc|swp|dist|env)|~)$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+</IfModule>
+
+# 6. Disable directory browsing
+Options -Indexes

@@ -119,14 +119,13 @@ const Footer: React.FC = () => {
             : [
                 {
                   id: 'fcol-capabilities',
-                  title: 'Core Capabilities',
+                  title: 'Operating Divisions',
                   links: [
-                    { id: '1', label: 'Ground Intelligence', href: '/services/ground-intelligence', is_active: true },
-                    { id: '2', label: 'Digital Intelligence', href: '/services/digital-intelligence', is_active: true },
-                    { id: '3', label: 'Integrated Engineering & Construction Solutions', href: '/services/integrated-engineering-construction', is_active: true },
-                    { id: '4', label: 'Industrial & Environmental Technologies', href: '/services/industrial-environmental', is_active: true },
-                    { id: '5', label: 'Offshore Intelligence', href: '/services/marine-intelligence', is_active: true },
-                    { id: '6', label: 'Explore All Services', href: '/services', is_active: true },
+                    { id: '1', label: 'GeoSolutions & Engineering Services (GES)', href: '/services/geosolutions-engineering-services', is_active: true },
+                    { id: '2', label: 'Metocean & Marine Solutions (MMS)', href: '/services/metocean-marine-solutions', is_active: true },
+                    { id: '3', label: 'Integrated Construction Services (ICS)', href: '/services/integrated-construction-services', is_active: true },
+                    { id: '4', label: 'Industrial Solutions (IS)', href: '/services/industrial-solutions', is_active: true },
+                    { id: '5', label: 'Explore All Services', href: '/services', is_active: true },
                   ]
                 },
                 {

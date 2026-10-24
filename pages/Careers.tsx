@@ -325,7 +325,7 @@ const Careers: React.FC = () => {
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
                         placeholder="John Doe"
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-emerald-700 font-bold text-slate-800 text-xs placeholder:text-slate-400 placeholder:font-normal"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md focus:outline-none focus:border-emerald-700 font-bold text-slate-800 text-xs placeholder:text-slate-400 placeholder:font-normal"
                       />
                     </div>
 
@@ -338,7 +338,7 @@ const Careers: React.FC = () => {
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
                         placeholder="john@example.com"
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-emerald-700 font-bold text-slate-800 text-xs placeholder:text-slate-400 placeholder:font-normal"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md focus:outline-none focus:border-emerald-700 font-bold text-slate-800 text-xs placeholder:text-slate-400 placeholder:font-normal"
                       />
                     </div>
 
@@ -351,7 +351,7 @@ const Careers: React.FC = () => {
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                         placeholder="+234 809 708 1333"
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-emerald-700 font-bold text-slate-800 text-xs placeholder:text-slate-400 placeholder:font-normal"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md focus:outline-none focus:border-emerald-700 font-bold text-slate-800 text-xs placeholder:text-slate-400 placeholder:font-normal"
                       />
                     </div>
 
@@ -363,7 +363,7 @@ const Careers: React.FC = () => {
                         value={formData.coverLetter}
                         onChange={(e) => setFormData({...formData, coverLetter: e.target.value})}
                         placeholder="Highlight your key engineering background, years of experience, or equipment proficiencies..."
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-emerald-700 font-medium text-slate-800 text-xs placeholder:text-slate-400"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md focus:outline-none focus:border-emerald-700 font-medium text-slate-800 text-xs placeholder:text-slate-400"
                       />
                     </div>
 
@@ -375,7 +375,7 @@ const Careers: React.FC = () => {
                         onDragOver={handleDrag}
                         onDragLeave={handleDrag}
                         onDrop={handleDrop}
-                        className={`w-full p-4 border-2 border-dashed rounded-none transition-colors text-center cursor-pointer ${
+                        className={`w-full p-4 border-2 border-dashed rounded-md transition-colors text-center cursor-pointer ${
                           dragActive ? 'border-emerald-700 bg-emerald-50/30' : 'border-slate-300 hover:border-emerald-700 bg-slate-50'
                         }`}
                       >
@@ -467,7 +467,7 @@ const Careers: React.FC = () => {
               {status === 'success' && (
                 <div className="py-8 space-y-6">
                   <div className="text-center space-y-4">
-                    <div className="mx-auto w-16 h-16 bg-emerald-50 border border-emerald-100 rounded-none flex items-center justify-center text-emerald-600 text-3xl font-bold">
+                    <div className="mx-auto w-16 h-16 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 text-3xl font-bold">
                       ✓
                     </div>
                     <div className="space-y-2">

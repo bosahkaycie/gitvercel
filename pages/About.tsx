@@ -374,6 +374,9 @@ const About: React.FC = () => {
                         className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
                         loading="lazy"
                         decoding="async"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = '/assets/management/steve.png';
+                        }}
                       />
                       {member.linkedin && (
                         <a

@@ -42,7 +42,7 @@ const DeliverableDetailModal: React.FC<DeliverableDetailModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl bg-white border border-slate-200 shadow-2xl rounded-none overflow-hidden max-h-[92vh] flex flex-col hover-lift"
+        className="relative w-full max-w-2xl bg-white border border-slate-200 shadow-2xl rounded-xl overflow-hidden max-h-[92vh] flex flex-col hover-lift"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Accent Strip */}
@@ -65,7 +65,7 @@ const DeliverableDetailModal: React.FC<DeliverableDetailModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close modal"
-            className="flex-shrink-0 p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-200/60 rounded-none transition-colors"
+            className="flex-shrink-0 p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-200/60 rounded-md transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M6 18L18 6M6 6l12 12" />
@@ -78,7 +78,7 @@ const DeliverableDetailModal: React.FC<DeliverableDetailModalProps> = ({
           {/* Main Technical Scope & Description */}
           <div>
             <h4 className="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-2.5 flex items-center space-x-2">
-              <span className="w-1.5 h-1.5 bg-emerald-600 rounded-none"></span>
+              <span className="w-1.5 h-1.5 bg-emerald-600 rounded-md"></span>
               <span>Technical Scope & Methodology</span>
             </h4>
             <p className="text-slate-700 leading-relaxed font-normal bg-slate-50/60 p-3.5 sm:p-4 border border-slate-100 text-xs sm:text-sm">
@@ -90,7 +90,7 @@ const DeliverableDetailModal: React.FC<DeliverableDetailModalProps> = ({
           {deliverable.deliverablesOutput && (
             <div>
               <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2.5 flex items-center space-x-2">
-                <span className="w-1.5 h-1.5 bg-slate-800 rounded-none"></span>
+                <span className="w-1.5 h-1.5 bg-slate-800 rounded-md"></span>
                 <span>Deliverable Output & Documentation</span>
               </h4>
               <div className="bg-slate-50 p-3.5 sm:p-4 border border-slate-200/80 flex items-start space-x-3">
@@ -106,7 +106,7 @@ const DeliverableDetailModal: React.FC<DeliverableDetailModalProps> = ({
           {deliverable.standards && (
             <div>
               <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2.5 flex items-center space-x-2">
-                <span className="w-1.5 h-1.5 bg-slate-800 rounded-none"></span>
+                <span className="w-1.5 h-1.5 bg-slate-800 rounded-md"></span>
                 <span>Applicable Standards & Compliance</span>
               </h4>
               <div className="bg-emerald-50/60 p-3 sm:p-3.5 border border-emerald-100 flex items-center space-x-2.5 text-xs text-emerald-950 font-semibold">

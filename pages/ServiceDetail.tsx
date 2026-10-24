@@ -5,8 +5,6 @@ import { SERVICE_DETAILS_MAP, SERVICE_GALLERY_PRESETS, getEmbedVideoUrl } from '
 import { ServiceGalleryImage, ServiceDeliverableItem, CMSService } from '../types';
 import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 import NativeVideoPlayer from '../components/NativeVideoPlayer';
-import DeliverableDetailModal from '../components/DeliverableDetailModal';
-import { getDeliverableDetails } from '../data/serviceDeliverablesData';
 
 const ServiceDetailContactForm: React.FC<{ serviceTitle: string; initialScope?: string }> = ({ serviceTitle, initialScope = '' }) => {
   const [formData, setFormData] = useState({ name: '', email: '', company: '', message: '' });
@@ -62,10 +60,11 @@ const ServiceDetailContactForm: React.FC<{ serviceTitle: string; initialScope?: 
           <input 
             type="text" 
             required 
+            aria-label="Full Name"
             placeholder="Engr. Emeka Okonkwo"
             value={formData.name}
             onChange={e => setFormData({ ...formData, name: e.target.value })}
-            className="w-full bg-white border border-slate-300 px-4 py-3 text-slate-900 focus:outline-none focus:border-emerald-700 transition-colors"
+            className="w-full bg-white border border-slate-300 px-4 py-3 text-slate-900 rounded-md focus:outline-none focus:border-emerald-700 transition-colors"
           />
         </div>
         <div>
@@ -73,10 +72,11 @@ const ServiceDetailContactForm: React.FC<{ serviceTitle: string; initialScope?: 
           <input 
             type="email" 
             required 
+            aria-label="Corporate Email"
             placeholder="e.okonkwo@operator.com"
             value={formData.email}
             onChange={e => setFormData({ ...formData, email: e.target.value })}
-            className="w-full bg-white border border-slate-300 px-4 py-3 text-slate-900 focus:outline-none focus:border-emerald-700 transition-colors"
+            className="w-full bg-white border border-slate-300 px-4 py-3 text-slate-900 rounded-md focus:outline-none focus:border-emerald-700 transition-colors"
           />
         </div>
       </div>
@@ -96,15 +96,16 @@ const ServiceDetailContactForm: React.FC<{ serviceTitle: string; initialScope?: 
         <textarea 
           rows={4} 
           required
-          placeholder="Specify operational asset, target coordinates, environmental challenges (swamp/coastal/deepwater), or standards required..."
+          aria-label="Project Scope and Technical Parameters"
+          placeholder="Specify operational asset, target coordinates, environmental conditions (swamp/nearshore/deepwater), or standards required..."
           value={formData.message}
           onChange={e => setFormData({ ...formData, message: e.target.value })}
-          className="w-full bg-white border border-slate-300 px-4 py-3 text-slate-900 focus:outline-none focus:border-emerald-700 transition-colors resize-none"
+          className="w-full bg-white border border-slate-300 px-4 py-3 text-slate-900 rounded-md focus:outline-none focus:border-emerald-700 transition-colors resize-none"
         ></textarea>
       </div>
       <button 
         type="submit" 
-        className="inline-flex items-center px-8 py-4 bg-emerald-700 text-white font-bold hover:bg-emerald-800 transition-colors rounded-none"
+        className="inline-flex items-center px-8 py-4 bg-emerald-700 text-white font-bold hover:bg-emerald-800 transition-colors rounded-md shadow-md hover-lift cursor-pointer"
       >
         Submit Technical Inquiry <span className="ml-2">→</span>
       </button>
@@ -126,10 +127,9 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
     id = LEGACY_SERVICE_MAP[id];
   }
 
-  // Find base service with robust multi-tiered fallback
-  const fallbackCMS = FALLBACK_SERVICES.find((s) => s.slug === id || s.id === id || LEGACY_SERVICE_MAP[s.slug] === id || LEGACY_SERVICE_MAP[s.id] === id);
-  const staticDef = SERVICES.find((s) => s.id === id || LEGACY_SERVICE_MAP[s.id] === id);
-  const service = services.find((s) => s.slug === id || s.id === id || LEGACY_SERVICE_MAP[s.slug] === id || LEGACY_SERVICE_MAP[s.id] === id) || fallbackCMS || (staticDef ? {
+  // Find base service: prioritize exact canonical match first, only falling back to legacy alias if no exact match exists
+  const staticDef = SERVICES.find((s) => s.id === id);
+  const staticDefCMS: CMSService | undefined = staticDef ? {
     id: staticDef.id,
     slug: staticDef.id,
     title: staticDef.title,
@@ -157,7 +157,16 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
     featured: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
-  } as CMSService : undefined);
+  } as CMSService : undefined;
+
+  const exactFromServices = services.find((s) => s.slug === id || s.id === id);
+  const exactFromFallback = FALLBACK_SERVICES.find((s) => s.slug === id || s.id === id);
+  const exactFromStatic = staticDefCMS;
+
+  const legacyFromServices = services.find((s) => (s.slug && LEGACY_SERVICE_MAP[s.slug] === id) || (s.id && LEGACY_SERVICE_MAP[s.id] === id));
+  const legacyFromFallback = FALLBACK_SERVICES.find((s) => (s.slug && LEGACY_SERVICE_MAP[s.slug] === id) || (s.id && LEGACY_SERVICE_MAP[s.id] === id));
+
+  const service = exactFromServices || exactFromFallback || exactFromStatic || legacyFromServices || legacyFromFallback;
   const fallbackDetails = id ? SERVICE_DETAILS_MAP[id] : null;
 
   // Active Lightbox image index state
@@ -194,10 +203,20 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
     };
   }, [activeImageIndex, galleryImages.length]);
 
-  // Scroll to top on mount
+  // Scroll to hash target if present, or scroll to top on mount
   useEffect(() => {
+    if (window.location.hash) {
+      const targetHash = window.location.hash;
+      const target = document.querySelector(targetHash);
+      if (target) {
+        setTimeout(() => {
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+        return;
+      }
+    }
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [id, pathname]);
 
   useEffect(() => {
     const observerOptions = {
@@ -260,7 +279,7 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
     );
   }
 
-  const relatedServices = services.filter(s => s.id !== service.id && s.division === service.division).slice(0, 3);
+  const otherDivisions = SERVICES.filter(s => s.id !== service.id && s.id !== id);
   const operatingEnvironments = service.operating_environments?.length > 0
     ? service.operating_environments
     : fallbackDetails?.whereWeOperate || [];
@@ -271,8 +290,17 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
     ? service.methodology
     : fallbackDetails?.methodology || [];
 
+  const standardsList: string[] = (service.standards && service.standards.length > 0)
+    ? service.standards
+    : (fallbackDetails?.standards || []);
+
+  const deliverablesList: string[] = (service.key_deliverables && service.key_deliverables.length > 0)
+    ? service.key_deliverables
+    : (fallbackDetails?.keyDeliverables || []);
+
+  const hasSectionDContent = methodologyList.length > 0 || standardsList.length > 0 || equipmentList.length > 0 || deliverablesList.length > 0;
+
   const [selectedSubServiceScope, setSelectedSubServiceScope] = useState<string>('');
-  const [activeDeliverableModal, setActiveDeliverableModal] = useState<ServiceDeliverableItem | null>(null);
 
   const capabilitiesList: string[] = (service?.capabilities && service.capabilities.length > 0)
     ? service.capabilities
@@ -281,6 +309,23 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
   const subServicesList = (service.subServices && service.subServices.length > 0)
     ? service.subServices
     : (fallbackDetails?.subServices || ((service.slug === 'ground-intelligence' || id === 'ground-intelligence') ? GROUND_INTELLIGENCE_SERVICES : []));
+
+  // Dynamic SEO metadata management (title and description)
+  useEffect(() => {
+    if (service) {
+      document.title = service.meta_title || `${service.title} | PIGL Specialist Engineering`;
+      const metaDescription = service.meta_description || service.short_description || '';
+      let metaTag = document.querySelector('meta[name="description"]');
+      if (metaTag) {
+        metaTag.setAttribute('content', metaDescription);
+      } else if (metaDescription) {
+        metaTag = document.createElement('meta');
+        metaTag.setAttribute('name', 'description');
+        metaTag.setAttribute('content', metaDescription);
+        document.head.appendChild(metaTag);
+      }
+    }
+  }, [service]);
 
   const handleInquireSubService = (subTitle: string) => {
     setSelectedSubServiceScope(subTitle);
@@ -292,7 +337,7 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
 
   return (
     <div className="flex flex-col bg-white font-sans">
-      {/* 1. Sleek Hero Header */}
+      {/* Section A: Hero */}
       <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-28 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
@@ -302,6 +347,9 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
             loading="eager"
             fetchPriority="high"
             decoding="async"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = '/assets/slider.jpeg';
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/70 to-transparent"></div>
         </div>
@@ -310,21 +358,71 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
           <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-8">
             <a href="/" className="hover:text-white transition-colors">Home</a>
             <span className="text-slate-600">/</span>
-            <a href="/services" className="hover:text-white transition-colors">Capabilities</a>
+            <a href="/services" className="hover:text-white transition-colors">Services</a>
             <span className="text-slate-600">/</span>
             <span className="text-white truncate max-w-[240px] sm:max-w-none">{service.title}</span>
           </div>
 
           <div className="max-w-4xl">
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {service.abbreviation && (
+                <span className="text-xs font-mono font-bold uppercase tracking-widest bg-emerald-500/20 text-emerald-300 px-3 py-1 border border-emerald-400/30">
+                  {service.abbreviation}
+                </span>
+              )}
+              {service.descriptor && (
+                <span className="text-xs font-bold uppercase tracking-widest text-slate-300">
+                  {service.descriptor}
+                </span>
+              )}
+            </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-4">
-              {service.title}
+              {service.hero_heading || service.title}
             </h1>
-            <p className="text-xl text-emerald-400 font-medium mb-6">
-              {service.tagline}
-            </p>
+            {service.positioning && (
+              <p className="text-lg md:text-xl text-emerald-400 font-medium mb-4 italic">
+                "{service.positioning}"
+              </p>
+            )}
+            {service.tagline && !service.positioning && (
+              <p className="text-xl text-emerald-400 font-medium mb-6">
+                {service.tagline}
+              </p>
+            )}
             <p className="text-lg md:text-xl text-slate-300 font-normal leading-relaxed max-w-3xl">
               {service.short_description}
             </p>
+
+            {/* Primary CTA in Hero */}
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <a
+                href={service.cta_url || "#consultation-form"}
+                onClick={(e) => {
+                  const dest = service.cta_url || "#consultation-form";
+                  if (dest.startsWith('#')) {
+                    e.preventDefault();
+                    const targetEl = document.getElementById(dest.replace('#', ''));
+                    if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="inline-flex items-center justify-center px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm tracking-wide transition-colors shadow-lg hover-lift rounded-md"
+              >
+                {service.cta_text || 'Discuss a Project'} <span className="ml-2">→</span>
+              </a>
+              {subServicesList.length > 0 && (
+                <a
+                  href="#capabilities-section"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const el = document.getElementById('capabilities-section');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="inline-flex items-center justify-center px-6 py-3.5 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white font-bold text-sm tracking-wide transition-colors rounded-md"
+                >
+                  View Core Capabilities
+                </a>
+              )}
+            </div>
           </div>
         </div>
 
@@ -334,79 +432,38 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
         </div>
       </section>
 
-      {/* 2. Overview & Operating Environments */}
+      {/* Section B: Service Overview */}
       <section className="py-20 md:py-28 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start reveal">
             {/* Left: Deep Overview */}
-            <div className="lg:col-span-7 space-y-8">
+            <div className="lg:col-span-7 space-y-6">
               <div>
-                <h2 className="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-2">Technical Overview</h2>
+                <h2 className="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-2">Service Overview</h2>
                 <h3 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
-                  High-Fidelity Engineering & Nigerian Field Assurance
+                  {service.overview_heading || 'Engineering Scope & Problem Resolution'}
                 </h3>
               </div>
-              <p className="text-slate-600 text-lg leading-relaxed font-normal">
-                {service.full_description || fallbackDetails?.longDescription}
-              </p>
-              
-              {/* Operating Environments */}
-              {operatingEnvironments.length > 0 && (
-                <div className="pt-4">
-                  <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Where We Operate:</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {operatingEnvironments.map((env: string, i: number) => (
-                      <div key={i} className="flex items-center space-x-3 bg-slate-50 p-3.5 border border-slate-100">
-                        <span className="w-2 h-2 bg-emerald-600 flex-shrink-0"></span>
-                        <span className="text-slate-800 font-bold text-xs uppercase tracking-wide">{env}</span>
-                      </div>
-                    ))}
+              <div className="text-slate-600 text-lg leading-relaxed font-normal space-y-4">
+                <p>
+                  {service.full_description || fallbackDetails?.longDescription}
+                </p>
+                {(service.engineering_problem_addressed || fallbackDetails?.engineeringProblemAddressed) && (
+                  <div className="bg-emerald-900/5 border-l-4 border-emerald-600 p-5 rounded-r-lg mt-6">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1">
+                      Engineering Problem Addressed
+                    </h4>
+                    <p className="text-slate-700 text-sm md:text-base leading-relaxed font-medium">
+                      {service.engineering_problem_addressed || fallbackDetails?.engineeringProblemAddressed}
+                    </p>
                   </div>
-                </div>
-              )}
-
-              <div className="pt-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Core Deliverables & Focal Points:</h4>
-                  <span className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider flex items-center gap-1">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Click item for scope
-                  </span>
-                </div>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  {capabilitiesList.map((item, i) => {
-                    const deliverableObj = getDeliverableDetails(item, service.slug || service.id);
-                    return (
-                      <li key={i}>
-                        <button
-                          type="button"
-                          onClick={() => setActiveDeliverableModal(deliverableObj)}
-                          className="w-full h-full text-left flex items-center justify-between space-x-3 bg-slate-50 hover:bg-white p-4 border border-slate-200/80 hover:border-emerald-600 hover:shadow-sm transition-all group cursor-pointer"
-                        >
-                          <div className="flex items-center space-x-3 min-w-0 flex-1">
-                            <span className="flex-shrink-0 w-2 h-2 bg-emerald-600 group-hover:scale-125 transition-transform rounded-none"></span>
-                            <span className="text-slate-900 group-hover:text-emerald-900 font-bold text-sm leading-snug transition-colors">
-                              {deliverableObj.title}
-                            </span>
-                          </div>
-                          <span className="flex-shrink-0 text-slate-300 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all ml-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                          </span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
+                )}
               </div>
             </div>
 
-            {/* Right: Operational Video & Commercial Value & Integrity Standards */}
+            {/* Right: Operational Video & Integrated Commercial Value */}
             <div className="lg:col-span-5 space-y-8">
-              {/* Dynamic 16:9 Operational Video (Positioned directly above Commercial Value card) */}
+              {/* Operational Video if configured */}
               {rawVideoUrl && (
                 <NativeVideoPlayer
                   src={rawVideoUrl}
@@ -416,27 +473,28 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
                 />
               )}
 
-              <div className="bg-slate-50 p-8 md:p-10 border border-slate-200/80 shadow-sm relative overflow-hidden flex flex-col hover-lift">
+              {/* Integrated Commercial Value & Operator Assurance */}
+              <div className="bg-slate-50 p-8 md:p-10 border border-slate-200/80 shadow-sm relative overflow-hidden flex flex-col hover-lift rounded-lg">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-700"></div>
                 <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-4">Commercial Value & Operator Assurance</h3>
                 <p className="text-slate-600 leading-relaxed font-normal text-base mb-6">
-                  {service.business_value || fallbackDetails?.businessValue}
+                  {service.business_value || fallbackDetails?.businessValue || 'High-fidelity engineering execution designed to eliminate rework, reduce operational risk, and assure statutory compliance.'}
                 </p>
                 <div className="border-t border-slate-200 pt-6 mt-auto space-y-2">
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Compliance Standards</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Compliance & Standards</p>
                   <p className="text-sm font-bold text-slate-800">ISO 9001:2015 & ISO 45001:2018 Certified</p>
                   <p className="text-xs text-slate-500">NUPRC Regulated • 100% Nigerian Content Compliant</p>
                 </div>
               </div>
 
-              {/* Partner Callout if present */}
+              {/* Strategic Partner Callout if present */}
               {service.partner_badge && (
-                <div className="bg-slate-900 text-white p-8 md:p-10 border border-slate-800 relative overflow-hidden flex flex-col reveal">
-                  <div className="flex items-center space-x-2 text-emerald-400 text-xs font-black uppercase tracking-widest mb-3">
+                <div className="bg-slate-900 text-white p-6 border border-slate-800 relative overflow-hidden flex flex-col rounded-lg">
+                  <div className="flex items-center space-x-2 text-emerald-400 text-xs font-bold uppercase tracking-widest mb-2">
                     <span>Strategic Technology Alliance</span>
                   </div>
-                  <h4 className="text-xl font-bold text-white mb-2">{service.partner_badge.partnerName}</h4>
-                  <p className="text-slate-300 text-sm leading-relaxed mb-6">
+                  <h4 className="text-lg font-bold text-white mb-1">{service.partner_badge.partnerName}</h4>
+                  <p className="text-slate-300 text-xs leading-relaxed mb-4">
                     {service.partner_badge.role}
                   </p>
                   {service.partner_badge.website ? (
@@ -463,62 +521,73 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
         </div>
       </section>
 
-      {/* 2.5 Specialized Services Grid (Services Under Ground Intelligence) */}
+      {/* Section C: Core Capabilities */}
       {subServicesList.length > 0 && (
-        <section id="services-list" className="py-20 md:py-28 bg-slate-50 border-b border-slate-200 scroll-mt-20">
+        <section id="capabilities-section" className="py-20 md:py-28 bg-slate-50 border-b border-slate-200 scroll-mt-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 reveal">
               <div className="max-w-3xl">
                 <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">
-                  Specialized Service Capabilities
+                  Core Capabilities
                 </span>
                 <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight leading-tight">
-                  Services Under {service.title}
+                  Capabilities Under {service.abbreviation ? `${service.abbreviation} — ` : ''}{service.title}
                 </h3>
               </div>
               <p className="text-slate-600 text-sm md:text-base max-w-md mt-4 md:mt-0 font-normal leading-relaxed">
-                Dedicated subsurface, geophysical, and geotechnical solutions executed to rigorous international and Nigerian regulatory standards.
+                Dedicated engineering capabilities executed to rigorous international and Nigerian regulatory standards.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {/* 4 in a row layout */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {subServicesList.map((sub, idx) => (
                 <div
                   key={sub.id || idx}
                   id={sub.id}
-                  className="group relative bg-white border border-slate-200 p-8 shadow-xs hover:border-emerald-600 hover:shadow-xl transition-all duration-300 flex flex-col justify-between hover-lift scroll-mt-28 reveal"
+                  className="group relative bg-white border border-slate-200 p-6 shadow-xs hover:border-emerald-600 hover:shadow-xl transition-all duration-300 flex flex-col justify-between hover-lift scroll-mt-28 reveal rounded-lg"
                 >
                   {/* Subtle top accent bar on hover */}
                   <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity" />
 
                   <div>
-                    <div className="flex items-center justify-between mb-6">
+                    {sub.image && (
+                      <div className="mb-4 h-32 w-full rounded-md overflow-hidden bg-slate-100 border border-slate-200">
+                        <img
+                          src={sub.image}
+                          alt={sub.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between mb-4">
                       <span className="text-xs font-mono font-bold text-emerald-700 tracking-wider">
                         0{idx + 1}
                       </span>
                       {sub.icon && (
-                        <div className="w-10 h-10 bg-slate-50 border border-slate-100 flex items-center justify-center text-lg group-hover:bg-emerald-50 group-hover:border-emerald-200 transition-colors">
+                        <div className="w-9 h-9 bg-slate-50 border border-slate-100 flex items-center justify-center text-base group-hover:bg-emerald-50 group-hover:border-emerald-200 transition-colors rounded-md">
                           <span>{sub.icon}</span>
                         </div>
                       )}
                     </div>
 
-                    <h4 className="text-xl font-bold text-slate-900 tracking-tight mb-3 group-hover:text-emerald-700 transition-colors">
+                    <h4 className="text-lg font-bold text-slate-900 tracking-tight mb-2.5 group-hover:text-emerald-700 transition-colors">
                       {sub.title}
                     </h4>
 
-                    <p className="text-slate-600 text-sm leading-relaxed font-normal">
+                    <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal">
                       {sub.description}
                     </p>
                   </div>
 
-                  <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
+                  <div className="pt-5 mt-5 border-t border-slate-100 flex items-center justify-between">
                     <button
                       type="button"
                       onClick={() => handleInquireSubService(sub.title)}
-                      className="text-xs font-bold text-emerald-700 group-hover:text-emerald-900 inline-flex items-center transition-colors"
+                      className="text-xs font-bold text-emerald-700 group-hover:text-emerald-900 inline-flex items-center transition-colors cursor-pointer"
                     >
-                      <span>Inquire About This Service</span>
+                      <span>Inquire About This Capability</span>
                       <span className="ml-1.5 transform group-hover:translate-x-1 transition-transform">→</span>
                     </button>
                   </div>
@@ -529,62 +598,121 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
         </section>
       )}
 
-      {/* 3. Methodology & Instrumentation */}
-      <section className="py-20 md:py-28 bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 reveal">
-            {/* Methodology Execution Workflow */}
-            <div className="lg:col-span-7 space-y-6">
-              <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">Technical Workflow</span>
-              <h3 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-6">
-                Execution Methodology & Quality Control
+      
+      {/* Section D: Delivery, Methods, Technology & Deliverables */}
+      {hasSectionDContent && (
+        <section id="delivery-section" className="py-20 md:py-28 bg-white border-b border-slate-200 scroll-mt-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl mb-14 reveal">
+              <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">
+                Delivery, Methods & Technology
+              </span>
+              <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight leading-tight">
+                Execution Methodology, Equipment Spreads & Deliverables
               </h3>
-              <div className="space-y-4">
-                {methodologyList.map((step: string, i: number) => (
-                  <div key={i} className="flex items-start space-x-4 bg-white p-5 border border-slate-200 shadow-sm hover-lift">
-                    <span className="flex-shrink-0 w-7 h-7 bg-emerald-700 text-white text-xs font-black flex items-center justify-center">
-                      0{i + 1}
-                    </span>
-                    <p className="text-slate-700 text-sm font-medium leading-relaxed pt-0.5">{step}</p>
-                  </div>
-                ))}
-              </div>
+              <p className="text-slate-600 text-base mt-4 font-normal leading-relaxed">
+                Every campaign is executed under certified quality and safety management systems (ISO 9001:2015, ISO 45001:2018), complying with statutory Nigerian upstream regulations (NUPRC) and relevant international engineering standards.
+              </p>
             </div>
 
-            {/* Specialized Equipment */}
-            <div className="lg:col-span-5 space-y-6">
-              <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">Instrumentation Spreads</span>
-              <h3 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-6">
-                Equipment & Technology Fleet
-              </h3>
-              <div className="bg-white p-6 border border-slate-200 shadow-sm space-y-3">
-                {equipmentList.map((equip: string, i: number) => (
-                  <div key={i} className="flex items-center space-x-3 p-3 bg-slate-50 border border-slate-100">
-                    <span className="text-emerald-700 font-bold text-sm">⚙️</span>
-                    <span className="text-slate-800 text-xs font-bold uppercase tracking-wider">{equip}</span>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+              {/* Left: Methodologies & Standards */}
+              <div className="lg:col-span-7 space-y-8 reveal">
+                {/* Methodologies */}
+                {methodologyList.length > 0 && (
+                  <div className="bg-slate-50 border border-slate-200/80 p-8 rounded-lg">
+                    <h4 className="text-xl font-bold text-slate-900 tracking-tight mb-4 flex items-center space-x-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                      <span>Operational Methodologies</span>
+                    </h4>
+                    <ul className="space-y-3">
+                      {methodologyList.map((m, idx) => (
+                        <li key={idx} className="flex items-start space-x-3 text-sm text-slate-700 leading-relaxed">
+                          <span className="flex-shrink-0 w-1.5 h-1.5 bg-emerald-600 rounded-full mt-2"></span>
+                          <span>{m}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                ))}
+                )}
+
+                {/* Quality Standards & Regulatory Compliance */}
+                {standardsList.length > 0 && (
+                  <div className="bg-white border border-slate-200 p-8 rounded-lg shadow-xs">
+                    <h4 className="text-lg font-bold text-slate-900 tracking-tight mb-4 flex items-center space-x-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                      <span>Engineering Codes & Statutory Standards</span>
+                    </h4>
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {standardsList.map((std, idx) => (
+                        <li key={idx} className="flex items-start space-x-2 text-xs text-slate-600 leading-normal bg-slate-50 p-2.5 rounded border border-slate-100">
+                          <span className="text-emerald-600 font-bold shrink-0">✓</span>
+                          <span className="font-medium">{std}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {/* Right: Field Equipment & Certified Deliverables */}
+              <div className="lg:col-span-5 space-y-8 reveal">
+                {/* Field Equipment */}
+                {equipmentList.length > 0 && (
+                  <div className="bg-slate-900 text-white p-8 rounded-lg shadow-md border border-slate-800">
+                    <h4 className="text-xl font-bold text-white tracking-tight mb-4 flex items-center space-x-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span>Mobilised Equipment & Spreads</span>
+                    </h4>
+                    <ul className="space-y-3">
+                      {equipmentList.map((eq, idx) => (
+                        <li key={idx} className="flex items-start space-x-3 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                          <span className="text-emerald-400 font-bold shrink-0">▸</span>
+                          <span>{eq}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Verified Key Deliverables */}
+                {deliverablesList.length > 0 && (
+                  <div className="bg-emerald-50/50 border border-emerald-200/80 p-8 rounded-lg">
+                    <h4 className="text-lg font-bold text-slate-900 tracking-tight mb-4 flex items-center space-x-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                      <span>Certified Client Deliverables</span>
+                    </h4>
+                    <ul className="space-y-2.5">
+                      {deliverablesList.map((deliv, idx) => (
+                        <li key={idx} className="flex items-start space-x-2.5 text-xs text-slate-800 leading-relaxed">
+                          <span className="text-emerald-700 font-bold shrink-0">●</span>
+                          <span>{deliv}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Operational Field Imagery & Instrumentation Gallery */}
+      {/* Section E: Relevant Project Imagery or Field Experience */}
       {galleryImages.length > 0 && (
         <section className="py-20 md:py-28 bg-white border-b border-slate-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 reveal">
               <div>
                 <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">
-                  Operational Deployment & Field Imagery
+                  Project Imagery & Field Experience
                 </span>
                 <h3 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
-                  Field Operations & Instrumentation Gallery
+                  Operational Records & Field Experience
                 </h3>
               </div>
               <p className="text-slate-500 text-sm max-w-md mt-4 md:mt-0 font-normal">
-                Authentic field mobilization, sensor spreads, and certified engineering execution for {service.title}. Click any image to view in high resolution.
+                Authentic field mobilization, sensor spreads, and certified engineering execution for {service.title}. Click any image to inspect in full detail.
               </p>
             </div>
 
@@ -597,9 +725,12 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
                 >
                   <img
                     src={img.url}
-                    alt={img.title || `${service.title} operational record`}
+                    alt={img.alt || img.title || `${service.title} operational record`}
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
                     loading="lazy"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/assets/operations/pigl_offshore_geotech_drilling_barge.jpg';
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent opacity-85 group-hover:opacity-95 transition-opacity duration-300" />
                   
@@ -631,16 +762,16 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
         </section>
       )}
 
-      {/* 4. Technical Project Inquiry Consultation Form */}
+      {/* Section F: Primary Enquiry Call to Action */}
       <section id="consultation-form" className="py-20 md:py-28 bg-white border-b border-slate-200 scroll-mt-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-slate-50 border border-slate-200 p-8 md:p-14 reveal">
-            <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">Engineering Engagement</span>
+          <div className="bg-slate-50 border border-slate-200 p-8 md:p-14 reveal rounded-xl">
+            <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">Project Consultation</span>
             <h3 className="text-3xl font-bold text-slate-900 tracking-tight mb-4">
-              Scope Your Project with PIGL Engineers
+              Discuss a Project with PIGL Engineers
             </h3>
             <p className="text-slate-600 text-base leading-relaxed mb-8">
-              Discuss specific operational parameters, mobilization schedules, or survey specifications for <strong>{service.title}</strong> with our engineering teams.
+              Discuss specific operational parameters, mobilization schedules, or technical survey specifications for <strong>{service.title}</strong> with our engineering teams in Port Harcourt and Lagos.
             </p>
             <ServiceDetailContactForm 
               serviceTitle={service.title} 
@@ -650,39 +781,41 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
         </div>
       </section>
 
-      {/* 5. Related Capabilities */}
-      {relatedServices.length > 0 && (
+      {/* 5. Other Operating Divisions */}
+      {otherDivisions.length > 0 && (
         <section className="py-20 bg-slate-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between mb-10">
               <h3 className="text-2xl font-bold text-slate-900 tracking-tight">
-                Related {service.division} Capabilities
+                Other Operating Divisions
               </h3>
               <a href="/services" className="text-xs font-bold text-emerald-700 hover:text-emerald-900 uppercase tracking-wider">
-                All Capabilities →
+                All Divisions →
               </a>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {relatedServices.map((rel) => (
+              {otherDivisions.map((rel) => (
                 <a
                   key={rel.id}
-                  href={`/services/${rel.slug}`}
-                  className="bg-white border border-slate-200 p-6 shadow-sm hover:shadow-md hover:border-emerald-700 transition-all flex flex-col justify-between group hover-lift"
+                  href={`/services/${rel.id}`}
+                  className="bg-white border border-slate-200 p-6 shadow-sm hover:shadow-md hover:border-emerald-700 transition-all flex flex-col justify-between group hover-lift rounded-lg"
                 >
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 block mb-2">
-                      {rel.division}
-                    </span>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
+                        {rel.abbreviation || 'Division'}
+                      </span>
+                    </div>
                     <h4 className="font-bold text-slate-900 text-lg group-hover:text-emerald-700 transition-colors mb-2">
                       {rel.title}
                     </h4>
                     <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed">
-                      {rel.short_description}
+                      {rel.description}
                     </p>
                   </div>
                   <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-700">
-                    <span>View Specifications</span>
+                    <span>View Division Details</span>
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                   </div>
                 </a>
@@ -750,6 +883,9 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
                 src={galleryImages[activeImageIndex].url}
                 alt={galleryImages[activeImageIndex].title}
                 className="max-h-[72vh] w-auto max-w-full object-contain"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/assets/operations/pigl_offshore_geotech_drilling_barge.jpg';
+                }}
               />
             </div>
 
@@ -782,15 +918,6 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
           </div>
         </div>
       )}
-
-      {/* Deliverable Technical Scope Modal */}
-      <DeliverableDetailModal
-        deliverable={activeDeliverableModal}
-        serviceTitle={service.title}
-        division={service.division}
-        onClose={() => setActiveDeliverableModal(null)}
-        onInquire={handleInquireSubService}
-      />
 
     </div>
   );

@@ -55,7 +55,9 @@ const App: React.FC = () => {
         path = '/partners';
       }
       setCurrentPath(path);
-      window.scrollTo(0, 0);
+      if (!window.location.hash) {
+        window.scrollTo(0, 0);
+      }
     };
 
     window.addEventListener('popstate', handleLocationChange);
@@ -137,7 +139,7 @@ const App: React.FC = () => {
     const metaDescriptions: { [key: string]: string } = {
       '/': 'Polaris Integrated and GeoSolutions Limited (PIGL) - Indigenous Nigerian engineering and geosolutions leader providing intelligence, asset integrity, and field execution for the energy sector across Sub-Saharan Africa.',
       '/about': 'Discover PIGL\'s 20-year heritage of engineering excellence, ISO 9001:2015 & 45001:2018 certifications, and 100% indigenous Nigerian ownership.',
-      '/services': 'Explore PIGL\'s 9 core capabilities across Intelligence (Digital, Marine, Ground, Spatial) and Solutions & Engineering (Asset Integrity, Infrastructure, Field Operations, Water & Environment, Procurement).',
+      '/services': 'Explore PIGL\'s four operating divisions: GeoSolutions & Engineering Services (GES), Metocean & Marine Solutions (MMS), Integrated Construction Services (ICS), and Industrial Solutions (IS).',
       '/partners': 'PIGL Strategic Alliances & Global Technology Partnerships with Frankstar Technology, CoaleXpert, and NPK Flanges & Industrial Piping.',
       '/projects': 'Case studies of major engineering, reality capture, and geosolutions projects delivered for leading operators across swamp, coastal, land, and offshore terrains.',
       '/careers': 'Join the PIGL engineering team in Port Harcourt and across Nigeria. Grow your career with an indigenous leader in geosolutions and energy infrastructure.',
@@ -158,7 +160,7 @@ const App: React.FC = () => {
     const pageTitles: { [key: string]: string } = {
       '/': 'PIGL | Engineering, Geosolutions & Asset Integrity | Nigeria',
       '/about': 'About PIGL | ISO Certified Indigenous Engineering Leader',
-      '/services': 'Intelligence, Solutions & Engineering Services | PIGL',
+      '/services': 'Operating Divisions & Engineering Services | PIGL Nigeria',
       '/partners': 'Partners & Technology | Strategic Alliances | PIGL',
       '/projects': 'Engineering Case Studies & Executed Projects | PIGL',
       '/careers': 'Careers at PIGL | Indigenous Engineering Talent',
@@ -184,8 +186,8 @@ const App: React.FC = () => {
       if (LEGACY_SERVICE_MAP[id]) id = LEGACY_SERVICE_MAP[id];
       const service = SERVICES.find(s => s.id === id);
       if (service) {
-        activeTitle = `${service.title} | PIGL Specialist Engineering`;
-        activeDesc = `${service.tagline} - ${service.description}`;
+        activeTitle = `${service.title} (${service.abbreviation}) | PIGL Specialist Engineering`;
+        activeDesc = `${service.positioning ? `"${service.positioning}" — ` : ''}${service.description}`;
       }
     } else if (currentPath.startsWith('/blog/')) {
       activeTitle = 'Engineering Technical Publication | PIGL Insights';
@@ -229,6 +231,7 @@ const App: React.FC = () => {
           "@context": "https://schema.org",
           "@type": "Service",
           "name": service.title,
+          "alternateName": service.abbreviation,
           "provider": {
             "@type": "Organization",
             "name": "Polaris Integrated and GeoSolutions Limited (PIGL)",
@@ -239,10 +242,10 @@ const App: React.FC = () => {
             "@type": "Country",
             "name": "Nigeria"
           },
-          "category": service.division === 'Intelligence' ? 'Intelligence & Geosolutions' : 'Solutions & Engineering',
+          "category": service.descriptor || "Engineering & Industrial Solutions",
           "offers": {
             "@type": "Offer",
-            "description": "High-fidelity B2B engineering and geosolutions consultations"
+            "description": "High-fidelity engineering, geoscience, metocean and industrial solutions"
           }
         };
       }
@@ -250,7 +253,7 @@ const App: React.FC = () => {
       schemaData = {
         "@context": "https://schema.org",
         "@type": "ItemList",
-        "name": "PIGL Intelligence, Solutions & Engineering Services",
+        "name": "PIGL Four Operating Divisions",
         "itemListElement": SERVICES.map((s, index) => ({
           "@type": "ListItem",
           "position": index + 1,

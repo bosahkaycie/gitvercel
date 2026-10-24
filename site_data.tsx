@@ -38,6 +38,7 @@ import AssetManagementImg from './assets/asset_management.png';
 import GeomaticsSurveyImg from './assets/geomatics_survey.png';
 import Iso9001Img from './assets/Q-Mark (ISO 9001).png';
 import Iso45001Img from './assets/Q-Mark (ISO 45001).png';
+import WaterTreatmentSkidImg from './assets/water_treatment_skid.jpg';
 
 // Authentic Field Operations & Asset Photography
 import OpLogisticsBaseImg from './assets/operations/pigl_logistics_base_aerial.jpg';
@@ -94,396 +95,342 @@ export const CORE_VALUES: CoreValue[] = [
   }
 ];
 
-// 1. GEO DATA INTELLIGENCE SUB-SERVICES
-export const GEO_DATA_INTELLIGENCE_SERVICES: SubService[] = [
+// ==============================================================================
+// AUTHORITATIVE FOUR-DIVISION SERVICE ARCHITECTURE
+// ==============================================================================
+
+// DIVISION 01 — GEOSOLUTIONS & ENGINEERING SERVICES (GES) SERVICE FAMILIES
+export const GES_SERVICE_FAMILIES: SubService[] = [
   {
-    id: 'geotechnical-investigation',
-    title: 'Geotechnical Investigation & Site Characterisation',
-    description: 'Borehole drilling, deep foundation soil boring, standard penetration testing (SPT), and comprehensive in-situ testing for heavy onshore and swamp infrastructure.',
-    icon: '🔬'
-  },
-  {
-    id: 'cpt-cptu-testing',
-    title: 'Hydraulic CPT & CPTu Testing',
-    description: 'Heavy-duty 20-ton piezocone penetration testing (CPTu) providing continuous in-situ tip resistance, sleeve friction, and pore pressure stratigraphy.',
-    icon: '🚜'
-  },
-  {
-    id: 'geotechnical-sampling',
-    title: 'Geotechnical Sampling & Laboratory Testing',
-    description: 'Undisturbed Shelby tube sampling, rock coring, triaxial shearing, consolidation, and geotechnical laboratory analysis for soil mechanics.',
-    icon: '🧪'
-  },
-  {
-    id: 'onshore-geophysical',
-    title: 'Onshore Geophysical & Seismic Surveys',
-    description: '2D/3D terrestrial seismic refraction, reflection profiling, and geological mapping to delineate bedrock depth, rip-ability, and structural faults.',
+    id: 'geohazard-geoscan-seismic',
+    title: 'Geohazard, Geoscan & Seismic Services',
+    description: 'High-resolution 2D/UHR seismic profiling, electrical resistivity tomography, and shallow gas hazard detection mitigating subsurface drilling and piling risks.',
     icon: '📊'
   },
   {
-    id: 'electrical-resistivity',
-    title: 'Electrical Resistivity Tomography (ERT)',
-    description: 'Multi-electrode resistivity profiling and vertical electrical sounding (VES) for hydrogeology, groundwater mapping, and subsurface fault detection.',
-    icon: '⚡'
-  },
-  {
-    id: 'land-geospatial-survey',
-    title: 'Land Surveying & Geodetic Control',
-    description: 'High-precision cadastral boundary demarcation, route right-of-way (ROW) surveying, geodetic control networks, and enterprise GIS integration.',
-    icon: '📐'
-  }
-];
-
-// Backward compatibility alias
-export const GROUND_INTELLIGENCE_SERVICES: SubService[] = GEO_DATA_INTELLIGENCE_SERVICES;
-
-// 2. DIGITAL MAPPING INTELLIGENCE SUB-SERVICES
-export const DIGITAL_MAPPING_SERVICES: SubService[] = [
-  {
-    id: '3d-laser-scanning',
-    title: '3D Terrestrial & Mobile Laser Scanning',
-    description: 'High-speed millimeter-accurate point cloud acquisition for industrial complexes, flowstations, and offshore topsides using Leica RTC360 spreads.',
-    icon: '📸'
-  },
-  {
-    id: 'scan-to-bim',
-    title: 'Scan-to-BIM & Intelligent 3D CAD Modeling',
-    description: 'Conversion of raw point clouds into parametric as-built BIM/CAD models, piping isometrics, and structural documentation.',
-    icon: '💻'
-  },
-  {
-    id: 'dimensional-control',
-    title: 'Dimensional Control & Clash Detection',
-    description: 'Pre-fabrication interference simulation, geometric verification, and tie-in tolerance validation to eliminate costly field rework.',
-    icon: '🎯'
-  },
-  {
-    id: 'digital-twins',
-    title: 'Operational Digital Twins & Brownfield Digitalisation',
-    description: 'Living 3D cloud-hosted asset models with interactive operational metadata and virtual walkthroughs for facility modification planning.',
-    icon: '🌐'
-  },
-  {
-    id: 'topographic-uav-mapping',
-    title: 'Topographic Survey & UAV Aerial Mapping',
-    description: 'Drone LiDAR and high-resolution aerial photogrammetry generating digital elevation models (DEM) and topographic contours across expansive terrains.',
-    icon: '🚁'
-  },
-  {
-    id: 'digital-asset-mapping',
-    title: 'Digital Asset Mapping & Deformation Monitoring',
-    description: 'High-precision spatial verification, structural deflection checks, and continuous geometric asset monitoring.',
-    icon: '🔍'
-  }
-];
-
-// 3. MARINE INTELLIGENCE SUB-SERVICES
-export const MARINE_INTELLIGENCE_SERVICES: SubService[] = [
-  {
-    id: 'marine-seabed-survey',
-    title: 'Marine Geophysical & Seabed Mapping',
-    description: 'Acoustic seabed profiling, shallow sub-bottom stratigraphy, side-scan sonar hazard detection, and subsea pipeline route clearance.',
+    id: 'geophysical-hydrographic-survey',
+    title: 'Geophysical & Hydrographic Survey Services',
+    description: 'Dual-frequency multibeam bathymetry, side-scan sonar, and sub-bottom stratigraphy mapping seabed topography and subsea pipeline clearance corridors.',
     icon: '🗺️'
   },
   {
-    id: 'hydrographic-bathymetric',
-    title: 'Hydrographic & Bathymetric Surveying',
-    description: 'Multi-beam and single-beam acoustic echo sounding delivering high-precision seabed bathymetry for navigation, ports, and dredging corridors.',
-    icon: '📐'
+    id: 'geotechnical-foundation-engineering',
+    title: 'Geotechnical & Foundation Engineering Services',
+    description: 'Continuous 20-ton piezocone penetration testing (CPTu), deep borehole drilling, standard penetration testing (SPT), and foundation settlement analysis.',
+    icon: '🔬'
   },
   {
-    id: 'continuous-marine-intelligence',
-    title: 'Continuous Marine Intelligence & MetOcean Buoys',
-    description: 'Strategic deployment with Frankstar Technology of oceanographic telemetry buoys for real-time wave, current, and tidal dynamics measurement.',
-    icon: '🌊'
-  },
-  {
-    id: 'marine-environmental-monitoring',
-    title: 'Marine Environmental & Water Quality Telemetry',
-    description: 'Continuous real-time marine observation, water quality telemetry, baseline habitat surveys, and regulatory environmental compliance logging.',
-    icon: '🌿'
-  },
-  {
-    id: 'marine-positioning',
-    title: 'Marine Positioning & Subsea Metrology Support',
-    description: 'Surface and acoustic subsea positioning, rig moves, anchor handling, and precision navigation for offshore construction vessels.',
+    id: 'precise-positioning-navigation',
+    title: 'Precise Positioning & Navigation Services',
+    description: 'High-precision DGNSS surface positioning, subsea acoustic tracking (USBL/LBL), and geodetic control networks for offshore rigs, barges, and pipelay.',
     icon: '🧭'
   },
   {
-    id: 'search-and-salvage',
-    title: 'Marine Search & Salvage Operations',
-    description: 'High-resolution acoustic location and marine salvage recovery of lost submerged assets in shallow coastal and deepwater corridors.',
-    icon: '⚓'
-  }
-];
-
-// 4. ASSET INTEGRITY INTELLIGENCE SUB-SERVICES
-export const ASSET_INTEGRITY_SERVICES: SubService[] = [
-  {
-    id: 'inspection-ndt',
-    title: 'Non-Destructive Testing (NDT) & Inspection',
-    description: 'Certified visual inspection, phased-array ultrasonics (PAUT), radiographic testing, and magnetic particle testing for critical assets.',
-    icon: '🔍'
+    id: 'geospatial-reality-capture-digital-engineering',
+    title: 'Geospatial, Reality Capture & Digital Engineering',
+    description: 'Terrestrial 3D laser scanning (Scan-to-BIM), dimensional metrology, GIS mapping, and operational digital twins eliminating brownfield clash rework.',
+    icon: '📸'
   },
   {
-    id: 'integrity-monitoring',
-    title: 'Corrosion Monitoring & Wall-Thickness Profiling',
-    description: 'Ultrasonic wall-thickness measurements, corrosion rate analysis, and remaining life assessment for piping, vessels, and storage tanks.',
-    icon: '📊'
-  },
-  {
-    id: 'condition-monitoring',
-    title: 'Structural Condition & Deformation Monitoring',
-    description: 'Acoustic emission flaw detection, geometric integrity verification, and real-time structural health monitoring for industrial assets.',
-    icon: '⚙️'
-  },
-  {
-    id: 'maintenance-repairs',
-    title: 'Mechanical Maintenance & Rehabilitation',
-    description: 'Preventive and corrective mechanical servicing, flowstation maintenance, equipment refurbishment, and field rehabilitation.',
-    icon: '🔧'
-  },
-  {
-    id: 'rov-subsea-integrity',
-    title: 'ROV Subsea Inspection & Asset Assessment',
-    description: 'Remotely operated vehicle (ROV) video audits, underwater pipeline inspection, and marine cathodic protection integrity checks.',
-    icon: '🤖'
-  },
-  {
-    id: 'digital-asset-integrity',
-    title: 'Digital Asset Integrity Documentation & 3D Records',
-    description: 'Interactive digital inspection dossiers, 3D defect mapping, and digital twin integration for lifecycle integrity tracking.',
-    icon: '📁'
-  }
-];
-
-// 5. ENGINEERING, INDUSTRIAL & ENVIRONMENTAL SOLUTIONS SUB-SERVICES
-export const ENGINEERING_SOLUTIONS_SERVICES: SubService[] = [
-  {
-    id: 'produced-water-treatment',
-    title: 'Produced Water Treatment & Oil Separation',
-    description: 'Advanced oil-water separation systems and treatment skids delivered with CoaleXpert for regulatory compliance and subsurface reinjection.',
-    icon: '💧'
-  },
-  {
-    id: 'industrial-wastewater-treatment',
-    title: 'Industrial Wastewater & Effluent Treatment',
-    description: 'Effluent treatment plants, filtration packages, and water reuse engineering for downstream and industrial facilities.',
+    id: 'laboratory-services',
+    title: 'Laboratory Services',
+    description: 'Accredited soil and rock mechanics testing, triaxial shear (UU/CU), consolidation oedometer tests, and construction materials compliance verification.',
     icon: '🧪'
+  }
+];
+
+// DIVISION 02 — METOCEAN & MARINE SOLUTIONS (MMS) SERVICE FAMILIES
+export const MMS_SERVICE_FAMILIES: SubService[] = [
+  {
+    id: 'metocean-observation-monitoring',
+    title: 'Metocean Observation & Monitoring',
+    description: 'Deployment of directional wave buoys, ADCP current profiling arrays, and tide monitoring stations capturing real-time oceanographic parameters.',
+    icon: '🌊'
   },
   {
-    id: 'flow-control-valves',
-    title: 'Flow Control, Industrial Valves & Actuation',
-    description: 'Supply of certified industrial ball, gate, butterfly, and control valves with automated electric/pneumatic actuators in alliance with NPK Automation.',
-    icon: '🚰'
+    id: 'marine-forecasting-intelligence',
+    title: 'Marine Forecasting & Intelligence',
+    description: 'High-resolution hydrodynamic modelling, squall early warning, and calibrated weather-window forecasts for offshore drilling and marine logistics.',
+    icon: '🌦️'
   },
   {
-    id: 'integrated-valve-maintenance',
-    title: 'Integrated Valve Maintenance Services',
-    description: 'Dedicated valve inspection, servicing, overhaul, actuator calibration, hydro-testing, and complete lifecycle spare parts support.',
-    icon: '🛠️'
+    id: 'marine-environmental-services',
+    title: 'Marine Environmental Services',
+    description: 'Offshore baseline environmental surveys, benthic grab sampling, CTD water column profiling, and sediment characterisation for statutory compliance.',
+    icon: '🌿'
   },
   {
-    id: 'pipeline-construction',
-    title: 'Pipeline Fabrication & Civil Construction',
-    description: 'API 1104 welding, pipe stringing, swamp pipeline trenching, hydrotesting, heavy piling, access roads, and structural concrete works.',
+    id: 'marine-advisory-operational-support',
+    title: 'Marine Advisory & Operational Support',
+    description: 'Derivation of 10/50/100-year extreme metocean design criteria, vessel mooring analyses, and marine warranty engineering advisory.',
+    icon: '🛡️'
+  }
+];
+
+// DIVISION 03 — INTEGRATED CONSTRUCTION SERVICES (ICS) SERVICE FAMILIES
+export const ICS_SERVICE_FAMILIES: SubService[] = [
+  {
+    id: 'pipeline-construction-installation',
+    title: 'Pipeline Construction & Installation',
+    description: 'Flowline and trunkline installation, amphibious swamp trenching, pipe stringing, field joint coating, and pipeline lowering-in across wetland terrain.',
     icon: '🏗️'
   },
   {
-    id: 'environmental-mitigation',
-    title: 'Environmental Assessment & Mitigation Services',
-    description: 'Industrial environmental compliance, pollution prevention, contaminated land remediation, and specialized waste management solutions.',
-    icon: '🌱'
+    id: 'civil-infrastructure-construction',
+    title: 'Civil & Infrastructure Construction',
+    description: 'Heavy industrial foundations, reinforced concrete bunds, piling caps, access roads, and stormwater drainage for industrial and energy facilities.',
+    icon: '🚜'
   },
   {
-    id: 'field-engineering-support',
-    title: 'Field Engineering & Swamp Project Support',
-    description: 'Amphibious swamp operations, quayside logistics, rig positioning, tug management, and turnkey field delivery across challenging terrains.',
-    icon: '🚜'
+    id: 'mechanical-fabrication-installation',
+    title: 'Mechanical, Fabrication & Installation',
+    description: 'Certified structural steel fabrication, process piping spool manufacturing, equipment alignment, and non-destructive examination (NDE).',
+    icon: '⚙️'
+  },
+  {
+    id: 'project-delivery-testing-commissioning',
+    title: 'Project Delivery, Testing & Commissioning Support',
+    description: 'Hydrostatic pressure testing, caliper cleaning pigging, nitrogen purging, and statutory pre-commissioning verification for operational handover.',
+    icon: '📋'
   }
 ];
 
-// Mapping for backward compatibility from old service URLs to the 5 Canonical Platforms
+// DIVISION 04 — INDUSTRIAL SOLUTIONS (IS) SERVICE FAMILIES
+export const IS_SERVICE_FAMILIES: SubService[] = [
+  {
+    id: 'produced-water-treatment-solutions',
+    title: 'Produced Water Treatment Solutions',
+    description: 'High-efficiency coalescing oil-water separation skids and filtration systems conditioning produced water for reinjection or compliant disposal.',
+    icon: '💧'
+  },
+  {
+    id: 'industrial-domestic-water-solutions',
+    title: 'Industrial & Domestic Water Solutions',
+    description: 'Reverse osmosis (RO) desalination, deep water borehole abstraction, and multimedia filtration packages supplying potable and process water.',
+    icon: '🚰'
+  },
+  {
+    id: 'water-environmental-laboratory-services',
+    title: 'Water & Environmental Laboratory Services',
+    description: 'Accredited analytical testing for oil-in-water concentration, heavy metal spectroscopy, BOD/COD demand, and microbiological parameters.',
+    icon: '🧪'
+  },
+  {
+    id: 'wastewater-treatment-resource-recovery',
+    title: 'Wastewater Treatment & Resource Recovery',
+    description: 'Industrial effluent treatment plants (ETP), sewage treatment packages, and automated chemical dosing supporting environmental compliance.',
+    icon: '♻️'
+  }
+];
+
+// Backwards-compatibility subservice exports
+export const GEO_DATA_INTELLIGENCE_SERVICES: SubService[] = GES_SERVICE_FAMILIES;
+export const GROUND_INTELLIGENCE_SERVICES: SubService[] = GES_SERVICE_FAMILIES;
+export const DIGITAL_MAPPING_SERVICES: SubService[] = GES_SERVICE_FAMILIES;
+export const MARINE_INTELLIGENCE_SERVICES: SubService[] = MMS_SERVICE_FAMILIES;
+export const ASSET_INTEGRITY_SERVICES: SubService[] = ICS_SERVICE_FAMILIES;
+export const ENGINEERING_SOLUTIONS_SERVICES: SubService[] = IS_SERVICE_FAMILIES;
+
+// Comprehensive routing map for clean redirection from all legacy paths & shorthands to the 4 approved divisions
 export const LEGACY_SERVICE_MAP: Record<string, string> = {
-  // Direct canonical platform mappings
-  'ground-intelligence': 'geo-data-intelligence',
-  'geo-data-intelligence': 'geo-data-intelligence',
-  'digital-intelligence': 'digital-mapping-intelligence',
-  'digital-mapping-intelligence': 'digital-mapping-intelligence',
-  'offshore-intelligence': 'marine-intelligence',
-  'marine-intelligence': 'marine-intelligence',
-  'asset-integrity': 'asset-integrity-intelligence',
-  'asset-integrity-intelligence': 'asset-integrity-intelligence',
-  'integrated-engineering-construction': 'engineering-industrial-environmental-solutions',
-  'industrial-environmental-technologies': 'engineering-industrial-environmental-solutions',
-  'engineering-industrial-environmental-solutions': 'engineering-industrial-environmental-solutions',
+  // Direct shorthand aliases
+  'ges': 'geosolutions-engineering-services',
+  'mms': 'metocean-marine-solutions',
+  'ics': 'integrated-construction-services',
+  'is': 'industrial-solutions',
 
-  // Digital Mapping Intelligence aliases
-  'reality-capture': 'digital-mapping-intelligence',
-  '3d-laser-scanning': 'digital-mapping-intelligence',
-  'digital-twins': 'digital-mapping-intelligence',
-  'geomatics-services': 'digital-mapping-intelligence',
-  'spatial-intelligence': 'digital-mapping-intelligence',
-  'geomatics': 'digital-mapping-intelligence',
-  'topographic-mapping': 'digital-mapping-intelligence',
+  // Division 01: GeoSolutions & Engineering Services (GES) mappings
+  'geosolutions-engineering-services': 'geosolutions-engineering-services',
+  'geosolutions-engineering': 'geosolutions-engineering-services',
+  'geo-solutions-engineering': 'geosolutions-engineering-services',
+  'geo-data-intelligence': 'geosolutions-engineering-services',
+  'ground-intelligence': 'geosolutions-engineering-services',
+  'digital-mapping-intelligence': 'geosolutions-engineering-services',
+  'digital-intelligence': 'geosolutions-engineering-services',
+  'reality-capture': 'geosolutions-engineering-services',
+  '3d-laser-scanning': 'geosolutions-engineering-services',
+  'digital-twins': 'geosolutions-engineering-services',
+  'geomatics-services': 'geosolutions-engineering-services',
+  'spatial-intelligence': 'geosolutions-engineering-services',
+  'geomatics': 'geosolutions-engineering-services',
+  'topographic-mapping': 'geosolutions-engineering-services',
+  'geotechnical-services': 'geosolutions-engineering-services',
+  'onshore-nearshore-geotechnical': 'geosolutions-engineering-services',
+  'seismic-services': 'geosolutions-engineering-services',
+  'geotechnical-sampling': 'geosolutions-engineering-services',
+  'geotechnical-investigation': 'geosolutions-engineering-services',
+  'cpt-testing': 'geosolutions-engineering-services',
+  'geohazard-geoscan-seismic': 'geosolutions-engineering-services',
+  'geophysical-hydrographic-survey': 'geosolutions-engineering-services',
+  'geotechnical-foundation-engineering': 'geosolutions-engineering-services',
+  'precise-positioning-navigation': 'geosolutions-engineering-services',
+  'geospatial-reality-capture-digital-engineering': 'geosolutions-engineering-services',
+  'laboratory-services': 'geosolutions-engineering-services',
+  'geophysical-surveys': 'geosolutions-engineering-services',
+  'hydrographic-survey': 'geosolutions-engineering-services',
+  'seabed-mapping': 'geosolutions-engineering-services',
+  'subsurface-intelligence': 'geosolutions-engineering-services',
+  'geospatial-intelligence': 'geosolutions-engineering-services',
 
-  // Marine Intelligence aliases
-  'geophysical-surveys': 'marine-intelligence',
-  'climate-environmental-metocean': 'marine-intelligence',
-  'metocean': 'marine-intelligence',
-  'continuous-marine-intelligence': 'marine-intelligence',
-  'hydrographic-survey': 'marine-intelligence',
-  'seabed-mapping': 'marine-intelligence',
-  'search-and-salvage': 'marine-intelligence',
-  'environmental-survey': 'marine-intelligence',
+  // Division 02: Metocean & Marine Solutions (MMS) mappings
+  'metocean-marine-solutions': 'metocean-marine-solutions',
+  'metocean-marine': 'metocean-marine-solutions',
+  'marine-intelligence': 'metocean-marine-solutions',
+  'offshore-intelligence': 'metocean-marine-solutions',
+  'continuous-marine-intelligence': 'metocean-marine-solutions',
+  'metocean': 'metocean-marine-solutions',
+  'climate-environmental-metocean': 'metocean-marine-solutions',
+  'metocean-observation-monitoring': 'metocean-marine-solutions',
+  'marine-forecasting-intelligence': 'metocean-marine-solutions',
+  'marine-environmental-services': 'metocean-marine-solutions',
+  'marine-advisory-operational-support': 'metocean-marine-solutions',
+  'environmental-survey': 'metocean-marine-solutions',
+  'search-and-salvage': 'metocean-marine-solutions',
 
-  // Geo Data Intelligence aliases
-  'geotechnical-services': 'geo-data-intelligence',
-  'onshore-nearshore-geotechnical': 'geo-data-intelligence',
-  'seismic-services': 'geo-data-intelligence',
-  'geotechnical-sampling': 'geo-data-intelligence',
-  'geotechnical-investigation': 'geo-data-intelligence',
-  'cpt-testing': 'geo-data-intelligence',
+  // Division 03: Integrated Construction Services (ICS) mappings
+  'integrated-construction-services': 'integrated-construction-services',
+  'integrated-engineering-construction': 'integrated-construction-services',
+  'integrated-construction': 'integrated-construction-services',
+  'pipeline-construction': 'integrated-construction-services',
+  'pipeline-construction-installation': 'integrated-construction-services',
+  'infrastructure-construction': 'integrated-construction-services',
+  'civil-infrastructure-construction': 'integrated-construction-services',
+  'civil-infrastructure': 'integrated-construction-services',
+  'civil-works': 'integrated-construction-services',
+  'mechanical-fabrication': 'integrated-construction-services',
+  'mechanical-fabrication-installation': 'integrated-construction-services',
+  'construction-project-management': 'integrated-construction-services',
+  'project-delivery-testing-commissioning': 'integrated-construction-services',
+  'project-delivery': 'integrated-construction-services',
+  'asset-integrity': 'integrated-construction-services',
+  'asset-integrity-intelligence': 'integrated-construction-services',
+  'asset-integrity-services': 'integrated-construction-services',
+  'asset-integrity-management': 'integrated-construction-services',
+  'facility-maintenance': 'integrated-construction-services',
+  'asset-inspection': 'integrated-construction-services',
+  'rov-inspection': 'integrated-construction-services',
+  'ndt-inspection': 'integrated-construction-services',
+  'oilfield-services': 'integrated-construction-services',
+  'field-operations': 'integrated-construction-services',
 
-  // Asset Integrity Intelligence aliases
-  'asset-integrity-services': 'asset-integrity-intelligence',
-  'asset-integrity-management': 'asset-integrity-intelligence',
-  'facility-maintenance': 'asset-integrity-intelligence',
-  'asset-management': 'asset-integrity-intelligence',
-  'asset-inspection': 'asset-integrity-intelligence',
-  'rov-inspection': 'asset-integrity-intelligence',
-  'ndt-inspection': 'asset-integrity-intelligence',
-
-  // Engineering, Industrial & Environmental Solutions aliases
-  'pipeline-construction': 'engineering-industrial-environmental-solutions',
-  'infrastructure-construction': 'engineering-industrial-environmental-solutions',
-  'civil-works': 'engineering-industrial-environmental-solutions',
-  'oilfield-services': 'engineering-industrial-environmental-solutions',
-  'field-operations': 'engineering-industrial-environmental-solutions',
-  'water-engineering': 'engineering-industrial-environmental-solutions',
-  'water-environmental-solutions': 'engineering-industrial-environmental-solutions',
-  'engineering-procurement': 'engineering-industrial-environmental-solutions',
-  'produced-water-treatment': 'engineering-industrial-environmental-solutions',
-  'wastewater-treatment': 'engineering-industrial-environmental-solutions',
-  'industrial-water-treatment': 'engineering-industrial-environmental-solutions',
-  'water-treatment-plants': 'engineering-industrial-environmental-solutions',
-  'valves-and-actuators': 'engineering-industrial-environmental-solutions',
-  'flow-control-and-automation': 'engineering-industrial-environmental-solutions',
-  'integrated-valve-maintenance': 'engineering-industrial-environmental-solutions'
+  // Division 04: Industrial Solutions (IS) mappings
+  'industrial-solutions': 'industrial-solutions',
+  'industrial-environmental-technologies': 'industrial-solutions',
+  'industrial-environmental': 'industrial-solutions',
+  'engineering-industrial-environmental-solutions': 'industrial-solutions',
+  'produced-water-treatment': 'industrial-solutions',
+  'produced-water-treatment-solutions': 'industrial-solutions',
+  'industrial-domestic-water-solutions': 'industrial-solutions',
+  'wastewater-treatment': 'industrial-solutions',
+  'wastewater-treatment-resource-recovery': 'industrial-solutions',
+  'water-environmental-laboratory-services': 'industrial-solutions',
+  'industrial-water-treatment': 'industrial-solutions',
+  'water-treatment-plants': 'industrial-solutions',
+  'water-engineering': 'industrial-solutions',
+  'water-environmental-solutions': 'industrial-solutions',
+  'valves-and-actuators': 'industrial-solutions',
+  'flow-control-and-automation': 'industrial-solutions',
+  'integrated-valve-maintenance': 'industrial-solutions',
+  'energy-transition': 'industrial-solutions'
 };
 
+// Master Authoritative Services Array: Four Divisions
 export const SERVICES: Service[] = [
-  // 1. GEO DATA INTELLIGENCE
+  // 01. GEOSOLUTIONS & ENGINEERING SERVICES (GES)
   {
-    id: 'geo-data-intelligence',
+    id: 'geosolutions-engineering-services',
     serviceNumber: '01',
-    title: 'Geo Data Intelligence',
-    tagline: 'Understand the ground, build with confidence.',
-    description: 'We perform detailed soil and rock investigations, 20-ton hydraulic CPT/CPTu testing, borehole drilling, onshore seismic surveys, and land geodetic surveying across Nigeria, establishing structural certainty before construction begins.',
+    abbreviation: 'GES',
+    descriptor: 'GEOSCIENCE | SURVEY | ENGINEERING | DIGITAL SOLUTIONS',
+    positioning: 'Accurate data. Deeper insight. Smarter engineering.',
+    title: 'GeoSolutions & Engineering Services',
+    tagline: 'Accurate data. Deeper insight. Smarter engineering.',
+    description: "Integrated site investigation, geophysics, hydrography, 20-ton piezocone CPTu testing, geodetic positioning, terrestrial 3D laser scanning, and accredited materials laboratory testing de-risking ground and foundation conditions across swamp, nearshore, and offshore assets.",
     items: [
-      'Geotechnical & Site Investigation (soil boring, SPT, rock coring)',
-      'Hydraulic Cone Penetration Testing (20-Ton CPT & CPTu profiling)',
-      'Geotechnical Sampling & Soil Mechanics Laboratory Testing',
-      'Onshore Geophysical Surveys & Seismic Refraction Acquisition',
-      'Electrical Resistivity Tomography & Subsurface Characterisation',
-      'Land Surveying, Geodetic Control Networks & Terrestrial GIS'
+      'Geohazard, Geoscan & Seismic Services',
+      'Geophysical & Hydrographic Survey Services',
+      'Geotechnical & Foundation Engineering Services',
+      'Precise Positioning & Navigation Services',
+      'Geospatial, Reality Capture & Digital Engineering',
+      'Laboratory Services'
     ],
-    subServices: GEO_DATA_INTELLIGENCE_SERVICES,
+    subServices: GES_SERVICE_FAMILIES,
     icon: '🔬',
     image: OpDrillCrewCasingImg,
-    division: 'Geo Data Intelligence'
+    division: 'GeoSolutions & Engineering Services'
   },
 
-  // 2. DIGITAL MAPPING INTELLIGENCE
+  // 02. METOCEAN & MARINE SOLUTIONS (MMS)
   {
-    id: 'digital-mapping-intelligence',
+    id: 'metocean-marine-solutions',
     serviceNumber: '02',
-    title: 'Digital Mapping Intelligence',
-    tagline: 'Capture reality, create certainty.',
-    description: 'We deploy millimeter-precision 3D terrestrial laser scanners and UAV photogrammetry to create exact digital twins, scan-to-BIM models, and clash-detection models of industrial facilities and operational terrains.',
+    abbreviation: 'MMS',
+    descriptor: 'METOCEAN | MARINE INTELLIGENCE | ENVIRONMENTAL SOLUTIONS',
+    positioning: 'Real-time ocean insight. Safer operations. Informed decisions.',
+    title: 'Metocean & Marine Solutions',
+    tagline: 'Real-time ocean insight. Safer operations. Informed decisions.',
+    description: 'Continuous oceanographic data acquisition, metocean observation, real-time wave and current profiling, coastal hydrodynamic modelling, marine meteorological forecasting, and offshore environmental baseline surveys deployed with Frankstar Technology.',
     items: [
-      'High-precision 3D terrestrial and mobile laser scanning',
-      'Scan-to-BIM & Intelligent as-built 3D CAD computer models',
-      'Dimensional control and clash detection before site installation',
-      'Living digital twins and virtual walkthroughs for operating facilities',
-      'Topographic surveying, UAV mapping & digital elevation models',
-      'Digital asset mapping, geometric verification & deformation monitoring'
+      'Metocean Observation & Monitoring',
+      'Marine Forecasting & Intelligence',
+      'Marine Environmental Services',
+      'Marine Advisory & Operational Support'
     ],
-    subServices: DIGITAL_MAPPING_SERVICES,
-    icon: '📸',
-    image: OpLaserManifoldImg,
-    division: 'Digital Mapping Intelligence'
-  },
-
-  // 3. MARINE INTELLIGENCE
-  {
-    id: 'marine-intelligence',
-    serviceNumber: '03',
-    title: 'Marine Intelligence',
-    tagline: 'From seabed conditions to ocean dynamics.',
-    description: 'We provide marine geophysical surveys, high-resolution bathymetric depth mapping, underwater hazard detection, and continuous MetOcean telemetry buoys across coastal, nearshore, and deepwater corridors.',
-    items: [
-      'Marine geophysical surveys, sub-bottom profiling & side-scan sonar',
-      'High-resolution multibeam and single-beam hydrographic bathymetry',
-      'Continuous Marine Intelligence & MetOcean telemetry buoys',
-      'Oceanographic wave monitoring, current profiling (ADCP) & tidal stations',
-      'Marine environmental compliance & water quality telemetry',
-      'Subsea marine positioning, metrology & lost asset search and salvage'
-    ],
-    subServices: MARINE_INTELLIGENCE_SERVICES,
+    subServices: MMS_SERVICE_FAMILIES,
     icon: '🌊',
     image: OpOffshoreBargeImg,
-    division: 'Marine Intelligence',
+    division: 'Metocean & Marine Solutions',
     partnerBadge: {
       partnerName: 'Frankstar Technology',
       role: 'Strategic MetOcean & Marine Intelligence Partner'
     }
   },
 
-  // 4. ASSET INTEGRITY INTELLIGENCE
+  // 03. INTEGRATED CONSTRUCTION SERVICES (ICS)
   {
-    id: 'asset-integrity-intelligence',
-    serviceNumber: '04',
-    title: 'Asset Integrity Intelligence',
-    tagline: 'Assure structural reliability, prevent catastrophic downtime.',
-    description: 'We deliver advanced Non-Destructive Testing (NDT), ultrasonic wall-thickness profiling, corrosion rate monitoring, subsea ROV inspection, and mechanical facility maintenance to extend industrial asset lifecycles.',
+    id: 'integrated-construction-services',
+    serviceNumber: '03',
+    abbreviation: 'ICS',
+    descriptor: 'PIPELINE | INFRASTRUCTURE | MECHANICAL | CONSTRUCTION DELIVERY',
+    positioning: 'From engineering preparation to successful project delivery.',
+    title: 'Integrated Construction Services',
+    tagline: 'From engineering preparation to successful project delivery.',
+    description: "End-to-end construction execution spanning swamp and onshore pipeline installation, heavy civil infrastructure, structural mechanical fabrication, and pre-commissioning testing for energy facilities and industrial sites.",
     items: [
-      'Non-Destructive Testing (NDT), PAUT & radiographic inspections',
-      'Corrosion monitoring, ultrasonic wall-thickness & remaining life reviews',
-      'Acoustic emission structural health monitoring & condition assessments',
-      'Subsea ROV inspection of marine structures and pipelines',
-      'Mechanical facility maintenance, equipment overhauls & repairs',
-      'Digital asset inspection records & 3D defect documentation'
+      'Pipeline Construction & Installation',
+      'Civil & Infrastructure Construction',
+      'Mechanical, Fabrication & Installation',
+      'Project Delivery, Testing & Commissioning Support'
     ],
-    subServices: ASSET_INTEGRITY_SERVICES,
-    icon: '🛡️',
-    image: AssetIntegrityImg,
-    division: 'Asset Integrity Intelligence'
+    subServices: ICS_SERVICE_FAMILIES,
+    icon: '🏗️',
+    image: OpPipelineSwampCatImg,
+    division: 'Integrated Construction Services'
   },
 
-  // 5. ENGINEERING, INDUSTRIAL & ENVIRONMENTAL SOLUTIONS
+  // 04. INDUSTRIAL SOLUTIONS (IS)
   {
-    id: 'engineering-industrial-environmental-solutions',
-    serviceNumber: '05',
-    title: 'Engineering, Industrial & Environmental Solutions',
-    tagline: 'From engineered infrastructure to process treatment and industrial flow delivery.',
-    description: 'We engineer produced water treatment systems, supply and maintain automated flow control valves, fabricate welded pipelines, execute swamp civil works, and manage complex industrial field operations.',
+    id: 'industrial-solutions',
+    serviceNumber: '04',
+    abbreviation: 'IS',
+    descriptor: 'WATER TREATMENT | PROCESS SOLUTIONS | ENVIRONMENTAL SERVICES',
+    positioning: 'Cleaner water. Healthier communities. Sustainable industries.',
+    title: 'Industrial Solutions',
+    tagline: 'Cleaner water. Healthier communities. Sustainable industries.',
+    description: "Engineered produced-water treatment systems, coalescing oil-water separation skids, reverse osmosis desalination, accredited water laboratory analysis, and wastewater resource recovery engineered in partnership with CoaleXpert.",
     items: [
-      'Produced water treatment & oil-water separation systems',
-      'Industrial wastewater treatment plants & effluent filtration skids',
-      'Automated industrial valves, actuators & shutdown packages',
-      'Integrated valve inspection, servicing, testing & calibration',
-      'API 1104 pipeline fabrication, swamp pipe laying & hydrotesting',
-      'Civil infrastructure, heavy piling, access roads & swamp rehabilitation',
-      'Environmental mitigation, pollution prevention & industrial waste solutions'
+      'Produced Water Treatment Solutions',
+      'Industrial & Domestic Water Solutions',
+      'Water & Environmental Laboratory Services',
+      'Wastewater Treatment & Resource Recovery'
     ],
-    subServices: ENGINEERING_SOLUTIONS_SERVICES,
-    icon: '🔧',
-    image: WaterTreatmentImg,
-    division: 'Engineering, Industrial & Environmental Solutions',
+    subServices: IS_SERVICE_FAMILIES,
+    icon: '💧',
+    image: WaterTreatmentSkidImg,
+    division: 'Industrial Solutions',
     partnerBadge: {
-      partnerName: 'CoaleXpert & NPK Automation',
-      role: 'Strategic Water, Process & Valve Technology Partners'
+      partnerName: 'CoaleXpert',
+      role: 'Strategic Produced Water & Separation Partner'
     }
   }
 ];
@@ -503,8 +450,8 @@ export const PARTNERS: Partner[] = [
       'Marine operational safety monitoring'
     ],
     website: 'https://www.frankstartech.com/',
-    serviceId: 'marine-intelligence',
-    serviceTitle: 'Marine Intelligence'
+    serviceId: 'metocean-marine-solutions',
+    serviceTitle: 'Metocean & Marine Solutions'
   },
   {
     id: 'coalexpert',
@@ -520,8 +467,8 @@ export const PARTNERS: Partner[] = [
       'Plant optimization and technical field support'
     ],
     website: 'https://coalexpert.pro/',
-    serviceId: 'engineering-industrial-environmental-solutions',
-    serviceTitle: 'Engineering, Industrial & Environmental Solutions'
+    serviceId: 'industrial-solutions',
+    serviceTitle: 'Industrial Solutions'
   },
   {
     id: 'npk',
@@ -537,8 +484,8 @@ export const PARTNERS: Partner[] = [
       'Inspection, lifecycle maintenance, and spare parts support'
     ],
     website: '',
-    serviceId: 'engineering-industrial-environmental-solutions',
-    serviceTitle: 'Engineering, Industrial & Environmental Solutions'
+    serviceId: 'industrial-solutions',
+    serviceTitle: 'Industrial Solutions'
   }
 ];
 

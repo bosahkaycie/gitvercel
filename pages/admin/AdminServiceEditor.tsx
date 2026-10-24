@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CMSService, ServiceGalleryImage, ServiceDeliverableItem } from '../../types';
+import { CMSService, ServiceGalleryImage, ServiceDeliverableItem, SubService } from '../../types';
 import ImageUploader from '../../components/admin/ImageUploader';
 import { SERVICE_GALLERY_PRESETS, getEmbedVideoUrl } from '../ServicesDetailsData';
 import NativeVideoPlayer from '../../components/NativeVideoPlayer';
@@ -14,52 +14,54 @@ interface AdminServiceEditorProps {
 }
 
 const SUGGESTED_DELIVERABLES: Record<string, string[]> = {
-  'Ground Intelligence': [
-    'Seismic Services (2D/3D digital seismic surveys & harvesting)',
-    'Seabed Mapping (Geophysical sub-seabed investigations)',
-    'Geotechnical Sampling (Seabed sampling & in-situ testing)',
-    'Asset Inspection (High-resolution offshore asset management)',
-    'Hydrographic Survey (High precision seabed maps)',
-    'Search and Salvage (Shallow & deep ocean asset recovery)',
-    'Environmental survey (Complex marine ecosystem interpretation)',
-    'Cone Penetration Testing (CPTu) Soundings',
-    'Deep Geotechnical Borehole Soil Drilling',
-    'Laboratory Geotechnical Soil & Water Testing'
+  'GeoSolutions & Engineering Services': [
+    'HR2D/UHR2D seismic surveys',
+    'Shallow gas detection & geohazard assessment',
+    'Multibeam surveys & seabed mapping',
+    'Side-scan sonar & sub-bottom profiling',
+    'Cone Penetration Testing (CPT) soundings',
+    'Borehole investigations & soil characterisation',
+    'Rig positioning & USBL/LBL positioning',
+    'GIS, 3D modelling & LiDAR scanning',
+    'Scan-to-BIM & digital twins',
+    'Soil mechanics & rock laboratory testing'
   ],
-  'Digital Intelligence': [
-    '3D Terrestrial Laser Scanning (TLS)',
-    'Millimeter-Accuracy Reality Capture & Point Clouds',
-    'Intelligent Digital Twin & As-Built CAD Modeling',
-    'BIM Plant Information Modeling & Asset Digitization',
-    'Clash Detection & Dimensional Verification Reports'
+  'Metocean & Marine Solutions': [
+    'Wave, current & tide measurements',
+    'Weather measurements & ADCP current profiling',
+    'Oceanographic buoy deployments',
+    'Marine weather forecasts & wave models',
+    'Benthic surveys & marine environmental monitoring',
+    'Water & sediment field sampling',
+    'Metocean design criteria & marine risk assessment'
   ],
-  'Offshore Intelligence': [
-    'High-Resolution Geophysical Seabed Profiling',
-    'Multi-Beam Acoustic Bathymetric Charting',
-    'Sub-Bottom Profiling & Debris Hazard Mapping',
-    'Subsea Metocean Monitoring & Current Profiling',
-    'Offshore Rig & Barge Positioning Verification'
+  'Integrated Construction Services': [
+    'Oil and gas pipelines & flowlines installation',
+    'Gathering lines, welding & tie-ins',
+    'Hydrostatic testing & pre-commissioning',
+    'Earthworks & foundations construction',
+    'Access roads, drainage & site development',
+    'Structural steel & process piping fabrication',
+    'Modular facilities & equipment installation',
+    'Project delivery & commissioning support'
   ],
-  'Integrated Engineering & Construction Solutions': [
-    'Pipeline Constructability & Route Optimization',
-    'Civil Structural Foundation Integrity Engineering',
-    'Cathodic Protection & Corrosion Control Systems',
-    'Statutory NUPRC & API Engineering Compliance Dossiers'
-  ],
-  'Industrial & Environmental Technologies': [
-    'Advanced Non-Destructive Testing (NDT) & Inspection',
-    'Acoustic Emission Structural Health Monitoring',
-    'Environmental Baseline Studies (EBS) & Impact Assessment',
-    'Statutory Regulatory Compliance & Verification Dossiers'
+  'Industrial Solutions': [
+    'Produced water oil-water separation',
+    'Produced water filtration & chemical treatment',
+    'Modular treatment skids & performance monitoring',
+    'Process water & potable water systems',
+    'Borehole water treatment & reverse osmosis (RO)',
+    'Water-quality & oil-in-water laboratory analysis',
+    'Metals & microbiological laboratory testing',
+    'Effluent treatment & water recycling plants'
   ]
 };
 
 const CATEGORIES_LIST = [
-  { name: 'Ground Intelligence', division: 'Ground Intelligence' as const },
-  { name: 'Digital Intelligence', division: 'Digital Intelligence' as const },
-  { name: 'Integrated Engineering & Construction Solutions', division: 'Integrated Engineering & Construction Solutions' as const },
-  { name: 'Industrial & Environmental Technologies', division: 'Industrial & Environmental Technologies' as const },
-  { name: 'Offshore Intelligence', division: 'Offshore Intelligence' as const },
+  { name: 'GeoSolutions & Engineering Services (GES)', division: 'GeoSolutions & Engineering Services' as const },
+  { name: 'Metocean & Marine Solutions (MMS)', division: 'Metocean & Marine Solutions' as const },
+  { name: 'Integrated Construction Services (ICS)', division: 'Integrated Construction Services' as const },
+  { name: 'Industrial Solutions (IS)', division: 'Industrial Solutions' as const },
 ];
 
 export const ALL_OPERATIONAL_ASSETS: { url: string; title: string; caption: string; tag: string }[] = [
@@ -83,7 +85,7 @@ export const ALL_OPERATIONAL_ASSETS: { url: string; title: string; caption: stri
   { url: '/assets/operations/pigl_marine_crew_vessel.jpg', title: 'Dedicated Hydrographic Survey Support Vessel', caption: 'PIGL coastal survey craft configured with multi-beam echo sounders, gyrocompasses, and hydroacoustic tracking.', tag: 'Offshore Intelligence' },
   { url: '/assets/operations/pigl_offshore_winch_pigl_container.jpg', title: 'Survey Deck Winch & Instrumented Container', caption: 'Mobilization of deck handling equipment and air-conditioned instrumentation laboratory for offshore geophysics.', tag: 'Offshore Intelligence' },
   { url: '/assets/field_operations_marine.jpg', title: 'Nearshore Bathymetry & Seabed Profiling', caption: 'Dual-frequency acoustic bathymetry, side-scan sonar, and marine magnetics mapping for pipeline landfalls.', tag: 'Offshore Intelligence' },
-  { url: '/assets/new barge.png', title: 'Shallow-Water Geophysical Survey Barge', caption: 'Customized marine barge spread delivering precise navigation and seabed clearance in shallow delta estuaries.', tag: 'Offshore Intelligence' },
+  { url: '/assets/new-barge.png', title: 'Shallow-Water Geophysical Survey Barge', caption: 'Customized marine barge spread delivering precise navigation and seabed clearance in shallow delta estuaries.', tag: 'Offshore Intelligence' },
   // Asset Integrity
   { url: '/assets/asset_integrity_ndt.jpg', title: 'Pressure Vessel NDT Ultrasonic Scanning', caption: 'Certified Non-Destructive Testing, phased array ultrasonics, and wall-thickness profiling on processing vessels.', tag: 'Asset Integrity' },
   { url: '/assets/IMG_6170.jpg', title: 'PIGL Technical Integrity Inspection Team', caption: 'Certified inspection engineers mobilizing with precision ultrasonic and acoustic emission diagnostic instrumentation.', tag: 'Asset Integrity' },
@@ -95,7 +97,7 @@ export const ALL_OPERATIONAL_ASSETS: { url: string; title: string; caption: stri
   { url: '/assets/operations/pigl_pipeline_construction_swamp_cat.jpg', title: 'Swamp Excavator Pipeline Trenching & Clearing', caption: 'Specialized low-ground-pressure swamp cat excavators executing pipeline trenching in waterlogged delta terrain.', tag: 'Infrastructure & EPC' },
   { url: '/assets/newpipeline.png', title: 'Cross-Country Pipeline Stringing & Lowering-In', caption: 'Heavy-duty sideboom crawler fleet stringing and lowering certified welded pipe into prepared swamp trenches.', tag: 'Infrastructure & EPC' },
   { url: '/assets/pigl_pipeline_clearing_aerial.jpg', title: 'Pipeline Right-of-Way (ROW) Aerial Geomatics', caption: 'High-resolution drone aerial mapping and environmental monitoring of cleared pipeline right-of-way corridors.', tag: 'Infrastructure & EPC' },
-  { url: '/assets/access road.jpg', title: 'Heavy Civil Infrastructure & Access Road Construction', caption: 'Heavy-duty crushed aggregate road construction, geotextile stabilization, and hydraulic drainage works.', tag: 'Infrastructure & EPC' },
+  { url: '/assets/access-road.jpg', title: 'Heavy Civil Infrastructure & Access Road Construction', caption: 'Heavy-duty crushed aggregate road construction, geotextile stabilization, and hydraulic drainage works.', tag: 'Infrastructure & EPC' },
   { url: '/assets/water_treatment_skid.jpg', title: 'Produced Water & Oil Separation Treatment Skid', caption: 'CoaleXpert high-efficiency modular coalescing water treatment system deployed for environmental discharge compliance.', tag: 'Infrastructure & EPC' },
   { url: '/assets/operations/pigl_logistics_base_aerial.jpg', title: 'PIGL Port Harcourt Operational Base & Yard', caption: 'Aerial view of PIGL engineering fabrication yard, equipment staging area, and vessel berthing quayside.', tag: 'Infrastructure & EPC' }
 ];
@@ -113,12 +115,188 @@ const AdminServiceEditor: React.FC<AdminServiceEditorProps> = ({
   const [division, setDivision] = useState<any>(
     initialData?.division || CATEGORIES_LIST[0].division
   );
+  const [abbreviation, setAbbreviation] = useState(initialData?.abbreviation || '');
+  const [descriptor, setDescriptor] = useState(initialData?.descriptor || '');
+  const [positioning, setPositioning] = useState(initialData?.positioning || '');
   const [tagline, setTagline] = useState(initialData?.tagline || '');
   const [shortDescription, setShortDescription] = useState(initialData?.short_description || '');
   const [fullDescription, setFullDescription] = useState(initialData?.full_description || '');
   const [businessValue, setBusinessValue] = useState(initialData?.business_value || '');
   const [heroImage, setHeroImage] = useState(initialData?.hero_image || '/assets/DJI_0003.jpg');
   const [cardImage, setCardImage] = useState(initialData?.card_image || '/assets/DJI_0003.jpg');
+  const [heroHeading, setHeroHeading] = useState(initialData?.hero_heading || '');
+  const [overviewHeading, setOverviewHeading] = useState(initialData?.overview_heading || '');
+  const [engineeringProblemAddressed, setEngineeringProblemAddressed] = useState(initialData?.engineering_problem_addressed || '');
+
+  // SubServices / Core Capabilities State
+  const [subServices, setSubServices] = useState<SubService[]>(() => {
+    if (initialData?.subServices && initialData.subServices.length > 0) {
+      return initialData.subServices;
+    }
+    return [];
+  });
+  const [newSubTitle, setNewSubTitle] = useState('');
+  const [newSubDesc, setNewSubDesc] = useState('');
+  const [newSubIcon, setNewSubIcon] = useState('⚡');
+  const [newSubImage, setNewSubImage] = useState('');
+
+  const handleAddSubService = () => {
+    if (!newSubTitle.trim()) return;
+    const newSub: SubService = {
+      id: `sub-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      title: newSubTitle.trim(),
+      description: newSubDesc.trim(),
+      icon: newSubIcon.trim() || '⚡',
+      image: newSubImage.trim() || undefined,
+      display_order: subServices.length + 1
+    };
+    setSubServices(prev => [...prev, newSub]);
+    setNewSubTitle('');
+    setNewSubDesc('');
+    setNewSubIcon('⚡');
+    setNewSubImage('');
+  };
+
+  const handleUpdateSubService = (index: number, field: keyof SubService, value: string) => {
+    setSubServices(prev => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], [field]: value };
+      return copy;
+    });
+  };
+
+  const handleRemoveSubService = (index: number) => {
+    setSubServices(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleMoveSubService = (index: number, direction: 'up' | 'down') => {
+    setSubServices(prev => {
+      const target = direction === 'up' ? index - 1 : index + 1;
+      if (target < 0 || target >= prev.length) return prev;
+      const copy = [...prev];
+      const temp = copy[index];
+      copy[index] = copy[target];
+      copy[target] = temp;
+      return copy;
+    });
+  };
+
+  // Execution Methodology Steps State
+  const [methodologyList, setMethodologyList] = useState<string[]>(() => {
+    if (initialData?.methodology && initialData.methodology.length > 0) {
+      return initialData.methodology;
+    }
+    return [];
+  });
+  const [newMethodologyStep, setNewMethodologyStep] = useState('');
+
+  const handleAddMethodologyStep = () => {
+    if (!newMethodologyStep.trim()) return;
+    setMethodologyList(prev => [...prev, newMethodologyStep.trim()]);
+    setNewMethodologyStep('');
+  };
+
+  const handleUpdateMethodologyStep = (index: number, value: string) => {
+    setMethodologyList(prev => {
+      const copy = [...prev];
+      copy[index] = value;
+      return copy;
+    });
+  };
+
+  const handleRemoveMethodologyStep = (index: number) => {
+    setMethodologyList(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleMoveMethodologyStep = (index: number, direction: 'up' | 'down') => {
+    setMethodologyList(prev => {
+      const target = direction === 'up' ? index - 1 : index + 1;
+      if (target < 0 || target >= prev.length) return prev;
+      const copy = [...prev];
+      const temp = copy[index];
+      copy[index] = copy[target];
+      copy[target] = temp;
+      return copy;
+    });
+  };
+
+  // Statutory Standards & Quality Control Codes State
+  const [standardsList, setStandardsList] = useState<string[]>(() => {
+    if (initialData?.standards && initialData.standards.length > 0) {
+      return initialData.standards;
+    }
+    return [];
+  });
+  const [newStandard, setNewStandard] = useState('');
+
+  const handleAddStandard = () => {
+    if (!newStandard.trim()) return;
+    setStandardsList(prev => [...prev, newStandard.trim()]);
+    setNewStandard('');
+  };
+
+  const handleUpdateStandard = (index: number, value: string) => {
+    setStandardsList(prev => {
+      const copy = [...prev];
+      copy[index] = value;
+      return copy;
+    });
+  };
+
+  const handleRemoveStandard = (index: number) => {
+    setStandardsList(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleMoveStandard = (index: number, direction: 'up' | 'down') => {
+    setStandardsList(prev => {
+      const target = direction === 'up' ? index - 1 : index + 1;
+      if (target < 0 || target >= prev.length) return prev;
+      const copy = [...prev];
+      const temp = copy[index];
+      copy[index] = copy[target];
+      copy[target] = temp;
+      return copy;
+    });
+  };
+
+  // Project Deliverables & Technical Data Packages State
+  const [keyDeliverablesList, setKeyDeliverablesList] = useState<string[]>(() => {
+    if (initialData?.key_deliverables && initialData.key_deliverables.length > 0) {
+      return initialData.key_deliverables;
+    }
+    return [];
+  });
+  const [newKeyDeliverable, setNewKeyDeliverable] = useState('');
+
+  const handleAddKeyDeliverable = () => {
+    if (!newKeyDeliverable.trim()) return;
+    setKeyDeliverablesList(prev => [...prev, newKeyDeliverable.trim()]);
+    setNewKeyDeliverable('');
+  };
+
+  const handleUpdateKeyDeliverable = (index: number, value: string) => {
+    setKeyDeliverablesList(prev => {
+      const copy = [...prev];
+      copy[index] = value;
+      return copy;
+    });
+  };
+
+  const handleRemoveKeyDeliverable = (index: number) => {
+    setKeyDeliverablesList(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleMoveKeyDeliverable = (index: number, direction: 'up' | 'down') => {
+    setKeyDeliverablesList(prev => {
+      const target = direction === 'up' ? index - 1 : index + 1;
+      if (target < 0 || target >= prev.length) return prev;
+      const copy = [...prev];
+      const temp = copy[index];
+      copy[index] = copy[target];
+      copy[target] = temp;
+      return copy;
+    });
+  };
 
   // Service Gallery State
   const [gallery, setGallery] = useState<ServiceGalleryImage[]>(() => {
@@ -143,12 +321,13 @@ const AdminServiceEditor: React.FC<AdminServiceEditorProps> = ({
     return '';
   });
 
-  const handleAddGalleryItem = (presetItem?: { url: string; title: string; caption: string }) => {
+  const handleAddGalleryItem = (presetItem?: { url: string; title: string; caption: string; alt?: string }) => {
     const newItem: ServiceGalleryImage = {
       id: `gal-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
       url: presetItem?.url || '',
       title: presetItem?.title || '',
-      caption: presetItem?.caption || ''
+      caption: presetItem?.caption || '',
+      alt: presetItem?.alt || presetItem?.title || ''
     };
     setGallery(prev => [...prev, newItem]);
   };
@@ -336,19 +515,28 @@ const AdminServiceEditor: React.FC<AdminServiceEditorProps> = ({
       slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
       division,
       category,
+      abbreviation: abbreviation.trim() || undefined,
+      descriptor: descriptor.trim() || undefined,
+      positioning: positioning.trim() || undefined,
       tagline,
+      hero_heading: heroHeading.trim() || undefined,
       short_description: shortDescription,
+      overview_heading: overviewHeading.trim() || undefined,
       full_description: fullDescription,
+      engineering_problem_addressed: engineeringProblemAddressed.trim() || undefined,
       business_value: businessValue,
       hero_image: heroImage,
       card_image: cardImage || heroImage,
       video_url: videoUrl.trim() || undefined,
       gallery: gallery.filter(img => img.url.trim().length > 0),
+      subServices: subServices.filter(s => Boolean(s.title?.trim())),
       capabilities,
       benefits,
       operating_environments,
       technology: equipment,
-      methodology: initialData?.methodology || [],
+      methodology: methodologyList.filter(s => Boolean(s.trim())),
+      standards: standardsList.filter(s => Boolean(s.trim())),
+      key_deliverables: keyDeliverablesList.filter(s => Boolean(s.trim())),
       equipment,
       cta_text: ctaText,
       cta_url: ctaUrl,
@@ -479,7 +667,27 @@ const AdminServiceEditor: React.FC<AdminServiceEditorProps> = ({
               <label className={`block text-xs font-bold uppercase tracking-wider mb-1 ${
                 isDark ? 'text-slate-300' : 'text-slate-700'
               }`}>
-                Approved Category & Division *
+                Hero Section Headline (H1)
+              </label>
+              <input
+                type="text"
+                value={heroHeading}
+                onChange={(e) => setHeroHeading(e.target.value)}
+                placeholder="e.g. Precision Geodetic Survey, Subsurface Geophysics & Geotechnical Engineering"
+                className={`w-full px-3.5 py-2.5 border rounded-lg text-sm focus:border-emerald-500 outline-none ${
+                  isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                }`}
+              />
+              <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Primary H1 headline on the public service page. Defaults to Service Title if left blank.
+              </p>
+            </div>
+
+            <div>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-1 ${
+                isDark ? 'text-slate-300' : 'text-slate-700'
+              }`}>
+                Approved Division & Taxonomy *
               </label>
               <select
                 value={category}
@@ -488,20 +696,65 @@ const AdminServiceEditor: React.FC<AdminServiceEditorProps> = ({
                   isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-300 text-slate-900'
                 }`}
               >
-                <optgroup label="INTELLIGENCE">
-                  <option value="Digital Intelligence">Digital Intelligence (Intelligence)</option>
-                  <option value="Marine Intelligence">Marine Intelligence (Intelligence)</option>
-                  <option value="Ground Intelligence">Ground Intelligence (Intelligence)</option>
-                  <option value="Spatial Intelligence">Spatial Intelligence (Intelligence)</option>
-                </optgroup>
-                <optgroup label="SOLUTIONS & ENGINEERING">
-                  <option value="Asset Integrity & Management">Asset Integrity & Management (Solutions & Eng)</option>
-                  <option value="Infrastructure & Construction">Infrastructure & Construction (Solutions & Eng)</option>
-                  <option value="Field Operations">Field Operations (Solutions & Eng)</option>
-                  <option value="Water & Environmental Solutions">Water & Environmental Solutions (Solutions & Eng)</option>
-                  <option value="Engineering & Procurement">Engineering & Procurement (Solutions & Eng)</option>
-                </optgroup>
+                {CATEGORIES_LIST.map((cat, idx) => (
+                  <option key={idx} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
               </select>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className={`block text-xs font-bold uppercase tracking-wider mb-1 ${
+                  isDark ? 'text-slate-300' : 'text-slate-700'
+                }`}>
+                  Abbreviation
+                </label>
+                <input
+                  type="text"
+                  value={abbreviation}
+                  onChange={(e) => setAbbreviation(e.target.value)}
+                  placeholder="e.g. GES, MMS, ICS, IS"
+                  className={`w-full px-3.5 py-2.5 border rounded-lg text-sm font-mono focus:border-emerald-500 outline-none ${
+                    isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                  }`}
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className={`block text-xs font-bold uppercase tracking-wider mb-1 ${
+                  isDark ? 'text-slate-300' : 'text-slate-700'
+                }`}>
+                  Service Descriptor
+                </label>
+                <input
+                  type="text"
+                  value={descriptor}
+                  onChange={(e) => setDescriptor(e.target.value)}
+                  placeholder="e.g. GEOSCIENCE | SURVEY | ENGINEERING | DIGITAL SOLUTIONS"
+                  className={`w-full px-3.5 py-2.5 border rounded-lg text-sm focus:border-emerald-500 outline-none ${
+                    isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                  }`}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-1 ${
+                isDark ? 'text-slate-300' : 'text-slate-700'
+              }`}>
+                Positioning Statement
+              </label>
+              <input
+                type="text"
+                value={positioning}
+                onChange={(e) => setPositioning(e.target.value)}
+                placeholder="e.g. Accurate data. Deeper insight. Smarter engineering."
+                className={`w-full px-3.5 py-2.5 border rounded-lg text-sm focus:border-emerald-500 outline-none ${
+                  isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                }`}
+              />
             </div>
 
             <div>
@@ -514,7 +767,7 @@ const AdminServiceEditor: React.FC<AdminServiceEditorProps> = ({
                 type="text"
                 value={tagline}
                 onChange={(e) => setTagline(e.target.value)}
-                placeholder="e.g. High-Precision 3D Laser Scanning, As-Built Digitalization & Digital Twins"
+                placeholder="e.g. Accurate data. Deeper insight. Smarter engineering."
                 className={`w-full px-3.5 py-2.5 border rounded-lg text-sm focus:border-emerald-500 outline-none ${
                   isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
                 }`}
@@ -529,8 +782,28 @@ const AdminServiceEditor: React.FC<AdminServiceEditorProps> = ({
             <h3 className={`text-sm font-bold uppercase tracking-wider border-b pb-2 ${
               isDark ? 'text-white border-slate-800' : 'text-slate-900 border-slate-100'
             }`}>
-              2. Technical Descriptions
+              2. Technical Descriptions & Engineering Scope
             </h3>
+
+            <div>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-1 ${
+                isDark ? 'text-slate-300' : 'text-slate-700'
+              }`}>
+                Overview Section Headline
+              </label>
+              <input
+                type="text"
+                value={overviewHeading}
+                onChange={(e) => setOverviewHeading(e.target.value)}
+                placeholder="e.g. Engineering Scope & Problem Resolution"
+                className={`w-full p-3 border rounded-lg text-sm focus:border-emerald-500 outline-none ${
+                  isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                }`}
+              />
+              <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Primary section heading for Section B on the public service page.
+              </p>
+            </div>
 
             <div>
               <label className={`block text-xs font-bold uppercase tracking-wider mb-1 ${
@@ -572,6 +845,26 @@ const AdminServiceEditor: React.FC<AdminServiceEditorProps> = ({
               <label className={`block text-xs font-bold uppercase tracking-wider mb-1 ${
                 isDark ? 'text-slate-300' : 'text-slate-700'
               }`}>
+                Engineering Problem Addressed
+              </label>
+              <textarea
+                rows={3}
+                value={engineeringProblemAddressed}
+                onChange={(e) => setEngineeringProblemAddressed(e.target.value)}
+                placeholder="Explains the geotechnical hazards, operational bottlenecks, or failure modes this service resolves before engineering commitments..."
+                className={`w-full p-3 border rounded-lg text-sm focus:border-emerald-500 outline-none leading-relaxed ${
+                  isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                }`}
+              />
+              <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Highlighted problem statement callout in Section B on the public service page.
+              </p>
+            </div>
+
+            <div>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-1 ${
+                isDark ? 'text-slate-300' : 'text-slate-700'
+              }`}>
                 Strategic Business Value
               </label>
               <textarea
@@ -586,7 +879,193 @@ const AdminServiceEditor: React.FC<AdminServiceEditorProps> = ({
             </div>
           </div>
 
-          {/* Section 3: Core Deliverables & Focal Points */}
+          {/* Section 3: Core Capabilities / Service Families */}
+          <div className={`border rounded-xl p-6 shadow-sm space-y-5 ${
+            isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+          }`}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2.5 h-2.5 bg-emerald-600 rounded-none inline-block"></span>
+                  <h3 className={`text-sm sm:text-base font-bold uppercase tracking-wider ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>
+                    3. Core Capabilities / Service Families ({subServices.length})
+                  </h3>
+                </div>
+                <p className={`text-xs mt-1 leading-normal ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  Principal capability cards displayed on the public service page. Authorised administrators can add, edit, reorder, and remove cards.
+                </p>
+              </div>
+            </div>
+
+            {/* List of subServices */}
+            <div className="space-y-3">
+              {subServices.length === 0 ? (
+                <div className={`p-6 border-2 border-dashed rounded-xl text-center text-xs ${
+                  isDark ? 'border-slate-800 text-slate-400' : 'border-slate-200 text-slate-500'
+                }`}>
+                  No capability cards configured yet. Add your first capability card below.
+                </div>
+              ) : (
+                subServices.map((sub, idx) => (
+                  <div
+                    key={sub.id || idx}
+                    className={`p-4 border rounded-xl transition-all space-y-3 ${
+                      isDark ? 'bg-slate-950/70 border-slate-800 hover:border-slate-700' : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center space-x-2 min-w-0 flex-1">
+                        <span className="w-7 h-7 flex items-center justify-center rounded-md font-mono text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex-shrink-0">
+                          0{idx + 1}
+                        </span>
+                        <input
+                          type="text"
+                          value={sub.icon || '⚡'}
+                          onChange={(e) => handleUpdateSubService(idx, 'icon', e.target.value)}
+                          title="Icon / Emoji"
+                          placeholder="Icon"
+                          className={`w-12 text-center py-1.5 px-1 text-sm border rounded-lg outline-none ${
+                            isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-300 text-slate-900'
+                          }`}
+                        />
+                        <input
+                          type="text"
+                          value={sub.title}
+                          onChange={(e) => handleUpdateSubService(idx, 'title', e.target.value)}
+                          placeholder="Capability Title"
+                          className={`flex-1 py-1.5 px-3 text-sm font-bold border rounded-lg outline-none ${
+                            isDark ? 'bg-slate-900 border-slate-700 text-white focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-900 focus:border-emerald-600'
+                          }`}
+                        />
+                      </div>
+
+                      <div className="flex items-center space-x-1 flex-shrink-0">
+                        <button
+                          type="button"
+                          disabled={idx === 0}
+                          onClick={() => handleMoveSubService(idx, 'up')}
+                          className="p-1.5 rounded text-slate-400 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30"
+                          title="Move Up"
+                        >
+                          ▲
+                        </button>
+                        <button
+                          type="button"
+                          disabled={idx === subServices.length - 1}
+                          onClick={() => handleMoveSubService(idx, 'down')}
+                          className="p-1.5 rounded text-slate-400 hover:text-emerald-500 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30"
+                          title="Move Down"
+                        >
+                          ▼
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSubService(idx)}
+                          className="p-1.5 rounded text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50"
+                          title="Delete Capability"
+                        >
+                          <IconTrash className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <textarea
+                        rows={2}
+                        value={sub.description}
+                        onChange={(e) => handleUpdateSubService(idx, 'description', e.target.value)}
+                        placeholder="Concise explanation of the engineering work performed and deliverables..."
+                        className={`w-full p-2.5 text-xs border rounded-lg outline-none leading-relaxed ${
+                          isDark ? 'bg-slate-900 border-slate-700 text-slate-200 focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-800 focus:border-emerald-600'
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <input
+                        type="text"
+                        value={sub.image || ''}
+                        onChange={(e) => handleUpdateSubService(idx, 'image', e.target.value)}
+                        placeholder="Optional Capability Image Path (/assets/...)"
+                        className={`w-full p-2 text-xs border rounded-lg outline-none font-mono ${
+                          isDark ? 'bg-slate-900 border-slate-700 text-slate-300 placeholder:text-slate-600' : 'bg-white border-slate-200 text-slate-700 placeholder:text-slate-400'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Add new capability card input */}
+            <div className={`p-4 border rounded-xl space-y-3 ${
+              isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}>
+              <span className={`text-xs font-bold uppercase tracking-wider block ${
+                isDark ? 'text-slate-300' : 'text-slate-700'
+              }`}>
+                Add New Capability Card
+              </span>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newSubIcon}
+                  onChange={(e) => setNewSubIcon(e.target.value)}
+                  placeholder="⚡"
+                  title="Emoji / Symbol"
+                  className={`w-12 text-center py-2 px-1 text-sm border rounded-lg outline-none ${
+                    isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-300 text-slate-900'
+                  }`}
+                />
+                <input
+                  type="text"
+                  value={newSubTitle}
+                  onChange={(e) => setNewSubTitle(e.target.value)}
+                  placeholder="Capability Title (e.g. Seabed Mapping & Hydrographic Surveys)..."
+                  className={`flex-1 py-2 px-3 text-sm font-bold border rounded-lg outline-none ${
+                    isDark ? 'bg-slate-900 border-slate-700 text-white focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-900 focus:border-emerald-600'
+                  }`}
+                />
+              </div>
+
+              <textarea
+                rows={2}
+                value={newSubDesc}
+                onChange={(e) => setNewSubDesc(e.target.value)}
+                placeholder="Short explanation of the work performed for prospective clients..."
+                className={`w-full p-2.5 text-xs border rounded-lg outline-none leading-relaxed ${
+                  isDark ? 'bg-slate-900 border-slate-700 text-slate-200 focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-800 focus:border-emerald-600'
+                }`}
+              />
+
+              <input
+                type="text"
+                value={newSubImage}
+                onChange={(e) => setNewSubImage(e.target.value)}
+                placeholder="Optional Capability Image Path (/assets/...)"
+                className={`w-full p-2 text-xs border rounded-lg outline-none font-mono ${
+                  isDark ? 'bg-slate-900 border-slate-700 text-slate-300 placeholder:text-slate-600' : 'bg-white border-slate-200 text-slate-700 placeholder:text-slate-400'
+                }`}
+              />
+
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleAddSubService}
+                  disabled={!newSubTitle.trim()}
+                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-all flex items-center space-x-1.5 shadow-xs cursor-pointer"
+                >
+                  <IconPlus className="w-4 h-4" />
+                  <span>Add Capability Card</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 4: Core Deliverables & Focal Points */}
           <div className={`border rounded-xl p-6 shadow-sm space-y-5 ${
             isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
           }`}>
@@ -896,28 +1375,284 @@ const AdminServiceEditor: React.FC<AdminServiceEditorProps> = ({
             </div>
           </div>
 
-          {/* Section 4: Technical Scope & Key Benefits */}
-          <div className={`border rounded-xl p-6 shadow-sm space-y-4 ${
+          {/* Section 5: Technical Scope, Methodology, Benefits & Environments */}
+          <div className={`border rounded-xl p-6 shadow-sm space-y-5 ${
             isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
           }`}>
             <h3 className={`text-sm font-bold uppercase tracking-wider border-b pb-2 ${
               isDark ? 'text-white border-slate-800' : 'text-slate-900 border-slate-100'
             }`}>
-              4. Technical Scope, Benefits & Environments
+              5. Delivery Methodology, Equipment & Scope
             </h3>
+
+            {/* Methodology Workflow Steps Manager */}
+            <div className={`p-4 border rounded-xl space-y-3 ${
+              isDark ? 'bg-slate-950/70 border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className={`block text-xs font-bold uppercase tracking-wider ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>
+                    Execution Methodology & Quality Control Steps ({methodologyList.length})
+                  </label>
+                  <p className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Numbered workflow steps (01, 02, 03...) displayed in Section D on the public service page.
+                  </p>
+                </div>
+              </div>
+
+              {/* Steps list */}
+              <div className="space-y-2">
+                {methodologyList.length === 0 ? (
+                  <p className="text-xs italic text-slate-400">No methodology steps added. Add your first step below.</p>
+                ) : (
+                  methodologyList.map((step, sIdx) => (
+                    <div key={sIdx} className="flex items-center space-x-2">
+                      <span className="w-6 h-6 flex items-center justify-center rounded font-mono text-[11px] font-bold bg-emerald-700 text-white flex-shrink-0">
+                        0{sIdx + 1}
+                      </span>
+                      <input
+                        type="text"
+                        value={step}
+                        onChange={(e) => handleUpdateMethodologyStep(sIdx, e.target.value)}
+                        className={`flex-1 p-2 text-xs border rounded-lg outline-none ${
+                          isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-300 text-slate-900'
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        disabled={sIdx === 0}
+                        onClick={() => handleMoveMethodologyStep(sIdx, 'up')}
+                        className="p-1.5 text-slate-400 hover:text-emerald-500 disabled:opacity-30 cursor-pointer"
+                        title="Move Up"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        type="button"
+                        disabled={sIdx === methodologyList.length - 1}
+                        onClick={() => handleMoveMethodologyStep(sIdx, 'down')}
+                        className="p-1.5 text-slate-400 hover:text-emerald-500 disabled:opacity-30 cursor-pointer"
+                        title="Move Down"
+                      >
+                        ▼
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveMethodologyStep(sIdx)}
+                        className="p-1.5 text-rose-400 hover:text-rose-600 cursor-pointer"
+                        title="Remove Step"
+                      >
+                        <IconTrash className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Add step input */}
+              <div className="flex space-x-2 pt-1">
+                <input
+                  type="text"
+                  value={newMethodologyStep}
+                  onChange={(e) => setNewMethodologyStep(e.target.value)}
+                  placeholder="e.g. Survey Planning & Geodetic Network Establishment..."
+                  className={`flex-1 p-2 text-xs border rounded-lg outline-none ${
+                    isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-300 text-slate-900'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddMethodologyStep}
+                  disabled={!newMethodologyStep.trim()}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white text-xs font-bold rounded-lg cursor-pointer"
+                >
+                  + Add Step
+                </button>
+              </div>
+            </div>
+
+            {/* Quality Standards & Statutory Codes Manager */}
+            <div className={`p-4 border rounded-xl space-y-3 ${
+              isDark ? 'bg-slate-950/70 border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}>
+              <div>
+                <label className={`block text-xs font-bold uppercase tracking-wider ${
+                  isDark ? 'text-white' : 'text-slate-900'
+                }`}>
+                  Statutory Engineering Codes & QA/QC Standards ({standardsList.length})
+                </label>
+                <p className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  Compliance standards (DNV, API, ISO, NUPRC) rendered in Section D on the public service page.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                {standardsList.length === 0 ? (
+                  <p className="text-xs italic text-slate-400">No standards configured. Add a statutory code below.</p>
+                ) : (
+                  standardsList.map((std, idx) => (
+                    <div key={idx} className="flex items-center space-x-2">
+                      <span className="w-6 h-6 flex items-center justify-center rounded font-mono text-[11px] font-bold bg-emerald-800 text-emerald-100 flex-shrink-0">
+                        ✓
+                      </span>
+                      <input
+                        type="text"
+                        value={std}
+                        onChange={(e) => handleUpdateStandard(idx, e.target.value)}
+                        className={`flex-1 p-2 text-xs border rounded-lg outline-none ${
+                          isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-300 text-slate-900'
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        disabled={idx === 0}
+                        onClick={() => handleMoveStandard(idx, 'up')}
+                        className="p-1.5 text-slate-400 hover:text-emerald-500 disabled:opacity-30 cursor-pointer"
+                        title="Move Up"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        type="button"
+                        disabled={idx === standardsList.length - 1}
+                        onClick={() => handleMoveStandard(idx, 'down')}
+                        className="p-1.5 text-slate-400 hover:text-emerald-500 disabled:opacity-30 cursor-pointer"
+                        title="Move Down"
+                      >
+                        ▼
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveStandard(idx)}
+                        className="p-1.5 text-rose-400 hover:text-rose-600 cursor-pointer"
+                        title="Remove Standard"
+                      >
+                        <IconTrash className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="flex space-x-2 pt-1">
+                <input
+                  type="text"
+                  value={newStandard}
+                  onChange={(e) => setNewStandard(e.target.value)}
+                  placeholder="e.g. ISO 9001:2015 Quality Management Systems..."
+                  className={`flex-1 p-2 text-xs border rounded-lg outline-none ${
+                    isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-300 text-slate-900'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddStandard}
+                  disabled={!newStandard.trim()}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white text-xs font-bold rounded-lg cursor-pointer"
+                >
+                  + Add Standard
+                </button>
+              </div>
+            </div>
+
+            {/* Key Deliverables & Certified Packages Manager */}
+            <div className={`p-4 border rounded-xl space-y-3 ${
+              isDark ? 'bg-slate-950/70 border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}>
+              <div>
+                <label className={`block text-xs font-bold uppercase tracking-wider ${
+                  isDark ? 'text-white' : 'text-slate-900'
+                }`}>
+                  Client Project Deliverables & Data Packages ({keyDeliverablesList.length})
+                </label>
+                <p className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  Key engineering outputs and data packages rendered in Section D on the public service page.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                {keyDeliverablesList.length === 0 ? (
+                  <p className="text-xs italic text-slate-400">No deliverables configured. Add a deliverable package below.</p>
+                ) : (
+                  keyDeliverablesList.map((deliv, idx) => (
+                    <div key={idx} className="flex items-center space-x-2">
+                      <span className="w-6 h-6 flex items-center justify-center rounded font-mono text-[11px] font-bold bg-slate-800 text-emerald-400 flex-shrink-0">
+                        ●
+                      </span>
+                      <input
+                        type="text"
+                        value={deliv}
+                        onChange={(e) => handleUpdateKeyDeliverable(idx, e.target.value)}
+                        className={`flex-1 p-2 text-xs border rounded-lg outline-none ${
+                          isDark ? 'bg-slate-900 border-slate-700 text-slate-100' : 'bg-white border-slate-300 text-slate-900'
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        disabled={idx === 0}
+                        onClick={() => handleMoveKeyDeliverable(idx, 'up')}
+                        className="p-1.5 text-slate-400 hover:text-emerald-500 disabled:opacity-30 cursor-pointer"
+                        title="Move Up"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        type="button"
+                        disabled={idx === keyDeliverablesList.length - 1}
+                        onClick={() => handleMoveKeyDeliverable(idx, 'down')}
+                        className="p-1.5 text-slate-400 hover:text-emerald-500 disabled:opacity-30 cursor-pointer"
+                        title="Move Down"
+                      >
+                        ▼
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveKeyDeliverable(idx)}
+                        className="p-1.5 text-rose-400 hover:text-rose-600 cursor-pointer"
+                        title="Remove Deliverable"
+                      >
+                        <IconTrash className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="flex space-x-2 pt-1">
+                <input
+                  type="text"
+                  value={newKeyDeliverable}
+                  onChange={(e) => setNewKeyDeliverable(e.target.value)}
+                  placeholder="e.g. Certified Geotechnical Engineering Soil Investigation Report..."
+                  className={`flex-1 p-2 text-xs border rounded-lg outline-none ${
+                    isDark ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-300 text-slate-900'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddKeyDeliverable}
+                  disabled={!newKeyDeliverable.trim()}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white text-xs font-bold rounded-lg cursor-pointer"
+                >
+                  + Add Deliverable
+                </button>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={`block text-xs font-bold uppercase tracking-wider mb-1 ${
                   isDark ? 'text-slate-300' : 'text-slate-700'
                 }`}>
-                  Key Benefits (One per line)
+                  Client Benefits & Operational Assurance (One per line)
                 </label>
                 <textarea
                   rows={4}
                   value={benefitsStr}
                   onChange={(e) => setBenefitsStr(e.target.value)}
-                  placeholder="Up to 95% reduction in rework&#10;Single source of truth"
+                  placeholder="Up to 95% reduction in rework&#10;Single source of truth&#10;Certified to ISO 9001:2015 and ISO 45001:2018"
                   className={`w-full p-3 font-mono text-xs border rounded-lg focus:border-emerald-500 outline-none ${
                     isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
                   }`}
@@ -934,7 +1669,7 @@ const AdminServiceEditor: React.FC<AdminServiceEditorProps> = ({
                   rows={4}
                   value={operatingEnvironmentsStr}
                   onChange={(e) => setOperatingEnvironmentsStr(e.target.value)}
-                  placeholder="Land Facilities&#10;Swamp Flow Stations&#10;Offshore Platforms"
+                  placeholder="Onshore Facilities&#10;Swamp Flow Stations&#10;Offshore Platforms"
                   className={`w-full p-3 font-mono text-xs border rounded-lg focus:border-emerald-500 outline-none ${
                     isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
                   }`}
@@ -946,13 +1681,13 @@ const AdminServiceEditor: React.FC<AdminServiceEditorProps> = ({
               <label className={`block text-xs font-bold uppercase tracking-wider mb-1 ${
                 isDark ? 'text-slate-300' : 'text-slate-700'
               }`}>
-                Equipment & Technology (One per line)
+                Equipment & Technology Fleet (One per line)
               </label>
               <textarea
                 rows={3}
                 value={equipmentStr}
                 onChange={(e) => setEquipmentStr(e.target.value)}
-                placeholder="Leica RTC360 High-Speed Scanner&#10;RTK-GNSS Dual-Frequency Receivers"
+                placeholder="Leica RTC360 High-Speed Terrestrial 3D Scanner&#10;Dual-frequency RTK GNSS receivers&#10;Digital hydrographic survey craft"
                 className={`w-full p-3 font-mono text-xs border rounded-lg focus:border-emerald-500 outline-none ${
                   isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
                 }`}
@@ -1199,6 +1934,21 @@ const AdminServiceEditor: React.FC<AdminServiceEditorProps> = ({
                             value={item.caption || ''}
                             onChange={(e) => handleUpdateGalleryItem(idx, 'caption', e.target.value)}
                             placeholder="Engineering context, instrumentation specifications, or field location details..."
+                            className={`w-full p-2 border rounded-lg text-xs ${
+                              isDark ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                            }`}
+                          />
+                        </div>
+
+                        <div>
+                          <label className={`block text-xs font-bold mb-1 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                            Alt Text (Accessibility & SEO)
+                          </label>
+                          <input
+                            type="text"
+                            value={item.alt || ''}
+                            onChange={(e) => handleUpdateGalleryItem(idx, 'alt', e.target.value)}
+                            placeholder="Descriptive alt text for screen readers..."
                             className={`w-full p-2 border rounded-lg text-xs ${
                               isDark ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
                             }`}

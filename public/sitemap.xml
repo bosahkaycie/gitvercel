@@ -58,53 +58,29 @@
     <priority>0.75</priority>
   </url>
 
-  <!-- Specialized Engineering Capabilities & Service Detail Pages -->
+  <!-- Four Authoritative Service Divisions -->
   <url>
-    <loc>https://polarisigl.com/services/ground-intelligence</loc>
-    <lastmod>2026-09-22</lastmod>
+    <loc>https://polarisigl.com/services/geosolutions-engineering-services</loc>
+    <lastmod>2026-10-23</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://polarisigl.com/services/reality-capture</loc>
-    <lastmod>2026-09-22</lastmod>
+    <loc>https://polarisigl.com/services/metocean-marine-solutions</loc>
+    <lastmod>2026-10-23</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://polarisigl.com/services/geospatial-intelligence</loc>
-    <lastmod>2026-09-22</lastmod>
+    <loc>https://polarisigl.com/services/integrated-construction-services</loc>
+    <lastmod>2026-10-23</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://polarisigl.com/services/subsurface-intelligence</loc>
-    <lastmod>2026-09-22</lastmod>
+    <loc>https://polarisigl.com/services/industrial-solutions</loc>
+    <lastmod>2026-10-23</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://polarisigl.com/services/offshore-intelligence</loc>
-    <lastmod>2026-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://polarisigl.com/services/asset-integrity</loc>
-    <lastmod>2026-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://polarisigl.com/services/energy-transition</loc>
-    <lastmod>2026-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://polarisigl.com/services/civil-infrastructure</loc>
-    <lastmod>2026-09-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
 </urlset>

@@ -13,12 +13,73 @@ interface NavbarProps {
   onSearchClick?: () => void;
 }
 
+interface ServiceDivisionMenuItem {
+  id: string;
+  title: string;
+  acronym: string;
+  description: string;
+  representativeServices: { label: string; href: string }[];
+  exploreHref: string;
+}
+
+const SERVICE_DIVISIONS_MENU: ServiceDivisionMenuItem[] = [
+  {
+    id: 'geosolutions-engineering-services',
+    title: 'GeoSolutions & Engineering Services',
+    acronym: 'GES',
+    description: 'Precision geotechnical, geophysical, geospatial, and foundation engineering.',
+    representativeServices: [
+      { label: 'Geohazard, Geoscan & Seismic', href: '/services/geosolutions-engineering-services#geohazard-geoscan-seismic' },
+      { label: 'Geophysical & Hydrographic Survey', href: '/services/geosolutions-engineering-services#geophysical-hydrographic-survey' },
+      { label: 'Geotechnical & Foundation Engineering', href: '/services/geosolutions-engineering-services#geotechnical-foundation-engineering' },
+    ],
+    exploreHref: '/services/geosolutions-engineering-services',
+  },
+  {
+    id: 'metocean-marine-solutions',
+    title: 'Metocean & Marine Solutions',
+    acronym: 'MMS',
+    description: 'Advanced metocean data, marine forecasting, and offshore operational intelligence.',
+    representativeServices: [
+      { label: 'Metocean Observation & Monitoring', href: '/services/metocean-marine-solutions#metocean-observation-monitoring' },
+      { label: 'Marine Forecasting & Intelligence', href: '/services/metocean-marine-solutions#marine-forecasting-intelligence' },
+      { label: 'Marine Environmental Services', href: '/services/metocean-marine-solutions#marine-environmental-services' },
+    ],
+    exploreHref: '/services/metocean-marine-solutions',
+  },
+  {
+    id: 'integrated-construction-services',
+    title: 'Integrated Construction Services',
+    acronym: 'ICS',
+    description: 'Pipeline, civil infrastructure, fabrication, and turnaround project delivery.',
+    representativeServices: [
+      { label: 'Pipeline Construction & Installation', href: '/services/integrated-construction-services#pipeline-construction-installation' },
+      { label: 'Civil & Infrastructure Construction', href: '/services/integrated-construction-services#civil-infrastructure-construction' },
+      { label: 'Mechanical, Fabrication & Installation', href: '/services/integrated-construction-services#mechanical-fabrication-installation' },
+    ],
+    exploreHref: '/services/integrated-construction-services',
+  },
+  {
+    id: 'industrial-solutions',
+    title: 'Industrial Solutions',
+    acronym: 'IS',
+    description: 'Produced water treatment, certified environmental lab, and resource recovery.',
+    representativeServices: [
+      { label: 'Produced Water Treatment Solutions', href: '/services/industrial-solutions#produced-water-treatment-solutions' },
+      { label: 'Industrial & Domestic Water Solutions', href: '/services/industrial-solutions#industrial-domestic-water-solutions' },
+      { label: 'Water & Environmental Laboratory', href: '/services/industrial-solutions#water-environmental-laboratory-services' },
+    ],
+    exploreHref: '/services/industrial-solutions',
+  },
+];
+
 const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+  const [mobileExpandedDivision, setMobileExpandedDivision] = useState<string | null>(null);
   const [hoveredService, setHoveredService] = useState<Service>(SERVICES[0]);
   const [hoveredProject, setHoveredProject] = useState<Project>(PROJECTS[0]);
   const { navConfig } = useNavigation();
@@ -275,7 +336,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
 
               <a
                 href="/contact"
-                className={`ml-2.5 xl:ml-4 px-3.5 xl:px-5 py-2 xl:py-2.5 rounded-none font-bold text-xs uppercase tracking-wider whitespace-nowrap shrink-0 transition-all border-2 ${
+                className={`ml-2.5 xl:ml-4 px-3.5 xl:px-5 py-2 xl:py-2.5 rounded-md font-bold text-xs uppercase tracking-wider whitespace-nowrap shrink-0 transition-all border-2 ${
                   useDarkText 
                     ? 'border-emerald-950 text-emerald-950 hover:bg-emerald-950 hover:text-white' 
                     : 'border-white text-white hover:bg-white hover:text-emerald-950'
@@ -328,7 +389,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
               return (
                 <div key={`${link.name}-dropdown`} className="flex flex-col lg:flex-row gap-12 animate-fade-in">
                   {/* Menu Links Column */}
-                  <div className={`flex-1 ${link.layout === 'services' ? 'lg:col-span-2' : ''}`}>
+                  <div className={`flex-1 ${link.layout === 'services' ? 'w-full' : ''}`}>
                     <div className="mb-6 border-b border-slate-100 pb-4">
                       <h3 className="text-2xl font-black text-slate-900">{link.name}</h3>
                     </div>
@@ -376,161 +437,68 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                       </div>
                     )}
 
-                    {/* Layout for Services mapping (5 Canonical Platforms) */}
+                    {/* Layout for Services mapping (4 Authoritative Divisions - Equal 4-Column Grid) */}
                     {link.layout === 'services' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {/* 01. Geo Data Intelligence */}
-                        <div 
-                          className="space-y-2 p-3 rounded-md hover:bg-slate-50/80 transition-colors cursor-pointer group"
-                          onMouseEnter={() => {
-                            const found = SERVICES.find(s => s.id === 'geo-data-intelligence');
-                            if (found) setHoveredService(found);
-                          }}
-                        >
-                          <div className="border-b border-slate-100 pb-1.5 flex items-center justify-between">
-                            <a href="/services/geo-data-intelligence" onClick={() => setActiveDropdown(null)} className="text-xs font-bold uppercase tracking-wider text-emerald-800 group-hover:text-emerald-950 flex items-center">
-                              <span>Geo Data Intelligence</span>
-                              <span className="ml-1 text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                            </a>
-                          </div>
-                          <ul className="space-y-1 pl-1 border-l border-emerald-100">
-                            {['Geotechnical', 'Geophysical', 'Geospatial'].map((sub, sIdx) => (
-                              <li key={sIdx}>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8">
+                        {SERVICE_DIVISIONS_MENU.map((division) => (
+                          <div 
+                            key={division.id}
+                            className="flex flex-col h-full p-4 rounded-lg bg-slate-50/70 hover:bg-slate-50 border border-slate-100 hover:border-emerald-200 transition-all duration-200 group"
+                          >
+                            {/* Division Header & Acronym */}
+                            <div className="border-b border-slate-200/80 pb-3 mb-3">
+                              <div className="flex items-start justify-between gap-2">
                                 <a 
-                                  href="/services/geo-data-intelligence" 
-                                  className="text-xs text-slate-600 hover:text-emerald-700 block py-0.5 font-medium transition-colors"
+                                  href={division.exploreHref}
                                   onClick={() => setActiveDropdown(null)}
+                                  className="text-sm font-bold text-slate-900 group-hover:text-emerald-800 transition-colors leading-snug"
                                 >
-                                  {sub}
+                                  {division.title}
                                 </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                                <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2 py-0.5 shrink-0 rounded">
+                                  {division.acronym}
+                                </span>
+                              </div>
+                              <p className="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">
+                                {division.description}
+                              </p>
+                            </div>
 
-                        {/* 02. Digital Mapping Intelligence */}
-                        <div 
-                          className="space-y-2 p-3 rounded-md hover:bg-slate-50/80 transition-colors cursor-pointer group"
-                          onMouseEnter={() => {
-                            const found = SERVICES.find(s => s.id === 'digital-mapping-intelligence');
-                            if (found) setHoveredService(found);
-                          }}
-                        >
-                          <div className="border-b border-slate-100 pb-1.5 flex items-center justify-between">
-                            <a href="/services/digital-mapping-intelligence" onClick={() => setActiveDropdown(null)} className="text-xs font-bold uppercase tracking-wider text-emerald-800 group-hover:text-emerald-950 flex items-center">
-                              <span>Digital Mapping Intelligence</span>
-                              <span className="ml-1 text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                            </a>
-                          </div>
-                          <ul className="space-y-1 pl-1 border-l border-emerald-100">
-                            {['Topographic Mapping', '3D Reality Capture', 'Geomatics', 'Digital Engineering'].map((sub, sIdx) => (
-                              <li key={sIdx}>
-                                <a 
-                                  href="/services/digital-mapping-intelligence" 
-                                  className="text-xs text-slate-600 hover:text-emerald-700 block py-0.5 font-medium transition-colors"
-                                  onClick={() => setActiveDropdown(null)}
-                                >
-                                  {sub}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                            {/* 3 Representative Services */}
+                            <ul className="space-y-2.5 flex-1 mb-4">
+                              {division.representativeServices.map((sub, sIdx) => (
+                                <li key={sIdx}>
+                                  <a 
+                                    href={sub.href} 
+                                    className="text-xs text-slate-700 hover:text-emerald-700 flex items-start font-medium transition-colors group/item"
+                                    onClick={() => setActiveDropdown(null)}
+                                  >
+                                    <span className="text-emerald-500 mr-2 opacity-60 group-hover/item:opacity-100 transition-opacity font-bold">›</span>
+                                    <span className="leading-snug">{sub.label}</span>
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
 
-                        {/* 03. Marine Intelligence */}
-                        <div 
-                          className="space-y-2 p-3 rounded-md hover:bg-slate-50/80 transition-colors cursor-pointer group"
-                          onMouseEnter={() => {
-                            const found = SERVICES.find(s => s.id === 'marine-intelligence');
-                            if (found) setHoveredService(found);
-                          }}
-                        >
-                          <div className="border-b border-slate-100 pb-1.5 flex items-center justify-between">
-                            <a href="/services/marine-intelligence" onClick={() => setActiveDropdown(null)} className="text-xs font-bold uppercase tracking-wider text-emerald-800 group-hover:text-emerald-950 flex items-center">
-                              <span>Marine Intelligence</span>
-                              <span className="ml-1 text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                            </a>
-                            <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-none">Frankstar</span>
+                            {/* Visible “Explore all services” link */}
+                            <div className="pt-3 border-t border-slate-200/60 mt-auto">
+                              <a
+                                href={division.exploreHref}
+                                onClick={() => setActiveDropdown(null)}
+                                className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-800 hover:text-emerald-950 transition-colors"
+                              >
+                                <span>Explore all services</span>
+                                <span className="ml-1.5 transition-transform group-hover:translate-x-1">→</span>
+                              </a>
+                            </div>
                           </div>
-                          <ul className="space-y-1 pl-1 border-l border-emerald-100">
-                            {['Marine & Seabed Survey', 'Hydrographic Survey', 'Continuous Marine Intelligence', 'MetOcean'].map((sub, sIdx) => (
-                              <li key={sIdx}>
-                                <a 
-                                  href="/services/marine-intelligence" 
-                                  className="text-xs text-slate-600 hover:text-emerald-700 block py-0.5 font-medium transition-colors"
-                                  onClick={() => setActiveDropdown(null)}
-                                >
-                                  {sub}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        {/* 04. Asset Integrity Intelligence */}
-                        <div 
-                          className="space-y-2 p-3 rounded-md hover:bg-slate-50/80 transition-colors cursor-pointer group"
-                          onMouseEnter={() => {
-                            const found = SERVICES.find(s => s.id === 'asset-integrity-intelligence');
-                            if (found) setHoveredService(found);
-                          }}
-                        >
-                          <div className="border-b border-slate-100 pb-1.5 flex items-center justify-between">
-                            <a href="/services/asset-integrity-intelligence" onClick={() => setActiveDropdown(null)} className="text-xs font-bold uppercase tracking-wider text-slate-800 group-hover:text-emerald-800 flex items-center">
-                              <span>Asset Integrity Intelligence</span>
-                              <span className="ml-1 text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                            </a>
-                          </div>
-                          <ul className="space-y-1 pl-1 border-l border-slate-200">
-                            {['Inspection & NDT', 'Monitoring', 'Maintenance & Repairs', 'ROV & Subsea'].map((sub, sIdx) => (
-                              <li key={sIdx}>
-                                <a 
-                                  href="/services/asset-integrity-intelligence" 
-                                  className="text-xs text-slate-600 hover:text-emerald-700 block py-0.5 font-medium transition-colors"
-                                  onClick={() => setActiveDropdown(null)}
-                                >
-                                  {sub}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        {/* 05. Engineering, Industrial & Environmental Solutions */}
-                        <div 
-                          className="space-y-2 p-3 rounded-md hover:bg-slate-50/80 transition-colors cursor-pointer group md:col-span-2"
-                          onMouseEnter={() => {
-                            const found = SERVICES.find(s => s.id === 'engineering-industrial-environmental-solutions');
-                            if (found) setHoveredService(found);
-                          }}
-                        >
-                          <div className="border-b border-slate-100 pb-1.5 flex items-center justify-between">
-                            <a href="/services/engineering-industrial-environmental-solutions" onClick={() => setActiveDropdown(null)} className="text-xs font-bold uppercase tracking-wider text-slate-800 group-hover:text-emerald-800 flex items-center">
-                              <span>Engineering, Industrial & Environmental Solutions</span>
-                              <span className="ml-1 text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                            </a>
-                            <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-1.5 py-0.2 rounded-none">CoaleXpert • NPK</span>
-                          </div>
-                          <ul className="grid grid-cols-2 gap-x-4 gap-y-1 pl-1 border-l border-slate-200">
-                            {['Water Engineering', 'Wastewater Treatment', 'Produced Water Treatment', 'Flow Control & Valves', 'Pipeline & Civil Engineering'].map((sub, sIdx) => (
-                              <li key={sIdx}>
-                                <a 
-                                  href="/services/engineering-industrial-environmental-solutions" 
-                                  className="text-xs text-slate-600 hover:text-emerald-700 block py-0.5 font-medium transition-colors"
-                                  onClick={() => setActiveDropdown(null)}
-                                >
-                                  {sub}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                        ))}
                       </div>
                     )}
                   </div>
 
-                  {/* Featured Content Column */}
-                  {link.featured && (
+                  {/* Featured Content Column (Suppressed for Services to provide 4 full, balanced columns) */}
+                  {link.featured && link.layout !== 'services' && (
                     <div className="hidden lg:block w-[350px] shrink-0">
                       {link.layout === 'services' ? (
                         <a 
@@ -546,15 +514,18 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 animate-fade-in"
                             loading="lazy"
                             decoding="async"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = '/assets/field_operations_marine.jpg';
+                            }}
                           />
                           <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-20">
                             <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-2 block">
-                              {hoveredService.division}
+                              {hoveredService.abbreviation ? `${hoveredService.abbreviation} • ` : ''}{hoveredService.division}
                             </span>
                             <h4 className="text-white font-black text-xl mb-2 min-h-[28px]">{hoveredService.title}</h4>
                             <p className="text-slate-200 text-sm font-medium line-clamp-3 leading-relaxed min-h-[60px]">{hoveredService.description}</p>
                             <div className="mt-4 flex items-center text-xs font-bold uppercase tracking-wider text-emerald-400 group-hover:text-white transition-colors">
-                              Explore Service Details <span className="ml-2">→</span>
+                              Explore Division Details <span className="ml-2">→</span>
                             </div>
                           </div>
                         </a>
@@ -572,6 +543,9 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 animate-fade-in"
                             loading="lazy"
                             decoding="async"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = '/assets/slider.jpeg';
+                            }}
                           />
                           <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-20">
                             <span className="text-xs font-bold uppercase tracking-wider text-orange-400 mb-2 block">
@@ -593,6 +567,9 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                             loading="lazy"
                             decoding="async"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = '/assets/slider.jpeg';
+                            }}
                           />
                           <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent z-20">
                             {link.featured.category && (
@@ -644,129 +621,71 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                 
                 {/* Accordion Content */}
                 {link.type === 'mega' && (
-                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${mobileExpanded === link.name ? 'max-h-[1000px] opacity-100 mb-4' : 'max-h-0 opacity-0'}`}>
+                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${mobileExpanded === link.name ? 'max-h-[1200px] opacity-100 mb-4' : 'max-h-0 opacity-0'}`}>
                     <div className="pl-4 border-l-2 border-emerald-100 space-y-4 pt-2">
                       {link.layout === 'services' && (
-                        <div className="space-y-4 w-full">
-                          {/* 01. Geo Data Intelligence */}
-                          <div>
-                            <a 
-                              href="/services/geo-data-intelligence"
-                              className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1.5 flex items-center justify-between"
-                              onClick={() => setIsOpen(false)}
-                            >
-                              <span>Geo Data Intelligence</span>
-                              <span className="text-[10px] text-emerald-600 font-normal">View →</span>
-                            </a>
-                            <div className="space-y-2 pl-2 border-l border-slate-200">
-                              {['Geotechnical', 'Geophysical', 'Geospatial'].map((sub, sIdx) => (
-                                <a 
-                                  key={sIdx} 
-                                  href="/services/geo-data-intelligence" 
-                                  className="block text-sm font-medium text-slate-600 hover:text-emerald-600"
-                                  onClick={() => setIsOpen(false)}
+                        <div className="space-y-2.5 w-full">
+                          {SERVICE_DIVISIONS_MENU.map((division) => {
+                            const isExpanded = mobileExpandedDivision === division.id;
+                            return (
+                              <div 
+                                key={division.id} 
+                                className="border border-slate-200/90 rounded-md overflow-hidden bg-white shadow-sm"
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => setMobileExpandedDivision(isExpanded ? null : division.id)}
+                                  className="w-full flex items-center justify-between p-3 text-left font-bold text-sm text-slate-800 hover:text-emerald-700 transition-colors"
+                                  aria-expanded={isExpanded}
                                 >
-                                  {sub}
-                                </a>
-                              ))}
-                            </div>
-                          </div>
+                                  <div className="flex items-center gap-2 pr-2">
+                                    <span className="text-[11px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-1.5 py-0.5 rounded shrink-0">
+                                      {division.acronym}
+                                    </span>
+                                    <span className="leading-snug">{division.title}</span>
+                                  </div>
+                                  <svg
+                                    className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${isExpanded ? 'rotate-180 text-emerald-600' : ''}`}
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                  </svg>
+                                </button>
 
-                          {/* 02. Digital Mapping Intelligence */}
-                          <div>
-                            <a 
-                              href="/services/digital-mapping-intelligence"
-                              className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1.5 flex items-center justify-between"
-                              onClick={() => setIsOpen(false)}
-                            >
-                              <span>Digital Mapping Intelligence</span>
-                              <span className="text-[10px] text-emerald-600 font-normal">View →</span>
-                            </a>
-                            <div className="space-y-2 pl-2 border-l border-slate-200">
-                              {['Topographic Mapping', '3D Reality Capture', 'Geomatics', 'Digital Engineering'].map((sub, sIdx) => (
-                                <a 
-                                  key={sIdx} 
-                                  href="/services/digital-mapping-intelligence" 
-                                  className="block text-sm font-medium text-slate-600 hover:text-emerald-600"
-                                  onClick={() => setIsOpen(false)}
-                                >
-                                  {sub}
-                                </a>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* 03. Marine Intelligence */}
-                          <div>
-                            <a 
-                              href="/services/marine-intelligence"
-                              className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1.5 flex items-center justify-between"
-                              onClick={() => setIsOpen(false)}
-                            >
-                              <span>Marine Intelligence</span>
-                              <span className="text-[10px] text-emerald-600 font-normal">View →</span>
-                            </a>
-                            <div className="space-y-2 pl-2 border-l border-slate-200">
-                              {['Marine & Seabed Survey', 'Hydrographic Survey', 'Continuous Marine Intelligence', 'MetOcean'].map((sub, sIdx) => (
-                                <a 
-                                  key={sIdx} 
-                                  href="/services/marine-intelligence" 
-                                  className="block text-sm font-medium text-slate-600 hover:text-emerald-600"
-                                  onClick={() => setIsOpen(false)}
-                                >
-                                  {sub}
-                                </a>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* 04. Asset Integrity Intelligence */}
-                          <div>
-                            <a 
-                              href="/services/asset-integrity-intelligence"
-                              className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1.5 flex items-center justify-between"
-                              onClick={() => setIsOpen(false)}
-                            >
-                              <span>Asset Integrity Intelligence</span>
-                              <span className="text-[10px] text-emerald-600 font-normal">View →</span>
-                            </a>
-                            <div className="space-y-2 pl-2 border-l border-slate-200">
-                              {['Inspection & NDT', 'Monitoring', 'Maintenance & Repairs', 'ROV & Subsea'].map((sub, sIdx) => (
-                                <a 
-                                  key={sIdx} 
-                                  href="/services/asset-integrity-intelligence" 
-                                  className="block text-sm font-medium text-slate-600 hover:text-emerald-600"
-                                  onClick={() => setIsOpen(false)}
-                                >
-                                  {sub}
-                                </a>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* 05. Engineering, Industrial & Environmental Solutions */}
-                          <div>
-                            <a 
-                              href="/services/engineering-industrial-environmental-solutions"
-                              className="text-xs font-bold uppercase tracking-wider text-emerald-800 mb-1.5 flex items-center justify-between"
-                              onClick={() => setIsOpen(false)}
-                            >
-                              <span>Engineering, Industrial & Environmental</span>
-                              <span className="text-[10px] text-emerald-600 font-normal">View →</span>
-                            </a>
-                            <div className="space-y-2 pl-2 border-l border-slate-200">
-                              {['Water Engineering', 'Wastewater Treatment', 'Produced Water Treatment', 'Flow Control & Valves', 'Pipeline & Civil Engineering'].map((sub, sIdx) => (
-                                <a 
-                                  key={sIdx} 
-                                  href="/services/engineering-industrial-environmental-solutions" 
-                                  className="block text-sm font-medium text-slate-600 hover:text-emerald-600"
-                                  onClick={() => setIsOpen(false)}
-                                >
-                                  {sub}
-                                </a>
-                              ))}
-                            </div>
-                          </div>
+                                {isExpanded && (
+                                  <div className="px-3 pb-3 pt-1 border-t border-slate-100 bg-slate-50/70 space-y-2 animate-fade-in">
+                                    <p className="text-xs text-slate-500 leading-relaxed">
+                                      {division.description}
+                                    </p>
+                                    <div className="space-y-1 pl-2 border-l-2 border-emerald-300">
+                                      {division.representativeServices.map((sub, sIdx) => (
+                                        <a
+                                          key={sIdx}
+                                          href={sub.href}
+                                          className="block text-xs font-medium text-slate-700 hover:text-emerald-700 py-1 transition-colors"
+                                          onClick={() => setIsOpen(false)}
+                                        >
+                                          {sub.label}
+                                        </a>
+                                      ))}
+                                    </div>
+                                    <div className="pt-2">
+                                      <a
+                                        href={division.exploreHref}
+                                        className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-800 hover:text-emerald-950 py-1"
+                                        onClick={() => setIsOpen(false)}
+                                      >
+                                        <span>Explore all services</span>
+                                        <span className="ml-1.5">→</span>
+                                      </a>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
                       
@@ -873,14 +792,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                   href={ProfilePDF}
                   download="PIGL_Company_Profile.pdf"
                   onClick={() => setIsDownloadModalOpen(false)}
-                  className="w-full inline-flex items-center justify-center py-3 sm:py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs uppercase tracking-widest transition-colors duration-300 rounded sm:rounded-none"
+                  className="w-full inline-flex items-center justify-center py-3 sm:py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs uppercase tracking-widest transition-colors duration-300 rounded-md"
                 >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                   Confirm Download
                 </a>
                 <button
                   onClick={() => setIsDownloadModalOpen(false)}
-                  className="w-full py-3 sm:py-3.5 border-2 border-slate-200 text-slate-600 hover:text-slate-950 hover:border-slate-950 font-black text-xs uppercase tracking-widest transition-colors duration-300 rounded sm:rounded-none"
+                  className="w-full py-3 sm:py-3.5 border-2 border-slate-200 text-slate-600 hover:text-slate-950 hover:border-slate-950 font-black text-xs uppercase tracking-widest transition-colors duration-300 rounded-md"
                 >
                   Cancel
                 </button>

@@ -129,8 +129,8 @@ const Partners: React.FC = () => {
             const isReversed = index % 2 === 1;
             const img = partner.image_url || partnerImages[partner.id] || MarineIntelImg;
             const logo = partner.logo_url || (partner.id === 'frankstar' ? FrankstarLogo : null);
-            const serviceId = partner.service_id || partner.serviceId || 'offshore-intelligence';
-            const serviceTitle = partner.service_title || partner.serviceTitle || 'Offshore Intelligence';
+            const serviceId = partner.service_id || partner.serviceId || 'metocean-marine-solutions';
+            const serviceTitle = partner.service_title || partner.serviceTitle || 'Metocean & Marine Solutions';
 
             return (
               <div 
@@ -140,7 +140,7 @@ const Partners: React.FC = () => {
               >
                 {/* Image Column */}
                 <div className={`lg:col-span-5 ${isReversed ? 'lg:order-2' : ''}`}>
-                  <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 border border-slate-200 shadow-md group">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 border border-slate-200 shadow-md group rounded-lg">
                     <img 
                       src={img} 
                       alt={`${partner.name} - ${partner.role}`}
@@ -185,7 +185,7 @@ const Partners: React.FC = () => {
                   </p>
 
                   {partner.capabilities && partner.capabilities.length > 0 && (
-                    <div className="bg-slate-50 border border-slate-200/80 p-6 md:p-8">
+                    <div className="bg-slate-50 border border-slate-200/80 p-6 md:p-8 rounded-lg">
                       <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4">
                         Integrated Capabilities & Solutions:
                       </h4>

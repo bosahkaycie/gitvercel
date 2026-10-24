@@ -4,6 +4,7 @@ export interface SubService {
   description: string;
   icon?: string;
   image?: string;
+  display_order?: number;
 }
 
 export interface ServiceDeliverableItem {
@@ -13,9 +14,31 @@ export interface ServiceDeliverableItem {
   standards?: string;
 }
 
+export type DivisionName =
+  | 'GeoSolutions & Engineering Services'
+  | 'Metocean & Marine Solutions'
+  | 'Integrated Construction Services'
+  | 'Industrial Solutions'
+  | 'Geo Data Intelligence'
+  | 'Digital Mapping Intelligence'
+  | 'Marine Intelligence'
+  | 'Asset Integrity Intelligence'
+  | 'Engineering, Industrial & Environmental Solutions'
+  | 'Ground Intelligence'
+  | 'Digital Intelligence'
+  | 'Integrated Engineering & Construction Solutions'
+  | 'Industrial & Environmental Technologies'
+  | 'Offshore Intelligence'
+  | 'Intelligence'
+  | 'Solutions & Engineering'
+  | string;
+
 export interface Service {
   id: string;
   serviceNumber?: string;
+  abbreviation?: string;
+  descriptor?: string;
+  positioning?: string;
   title: string;
   tagline: string;
   description: string;
@@ -23,7 +46,7 @@ export interface Service {
   subServices?: SubService[];
   icon: string;
   image: string;
-  division: 'Geo Data Intelligence' | 'Digital Mapping Intelligence' | 'Marine Intelligence' | 'Asset Integrity Intelligence' | 'Engineering, Industrial & Environmental Solutions' | 'Ground Intelligence' | 'Digital Intelligence' | 'Integrated Engineering & Construction Solutions' | 'Industrial & Environmental Technologies' | 'Offshore Intelligence' | 'Intelligence' | 'Solutions & Engineering' | string;
+  division: DivisionName;
   partnerBadge?: {
     partnerName: string;
     role: string;
@@ -35,17 +58,24 @@ export interface ServiceGalleryImage {
   url: string;
   title?: string;
   caption?: string;
+  alt?: string;
 }
 
 export interface CMSService {
   id: string;
   slug: string;
   title: string;
-  division: 'Geo Data Intelligence' | 'Digital Mapping Intelligence' | 'Marine Intelligence' | 'Asset Integrity Intelligence' | 'Engineering, Industrial & Environmental Solutions' | 'Ground Intelligence' | 'Digital Intelligence' | 'Integrated Engineering & Construction Solutions' | 'Industrial & Environmental Technologies' | 'Offshore Intelligence' | 'Intelligence' | 'Solutions & Engineering' | string;
+  hero_heading?: string;
+  abbreviation?: string;
+  descriptor?: string;
+  positioning?: string;
+  division: DivisionName;
   category: string;
   tagline?: string;
   short_description: string;
+  overview_heading?: string;
   full_description: string;
+  engineering_problem_addressed?: string;
   business_value?: string;
   hero_image?: string;
   card_image?: string;
@@ -55,7 +85,9 @@ export interface CMSService {
   operating_environments: string[];
   technology: string[];
   methodology: string[];
+  standards?: string[];
   equipment: string[];
+  key_deliverables?: string[];
   gallery?: ServiceGalleryImage[];
   video_url?: string;
   cta_text?: string;
@@ -64,6 +96,8 @@ export interface CMSService {
     partnerName: string;
     role: string;
     website?: string;
+    title?: string;
+    description?: string;
   } | null;
   display_order: number;
   featured: boolean;

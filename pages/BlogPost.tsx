@@ -103,6 +103,9 @@ const BlogPost: React.FC<BlogPostProps> = ({ currentPath }) => {
             src={post.featured_image || '/assets/IMG_6170.jpg'}
             alt={post.title}
             className="w-full h-full object-cover opacity-25"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = '/assets/IMG_6170.jpg';
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/40"></div>
         </div>
@@ -150,6 +153,9 @@ const BlogPost: React.FC<BlogPostProps> = ({ currentPath }) => {
               src={post.featured_image}
               alt={post.title}
               className="w-full h-auto max-h-[520px] object-cover"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = '/assets/IMG_6170.jpg';
+              }}
             />
           </div>
         )}
@@ -265,6 +271,9 @@ const BlogPost: React.FC<BlogPostProps> = ({ currentPath }) => {
                       src={rel.featured_image || '/assets/IMG_6170.jpg'}
                       alt={rel.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/assets/IMG_6170.jpg';
+                      }}
                     />
                   </div>
                   <div className="p-5 flex-1 flex flex-col justify-between space-y-2">

@@ -50,6 +50,9 @@ const InteractiveProjectCard: React.FC<{
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           loading="lazy"
           decoding="async"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = '/assets/operations/pigl_pipeline_construction_swamp_cat.jpg';
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
       </div>
@@ -278,6 +281,9 @@ const Projects: React.FC = () => {
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                             loading="lazy"
                             decoding="async"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = '/assets/operations/pigl_pipeline_construction_swamp_cat.jpg';
+                            }}
                           />
                         </div>
                         {/* Technical Tag Overlay */}
@@ -351,7 +357,7 @@ const Projects: React.FC = () => {
                               <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-16 -mt-16"></div>
                               <h3 className="text-emerald-400 text-xs font-black uppercase tracking-[0.2em] mb-4">Measured Result & Client Impact</h3>
                               <p className="text-2xl md:text-3xl font-bold leading-tight tracking-tight italic relative z-10">
-                                "{project.results || 'High-fidelity technical deliverables executed with 100% compliance and zero safety incidents.'}"
+                                "{project.results || 'High-fidelity technical deliverables executed in accordance with approved engineering specifications and client standards.'}"
                               </p>
                               <div className="mt-8 flex items-center space-x-3">
                                 <div className="w-10 h-10 bg-emerald-600 flex items-center justify-center">

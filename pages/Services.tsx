@@ -14,38 +14,33 @@ import DeliverableDetailModal from '../components/DeliverableDetailModal';
 import { getDeliverableDetails } from '../data/serviceDeliverablesData';
 import { ServiceDeliverableItem } from '../types';
 
-// Representative capabilities for high-level service discovery (Section 12 & 13)
-const PLATFORM_REPRESENTATIVE_SERVICES: Record<string, string[]> = {
-  'geo-data-intelligence': [
-    'Geotechnical Investigation',
-    'Geophysical Investigation',
-    'CPT / Site Investigation',
-    'Geospatial Survey'
+// Service families for authoritative four-division landing page discovery
+const DIVISION_SERVICE_FAMILIES: Record<string, string[]> = {
+  'geosolutions-engineering-services': [
+    'Geohazard, Geoscan & Seismic Services',
+    'Geophysical & Hydrographic Survey Services',
+    'Geotechnical & Foundation Engineering Services',
+    'Precise Positioning & Navigation Services',
+    'Geospatial, Reality Capture & Digital Engineering',
+    'Laboratory Services'
   ],
-  'digital-mapping-intelligence': [
-    'Topographic Survey',
-    '3D Reality Capture',
-    'Geomatics',
-    'Digital Engineering'
+  'metocean-marine-solutions': [
+    'Metocean Observation & Monitoring',
+    'Marine Forecasting & Intelligence',
+    'Marine Environmental Services',
+    'Marine Advisory & Operational Support'
   ],
-  'marine-intelligence': [
-    'Marine & Seabed Survey',
-    'Hydrographic Survey',
-    'MetOcean',
-    'Continuous Marine Monitoring'
+  'integrated-construction-services': [
+    'Pipeline Construction & Installation',
+    'Civil & Infrastructure Construction',
+    'Mechanical, Fabrication & Installation',
+    'Project Delivery, Testing & Commissioning Support'
   ],
-  'asset-integrity-intelligence': [
-    'Inspection & NDT',
-    'Integrity Monitoring',
-    'Maintenance & Repairs',
-    'ROV & Subsea Integrity'
-  ],
-  'engineering-industrial-environmental-solutions': [
-    'Water Engineering',
-    'Wastewater Treatment',
-    'Produced Water Treatment',
-    'Flow Control & Valve Solutions',
-    'Pipeline & Civil Engineering'
+  'industrial-solutions': [
+    'Produced Water Treatment Solutions',
+    'Industrial & Domestic Water Solutions',
+    'Water & Environmental Laboratory Services',
+    'Wastewater Treatment & Resource Recovery'
   ]
 };
 
@@ -94,10 +89,11 @@ const ServiceContactForm: React.FC<{ serviceTitle: string }> = ({ serviceTitle }
           <input 
             type="text" 
             required 
+            aria-label="Full Name"
             placeholder="Engr. Adeola Balogun"
             value={formData.name}
             onChange={e => setFormData({ ...formData, name: e.target.value })}
-            className="w-full bg-white border border-slate-300 px-4 py-3 text-slate-900 focus:outline-none focus:border-emerald-700 transition-colors"
+            className="w-full bg-white border border-slate-300 px-4 py-3 text-slate-900 rounded-md focus:outline-none focus:border-emerald-700 transition-colors"
           />
         </div>
         <div>
@@ -105,10 +101,11 @@ const ServiceContactForm: React.FC<{ serviceTitle: string }> = ({ serviceTitle }
           <input 
             type="email" 
             required 
+            aria-label="Corporate Email"
             placeholder="a.balogun@company.com"
             value={formData.email}
             onChange={e => setFormData({ ...formData, email: e.target.value })}
-            className="w-full bg-white border border-slate-300 px-4 py-3 text-slate-900 focus:outline-none focus:border-emerald-700 transition-colors"
+            className="w-full bg-white border border-slate-300 px-4 py-3 text-slate-900 rounded-md focus:outline-none focus:border-emerald-700 transition-colors"
           />
         </div>
       </div>
@@ -128,15 +125,16 @@ const ServiceContactForm: React.FC<{ serviceTitle: string }> = ({ serviceTitle }
         <textarea 
           rows={4} 
           required
+          aria-label="Project Brief and Technical Specifications"
           placeholder="Outline project coordinates, terrain type (swamp/onshore/offshore), target depths, specifications, or required delivery timeframe..."
           value={formData.message}
           onChange={e => setFormData({ ...formData, message: e.target.value })}
-          className="w-full bg-white border border-slate-300 px-4 py-3 text-slate-900 focus:outline-none focus:border-emerald-700 transition-colors resize-none"
+          className="w-full bg-white border border-slate-300 px-4 py-3 text-slate-900 rounded-md focus:outline-none focus:border-emerald-700 transition-colors resize-none"
         ></textarea>
       </div>
       <button 
         type="submit" 
-        className="inline-flex items-center px-8 py-4 bg-emerald-700 text-white font-bold hover:bg-emerald-800 transition-colors rounded-none"
+        className="inline-flex items-center px-8 py-4 bg-emerald-700 text-white font-bold hover:bg-emerald-800 transition-colors rounded-md shadow-md hover-lift cursor-pointer"
       >
         Submit Technical Inquiry <span className="ml-2">→</span>
       </button>
@@ -213,13 +211,12 @@ const Services: React.FC = () => {
     ? selectedService.gallery
     : (selectedDetails?.gallery || (SERVICE_GALLERY_PRESETS && (SERVICE_GALLERY_PRESETS[selectedService?.slug || ''] || (resolvedId ? SERVICE_GALLERY_PRESETS[resolvedId] : []))) || []);
 
-  // Canonical 5 Top-Level Service Platforms
+  // Canonical 4 Authoritative Service Divisions
   const canonicalOrder = [
-    'geo-data-intelligence',
-    'digital-mapping-intelligence',
-    'marine-intelligence',
-    'asset-integrity-intelligence',
-    'engineering-industrial-environmental-solutions'
+    'geosolutions-engineering-services',
+    'metocean-marine-solutions',
+    'integrated-construction-services',
+    'industrial-solutions'
   ];
 
   const primaryPlatforms = canonicalOrder.map((slug, idx) => {
@@ -252,6 +249,9 @@ const Services: React.FC = () => {
               className="w-full h-full object-cover opacity-30 grayscale-[0.1]"
               loading="eager"
               fetchPriority="high"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = ServiceBg;
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-900/70 to-transparent"></div>
           </div>
@@ -438,7 +438,7 @@ const Services: React.FC = () => {
                               className="w-full text-left flex items-start justify-between space-x-3 p-3 bg-white border border-slate-200/70 hover:border-emerald-600 hover:bg-emerald-50/20 hover:shadow-sm transition-all group cursor-pointer"
                             >
                               <div className="flex items-start space-x-2.5 min-w-0">
-                                <span className="flex-shrink-0 w-1.5 h-1.5 bg-emerald-600 group-hover:scale-125 transition-transform rounded-none mt-1.5"></span>
+                                <span className="flex-shrink-0 w-1.5 h-1.5 bg-emerald-600 group-hover:scale-125 transition-transform rounded-full mt-1.5"></span>
                                 <span className="text-slate-800 group-hover:text-emerald-900 font-bold text-xs leading-snug line-clamp-2">
                                   {deliverableObj.title}
                                 </span>
@@ -528,6 +528,9 @@ const Services: React.FC = () => {
                           alt={img.title || `${selectedService.title} asset`}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           loading="lazy"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = '/assets/field_operations_marine.jpg';
+                          }}
                         />
                         <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-xs text-white text-[10px] font-mono px-2 py-0.5 border border-slate-700">
                           Asset 0{idx + 1}
@@ -615,85 +618,89 @@ const Services: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
           
           <div className="reveal max-w-3xl border-l-4 border-emerald-700 pl-6">
-            <span className="text-emerald-700 font-bold text-xs uppercase tracking-[0.2em] block mb-2">PIGL Master Service Platforms</span>
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">Five Operational Platforms</h2>
+            <span className="text-emerald-700 font-bold text-xs uppercase tracking-[0.2em] block mb-2">PIGL Master Service Architecture</span>
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">Four Operating Divisions</h2>
             <p className="text-lg md:text-xl text-slate-600 leading-relaxed font-normal">
-              High-fidelity subsurface intelligence, digital reality capture, marine metocean observation, asset lifecycle integrity, and turnkey industrial infrastructure across Nigeria.
+              Authoritative engineering divisions delivering accurate data, deep marine insight, infrastructure construction, and sustainable industrial solutions across Nigeria and Sub-Saharan Africa.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-14">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
             {primaryPlatforms.map((platform, idx) => {
               const platformSlug = platform.slug || platform.id;
-              const repItems = PLATFORM_REPRESENTATIVE_SERVICES[platformSlug] || (platform.capabilities ? platform.capabilities.slice(0, 4) : []);
-              const isFullWidth = idx === primaryPlatforms.length - 1 && primaryPlatforms.length % 2 !== 0;
+              const repItems = DIVISION_SERVICE_FAMILIES[platformSlug] || (platform.capabilities ? platform.capabilities.slice(0, 4) : []);
 
               return (
                 <div 
                   key={platform.id} 
                   id={platformSlug} 
-                  className={`flex flex-col border border-slate-200 bg-slate-50 hover:shadow-xl transition-shadow p-8 md:p-12 hover-lift reveal ${
-                    isFullWidth ? 'lg:col-span-2' : ''
-                  }`}
+                  className="flex flex-col border border-slate-200/90 bg-slate-50/70 hover:bg-slate-50 hover:shadow-xl transition-all duration-300 p-7 sm:p-9 lg:p-10 reveal hover-lift h-full"
                 >
-                  <a href={`/services/${platformSlug}`} className="relative h-64 md:h-[340px] bg-slate-200 mb-8 overflow-hidden group block">
+                  <a href={`/services/${platformSlug}`} className="relative aspect-[16/10] bg-slate-200 mb-7 overflow-hidden group block">
                     <img
                       src={platform.card_image || platform.hero_image || platform.image}
                       alt={`${platform.title} - PIGL Indigenous Engineering`}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       loading="lazy"
                       decoding="async"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/assets/field_operations_marine.jpg';
+                      }}
                     />
                     <div className="absolute top-4 left-4 bg-emerald-950/90 backdrop-blur-sm text-emerald-300 text-xs font-bold uppercase tracking-wider px-3 py-1.5 border border-emerald-700/50">
-                      PIGL Platform 0{idx + 1}
+                      Division 0{idx + 1}
                     </div>
-                    {platform.partnerBadge && (
-                      <div className="absolute bottom-4 right-4 bg-slate-900/90 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 border border-slate-700">
-                        {platform.partnerBadge.partnerName || platform.partnerBadge}
-                      </div>
-                    )}
                   </a>
 
+                  {/* Division Name & Acronym with clean alignment */}
                   <div className="mb-4">
-                    <span className="text-emerald-700 font-bold text-xs uppercase tracking-widest block mb-1">
-                      0{idx + 1} • {platform.division || platform.category || 'Specialist Platform'}
-                    </span>
-                    <h3 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight hover:text-emerald-700 transition-colors">
+                    <div className="flex items-center justify-between gap-3 mb-2">
+                      <span className="text-emerald-700 font-bold text-xs uppercase tracking-widest">
+                        0{idx + 1} • PIGL Division
+                      </span>
+                      <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-0.5 rounded shrink-0">
+                        {platform.abbreviation || 'PIGL'}
+                      </span>
+                    </div>
+                    <h3 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight leading-snug hover:text-emerald-700 transition-colors">
                       <a href={`/services/${platformSlug}`}>{platform.title}</a>
                     </h3>
-                    {platform.tagline && (
-                      <p className="text-sm font-semibold text-slate-500 mt-1">
-                        {platform.tagline}
+                    {platform.positioning && (
+                      <p className="text-sm font-semibold text-slate-500 mt-2">
+                        {platform.positioning}
                       </p>
                     )}
                   </div>
 
+                  {/* Concise Description */}
                   <p className="text-base text-slate-600 font-normal leading-relaxed mb-6 flex-grow">
                     {platform.short_description || platform.description}
                   </p>
 
-                  {/* Representative Capabilities (Section 12 & 13) */}
-                  <div className="bg-white p-5 border border-slate-200/80 mb-8">
+                  {/* Service Family Summary (Distinct Lines, High Legibility) */}
+                  <div className="bg-white p-5 border border-slate-200/90 mb-7">
                     <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
-                      <h4 className="text-emerald-800 font-bold text-xs uppercase tracking-wider">Representative Capabilities</h4>
-                      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Core Disciplines</span>
+                      <h4 className="text-emerald-900 font-bold text-xs uppercase tracking-wider">Core Service Families</h4>
+                      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Capabilities</span>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {repItems.map((item: string, rIdx: number) => (
-                        <div key={rIdx} className="flex items-start space-x-2 text-xs font-semibold text-slate-800">
-                          <span className="w-1.5 h-1.5 bg-emerald-600 flex-shrink-0 mt-1.5 rounded-none"></span>
-                          <span>{item}</span>
-                        </div>
+                    <ul className="space-y-2">
+                      {repItems.slice(0, 4).map((item: string, rIdx: number) => (
+                        <li key={rIdx} className="flex items-start text-xs font-semibold text-slate-700">
+                          <span className="text-emerald-600 font-bold mr-2 mt-[-1px]">›</span>
+                          <span className="leading-snug">{item}</span>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
 
-                  <div className="pt-2">
+                  {/* Clear Explore Division Action */}
+                  <div className="pt-2 mt-auto">
                     <a 
                       href={`/services/${platformSlug}`} 
                       className="inline-flex items-center px-6 py-3.5 bg-emerald-800 text-white font-bold text-xs uppercase tracking-widest hover:bg-emerald-900 transition-all group"
                     >
-                      Explore Platform & Specifications <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                      <span>Explore Division Capabilities</span>
+                      <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                     </a>
                   </div>
                 </div>
@@ -812,6 +819,9 @@ const Services: React.FC = () => {
                       isActive ? 'scale-110' : 'scale-100 group-hover:scale-105'
                     }`}
                     loading="lazy"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/assets/slider.jpeg';
+                    }}
                   />
 
                   {/* Dark Multi-Stop Gradient Scrim for Exceptional Contrast & Legibility */}
@@ -854,13 +864,19 @@ const Services: React.FC = () => {
             })}
           </div>
 
-          <div className="mt-20 flex flex-col md:flex-row items-center justify-between gap-8 bg-emerald-950 p-12 text-white border border-emerald-800/40">
-            <div>
-              <p className="text-emerald-400 font-bold text-sm uppercase tracking-wider mb-2">Technical Engagement</p>
-              <p className="text-3xl font-bold tracking-tight">Need specialized engineering support for your Nigerian project?</p>
+          <div className="mt-20 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 bg-emerald-950 p-8 sm:p-12 text-white border border-emerald-800/40 shadow-xl relative overflow-hidden">
+            <div className="max-w-2xl">
+              <p className="text-emerald-400 font-bold text-xs sm:text-sm uppercase tracking-wider mb-2">Technical Engagement</p>
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight leading-tight">
+                Need specialized engineering support for your project?
+              </h3>
             </div>
-            <a href="/contact" className="inline-flex items-center px-8 py-4 bg-white text-emerald-950 font-bold hover:bg-emerald-500 hover:text-white transition-colors">
-              Consult with Our Engineers <span className="ml-2">→</span>
+            <a
+              href="/contact"
+              className="inline-flex items-center justify-center whitespace-nowrap flex-shrink-0 px-8 py-4 bg-white text-emerald-950 font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-md group text-sm sm:text-base hover-lift"
+            >
+              <span>Consult with Our Engineers</span>
+              <span className="ml-2 transform group-hover:translate-x-1 transition-transform">→</span>
             </a>
           </div>
         </div>

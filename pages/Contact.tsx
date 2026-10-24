@@ -248,7 +248,7 @@ const Contact: React.FC = () => {
                             if (errors.name) setErrors({ ...errors, name: false });
                           }}
                           className={`w-full px-6 py-4 bg-white border outline-none transition-colors ${errors.name ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700'
-                            }`}
+                            } rounded-md`}
                           placeholder="John Doe"
                           required
                         />
@@ -267,7 +267,7 @@ const Contact: React.FC = () => {
                             if (errors.email) setErrors({ ...errors, email: false });
                           }}
                           className={`w-full px-6 py-4 bg-white border outline-none transition-colors ${errors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700'
-                            }`}
+                            } rounded-md`}
                           placeholder="john@example.com"
                           required
                         />
@@ -292,13 +292,15 @@ const Contact: React.FC = () => {
                         name="service"
                         value={formData.service}
                         onChange={handleChange}
-                        className="w-full px-6 py-4 bg-white border border-slate-300 focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 outline-none transition-colors appearance-none"
+                        aria-label="Operating Division or Service Required"
+                        className="w-full px-6 py-4 bg-white border border-slate-300 rounded-md focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 outline-none transition-colors appearance-none"
                       >
-                        <option>Geosolutions Services</option>
-                        <option>Integrated Services</option>
-                        <option>Pipeline Construction</option>
-                        <option>Civil Works</option>
-                        <option>Other Enquiry</option>
+                        <option value="">Select an Operating Division / Service</option>
+                        <option value="GeoSolutions & Engineering Services (GES)">GeoSolutions & Engineering Services (GES)</option>
+                        <option value="Metocean & Marine Solutions (MMS)">Metocean & Marine Solutions (MMS)</option>
+                        <option value="Integrated Construction Services (ICS)">Integrated Construction Services (ICS)</option>
+                        <option value="Industrial Solutions (IS)">Industrial Solutions (IS)</option>
+                        <option value="General Technical Consultation / Other">General Technical Consultation / Other</option>
                       </select>
                     </div>
                     
@@ -314,7 +316,7 @@ const Contact: React.FC = () => {
                           if (errors.message) setErrors({ ...errors, message: false });
                         }}
                         className={`w-full px-6 py-4 bg-white border outline-none transition-colors h-40 ${errors.message ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700'
-                          }`}
+                          } rounded-md`}
                         placeholder="How can we help you?"
                         required
                       ></textarea>

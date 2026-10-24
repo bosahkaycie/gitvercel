@@ -155,6 +155,9 @@ const Blog: React.FC = () => {
                       src={featuredPost.featured_image || FieldTeamSwampImg}
                       alt={featuredPost.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = FieldTeamSwampImg;
+                      }}
                     />
                     <div className="absolute top-4 left-4 z-10">
                       <span className="px-3 py-1 bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider shadow">
@@ -241,6 +244,9 @@ const Blog: React.FC = () => {
                           alt={post.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           loading="lazy"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = idx % 2 === 0 ? InternationalPartnerImg : ExhibitionConsultingImg;
+                          }}
                         />
                       </div>
 

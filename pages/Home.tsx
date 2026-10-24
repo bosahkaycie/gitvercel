@@ -188,58 +188,47 @@ const Home: React.FC = () => {
   }) : [
     {
       id: '3bd59604-1015-41e0-bcb1-c087fa769342',
-      phase: 'LIFECYCLE PHASE 01 // CONTINUOUS MARINE INTELLIGENCE',
-      title: 'Continuous Marine Intelligence',
-      description: 'Continuous Marine Intelligence is a real-time, round-the-clock framework of data collection, analysis, and surveillance used to maintain total situational awareness across maritime domains.',
-      cta_text: 'Explore Our Capabilities',
-      cta_url: '/services/marine-intelligence',
+      phase: 'LIFECYCLE PHASE 01 // METOCEAN & MARINE SOLUTIONS',
+      title: 'Metocean & Marine Solutions',
+      description: 'Real-time ocean observation, MetOcean forecasting, marine environmental monitoring, and operational advisory across maritime domains.',
+      cta_text: 'Explore Division Capabilities',
+      cta_url: '/services/metocean-marine-solutions',
       video_url: FrankstarLoopVideo,
       desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790716750733_HERO_2.png',
       mobile_image: '/assets/DJI_0003.jpg'
     },
     {
       id: 'c72b6c96-00ff-48d7-9589-1f2ef3a24aee',
-      phase: 'LIFECYCLE PHASE 02 // DEEP OFFSHORE INTELLIGENCE',
-      title: 'Deep Offshore Intelligence',
-      description: 'By merging real-time edge computing, AI-driven digital twins, and autonomous monitoring systems, we empower operators to maximize asset production, minimize operational downtime, and navigate complex marine environments safely.',
-      cta_text: 'Explore Our Capabilities',
-      cta_url: '/services/marine-intelligence',
+      phase: 'LIFECYCLE PHASE 02 // GEOSOLUTIONS & ENGINEERING',
+      title: 'GeoSolutions & Engineering Services',
+      description: 'Accurate data. Deeper insight. Smarter engineering. High-resolution seismic, geophysical & hydrographic survey, geotechnical investigation, reality capture, and laboratory testing.',
+      cta_text: 'Explore Division Capabilities',
+      cta_url: '/services/geosolutions-engineering-services',
       video_url: '/assets/OFFSHORE INTELLIGENCE.mp4',
       desktop_image: '/assets/DJI_0003.jpg',
       mobile_image: '/assets/DJI_0003.jpg'
     },
     {
       id: '52f9111a-7fc9-4668-9f04-3fdbb37ef77d',
-      phase: 'LIFECYCLE PHASE 03 // PIPELINE & CIVIL ENGINEERING',
-      title: 'Pipeline & Civil Engineering',
-      description: 'We deliver integrated pipeline and civil engineering solutions for energy, industrial, and infrastructure projects. Our expertise covers pipeline design and installation, right of way development, earthworks, drainage, foundations, access roads, and associated civil works.',
-      cta_text: 'Explore Capabilities',
-      cta_url: '/services/engineering-industrial-environmental-solutions',
+      phase: 'LIFECYCLE PHASE 03 // INTEGRATED CONSTRUCTION SERVICES',
+      title: 'Integrated Construction Services',
+      description: 'From engineering preparation to successful project delivery. Integrated pipeline construction, civil infrastructure, structural steel fabrication, and commissioning support.',
+      cta_text: 'Explore Division Capabilities',
+      cta_url: '/services/integrated-construction-services',
       video_url: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/media/1791214307405_Pipeline_construction.mp4',
       desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1791214469409_Screenshot_2026-10-05_at_4.34.19_PM.png',
       mobile_image: '/assets/DJI_0003.jpg'
     },
     {
       id: '9f5faf33-0d6b-4373-b86b-c989b330ba60',
-      phase: 'LIFECYCLE PHASE 04 // 3D REALITY CAPTURE & AS-BUILT INTEGRITY',
-      title: 'Digital Intelligence Reality Capture',
-      description: 'Digital Intelligence Reality Capture is the process of using smart sensors, laser scanners, and artificial intelligence to turn physical spaces into exact digital 3D models.',
-      cta_text: 'View Digital Intelligence',
-      cta_url: '/services/digital-mapping-intelligence',
+      phase: 'LIFECYCLE PHASE 04 // INDUSTRIAL SOLUTIONS',
+      title: 'Industrial Solutions',
+      description: 'Cleaner water. Healthier communities. Sustainable industries. Produced water treatment, industrial & domestic water solutions, water laboratory analysis, and wastewater recovery.',
+      cta_text: 'Explore Division Capabilities',
+      cta_url: '/services/industrial-solutions',
       video_url: DigitalIntelVideo,
       desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790716979886_leica_rtc360.jpg',
       mobile_image: '/assets/DJI_0003.jpg'
-    },
-    {
-      id: 'dee1a0f3-5f08-4bfd-948e-c5f597b32227',
-      phase: 'LIFECYCLE PHASE 05 // OFFSHORE INFRASTRUCTURE & NERVOUS SYSTEM',
-      title: 'Deep Offshore Intelligence',
-      description: 'Because deepwater environments operate under intense atmospheric pressure, freezing temperatures, and minimal physical accessibility, operators rely on this "intelligence infrastructure" as the primary nervous system for offshore production.',
-      cta_text: 'Explore Offshore Intelligence',
-      cta_url: '/services/marine-intelligence',
-      video_url: undefined,
-      desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790718985902_Screenshot_2026-09-29_at_10.56.16_PM.png',
-      mobile_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790718985902_Screenshot_2026-09-29_at_10.56.16_PM.png'
     }
   ];
 
@@ -626,14 +615,14 @@ const Home: React.FC = () => {
               <div className="pt-4 flex flex-wrap items-center gap-4">
                 <a
                   href="/about"
-                  className="px-7 py-4 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md hover:shadow-lg inline-flex items-center group rounded-none"
+                  className="px-7 py-4 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md hover:shadow-lg inline-flex items-center group rounded-md"
                 >
                   <span>Know more about us</span>
                   <span className="ml-2.5 group-hover:translate-x-1 transition-transform">→</span>
                 </a>
                 <a
                   href="/contact"
-                  className="px-7 py-4 border-2 border-slate-300 hover:border-emerald-700 text-slate-800 hover:text-emerald-700 font-bold text-xs sm:text-sm uppercase tracking-wider transition-all rounded-none"
+                  className="px-7 py-4 border-2 border-slate-300 hover:border-emerald-700 text-slate-800 hover:text-emerald-700 font-bold text-xs sm:text-sm uppercase tracking-wider transition-all rounded-md"
                 >
                   Request Consultation
                 </a>
@@ -843,7 +832,7 @@ const Home: React.FC = () => {
               <div className="flex items-center space-x-2 mb-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
                 <span className="text-emerald-700 font-bold text-xs uppercase tracking-widest">
-                  Core Engineering Platforms
+                  Core Engineering Divisions
                 </span>
               </div>
               <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">
@@ -898,11 +887,14 @@ const Home: React.FC = () => {
 
                 <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
                   <img
-                    src={service.image}
+                    src={(service as any).card_image || (service as any).hero_image || (service as any).image || SERVICES.find(s => s.id === service.id)?.image || '/assets/field_operations_marine.jpg'}
                     alt={`${service.title} - Polaris Integrated & GeoSolutions`}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     loading="lazy"
                     decoding="async"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/assets/field_operations_marine.jpg';
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 </div>
@@ -981,6 +973,9 @@ const Home: React.FC = () => {
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                     loading="lazy" 
                     decoding="async" 
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/assets/operations/pigl_pipeline_construction_swamp_cat.jpg';
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 </div>
@@ -1007,7 +1002,7 @@ const Home: React.FC = () => {
                       <div className="pt-1.5">
                         <span className="font-mono font-bold text-emerald-700 uppercase text-[10px] block">OUTCOME ACHIEVED:</span>
                         <p className="text-slate-800 font-medium leading-relaxed line-clamp-1 mt-0.5">
-                          {project.results || 'Delivered with 100% HSSE compliance and zero asset clashes.'}
+                          {project.results || 'Executed in accordance with approved engineering specifications and client standards.'}
                         </p>
                       </div>
                     </div>
@@ -1095,6 +1090,9 @@ const Home: React.FC = () => {
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     loading="lazy"
                     decoding="async"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/assets/operations/pigl_offshore_geotech_drilling_barge.jpg';
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/25 to-transparent opacity-80 group-hover:opacity-90 transition-opacity pointer-events-none" />
                   
@@ -1352,6 +1350,9 @@ const Home: React.FC = () => {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             loading="lazy"
                             decoding="async"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = '/assets/IMG_6170.jpg';
+                            }}
                           />
                         </div>
 
@@ -1406,6 +1407,9 @@ const Home: React.FC = () => {
                                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                   loading="lazy"
                                   decoding="async"
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).src = '/assets/IMG_6170.jpg';
+                                  }}
                                 />
                               </div>
 
@@ -1488,7 +1492,7 @@ const Home: React.FC = () => {
       {/* Video Story Modal */}
       {isVideoModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/95 backdrop-blur-sm">
-          <div className="relative w-full max-w-5xl aspect-video rounded-none overflow-hidden shadow-2xl bg-black animate-fade-in-scale">
+          <div className="relative w-full max-w-5xl aspect-video rounded-xl overflow-hidden shadow-2xl bg-black animate-fade-in-scale">
             <button
               onClick={() => setIsVideoModalOpen(false)}
               className="absolute top-4 right-4 z-10 w-12 h-12 bg-white hover:bg-emerald-500 text-slate-900 hover:text-white flex items-center justify-center transition-colors shadow-lg"
