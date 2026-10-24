@@ -132,13 +132,13 @@ Key technical deliverables included:
 - **Clash Detection**: Pinpointing over 45 potential construction interferences prior to spool fabrication, eliminating expensive field rework.
 
 > *"By converting physical facilities into living digital twins, we give operators total clarity over their assets from anywhere in the world, reducing offshore mobilization requirements and ensuring 100% first-time-fit engineering."*
-> — **Engr. Chigozie Bosah**, Managing Director, PIGL
+> — **Dr. Chigozie Dimgba**, Managing Director, PIGL
 
 ### Environmental & Safety Impact
 
 Through digital reality capture, asset owners avoided more than 300 hours of hot-work field measuring and reduced overall shutdown duration by 35%. PIGL remains dedicated to driving safety, efficiency, and engineering excellence across Nigeria's energy corridors.`,
     featured_image: '/assets/digital_intel_scanner.jpg',
-    author: 'Engr. Chigozie Bosah',
+    author: 'Dr. Chigozie Dimgba',
     category: 'Technical Updates',
     tags: ['3D Reality Capture', 'Digital Twins', 'Leica RTC360', 'Brownfield Engineering', 'Niger Delta'],
     status: 'published',
@@ -621,8 +621,8 @@ const FALLBACK_ADMIN_USERS: AdminUser[] = [
   },
   {
     id: 'admin-2',
-    email: 'chigozie.bosah@polarisigl.com',
-    full_name: 'Engr. Chigozie Bosah',
+    email: 'chigozie.dimgba@polarisigl.com',
+    full_name: 'Dr. Chigozie Dimgba',
     role: 'Super Admin',
     status: 'active',
     created_at: '2026-01-10T08:00:00Z',
@@ -691,7 +691,7 @@ const FALLBACK_AUDIT_LOGS: AuditLog[] = [
     action: 'Published Blog Article: Leica RTC360 Digital Twins',
     entity_type: 'blog',
     entity_id: 'pigl-deploys-leica-rtc360-digital-twins-niger-delta',
-    user_email: 'chigozie.bosah@polarisigl.com',
+    user_email: 'chigozie.dimgba@polarisigl.com',
     created_at: new Date(Date.now() - 3600 * 1000 * 5).toISOString()
   }
 ];
@@ -1560,7 +1560,7 @@ export const useAdminAuth = () => {
               if (saved) cachedUser = JSON.parse(saved);
             } catch {}
 
-            const defaultName = cleanEmail.includes('bosah') ? 'Engr. Chigozie Bosah' : 'PIGL Administrator';
+            const defaultName = (cleanEmail.includes('dimgba') || cleanEmail.includes('bosah')) ? 'Dr. Chigozie Dimgba' : 'PIGL Administrator';
             const fullName = persisted?.full_name || dbUser?.full_name || session.user.user_metadata?.name || cachedUser?.full_name || defaultName;
 
             const adminUser: AdminUser = {
@@ -1619,9 +1619,10 @@ export const useAdminAuth = () => {
       Boolean(authUser) ||
       cleanEmail.includes('admin') ||
       cleanEmail.includes('polaris') ||
+      cleanEmail.includes('dimgba') ||
       cleanEmail.includes('bosah') ||
       cleanEmail === 'admin@polarisigl.com' ||
-      cleanEmail === 'chigozie.bosah@polarisigl.com' ||
+      cleanEmail === 'chigozie.dimgba@polarisigl.com' ||
       password === 'adminpassword123' ||
       password.length >= 6;
 
@@ -1630,7 +1631,7 @@ export const useAdminAuth = () => {
       const storedUsers = getStoredAdminUsers();
       const localMatched = storedUsers.find(u => u.email.toLowerCase() === cleanEmail);
 
-      const defaultName = cleanEmail.includes('bosah') ? 'Engr. Chigozie Bosah' : 'PIGL Administrator';
+      const defaultName = (cleanEmail.includes('dimgba') || cleanEmail.includes('bosah')) ? 'Dr. Chigozie Dimgba' : 'PIGL Administrator';
       const fullName = persisted?.full_name || dbUser?.full_name || authUser?.user_metadata?.name || localMatched?.full_name || defaultName;
       const avatarUrl = persisted?.avatar_url || dbUser?.avatar_url || authUser?.user_metadata?.avatar_url || localMatched?.avatar_url;
       const jobTitle = persisted?.job_title || authUser?.user_metadata?.job_title || localMatched?.job_title || 'Managing Director / Principal Engineer';

@@ -486,13 +486,13 @@ Key technical deliverables included:
 - **Clash Detection**: Pinpointing over 45 potential construction interferences prior to spool fabrication, eliminating expensive field rework.
 
 > *"By converting physical facilities into living digital twins, we give operators total clarity over their assets from anywhere in the world, reducing offshore mobilization requirements and ensuring 100% first-time-fit engineering."*
-> — **Engr. Chigozie Bosah**, Managing Director, PIGL
+> — **Dr. Chigozie Dimgba**, Managing Director, PIGL
 
 ### Environmental & Safety Impact
 
 Through digital reality capture, asset owners avoided more than 300 hours of hot-work field measuring and reduced overall shutdown duration by 35%. PIGL remains dedicated to driving safety, efficiency, and engineering excellence across Nigeria''s energy corridors.',
     '/assets/IMG_6170.jpg',
-    'Engr. Chigozie Bosah',
+    'Dr. Chigozie Dimgba',
     'Technical Updates',
     ARRAY['3D Reality Capture', 'Digital Twins', 'Leica RTC360', 'Brownfield Engineering', 'Niger Delta'],
     'published',
@@ -649,7 +649,7 @@ CREATE POLICY "Full access to admin users" ON admin_users FOR ALL TO authenticat
 -- Seed initial Admin Users
 INSERT INTO admin_users (email, full_name, role, status) VALUES
 ('admin@polarisigl.com', 'PIGL System Administrator', 'Super Admin', 'active'),
-('chigozie.bosah@polarisigl.com', 'Engr. Chigozie Bosah', 'Super Admin', 'active'),
+('chigozie.dimgba@polarisigl.com', 'Dr. Chigozie Dimgba', 'Super Admin', 'active'),
 ('communications@polarisigl.com', 'Technical Editorial Desk', 'Content Editor', 'active')
 ON CONFLICT (email) DO NOTHING;
 

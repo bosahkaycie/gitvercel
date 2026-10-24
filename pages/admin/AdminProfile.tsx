@@ -266,7 +266,7 @@ const AdminProfile: React.FC<AdminProfileProps> = ({
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="e.g. Engr. Chigozie Bosah"
+                    placeholder="e.g. Dr. Chigozie Dimgba"
                     className={`w-full px-4 py-2.5 rounded-xl text-sm border focus:outline-none transition-colors ${
                       isDark 
                         ? 'bg-slate-950 border-slate-800 text-white focus:border-emerald-500' 

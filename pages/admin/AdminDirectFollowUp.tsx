@@ -62,7 +62,7 @@ const DEFAULT_FOLLOWUP_TEMPLATES = [
     <div style="text-align: center; margin: 28px 0 16px 0;">
       <a href="https://polarisigl.com/contact" style="background-color: #059669; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 13px; display: inline-block;">Confirm Technical Scoping Call</a>
     </div>
-    <p style="font-size: 13px; color: #64748b; margin-top: 24px;">Warm regards,<br><strong style="color: #0f172a;">Engr. Chigozie Bosah</strong><br>Managing Director, PIGL<br><span style="font-size: 12px; color: #94a3b8;">Port Harcourt Desk: +234 803 708 1904</span></p>
+    <p style="font-size: 13px; color: #64748b; margin-top: 24px;">Warm regards,<br><strong style="color: #0f172a;">Dr. Chigozie Dimgba</strong><br>Managing Director, PIGL<br><span style="font-size: 12px; color: #94a3b8;">Port Harcourt Desk: +234 803 708 1904</span></p>
   </div>
   <div style="background-color: #f1f5f9; padding: 14px 20px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0;">
     &copy; 2026 Polaris Integrated & GeoSolutions Limited. ISO 9001:2015 & ISO 45001:2018 Certified.

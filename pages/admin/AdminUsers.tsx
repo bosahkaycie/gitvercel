@@ -409,7 +409,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Engr. Chigozie Bosah"
+                  placeholder="e.g. Dr. Chigozie Dimgba"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className={`w-full px-3.5 py-2.5 border rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all ${

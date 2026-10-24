@@ -39,7 +39,7 @@ const AdminBlogEditor: React.FC<AdminBlogEditorProps> = ({
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || '');
   const [content, setContent] = useState(initialData?.content || '');
   const [featuredImage, setFeaturedImage] = useState(initialData?.featured_image || '/assets/IMG_6170.jpg');
-  const [author, setAuthor] = useState(initialData?.author || 'Engr. Chigozie Bosah');
+  const [author, setAuthor] = useState(initialData?.author || 'Dr. Chigozie Dimgba');
   const [tagsStr, setTagsStr] = useState((initialData?.tags || ['Engineering', 'PIGL', 'Nigeria']).join(', '));
   const [status, setStatus] = useState<'draft' | 'published' | 'archived'>(initialData?.status || 'published');
   const [featured, setFeatured] = useState<boolean>(initialData?.featured ?? false);
@@ -598,7 +598,7 @@ const AdminBlogEditor: React.FC<AdminBlogEditorProps> = ({
                 type="text"
                 value={author}
                 onChange={(e) => setAuthor(e.target.value)}
-                placeholder="Engr. Chigozie Bosah"
+                placeholder="Dr. Chigozie Dimgba"
                 className={`w-full p-2.5 border rounded-lg text-xs ${
                   isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-300 text-slate-900'
                 }`}
