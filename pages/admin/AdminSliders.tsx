@@ -17,6 +17,7 @@ interface AdminSlidersProps {
   loading: boolean;
   onSave: (slider: Partial<CMSSlider> & { title: string }) => Promise<any>;
   onDelete: (id: string) => Promise<any>;
+  onReset?: () => Promise<any>;
   theme?: 'light' | 'dark';
 }
 
@@ -30,6 +31,7 @@ const AdminSliders: React.FC<AdminSlidersProps> = ({
   loading,
   onSave,
   onDelete,
+  onReset,
   theme = 'light'
 }) => {
   const [editingSlider, setEditingSlider] = useState<CMSSlider | null>(null);
@@ -162,13 +164,36 @@ const AdminSliders: React.FC<AdminSlidersProps> = ({
           </p>
         </div>
 
-        <button
-          onClick={() => setIsCreating(true)}
-          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 self-start sm:self-auto"
-        >
-          <IconPlus className="w-4 h-4" />
-          <span>Add New Slide</span>
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          {onReset && (
+            <button
+              onClick={async () => {
+                if (window.confirm('Synchronize sliders with the latest 4 Operating Divisions from the codebase? Any local uncommitted changes will be aligned with the canonical repository slides.')) {
+                  await onReset();
+                  setToast({
+                    type: 'success',
+                    message: 'Sliders successfully synchronized with the canonical 4 Operating Divisions.'
+                  });
+                }
+              }}
+              className={`px-3.5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center space-x-2 border ${
+                isDark
+                  ? "border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200"
+                  : "border-slate-300 bg-white hover:bg-slate-50 text-slate-700"
+              }`}
+              title="Synchronize sliders with codebase"
+            >
+              <span>↻ Sync with Codebase</span>
+            </button>
+          )}
+          <button
+            onClick={() => setIsCreating(true)}
+            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2"
+          >
+            <IconPlus className="w-4 h-4" />
+            <span>Add New Slide</span>
+          </button>
+        </div>
       </div>
 
       {/* Sliders Grid */}

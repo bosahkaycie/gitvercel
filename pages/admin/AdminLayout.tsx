@@ -97,7 +97,7 @@ const AdminLayout: React.FC = () => {
   const { jobs, loading: jobsLoading, saveJob, deleteJob } = useJobOpenings(true);
   const { applications, loading: appsLoading, updateApplicationStatus, deleteApplication } = useJobApplications();
   const { posts, loading: blogsLoading, savePost, deletePost } = useBlogPosts(undefined, true);
-  const { sliders, loading: slidersLoading, saveSlider, deleteSlider } = useSliders(true);
+  const { sliders, loading: slidersLoading, saveSlider, deleteSlider, resetSliders } = useSliders(true);
   const { videos, loading: videosLoading, saveVideo, deleteVideo } = useVideos(true);
   const { inquiries, loading: inquiriesLoading, updateInquiryStatus, deleteInquiry } = useInquiries();
   const { users, loading: usersLoading, saveUser, deleteUser, toggleUserStatus } = useAdminUsers();
@@ -384,6 +384,7 @@ const AdminLayout: React.FC = () => {
             loading={slidersLoading}
             onSave={saveSlider}
             onDelete={deleteSlider}
+            onReset={resetSliders}
             theme={theme}
           />
         );

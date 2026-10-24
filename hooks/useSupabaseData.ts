@@ -222,74 +222,60 @@ PIGL remains committed to delivering world-class engineering solutions while pro
 // Fallback seed sliders representing the authoritative, locally saved hero sequence
 export const FALLBACK_SLIDERS: CMSSlider[] = [
   {
-    id: '3bd59604-1015-41e0-bcb1-c087fa769342',
-    title: 'Continuous Marine Intelligence',
-    subtitle: 'Indigenous Engineering Excellence Across Sub-Saharan Africa',
-    description: 'Continuous Marine Intelligence is a real-time, round-the-clock framework of data collection, analysis, and surveillance used to maintain total situational awareness across maritime domains.',
-    desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790716750733_HERO_2.png',
-    mobile_image: '/assets/DJI_0003.jpg',
-    video_url: '/assets/FRANKSTAR LOOP.mp4',
-    cta_text: 'Explore Our Capabilities',
-    cta_url: '/services/marine-intelligence',
+    id: "3bd59604-1015-41e0-bcb1-c087fa769342",
+    title: "Metocean & Marine Solutions",
+    subtitle: "LIFECYCLE PHASE 01 // METOCEAN & MARINE SOLUTIONS",
+    description: "Real-time ocean observation, MetOcean forecasting, marine environmental monitoring, and operational advisory across maritime domains.",
+    desktop_image: "https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790716750733_HERO_2.png",
+    mobile_image: "/assets/DJI_0003.jpg",
+    video_url: "/assets/FRANKSTAR LOOP.mp4",
+    cta_text: "Explore Division Capabilities",
+    cta_url: "/services/metocean-marine-solutions",
     display_order: 1,
     is_active: true,
-    updated_at: '2026-10-05T15:02:33.715Z'
+    updated_at: "2026-10-24T20:00:00.000Z"
   },
   {
-    id: 'c72b6c96-00ff-48d7-9589-1f2ef3a24aee',
-    title: 'Metocean & Marine Solutions',
-    subtitle: 'Indigenous Engineering Excellence Across Sub-Saharan Africa',
-    description: 'By merging real-time edge computing, AI-driven digital twins, and autonomous monitoring systems, we empower operators to maximize asset production, minimize operational downtime, and navigate complex marine environments safely.',
-    desktop_image: '/assets/DJI_0003.jpg',
-    mobile_image: '/assets/DJI_0003.jpg',
-    video_url: '/assets/OFFSHORE INTELLIGENCE.mp4',
-    cta_text: 'Explore Our Capabilities',
-    cta_url: '/services/metocean-marine-solutions',
+    id: "c72b6c96-00ff-48d7-9589-1f2ef3a24aee",
+    title: "GeoSolutions & Engineering Services",
+    subtitle: "LIFECYCLE PHASE 02 // GEOSOLUTIONS & ENGINEERING",
+    description: "Accurate data. Deeper insight. Smarter engineering. High-resolution seismic, geophysical & hydrographic survey, geotechnical investigation, reality capture, and laboratory testing.",
+    desktop_image: "/assets/DJI_0003.jpg",
+    mobile_image: "/assets/DJI_0003.jpg",
+    video_url: "/assets/OFFSHORE INTELLIGENCE.mp4",
+    cta_text: "Explore Division Capabilities",
+    cta_url: "/services/geosolutions-engineering-services",
     display_order: 2,
     is_active: true,
-    updated_at: '2026-09-28T11:38:30.405Z'
+    updated_at: "2026-10-24T20:00:00.000Z"
   },
   {
-    id: '52f9111a-7fc9-4668-9f04-3fdbb37ef77d',
-    title: 'Pipeline & Civil Engineering',
-    subtitle: 'Integrated Infrastructure Delivery',
-    description: 'We deliver integrated pipeline and civil engineering solutions for energy, industrial, and infrastructure projects. Our expertise covers pipeline design and installation, right of way development, earthworks, drainage, foundations, access roads, and associated civil works.',
-    desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1791214469409_Screenshot_2026-10-05_at_4.34.19_PM.png',
-    mobile_image: '/assets/DJI_0003.jpg',
-    video_url: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/media/1791214307405_Pipeline_construction.mp4',
-    cta_text: 'Explore Capabilities',
-    cta_url: '/services/integrated-construction-services',
+    id: "52f9111a-7fc9-4668-9f04-3fdbb37ef77d",
+    title: "Integrated Construction Services",
+    subtitle: "LIFECYCLE PHASE 03 // INTEGRATED CONSTRUCTION SERVICES",
+    description: "From engineering preparation to successful project delivery. Integrated pipeline construction, civil infrastructure, structural steel fabrication, and commissioning support.",
+    desktop_image: "https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1791214469409_Screenshot_2026-10-05_at_4.34.19_PM.png",
+    mobile_image: "/assets/DJI_0003.jpg",
+    video_url: "https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/media/1791214307405_Pipeline_construction.mp4",
+    cta_text: "Explore Division Capabilities",
+    cta_url: "/services/integrated-construction-services",
     display_order: 3,
     is_active: true,
-    updated_at: '2026-10-05T15:35:22.974Z'
+    updated_at: "2026-10-24T20:00:00.000Z"
   },
   {
-    id: '9f5faf33-0d6b-4373-b86b-c989b330ba60',
-    title: 'Digital Intelligence Reality Capture',
-    subtitle: 'In Partnership with CoaleXpert',
-    description: 'Digital Intelligence Reality Capture is the process of using smart sensors, laser scanners, and artificial intelligence to turn physical spaces into exact digital 3D models.',
-    desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790716979886_leica_rtc360.jpg',
-    mobile_image: '/assets/DJI_0003.jpg',
-    video_url: null,
-    cta_text: 'View Digital Intelligence',
-    cta_url: '/services/geosolutions-engineering-services#geospatial-reality-capture-digital-engineering',
+    id: "9f5faf33-0d6b-4373-b86b-c989b330ba60",
+    title: "Industrial Solutions",
+    subtitle: "LIFECYCLE PHASE 04 // INDUSTRIAL SOLUTIONS",
+    description: "Cleaner water. Healthier communities. Sustainable industries. Produced water treatment, industrial & domestic water solutions, water laboratory analysis, and wastewater recovery.",
+    desktop_image: "https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790716979886_leica_rtc360.jpg",
+    mobile_image: "/assets/DJI_0003.jpg",
+    video_url: "/assets/DIGITAL INTELLINGENCE.mp4",
+    cta_text: "Explore Division Capabilities",
+    cta_url: "/services/industrial-solutions",
     display_order: 4,
     is_active: true,
-    updated_at: '2026-10-05T15:06:27.346Z'
-  },
-  {
-    id: 'dee1a0f3-5f08-4bfd-948e-c5f597b32227',
-    title: 'Metocean & Marine Solutions',
-    subtitle: 'Subsea Infrastructure & Asset Integrity',
-    description: 'Because deepwater environments operate under intense atmospheric pressure, freezing temperatures, and minimal physical accessibility, operators rely on this "intelligence infrastructure" as the primary nervous system for offshore production.',
-    desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790718985902_Screenshot_2026-09-29_at_10.56.16_PM.png',
-    mobile_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790718985902_Screenshot_2026-09-29_at_10.56.16_PM.png',
-    video_url: null,
-    cta_text: 'Explore Metocean & Marine Solutions',
-    cta_url: '/services/metocean-marine-solutions',
-    display_order: 5,
-    is_active: true,
-    updated_at: '2026-10-05T15:07:06.545Z'
+    updated_at: "2026-10-24T20:00:00.000Z"
   }
 ];
 
@@ -297,6 +283,8 @@ export const FALLBACK_SLIDERS: CMSSlider[] = [
 const LOCAL_STORAGE_KEY_SERVICES = 'pigl_cms_services';
 const LOCAL_STORAGE_KEY_BLOGS = 'pigl_cms_blogs';
 const LOCAL_STORAGE_KEY_SLIDERS = 'pigl_cms_sliders';
+export const CURRENT_SLIDERS_VERSION = "v4_four_divisions_sync";
+export const LOCAL_STORAGE_KEY_SLIDERS_VERSION = "pigl_cms_sliders_version";
 const LOCAL_STORAGE_KEY_AUTH = 'pigl_admin_auth_user';
 const LOCAL_STORAGE_KEY_ADMIN_USERS = 'pigl_cms_admin_users';
 const LOCAL_STORAGE_KEY_INQUIRIES = 'pigl_cms_inquiries';
@@ -784,10 +772,34 @@ export const saveStoredBlogs = (blogs: CMSBlogPost[]) => {
 
 export const getStoredSliders = (): CMSSlider[] => {
   try {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY_SLIDERS) || localStorage.getItem('pigl_cms_sliders_v2');
+    const version = typeof window !== "undefined" ? localStorage.getItem(LOCAL_STORAGE_KEY_SLIDERS_VERSION) : null;
+    const saved = typeof window !== "undefined" ? (localStorage.getItem(LOCAL_STORAGE_KEY_SLIDERS) || localStorage.getItem("pigl_cms_sliders_v2")) : null;
+
+    // Auto-migrate if version is outdated
+    if (version !== CURRENT_SLIDERS_VERSION) {
+      if (typeof window !== "undefined") {
+        localStorage.setItem(LOCAL_STORAGE_KEY_SLIDERS_VERSION, CURRENT_SLIDERS_VERSION);
+        saveStoredSliders(FALLBACK_SLIDERS);
+      }
+      return FALLBACK_SLIDERS;
+    }
+
     if (saved) {
       const parsed: CMSSlider[] = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
+        // Detect stale pre-restructure slides
+        const hasLegacy = parsed.some(s =>
+          s.title?.includes("Continuous Marine Intelligence") ||
+          s.cta_url?.includes("/services/marine-intelligence") ||
+          s.cta_url?.includes("/services/digital-mapping-intelligence")
+        );
+        if (hasLegacy) {
+          if (typeof window !== "undefined") {
+            saveStoredSliders(FALLBACK_SLIDERS);
+          }
+          return FALLBACK_SLIDERS;
+        }
+
         const seenIds = new Set<string>();
         const unique = parsed.filter(s => {
           if (!s || !s.id) return false;
@@ -796,15 +808,15 @@ export const getStoredSliders = (): CMSSlider[] => {
           return true;
         });
         return unique.map(s => {
-          if (s.video_url && s.video_url.includes('X0d8DmasSiQ')) {
-            return { ...s, video_url: '/assets/FRANKSTAR LOOP.mp4' };
+          if (s.video_url && s.video_url.includes("X0d8DmasSiQ")) {
+            return { ...s, video_url: "/assets/FRANKSTAR LOOP.mp4" };
           }
           return s;
         });
       }
     }
   } catch (e) {
-    console.warn('Failed to load local sliders', e);
+    console.warn("Failed to load local sliders", e);
   }
   return FALLBACK_SLIDERS;
 };
@@ -1296,31 +1308,23 @@ export const useSliders = (adminMode = false) => {
     setLoading(true);
     setError(null);
     const deletedIds = getDeletedSliderIds();
-    const rawLocal = localStorage.getItem(LOCAL_STORAGE_KEY_SLIDERS);
+    // 1. Load through versioned getStoredSliders() so codebase updates synchronize cleanly
+    const stored = getStoredSliders();
+    if (stored && stored.length > 0) {
+      const seen = new Set<string>();
+      const cleaned = stored.filter(s => {
+        if (!s || !s.id || deletedIds.has(s.id)) return false;
+        if (seen.has(s.id)) return false;
+        seen.add(s.id);
+        return true;
+      });
 
-    // 1. If local storage already has data, treat it as authoritative so edits are NEVER lost
-    if (rawLocal) {
-      try {
-        const parsed: CMSSlider[] = JSON.parse(rawLocal);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const seen = new Set<string>();
-          const cleaned = parsed.filter(s => {
-            if (!s || !s.id || deletedIds.has(s.id)) return false;
-            if (seen.has(s.id)) return false;
-            seen.add(s.id);
-            return true;
-          });
-
-          cleaned.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-          const filtered = adminMode ? cleaned : cleaned.filter(s => s.is_active);
-          setSliders(filtered);
-          saveStoredSliders(cleaned);
-          setLoading(false);
-          return;
-        }
-      } catch (e) {
-        console.warn('Failed to parse local stored sliders', e);
-      }
+      cleaned.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+      const filtered = adminMode ? cleaned : cleaned.filter(s => s.is_active);
+      setSliders(filtered);
+      saveStoredSliders(cleaned);
+      setLoading(false);
+      return;
     }
 
     // 2. If no local storage (fresh visitor or deployed instance):
@@ -1467,7 +1471,21 @@ export const useSliders = (adminMode = false) => {
     }
   };
 
-  return { sliders, loading, error, reload: fetchSliders, saveSlider, deleteSlider };
+  const resetSliders = async () => {
+    try {
+      localStorage.removeItem("pigl_cms_deleted_sliders");
+      localStorage.setItem(LOCAL_STORAGE_KEY_SLIDERS_VERSION, CURRENT_SLIDERS_VERSION);
+      saveStoredSliders(FALLBACK_SLIDERS);
+      const active = adminMode ? FALLBACK_SLIDERS : FALLBACK_SLIDERS.filter(s => s.is_active);
+      setSliders(active);
+      return FALLBACK_SLIDERS;
+    } catch (e) {
+      console.warn("Failed to reset sliders:", e);
+      return FALLBACK_SLIDERS;
+    }
+  };
+
+  return { sliders, loading, error, reload: fetchSliders, saveSlider, deleteSlider, resetSliders };
 };
 
 // ==============================================================================
