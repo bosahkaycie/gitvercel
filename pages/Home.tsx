@@ -9,8 +9,9 @@ import FrankstarLogo from '../assets/frankstar_logo.png';
 import FrankstarLoopVideo from '../assets/FRANKSTAR LOOP.mp4';
 import OffshoreIntelVideo from '../assets/OFFSHORE INTELLIGENCE.mp4';
 import DigitalIntelVideo from '../assets/DIGITAL INTELLINGENCE.mp4';
-import GroundIntelImg from '../assets/cpt.png';
-import PipelineImg from '../assets/newpipeline.png';
+import PipelineConstructionVideo from '../assets/PIPELINE_CONSTRUCTION.mp4';
+import GroundIntelImg from '../assets/cpt.webp';
+import PipelineImg from '../assets/newpipeline.webp';
 import FieldTeamSwampImg from '../assets/pigl_field_team_swamp.jpg';
 import ConferenceKeynoteImg from '../assets/pigl_conference_keynote.jpg';
 import InternationalPartnerImg from '../assets/pigl_international_partner.jpg';
@@ -92,8 +93,10 @@ const HeroSlideVideo: React.FC<{
   isActive: boolean;
   poster?: string;
   title?: string;
-}> = ({ src, isActive, poster, title }) => {
+  isFirst?: boolean;
+}> = ({ src, isActive, poster, title, isFirst = false }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -102,33 +105,80 @@ const HeroSlideVideo: React.FC<{
     // Critical: Programmatically enforce DOM property muting to satisfy strict modern browser autoplay security policies
     video.muted = true;
     video.defaultMuted = true;
+    video.playsInline = true;
 
-    if (isActive) {
+    let isSubscribed = true;
+
+    const playSafe = () => {
+      if (!isSubscribed || !video || !isActive) return;
       const playPromise = video.play();
       if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          // Normal browser interrupt or policy catch
-          console.warn('Hero video autoplay notice:', err?.message);
-        });
+        playPromise
+          .then(() => {
+            if (isSubscribed) setIsVideoLoaded(true);
+          })
+          .catch((err) => {
+            console.warn('Hero video autoplay notice:', err?.message);
+          });
+      }
+    };
+
+    if (isActive) {
+      if (video.readyState >= 2) {
+        playSafe();
+      } else {
+        const handleReady = () => {
+          playSafe();
+        };
+        video.addEventListener('canplay', handleReady, { once: true });
+        video.addEventListener('loadeddata', handleReady, { once: true });
+        return () => {
+          isSubscribed = false;
+          video.removeEventListener('canplay', handleReady);
+          video.removeEventListener('loadeddata', handleReady);
+        };
       }
     } else {
       video.pause();
     }
+
+    return () => {
+      isSubscribed = false;
+    };
   }, [isActive, src]);
 
   return (
-    <video
-      ref={videoRef}
-      src={src}
-      autoPlay
-      loop
-      muted
-      playsInline
-      preload={isActive ? 'auto' : 'metadata'}
-      poster={poster}
-      aria-label={title || 'Slide background video'}
-      className="w-full h-full object-cover pointer-events-none"
-    />
+    <div className="relative w-full h-full overflow-hidden">
+      {poster && (
+        <img
+          src={poster}
+          alt={title || 'Slide background poster'}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-out ${
+            isVideoLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}
+          loading={isFirst ? "eager" : "lazy"}
+          {...(isFirst ? { fetchPriority: "high" } : {})}
+          decoding="async"
+        />
+      )}
+      <video
+        ref={videoRef}
+        autoPlay
+        loop
+        muted
+        playsInline
+        disablePictureInPicture
+        disableRemotePlayback
+        preload={isActive ? 'auto' : 'none'}
+        aria-label={title || 'Slide background video'}
+        className={`w-full h-full object-cover pointer-events-none transition-opacity duration-700 ease-out ${
+          isVideoLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
+        onPlaying={() => setIsVideoLoaded(true)}
+      >
+        <source src={src} type="video/mp4" />
+      </video>
+    </div>
   );
 };
 
@@ -161,9 +211,17 @@ const Home: React.FC = () => {
 
   const heroSlides = sliders.length > 0 ? sliders.map((s, idx) => {
     let resolvedVideoUrl = s.video_url;
-    // Map known legacy Frankstar YouTube shortlink to local high-definition video loop if needed
-    if (resolvedVideoUrl && (resolvedVideoUrl.includes('X0d8DmasSiQ') || resolvedVideoUrl.includes('FRANKSTAR LOOP'))) {
-      resolvedVideoUrl = FrankstarLoopVideo;
+    // Map videos to local ultra-compressed, faststart video loops for instant playback
+    if (resolvedVideoUrl) {
+      if (resolvedVideoUrl.includes('X0d8DmasSiQ') || resolvedVideoUrl.includes('FRANKSTAR LOOP')) {
+        resolvedVideoUrl = FrankstarLoopVideo;
+      } else if (resolvedVideoUrl.includes('OFFSHORE INTELLIGENCE')) {
+        resolvedVideoUrl = OffshoreIntelVideo;
+      } else if (resolvedVideoUrl.includes('DIGITAL INTELLINGENCE')) {
+        resolvedVideoUrl = DigitalIntelVideo;
+      } else if (resolvedVideoUrl.includes('Pipeline_construction') || resolvedVideoUrl.includes('PIPELINE_CONSTRUCTION')) {
+        resolvedVideoUrl = PipelineConstructionVideo;
+      }
     }
 
     let targetCtaUrl = s.cta_url || '/services';
@@ -204,7 +262,7 @@ const Home: React.FC = () => {
       description: 'Accurate data. Deeper insight. Smarter engineering. High-resolution seismic, geophysical & hydrographic survey, geotechnical investigation, reality capture, and laboratory testing.',
       cta_text: 'Explore Division Capabilities',
       cta_url: '/services/geosolutions-engineering-services',
-      video_url: '/assets/OFFSHORE INTELLIGENCE.mp4',
+      video_url: OffshoreIntelVideo,
       desktop_image: '/assets/DJI_0003.jpg',
       mobile_image: '/assets/DJI_0003.jpg'
     },
@@ -215,7 +273,7 @@ const Home: React.FC = () => {
       description: 'From engineering preparation to successful project delivery. Integrated pipeline construction, civil infrastructure, structural steel fabrication, and commissioning support.',
       cta_text: 'Explore Division Capabilities',
       cta_url: '/services/integrated-construction-services',
-      video_url: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/media/1791214307405_Pipeline_construction.mp4',
+      video_url: PipelineConstructionVideo,
       desktop_image: 'https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1791214469409_Screenshot_2026-10-05_at_4.34.19_PM.png',
       mobile_image: '/assets/DJI_0003.jpg'
     },
@@ -374,11 +432,15 @@ const Home: React.FC = () => {
                     isActive={isActive}
                     poster={slide.desktop_image || fallbackPoster}
                     title={slide.title}
+                    isFirst={idx === 0}
                   />
                 ) : (
                   <img
                     src={slide.desktop_image || fallbackPoster}
                     alt={slide.title}
+                    loading={idx === 0 ? "eager" : "lazy"}
+                    {...(idx === 0 ? { fetchPriority: "high" } : {})}
+                    decoding="async"
                     className={`w-full h-full object-cover pointer-events-none transition-transform duration-[10000ms] ease-out ${
                       isActive ? 'scale-105' : 'scale-100'
                     }`}

@@ -95,12 +95,26 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'dist',
       assetsDir: 'assets',
-      // Emergency Mode: Disable modulePreload to remove 'crossorigin' and 'rel="modulepreload"'
-      modulePreload: false,
-      rollupOptions: {
+      modulePreload: {
+        polyfill: true,
       },
-      // Ensure source maps are off for emergency speed
+      cssCodeSplit: true,
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => {
+            if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('scheduler')) {
+                return 'vendor-react';
+              }
+              if (id.includes('@supabase')) {
+                return 'vendor-supabase';
+              }
+            }
+          },
+        },
+      },
       sourcemap: false,
+      chunkSizeWarningLimit: 1000,
     },
     plugins: [
       apiDevServerPlugin(),

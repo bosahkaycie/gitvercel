@@ -1,29 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import Home from './pages/Home';
-import About from './pages/About';
-import Services from './pages/Services';
-import ServiceDetail from './pages/ServiceDetail';
-import Projects from './pages/Projects';
-import Contact from './pages/Contact';
-import Careers from './pages/Careers';
-import News from './pages/News';
-import Blog from './pages/Blog';
-import BlogPost from './pages/BlogPost';
-import HSSE from './pages/HSSE';
-import Partners from './pages/Partners';
-import VendorHub from './pages/VendorHub';
-import Videos from './pages/Videos';
-import AdminLayout from './pages/admin/AdminLayout';
 import { SERVICES, PROJECTS, LEGACY_SERVICE_MAP } from './site_data';
 
-import AIChatbot from './components/AIChatbot';
 import ScrollToTop from './components/ScrollToTop';
 import WhatsAppButton from './components/WhatsAppButton';
-import SearchOverlay from './components/SearchOverlay';
-import MaintenanceUpdateScreen from './components/MaintenanceUpdateScreen';
 import { trackPageView, useSiteSettings } from './hooks/useSupabaseData';
+
+// Route-based code splitting for GTmetrix Grade A performance and ultra-fast initial load
+const Home = React.lazy(() => import('./pages/Home'));
+const About = React.lazy(() => import('./pages/About'));
+const Services = React.lazy(() => import('./pages/Services'));
+const ServiceDetail = React.lazy(() => import('./pages/ServiceDetail'));
+const Projects = React.lazy(() => import('./pages/Projects'));
+const Contact = React.lazy(() => import('./pages/Contact'));
+const Careers = React.lazy(() => import('./pages/Careers'));
+const News = React.lazy(() => import('./pages/News'));
+const Blog = React.lazy(() => import('./pages/Blog'));
+const BlogPost = React.lazy(() => import('./pages/BlogPost'));
+const HSSE = React.lazy(() => import('./pages/HSSE'));
+const Partners = React.lazy(() => import('./pages/Partners'));
+const VendorHub = React.lazy(() => import('./pages/VendorHub'));
+const Videos = React.lazy(() => import('./pages/Videos'));
+const AdminLayout = React.lazy(() => import('./pages/admin/AdminLayout'));
+const SearchOverlay = React.lazy(() => import('./components/SearchOverlay'));
+const MaintenanceUpdateScreen = React.lazy(() => import('./components/MaintenanceUpdateScreen'));
+
+const PageFallback: React.FC = () => (
+  <div className="min-h-screen w-full flex items-center justify-center bg-slate-950">
+    <div className="flex flex-col items-center gap-3">
+      <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+      <span className="text-xs font-semibold tracking-wider text-emerald-400 uppercase">Loading Polaris Portal...</span>
+    </div>
+  </div>
+);
 
 const App: React.FC = () => {
   const { settings } = useSiteSettings();
@@ -137,9 +147,9 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const metaDescriptions: { [key: string]: string } = {
-      '/': 'Polaris Integrated and GeoSolutions Limited (PIGL) - Indigenous Nigerian engineering and geosolutions leader providing intelligence, asset integrity, and field execution for the energy sector across Sub-Saharan Africa.',
+      '/': 'Polaris Integrated and GeoSolutions Limited (PIGL) is an ISO 9001:2015 & 45001:2018 certified geotechnical company, marine geophysical survey firm, and 3D reality capture specialist near you in Nigeria. Certified 20-ton CPT rigs, deep soil drilling, seismic surveys, and digital twins.',
       '/about': 'Discover PIGL\'s 20-year heritage of engineering excellence, ISO 9001:2015 & 45001:2018 certifications, and 100% indigenous Nigerian ownership.',
-      '/services': 'Explore PIGL\'s four operating divisions: GeoSolutions & Engineering Services (GES), Metocean & Marine Solutions (MMS), Integrated Construction Services (ICS), and Industrial Solutions (IS).',
+      '/services': 'Explore PIGL\'s specialist engineering divisions: GeoSolutions & Geotechnical Services, Metocean & Marine Solutions, 3D Reality Capture, Integrated Construction, and Industrial Solutions.',
       '/partners': 'PIGL Strategic Alliances & Global Technology Partnerships with Frankstar Technology, CoaleXpert, and NPK Flanges & Industrial Piping.',
       '/projects': 'Case studies of major engineering, reality capture, and geosolutions projects delivered for leading operators across swamp, coastal, land, and offshore terrains.',
       '/careers': 'Join the PIGL engineering team in Port Harcourt and across Nigeria. Grow your career with an indigenous leader in geosolutions and energy infrastructure.',
@@ -158,16 +168,16 @@ const App: React.FC = () => {
     };
 
     const pageTitles: { [key: string]: string } = {
-      '/': 'PIGL | Engineering, Geosolutions & Asset Integrity | Nigeria',
+      '/': 'PIGL | Geoscience, Marine, Engineering & Industrial Solutions in Nigeria',
       '/about': 'About PIGL | ISO Certified Indigenous Engineering Leader',
-      '/services': 'Operating Divisions & Engineering Services | PIGL Nigeria',
-      '/partners': 'Partners & Technology | Strategic Alliances | PIGL',
+      '/services': 'Engineering Services & Specialist Divisions | PIGL Nigeria',
+      '/partners': 'Strategic Alliances & Technology Partners | PIGL',
       '/projects': 'Engineering Case Studies & Executed Projects | PIGL',
       '/careers': 'Careers at PIGL | Indigenous Engineering Talent',
       '/news': 'News & Technical Insights | PIGL Nigeria',
       '/blog': 'Engineering News & Technical Insights | PIGL Nigeria',
       '/hsse': 'HSSEQ Standards & ISO Certifications | PIGL Safety',
-      '/contact': 'Contact PIGL | Technical Consultations & Project Scoping',
+      '/contact': 'Contact PIGL | Geotechnical & Engineering Consultations',
       '/vendors': 'Vendor Onboarding & Tax Compliance Portal | PIGL Nigeria',
       '/vendors/register': 'Vendor Registration Form PIGL/F/VOTC/AHR/037 | PIGL',
       '/vendor-registration': 'Vendor Registration Form PIGL/F/VOTC/AHR/037 | PIGL',
@@ -186,8 +196,22 @@ const App: React.FC = () => {
       if (LEGACY_SERVICE_MAP[id]) id = LEGACY_SERVICE_MAP[id];
       const service = SERVICES.find(s => s.id === id);
       if (service) {
-        activeTitle = `${service.title} (${service.abbreviation}) | PIGL Specialist Engineering`;
-        activeDesc = `${service.positioning ? `"${service.positioning}" — ` : ''}${service.description}`;
+        if (id === 'geosolutions-engineering-services') {
+          activeTitle = 'GeoSolutions & Engineering Services in Nigeria | PIGL';
+          activeDesc = 'Certified geotechnical investigations, 20-ton hydraulic CPT testing, deep borehole drilling, marine geophysical surveys, bathymetry, Leica RTC360 3D reality capture, and digital twins across Nigeria.';
+        } else if (id === 'metocean-marine-solutions') {
+          activeTitle = 'Metocean & Marine Solutions in Nigeria | PIGL';
+          activeDesc = 'Autonomous oceanographic buoy telemetry, marine environmental monitoring, ADCP Doppler current profiling, MetOcean forecasting, and marine operational advisory across the Gulf of Guinea.';
+        } else if (id === 'integrated-construction-services') {
+          activeTitle = 'Pipeline, Civil & Integrated Construction Services | PIGL';
+          activeDesc = 'Comprehensive energy infrastructure delivery: pipeline construction, horizontal directional drilling (HDD), mechanical spool fabrication, industrial civil infrastructure, and piling.';
+        } else if (id === 'industrial-solutions') {
+          activeTitle = 'Produced Water, Industrial Water & Wastewater Treatment | PIGL';
+          activeDesc = 'Advanced produced water treatment skids, industrial wastewater recovery, water quality laboratory analysis, environmental engineering, and specialty industrial procurement.';
+        } else {
+          activeTitle = `${service.title} (${service.abbreviation}) | Geotechnical & Engineering | PIGL`;
+          activeDesc = `${service.positioning ? `"${service.positioning}" — ` : ''}${service.description}`;
+        }
       }
     } else if (currentPath.startsWith('/blog/')) {
       activeTitle = 'Engineering Technical Publication | PIGL Insights';
@@ -313,7 +337,11 @@ const App: React.FC = () => {
 
   // Handle Admin Portal View as Standalone Full App
   if (currentPath.startsWith('/admin')) {
-    return <AdminLayout />;
+    return (
+      <Suspense fallback={<PageFallback />}>
+        <AdminLayout />
+      </Suspense>
+    );
   }
 
   // Handle Administrative Maintenance / Update Mode Switch
@@ -324,7 +352,11 @@ const App: React.FC = () => {
   );
 
   if (settings?.maintenance_mode && !isBypassActive) {
-    return <MaintenanceUpdateScreen settings={settings} />;
+    return (
+      <Suspense fallback={<PageFallback />}>
+        <MaintenanceUpdateScreen settings={settings} />
+      </Suspense>
+    );
   }
 
   const renderPage = () => {
@@ -376,12 +408,18 @@ const App: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar currentPath={currentPath} onSearchClick={() => setIsSearchOpen(true)} />
       <main className="flex-grow">
-        {renderPage()}
+        <Suspense fallback={<PageFallback />}>
+          {renderPage()}
+        </Suspense>
       </main>
       {currentPath !== '/vendors/portal' && <Footer />}
       <WhatsAppButton />
       <ScrollToTop />
-      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      {isSearchOpen && (
+        <Suspense fallback={null}>
+          <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+        </Suspense>
+      )}
     </div>
   );
 };

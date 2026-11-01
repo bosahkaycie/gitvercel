@@ -256,7 +256,7 @@ export const FALLBACK_SLIDERS: CMSSlider[] = [
     description: "From engineering preparation to successful project delivery. Integrated pipeline construction, civil infrastructure, structural steel fabrication, and commissioning support.",
     desktop_image: "https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1791214469409_Screenshot_2026-10-05_at_4.34.19_PM.png",
     mobile_image: "/assets/DJI_0003.jpg",
-    video_url: "https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/media/1791214307405_Pipeline_construction.mp4",
+    video_url: "/assets/PIPELINE_CONSTRUCTION.mp4",
     cta_text: "Explore Division Capabilities",
     cta_url: "/services/integrated-construction-services",
     display_order: 3,
