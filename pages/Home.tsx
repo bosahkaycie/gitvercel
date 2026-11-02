@@ -209,6 +209,7 @@ const Home: React.FC = () => {
   const effectivePartners = dynamicPartners && dynamicPartners.length > 0 ? dynamicPartners : PARTNERS;
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [activeCollageImage, setActiveCollageImage] = useState<{ src: string; alt: string; title: string } | null>(null);
   const [navScrolled, setNavScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState<'Intelligence' | 'Solutions & Engineering'>('Intelligence');
   const [galleryFilter, setGalleryFilter] = useState<string>('All');
@@ -428,9 +429,12 @@ const Home: React.FC = () => {
   // Close modal on ESC key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsVideoModalOpen(false);
+      if (e.key === 'Escape') {
+        setIsVideoModalOpen(false);
+        setActiveCollageImage(null);
+      }
     };
-    if (isVideoModalOpen) {
+    if (isVideoModalOpen || activeCollageImage) {
       window.addEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'hidden';
     } else {
@@ -440,7 +444,7 @@ const Home: React.FC = () => {
       window.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'unset';
     };
-  }, [isVideoModalOpen]);
+  }, [isVideoModalOpen, activeCollageImage]);
 
   return (
     <div className="flex flex-col font-sans bg-white">
@@ -867,34 +871,56 @@ const Home: React.FC = () => {
                 {/* Column 1 */}
                 <div className="flex flex-col gap-4 h-full">
                   {/* 1. Ground Truth / Geotech */}
-                  <div className="flex-1 relative overflow-hidden shadow-md border border-slate-200 group bg-slate-900 min-h-[220px] sm:min-h-[260px]">
+                  <div 
+                    onClick={() => setActiveCollageImage({
+                      src: OpDrillCrewCasingImg,
+                      alt: 'PIGL Geotechnical Drilling specialists conducting borehole operations',
+                      title: 'Deep Borehole Casing & Soil Sampling'
+                    })}
+                    className="flex-1 relative overflow-hidden rounded-md border border-slate-200 shadow-xs hover:shadow-2xl group bg-slate-900 min-h-[220px] sm:min-h-[260px] cursor-pointer transition-all duration-500 hover:border-emerald-500 hover:ring-2 hover:ring-emerald-500/30"
+                  >
                     <img
                       src={OpDrillCrewCasingImg}
                       alt="PIGL Geotechnical Drilling specialists conducting borehole operations"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 group-hover:brightness-[1.04]"
                       loading="lazy"
                       decoding="async"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent pointer-events-none" />
-                    <div className="absolute bottom-3.5 left-3.5 right-3.5 text-white">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block mb-0.5">Phase 1 • Ground Truth</span>
-                      <p className="text-xs font-bold leading-tight truncate">Deep Borehole Casing & Soil Sampling</p>
+                    {/* Interactive Ambient Sheen on Hover */}
+                    <div className="absolute inset-0 bg-emerald-950/15 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                    {/* Interactive Floating Zoom Indicator */}
+                    <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-950/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transform translate-y-1.5 group-hover:translate-y-0 transition-all duration-300 pointer-events-none shadow-md">
+                      <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                      </svg>
                     </div>
                   </div>
 
                   {/* 2. 3D Reality Capture Scanner */}
-                  <div className="flex-1 relative overflow-hidden shadow-md border border-slate-200 group bg-slate-900 min-h-[220px] sm:min-h-[260px]">
+                  <div 
+                    onClick={() => setActiveCollageImage({
+                      src: OpLaserManifoldImg,
+                      alt: 'PIGL Engineers conducting high-density 3D Laser Scanning on process manifold',
+                      title: 'Facility Manifold 3D Laser Scanning'
+                    })}
+                    className="flex-1 relative overflow-hidden rounded-md border border-slate-200 shadow-xs hover:shadow-2xl group bg-slate-900 min-h-[220px] sm:min-h-[260px] cursor-pointer transition-all duration-500 hover:border-emerald-500 hover:ring-2 hover:ring-emerald-500/30"
+                  >
                     <img
                       src={OpLaserManifoldImg}
                       alt="PIGL Engineers conducting high-density 3D Laser Scanning on process manifold"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 group-hover:brightness-[1.04]"
                       loading="lazy"
                       decoding="async"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent pointer-events-none" />
-                    <div className="absolute bottom-3.5 left-3.5 right-3.5 text-white">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block mb-0.5">Phase 3 • Verify</span>
-                      <p className="text-xs font-bold leading-tight truncate">Facility Manifold 3D Laser Scanning</p>
+                    {/* Interactive Ambient Sheen on Hover */}
+                    <div className="absolute inset-0 bg-emerald-950/15 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                    {/* Interactive Floating Zoom Indicator */}
+                    <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-950/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transform translate-y-1.5 group-hover:translate-y-0 transition-all duration-300 pointer-events-none shadow-md">
+                      <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                      </svg>
                     </div>
                   </div>
                 </div>
@@ -902,34 +928,56 @@ const Home: React.FC = () => {
                 {/* Column 2 */}
                 <div className="flex flex-col gap-4 h-full">
                   {/* 3. Marine Operations */}
-                  <div className="flex-1 relative overflow-hidden shadow-md border border-slate-200 group bg-slate-900 min-h-[220px] sm:min-h-[260px]">
+                  <div 
+                    onClick={() => setActiveCollageImage({
+                      src: OpOffshoreBargeImg,
+                      alt: 'PIGL Offshore Geotechnical Drilling Barge and Vessel in open sea',
+                      title: 'Offshore Geotech Drilling Vessel'
+                    })}
+                    className="flex-1 relative overflow-hidden rounded-md border border-slate-200 shadow-xs hover:shadow-2xl group bg-slate-900 min-h-[220px] sm:min-h-[260px] cursor-pointer transition-all duration-500 hover:border-emerald-500 hover:ring-2 hover:ring-emerald-500/30"
+                  >
                     <img
                       src={OpOffshoreBargeImg}
                       alt="PIGL Offshore Geotechnical Drilling Barge and Vessel in open sea"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 group-hover:brightness-[1.04]"
                       loading="lazy"
                       decoding="async"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent pointer-events-none" />
-                    <div className="absolute bottom-3.5 left-3.5 right-3.5 text-white">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block mb-0.5">Phase 1 • Marine</span>
-                      <p className="text-xs font-bold leading-tight truncate">Offshore Geotech Drilling Vessel</p>
+                    {/* Interactive Ambient Sheen on Hover */}
+                    <div className="absolute inset-0 bg-emerald-950/15 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                    {/* Interactive Floating Zoom Indicator */}
+                    <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-950/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transform translate-y-1.5 group-hover:translate-y-0 transition-all duration-300 pointer-events-none shadow-md">
+                      <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                      </svg>
                     </div>
                   </div>
 
                   {/* 4. Infrastructure & Pipeline Execution */}
-                  <div className="flex-1 relative overflow-hidden shadow-md border border-slate-200 group bg-slate-900 min-h-[220px] sm:min-h-[260px]">
+                  <div 
+                    onClick={() => setActiveCollageImage({
+                      src: OpPipelineSwampCatImg,
+                      alt: 'PIGL Heavy Pipeline ROW Construction with CAT pipelayers in swamp terrain',
+                      title: 'Swamp Pipeline ROW Execution'
+                    })}
+                    className="flex-1 relative overflow-hidden rounded-md border border-slate-200 shadow-xs hover:shadow-2xl group bg-slate-900 min-h-[220px] sm:min-h-[260px] cursor-pointer transition-all duration-500 hover:border-emerald-500 hover:ring-2 hover:ring-emerald-500/30"
+                  >
                     <img
                       src={OpPipelineSwampCatImg}
                       alt="PIGL Heavy Pipeline ROW Construction with CAT pipelayers in swamp terrain"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-110 group-hover:brightness-[1.04]"
                       loading="lazy"
                       decoding="async"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent pointer-events-none" />
-                    <div className="absolute bottom-3.5 left-3.5 right-3.5 text-white">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block mb-0.5">Phase 2 • Build</span>
-                      <p className="text-xs font-bold leading-tight truncate">Swamp Pipeline ROW Execution</p>
+                    {/* Interactive Ambient Sheen on Hover */}
+                    <div className="absolute inset-0 bg-emerald-950/15 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                    {/* Interactive Floating Zoom Indicator */}
+                    <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-950/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transform translate-y-1.5 group-hover:translate-y-0 transition-all duration-300 pointer-events-none shadow-md">
+                      <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                      </svg>
                     </div>
                   </div>
                 </div>
@@ -1600,6 +1648,39 @@ const Home: React.FC = () => {
               referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
             ></iframe>
+          </div>
+        </div>
+      )}
+
+      {/* Operational Image Lightbox Preview Modal */}
+      {activeCollageImage && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-950/90 backdrop-blur-md animate-fade-in"
+          onClick={() => setActiveCollageImage(null)}
+        >
+          <div 
+            className="relative max-w-5xl max-h-[90vh] bg-slate-900 border border-slate-700 rounded-xl overflow-hidden shadow-2xl flex flex-col"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950 text-white">
+              <h4 className="text-sm font-bold text-emerald-400 uppercase tracking-wider">{activeCollageImage.title}</h4>
+              <button 
+                onClick={() => setActiveCollageImage(null)}
+                className="text-slate-400 hover:text-white transition-colors p-1.5 rounded-md hover:bg-slate-800 cursor-pointer"
+                aria-label="Close image preview"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="overflow-hidden flex items-center justify-center p-2 bg-slate-950">
+              <img 
+                src={activeCollageImage.src} 
+                alt={activeCollageImage.alt}
+                className="max-h-[75vh] w-auto max-w-full object-contain rounded"
+              />
+            </div>
           </div>
         </div>
       )}
