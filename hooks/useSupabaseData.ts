@@ -4220,40 +4220,49 @@ export const getOrCreateVisitorId = (): string => {
   }
 };
 
-export const trackPageView = async (pagePath: string) => {
+export const trackPageView = (pagePath: string) => {
   // Avoid tracking admin panel paths as public visitor traffic
   if (pagePath.startsWith('/admin')) return;
 
-  try {
-    const visitorId = getOrCreateVisitorId();
-    const screenRes = typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : 'unknown';
-    const lang = typeof navigator !== 'undefined' ? navigator.language : 'en';
+  const executeTracking = async () => {
+    try {
+      const visitorId = getOrCreateVisitorId();
+      const screenRes = typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : 'unknown';
+      const lang = typeof navigator !== 'undefined' ? navigator.language : 'en';
 
-    const log: WebsiteTelemetryLog = {
-      id: `tel-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-      page_path: pagePath,
-      visitor_id: visitorId,
-      user_agent: typeof navigator !== 'undefined' ? `${navigator.userAgent} [${screenRes}, ${lang}]` : 'unknown',
-      referrer: typeof document !== 'undefined' ? (document.referrer || '') : '',
-      visited_at: new Date().toISOString()
-    };
+      const log: WebsiteTelemetryLog = {
+        id: `tel-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        page_path: pagePath,
+        visitor_id: visitorId,
+        user_agent: typeof navigator !== 'undefined' ? `${navigator.userAgent} [${screenRes}, ${lang}]` : 'unknown',
+        referrer: typeof document !== 'undefined' ? (document.referrer || '') : '',
+        visited_at: new Date().toISOString()
+      };
 
-    // Save locally
-    const existing = getStoredTelemetry();
-    existing.unshift(log);
-    saveStoredTelemetry(existing);
+      // Save locally
+      const existing = getStoredTelemetry();
+      existing.unshift(log);
+      saveStoredTelemetry(existing);
 
-    // Save to Supabase
-    const client = getSupabaseClient();
-    if (client) {
-      try {
-        await client.from('website_telemetry').insert([log]);
-      } catch (err) {
-        // Silently capture any network/RLS issues
+      // Save to Supabase
+      const client = getSupabaseClient();
+      if (client) {
+        try {
+          await client.from('website_telemetry').insert([log]);
+        } catch (err) {
+          // Silently capture any network/RLS issues
+        }
       }
+    } catch (err) {
+      console.warn('Page view tracking note:', err);
     }
-  } catch (err) {
-    console.warn('Page view tracking note:', err);
+  };
+
+  // Schedule tracking when browser main thread is idle to eliminate TBT contention
+  if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(executeTracking, { timeout: 3000 });
+  } else {
+    setTimeout(executeTracking, 1500);
   }
 };
 

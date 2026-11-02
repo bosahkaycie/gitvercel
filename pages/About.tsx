@@ -6,6 +6,7 @@ import AboutBg from '../assets/teaching.jpeg';
 import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
 import InfraSketchImg from '../assets/infrastructure_sketch.jpg';
 import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
+import YouTubeFacade from '../components/YouTubeFacade';
 
 // Authentic Operations Photography
 import OpLogisticsBaseImg from '../assets/operations/pigl_logistics_base_aerial.jpg';
@@ -126,14 +127,13 @@ const About: React.FC = () => {
                 </a>
               </div>
             </div>
-            <div className="relative h-[400px] md:h-[600px] bg-slate-100">
-              <iframe
-                src="https://www.youtube.com/embed/sExrHCIGkH0"
+            <div className="relative h-[400px] md:h-[600px] bg-slate-950 flex items-center justify-center overflow-hidden">
+              <YouTubeFacade
+                videoId="sExrHCIGkH0"
                 title="The Inspiring Journey of PIGL"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
+                poster="/assets/operations/pigl_offshore_geotech_drilling_barge.jpg"
                 className="w-full h-full border-0 absolute inset-0"
-              ></iframe>
+              />
             </div>
           </div>
         </div>
