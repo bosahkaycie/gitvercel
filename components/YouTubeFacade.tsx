@@ -62,6 +62,8 @@ export const YouTubeFacade: React.FC<YouTubeFacadeProps> = ({
       <img
         src={imgError ? fallbackPoster : primaryPoster}
         alt={title}
+        width="1280"
+        height="720"
         loading="lazy"
         decoding="async"
         onError={() => setImgError(true)}

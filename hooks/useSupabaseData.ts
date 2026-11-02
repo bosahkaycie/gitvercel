@@ -226,7 +226,7 @@ export const FALLBACK_SLIDERS: CMSSlider[] = [
     title: "Metocean & Marine Solutions",
     subtitle: "LIFECYCLE PHASE 01 // METOCEAN & MARINE SOLUTIONS",
     description: "Real-time ocean observation, MetOcean forecasting, marine environmental monitoring, and operational advisory across maritime domains.",
-    desktop_image: "https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790716750733_HERO_2.png",
+    desktop_image: "/assets/new_ocean.webp",
     mobile_image: "/assets/DJI_0003.jpg",
     video_url: "/assets/FRANKSTAR LOOP.mp4",
     cta_text: "Explore Division Capabilities",
@@ -240,7 +240,7 @@ export const FALLBACK_SLIDERS: CMSSlider[] = [
     title: "GeoSolutions & Engineering Services",
     subtitle: "LIFECYCLE PHASE 02 // GEOSOLUTIONS & ENGINEERING",
     description: "Accurate data. Deeper insight. Smarter engineering. High-resolution seismic, geophysical & hydrographic survey, geotechnical investigation, reality capture, and laboratory testing.",
-    desktop_image: "/assets/DJI_0003.jpg",
+    desktop_image: "/assets/seismic_survey.webp",
     mobile_image: "/assets/DJI_0003.jpg",
     video_url: "/assets/OFFSHORE INTELLIGENCE.mp4",
     cta_text: "Explore Division Capabilities",
@@ -254,7 +254,7 @@ export const FALLBACK_SLIDERS: CMSSlider[] = [
     title: "Integrated Construction Services",
     subtitle: "LIFECYCLE PHASE 03 // INTEGRATED CONSTRUCTION SERVICES",
     description: "From engineering preparation to successful project delivery. Integrated pipeline construction, civil infrastructure, structural steel fabrication, and commissioning support.",
-    desktop_image: "https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1791214469409_Screenshot_2026-10-05_at_4.34.19_PM.png",
+    desktop_image: "/assets/newpipeline.webp",
     mobile_image: "/assets/DJI_0003.jpg",
     video_url: "/assets/PIPELINE_CONSTRUCTION.mp4",
     cta_text: "Explore Division Capabilities",
@@ -268,7 +268,7 @@ export const FALLBACK_SLIDERS: CMSSlider[] = [
     title: "Industrial Solutions",
     subtitle: "LIFECYCLE PHASE 04 // INDUSTRIAL SOLUTIONS",
     description: "Cleaner water. Healthier communities. Sustainable industries. Produced water treatment, industrial & domestic water solutions, water laboratory analysis, and wastewater recovery.",
-    desktop_image: "https://supabasekong-7deaxlm0rmorqbbbstpmvjgj.191.215.41.50.sslip.io/storage/v1/object/public/sliders/1790716979886_leica_rtc360.jpg",
+    desktop_image: "/assets/water_treatment_skid.jpg",
     mobile_image: "/assets/DJI_0003.jpg",
     video_url: "/assets/DIGITAL INTELLINGENCE.mp4",
     cta_text: "Explore Division Capabilities",
@@ -283,8 +283,48 @@ export const FALLBACK_SLIDERS: CMSSlider[] = [
 const LOCAL_STORAGE_KEY_SERVICES = 'pigl_cms_services';
 const LOCAL_STORAGE_KEY_BLOGS = 'pigl_cms_blogs';
 const LOCAL_STORAGE_KEY_SLIDERS = 'pigl_cms_sliders';
-export const CURRENT_SLIDERS_VERSION = "v4_four_divisions_sync";
+export const CURRENT_SLIDERS_VERSION = "v5_perf_local_webp_assets";
 export const LOCAL_STORAGE_KEY_SLIDERS_VERSION = "pigl_cms_sliders_version";
+
+/**
+ * Strips unreachable remote IP URLs (such as 191.215.41.50) that cause 21-second connection stalls,
+ * mapping them directly to locally bundled, pre-compressed WebP and faststart video assets.
+ */
+export const sanitizeSliderAsset = (slider: CMSSlider, index: number): CMSSlider => {
+  const localPosters = [
+    '/assets/new_ocean.webp',
+    '/assets/seismic_survey.webp',
+    '/assets/newpipeline.webp',
+    '/assets/water_treatment_skid.jpg'
+  ];
+  let desktop = slider.desktop_image;
+  let mobile = slider.mobile_image;
+
+  if (!desktop || desktop.includes('191.215.41.50') || desktop.includes('sslip.io')) {
+    desktop = localPosters[index % localPosters.length];
+  }
+  if (!mobile || mobile.includes('191.215.41.50') || mobile.includes('sslip.io')) {
+    mobile = '/assets/DJI_0003.jpg';
+  }
+
+  let video = slider.video_url;
+  if (video && (video.includes('X0d8DmasSiQ') || video.includes('FRANKSTAR LOOP'))) {
+    video = '/assets/FRANKSTAR LOOP.mp4';
+  } else if (video && video.includes('OFFSHORE INTELLIGENCE')) {
+    video = '/assets/OFFSHORE INTELLIGENCE.mp4';
+  } else if (video && video.includes('DIGITAL INTELLINGENCE')) {
+    video = '/assets/DIGITAL INTELLINGENCE.mp4';
+  } else if (video && (video.includes('Pipeline_construction') || video.includes('PIPELINE_CONSTRUCTION'))) {
+    video = '/assets/PIPELINE_CONSTRUCTION.mp4';
+  }
+
+  return {
+    ...slider,
+    desktop_image: desktop,
+    mobile_image: mobile,
+    video_url: video
+  };
+};
 const LOCAL_STORAGE_KEY_AUTH = 'pigl_admin_auth_user';
 const LOCAL_STORAGE_KEY_ADMIN_USERS = 'pigl_cms_admin_users';
 const LOCAL_STORAGE_KEY_INQUIRIES = 'pigl_cms_inquiries';
@@ -807,18 +847,13 @@ export const getStoredSliders = (): CMSSlider[] => {
           seenIds.add(s.id);
           return true;
         });
-        return unique.map(s => {
-          if (s.video_url && s.video_url.includes("X0d8DmasSiQ")) {
-            return { ...s, video_url: "/assets/FRANKSTAR LOOP.mp4" };
-          }
-          return s;
-        });
+        return unique.map((s, idx) => sanitizeSliderAsset(s, idx));
       }
     }
   } catch (e) {
     console.warn("Failed to load local sliders", e);
   }
-  return FALLBACK_SLIDERS;
+  return FALLBACK_SLIDERS.map((s, idx) => sanitizeSliderAsset(s, idx));
 };
 
 export const saveStoredSliders = (sliders: CMSSlider[]) => {
@@ -1347,12 +1382,7 @@ export const useSliders = (adminMode = false) => {
             return true;
           });
 
-          const normalized = unique.map(s => {
-            if (s.video_url && s.video_url.includes('X0d8DmasSiQ')) {
-              return { ...s, video_url: '/assets/FRANKSTAR LOOP.mp4' };
-            }
-            return s;
-          });
+          const normalized = unique.map((s, idx) => sanitizeSliderAsset(s, idx));
 
           normalized.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
           saveStoredSliders(normalized);

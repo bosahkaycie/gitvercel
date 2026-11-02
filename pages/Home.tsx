@@ -167,9 +167,11 @@ const HeroSlideVideo: React.FC<{
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-out ${
             isVideoLoaded && isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'
           }`}
+          width="1920"
+          height="1080"
           loading={isFirst ? "eager" : "lazy"}
           {...(isFirst ? { fetchPriority: "high" } : {})}
-          decoding="async"
+          decoding={isFirst ? "sync" : "async"}
         />
       )}
       {hasBeenActive && !prefersReducedMotion && (
@@ -244,41 +246,14 @@ const Home: React.FC = () => {
 
   const [isHeroHovered, setIsHeroHovered] = useState(false);
 
-  const heroSlides = sliders.length > 0 ? sliders.map((s, idx) => {
-    let resolvedVideoUrl = s.video_url;
-    // Map videos to local ultra-compressed, faststart video loops for instant playback
-    if (resolvedVideoUrl) {
-      if (resolvedVideoUrl.includes('X0d8DmasSiQ') || resolvedVideoUrl.includes('FRANKSTAR LOOP')) {
-        resolvedVideoUrl = FrankstarLoopVideo;
-      } else if (resolvedVideoUrl.includes('OFFSHORE INTELLIGENCE')) {
-        resolvedVideoUrl = OffshoreIntelVideo;
-      } else if (resolvedVideoUrl.includes('DIGITAL INTELLINGENCE')) {
-        resolvedVideoUrl = DigitalIntelVideo;
-      } else if (resolvedVideoUrl.includes('Pipeline_construction') || resolvedVideoUrl.includes('PIPELINE_CONSTRUCTION')) {
-        resolvedVideoUrl = PipelineConstructionVideo;
-      }
-    }
+  const localSliderPosters = [
+    '/assets/new_ocean.webp',
+    '/assets/seismic_survey.webp',
+    '/assets/newpipeline.webp',
+    '/assets/water_treatment_skid.jpg'
+  ];
 
-    let targetCtaUrl = s.cta_url || '/services';
-    if (targetCtaUrl.startsWith('/services/')) {
-      const slug = targetCtaUrl.replace('/services/', '');
-      if (LEGACY_SERVICE_MAP[slug]) {
-        targetCtaUrl = `/services/${LEGACY_SERVICE_MAP[slug]}`;
-      }
-    }
-
-    return {
-      id: s.id,
-      phase: s.subtitle ? s.subtitle.toUpperCase() : `LIFECYCLE PHASE 0${idx + 1}`,
-      title: s.title,
-      description: s.description || s.subtitle || '',
-      cta_text: s.cta_text || 'Explore Capabilities',
-      cta_url: targetCtaUrl,
-      video_url: resolvedVideoUrl,
-      desktop_image: s.desktop_image,
-      mobile_image: s.mobile_image || s.desktop_image
-    };
-  }) : [
+  const heroSlides = (sliders.length > 0 ? sliders : [
     {
       id: '3bd59604-1015-41e0-bcb1-c087fa769342',
       phase: 'LIFECYCLE PHASE 01 // METOCEAN & MARINE SOLUTIONS',
@@ -323,13 +298,57 @@ const Home: React.FC = () => {
       desktop_image: '/assets/water_treatment_skid.jpg',
       mobile_image: '/assets/DJI_0003.jpg'
     }
-  ];
+  ]).map((s, idx) => {
+    let resolvedVideoUrl = s.video_url;
+    // Map videos to local ultra-compressed, faststart video loops for instant playback
+    if (resolvedVideoUrl) {
+      if (resolvedVideoUrl.includes('X0d8DmasSiQ') || resolvedVideoUrl.includes('FRANKSTAR LOOP')) {
+        resolvedVideoUrl = FrankstarLoopVideo;
+      } else if (resolvedVideoUrl.includes('OFFSHORE INTELLIGENCE')) {
+        resolvedVideoUrl = OffshoreIntelVideo;
+      } else if (resolvedVideoUrl.includes('DIGITAL INTELLINGENCE')) {
+        resolvedVideoUrl = DigitalIntelVideo;
+      } else if (resolvedVideoUrl.includes('Pipeline_construction') || resolvedVideoUrl.includes('PIPELINE_CONSTRUCTION')) {
+        resolvedVideoUrl = PipelineConstructionVideo;
+      }
+    }
+
+    let desktopImg = s.desktop_image;
+    if (!desktopImg || desktopImg.includes('191.215.41.50') || desktopImg.includes('sslip.io')) {
+      desktopImg = localSliderPosters[idx % localSliderPosters.length];
+    }
+
+    let mobileImg = s.mobile_image;
+    if (!mobileImg || mobileImg.includes('191.215.41.50') || mobileImg.includes('sslip.io')) {
+      mobileImg = '/assets/DJI_0003.jpg';
+    }
+
+    let targetCtaUrl = s.cta_url || '/services';
+    if (targetCtaUrl.startsWith('/services/')) {
+      const slug = targetCtaUrl.replace('/services/', '');
+      if (LEGACY_SERVICE_MAP[slug]) {
+        targetCtaUrl = `/services/${LEGACY_SERVICE_MAP[slug]}`;
+      }
+    }
+
+    return {
+      id: s.id,
+      phase: s.subtitle ? s.subtitle.toUpperCase() : `LIFECYCLE PHASE 0${idx + 1}`,
+      title: s.title,
+      description: s.description || s.subtitle || '',
+      cta_text: s.cta_text || 'Explore Capabilities',
+      cta_url: targetCtaUrl,
+      video_url: resolvedVideoUrl,
+      desktop_image: desktopImg,
+      mobile_image: mobileImg
+    };
+  });
 
   useEffect(() => {
     if (isHeroHovered || !isHeroVisible || heroSlides.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 7000);
+    }, 12000);
     return () => clearInterval(timer);
   }, [heroSlides.length, isHeroHovered, isHeroVisible]);
 

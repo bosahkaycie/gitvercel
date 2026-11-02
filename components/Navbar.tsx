@@ -278,6 +278,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                   src={useDarkText ? LogoDarkImg : LogoLightImg}
                   alt="Polaris Integrated & Geosolutions Logo"
                   className="h-9 md:h-10 xl:h-12 w-auto object-contain transition-all duration-500"
+                  width="160"
+                  height="48"
                   loading="eager"
                   fetchPriority="high"
                   decoding="async"

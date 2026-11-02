@@ -59,6 +59,8 @@ const Footer: React.FC = () => {
                 src={LogoImg}
                 alt="Polaris Integrated & Geosolutions Logo"
                 className="h-12 md:h-16 w-auto object-contain transition-all duration-500 hover:scale-105 hover:-translate-y-1 transform cursor-pointer"
+                width="160"
+                height="52"
                 loading="lazy"
                 decoding="async"
               />
@@ -73,6 +75,8 @@ const Footer: React.FC = () => {
                   src={Iso9001Img}
                   alt="ISO 9001:2015 Q-Mark"
                   className="h-14 md:h-18 w-auto object-contain opacity-90 hover:opacity-100 transition-all duration-500 hover:scale-105 hover:-translate-y-1 transform"
+                  width="72"
+                  height="72"
                   loading="lazy"
                   decoding="async"
                 />
@@ -89,6 +93,8 @@ const Footer: React.FC = () => {
                   src={Iso45001Img}
                   alt="ISO 45001:2018 Q-Mark"
                   className="h-14 md:h-18 w-auto object-contain opacity-90 hover:opacity-100 transition-all duration-500 hover:scale-105 hover:-translate-y-1 transform"
+                  width="72"
+                  height="72"
                   loading="lazy"
                   decoding="async"
                 />
