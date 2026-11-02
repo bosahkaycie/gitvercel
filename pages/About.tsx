@@ -163,8 +163,7 @@ const About: React.FC = () => {
       <section id="values" className="py-20 md:py-32 bg-white border-b border-slate-200 reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-16">
-            <span className="text-emerald-700 font-bold uppercase tracking-wider text-sm mb-4 block">Our Philosophy</span>
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">Core Values Driving PIGL</h2>
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">Core Values</h2>
             <p className="text-slate-600 text-lg mt-4 font-normal">
               At the heart of all our operations across Sub-Saharan Africa are four primary values that guarantee technical quality, safety, and dependable delivery.
             </p>
@@ -198,7 +197,6 @@ const About: React.FC = () => {
               </div>
             </div>
             <div className="order-1 lg:order-2 space-y-8">
-              <span className="text-emerald-700 font-bold uppercase tracking-wider text-sm">Commitment to Safety</span>
               <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight tracking-tight">Health, Safety & Environment (HSE)</h2>
               <p className="text-slate-600 text-lg leading-relaxed font-normal">
                 Safety is not just a policy at PIGL, it is our core culture. We operate under a "Goal Zero" mindset, striving for zero injuries, zero lost-time incidents, and complete environmental care. Our management systems are audited and certified to ISO 9001:2015 and ISO 45001:2018 to ensure the highest standard of protection for our workers and our communities.
@@ -231,8 +229,7 @@ const About: React.FC = () => {
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-16">
-            <span className="text-emerald-700 font-bold uppercase tracking-wider text-sm mb-4 block">Sustainability</span>
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">Empowering Local Capacity</h2>
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">Local Content & Community Engagement</h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
@@ -265,14 +262,8 @@ const About: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div className="space-y-6">
-              <div className="flex items-center space-x-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                <span className="text-emerald-400 font-bold uppercase tracking-widest text-xs">
-                  Operational Readiness & Logistics
-                </span>
-              </div>
               <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
-                Dedicated Logistics Yard & Mobilization Base
+                Logistics Yard & Mobilisation Base
               </h2>
               <div className="space-y-4 text-slate-300 text-base md:text-lg leading-relaxed font-normal">
                 <p>
@@ -321,7 +312,6 @@ const About: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24 items-center">
             <div className="space-y-8">
-              <span className="text-emerald-700 font-bold uppercase tracking-wider text-sm">Corporate Resources</span>
               <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight tracking-tight">Company Profile</h2>
               <p className="text-slate-600 text-lg font-normal leading-relaxed">
                 Download our detailed company profile to explore our full range of capabilities, technical specifications, and past project portfolios.
@@ -407,9 +397,9 @@ const About: React.FC = () => {
 
       {/* CTA Section */}
       <section className="bg-emerald-950 py-24 md:py-32 text-center px-4">
-        <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 tracking-tight max-w-4xl mx-auto">Ready to Partner with a Leader?</h2>
+        <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 tracking-tight max-w-4xl mx-auto">Discuss Your Engineering and Survey Requirements</h2>
         <a href="/contact" className="inline-flex items-center bg-emerald-500 text-white font-bold px-10 py-4 hover:bg-white hover:text-emerald-950 transition-colors shadow-lg">
-          Connect with Us <span className="ml-3 font-normal text-xl">→</span>
+          Contact Our Engineering Team <span className="ml-3 font-normal text-xl">→</span>
         </a>
       </section>
     </div>

@@ -707,12 +707,6 @@ const Home: React.FC = () => {
             {/* Left Narrative Content */}
             <div className="lg:col-span-6 flex flex-col justify-between space-y-6">
               <div>
-                <div className="flex items-center space-x-2 mb-3">
-                  <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
-                  <span className="text-emerald-700 font-bold text-xs uppercase tracking-widest block">
-                    About Polaris Integrated & GeoSolutions
-                  </span>
-                </div>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
                   Engineering Expertise Across Geoscience, Marine, Construction & Industrial Operations
                 </h2>
@@ -822,12 +816,6 @@ const Home: React.FC = () => {
             
             <div className="lg:col-span-6 flex flex-col justify-between space-y-6">
               <div>
-                <div className="flex items-center space-x-2 mb-3">
-                  <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
-                  <span className="text-emerald-700 font-bold text-xs uppercase tracking-widest block">
-                    The Asset Lifecycle Continuum
-                  </span>
-                </div>
                 <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight mb-4">
                   From Site Investigation to Asset Verification
                 </h2>
@@ -963,14 +951,8 @@ const Home: React.FC = () => {
           {/* Header with Carousel Navigation Controls */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div className="max-w-2xl">
-              <div className="flex items-center space-x-2 mb-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
-                <span className="text-emerald-700 font-bold text-xs uppercase tracking-widest">
-                  Core Engineering Divisions
-                </span>
-              </div>
               <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">
-                What We Do
+                Services
               </h2>
               <p className="text-slate-600 text-base md:text-lg font-normal leading-relaxed">
                 Converting physical environments, complex subsurfaces, and maritime conditions into high-fidelity data and execution.
@@ -1048,7 +1030,7 @@ const Home: React.FC = () => {
                       href={`/services/${service.id}`}
                       className="inline-flex items-center text-emerald-700 font-bold hover:text-emerald-900 text-xs sm:text-sm uppercase tracking-wider transition-colors group-hover:translate-x-1 duration-300"
                     >
-                      Explore Service Specs <span className="ml-2">→</span>
+                      View Capabilities <span className="ml-2">→</span>
                     </a>
                   </div>
                 </div>
@@ -1068,12 +1050,6 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
             <div className="max-w-2xl">
-              <div className="flex items-center space-x-2 mb-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
-                <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block">
-                  Proven Field Track Record
-                </span>
-              </div>
               <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">
                 Executed Projects
               </h2>
@@ -1085,7 +1061,7 @@ const Home: React.FC = () => {
               href="/projects"
               className="inline-flex items-center text-emerald-800 hover:text-emerald-950 font-bold text-sm tracking-wide transition-colors group"
             >
-              Explore All Case Studies <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+              View All Projects <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
             </a>
           </div>
 
@@ -1172,14 +1148,8 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div className="max-w-2xl">
-              <div className="flex items-center space-x-2 mb-3">
-                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                <span className="text-emerald-400 font-bold text-xs uppercase tracking-widest block">
-                  Field Operations in Action
-                </span>
-              </div>
               <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
-                Authentic Engineering & Maritime Delivery
+                Equipment & Technology
               </h2>
               <p className="text-slate-400 text-base md:text-lg font-normal leading-relaxed mt-4">
                 Real operational photographs from active PIGL energy projects across Nigeria—from deepwater geotechnical drilling vessels and high-density 3D laser scan surveys to heavy swamp pipeline construction and certified field fabrication.
@@ -1321,14 +1291,8 @@ const Home: React.FC = () => {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-3xl mb-16">
-            <div className="flex items-center space-x-2 mb-3">
-              <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
-              <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block">
-                Global Technology Alliances
-              </span>
-            </div>
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight mb-6">
-              Specialised Technology Alliances & Field Execution
+              Technology Partners
             </h2>
             <p className="text-lg md:text-xl text-slate-600 font-normal leading-relaxed">
               We deploy specialised international technology across Nigerian energy and infrastructure corridors. Through technical alliances with Frankstar Technology, CoaleXpert, and NPK, we mobilise oceanographic telemetry, modular produced water treatment, and engineered piping and valves—delivered by qualified Nigerian engineers and technicians.
@@ -1387,7 +1351,7 @@ const Home: React.FC = () => {
               href="/partners"
               className="inline-flex items-center text-sm font-bold text-slate-800 hover:text-emerald-700 transition-colors group"
             >
-              Explore Our Full Technology Alliance Framework <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+              View Technology Partners <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
             </a>
           </div>
         </div>
@@ -1398,11 +1362,8 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
             <div className="lg:w-1/2 space-y-6">
-              <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block">
-                Industry Presence
-              </span>
               <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight">
-                Driving the Energy Conversation at NIES 2025
+                Industry Participation: NIES 2025
               </h2>
               <p className="text-slate-600 text-lg leading-relaxed font-normal">
                 PIGL was proud to participate in high-level sessions at the Nigeria International Energy Summit (NIES) 2025. We shared our perspective on how 3D reality capture, digital twins, and high-fidelity geosolutions accelerate the sustainable modernization of Africa's energy assets.
@@ -1436,11 +1397,8 @@ const Home: React.FC = () => {
           {/* Section Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div className="space-y-3 max-w-2xl">
-              <span className="text-emerald-700 font-bold text-xs uppercase tracking-widest block">
-                News & Publications
-              </span>
               <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">
-                Blogs & Publications
+                Articles & Publications
               </h2>
               <p className="text-slate-600 text-sm md:text-base leading-relaxed">
                 Technical articles, project milestones, and engineering perspectives from Polaris Integrated & GeoSolutions.
@@ -1451,7 +1409,7 @@ const Home: React.FC = () => {
               href="/blog" 
               className="inline-flex items-center space-x-2 px-6 py-3 bg-white border border-slate-300 font-bold text-slate-900 hover:border-emerald-600 hover:text-emerald-700 transition-all text-xs uppercase tracking-wider shadow-sm hover:shadow self-start md:self-end"
             >
-              <span>View All Blogs & Publications</span>
+              <span>View All Articles</span>
               <span className="text-emerald-600 font-normal text-base">→</span>
             </a>
           </div>
@@ -1610,7 +1568,6 @@ const Home: React.FC = () => {
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto">
-          <p className="text-emerald-400 font-bold mb-6 text-sm uppercase tracking-widest">Join Our Engineering Team</p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-10 leading-tight tracking-tight">
             Help build and protect critical infrastructure
           </h2>

@@ -491,7 +491,6 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
             {/* Left: Deep Overview */}
             <div className="lg:col-span-7 space-y-6">
               <div>
-                <h2 className="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-2">Service Overview</h2>
                 <h3 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
                   {service.overview_heading || 'Engineering Scope & Problem Resolution'}
                 </h3>
@@ -579,9 +578,6 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 reveal">
               <div className="max-w-3xl">
-                <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">
-                  Capabilities
-                </span>
                 <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight leading-tight">
                   Capabilities
                 </h3>
@@ -656,11 +652,8 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
         <section id="delivery-section" className="py-20 md:py-28 bg-white border-b border-slate-200 scroll-mt-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mb-14 reveal">
-              <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">
-                Delivery, Methods & Technology
-              </span>
               <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight leading-tight">
-                Execution Methodology, Equipment Spreads & Deliverables
+                Deliverables & Equipment
               </h3>
               <p className="text-slate-600 text-base mt-4 font-normal leading-relaxed">
                 Every campaign is executed under certified quality and safety management systems (ISO 9001:2015, ISO 45001:2018), complying with statutory Nigerian upstream regulations (NUPRC) and relevant international engineering standards.
@@ -756,11 +749,8 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 reveal">
               <div>
-                <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">
-                  Project Imagery & Field Experience
-                </span>
                 <h3 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
-                  Operational Records & Field Experience
+                  Operational Records
                 </h3>
               </div>
               <p className="text-slate-500 text-sm max-w-md mt-4 md:mt-0 font-normal">
@@ -818,7 +808,6 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
       <section id="consultation-form" className="py-20 md:py-28 bg-white border-b border-slate-200 scroll-mt-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-slate-50 border border-slate-200 p-8 md:p-14 reveal rounded-xl">
-            <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">Project Consultation</span>
             <h3 className="text-3xl font-bold text-slate-900 tracking-tight mb-4">
               Discuss a Project with PIGL Engineers
             </h3>
@@ -837,9 +826,6 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
       <section className="py-20 md:py-28 bg-slate-50 border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-14 reveal">
-            <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">
-              Frequently Asked Questions
-            </span>
             <h3 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
               Frequently Asked Questions
             </h3>

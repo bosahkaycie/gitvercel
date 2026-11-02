@@ -262,11 +262,10 @@ const Careers: React.FC = () => {
         </div>
       </section>
 
-      {/* Graduate Internship Program */}
+      {/* Graduate Internship Programme */}
       <section className="py-20 md:py-32 bg-white text-center reveal">
         <div className="max-w-4xl mx-auto px-4">
-          <span className="text-emerald-700 font-bold uppercase tracking-wider text-sm mb-4 block">Student Opportunities</span>
-          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-8 tracking-tight">Graduate Internship Program</h2>
+          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-8 tracking-tight">Graduate Internship Programme</h2>
           <p className="text-xl text-slate-600 leading-relaxed font-light italic">
             "Fostering the next generation of Nigerian surveyors and engineers through hands-on field experience and technical mentorship."
           </p>

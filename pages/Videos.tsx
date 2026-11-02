@@ -83,7 +83,7 @@ const OFFICIAL_VIDEOS: CMSVideoItem[] = [
   {
     id: 'offshore-marine',
     youtubeId: 'sExrHCIGkH0',
-    title: 'Offshore Intelligence: Multi-Beam Bathymetry & Metocean Telemetry Buoys',
+    title: 'Metocean & Marine Operations: Multi-Beam Bathymetry & Telemetry Buoys',
     category: 'marine',
     categoryLabel: 'Offshore & Marine',
     duration: '04:10',
@@ -194,11 +194,8 @@ const Videos: React.FC = () => {
           
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8 mb-10 pb-6 border-b border-slate-800">
             <div>
-              <span className="text-emerald-400 font-mono text-xs uppercase tracking-widest font-bold block mb-1">
-                Featured Presentation
-              </span>
               <h2 className="text-2xl md:text-4xl font-bold tracking-tight text-white">
-                Company Corporate Documentary
+                Corporate Documentary
               </h2>
             </div>
             <div className="flex items-center space-x-3 text-xs font-mono text-slate-400">
@@ -305,11 +302,8 @@ const Videos: React.FC = () => {
           {/* Section Header & Filters */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-1">
-                Official YouTube Archive
-              </span>
               <h2 className="text-2xl md:text-4xl font-bold text-slate-900 tracking-tight">
-                Operations & Engineering Video Showcase
+                Operations & Engineering Video Library
               </h2>
               <p className="text-xs md:text-sm text-slate-600 mt-1 max-w-2xl">
                 Browse our collection of field execution clips, technical presentations, and project case studies.

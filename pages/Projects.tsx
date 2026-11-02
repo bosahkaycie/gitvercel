@@ -80,7 +80,7 @@ const InteractiveProjectCard: React.FC<{
             onClick={onExpand}
             className="w-full py-3 bg-slate-50 hover:bg-emerald-800 text-slate-900 hover:text-white font-bold text-xs uppercase tracking-wider transition-all inline-flex items-center justify-center group/btn shadow-sm"
           >
-            <span>Explore Technical Case Study</span>
+            <span>View Project Details</span>
             <span className="ml-2.5 transition-transform duration-300 group-hover/btn:translate-x-1">→</span>
           </button>
         </div>
@@ -404,18 +404,18 @@ const Projects: React.FC = () => {
                               <h4 className="text-xs font-black uppercase tracking-widest text-emerald-400 mb-4">Core Capabilities</h4>
                               <ul className="space-y-3">
                                 <li>
-                                  <a href="/services/digital-intelligence" className="text-sm font-bold hover:text-emerald-400 transition-colors flex items-center justify-between group">
-                                    Digital Intelligence <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                                  <a href="/services/geosolutions-engineering-services" className="text-sm font-bold hover:text-emerald-400 transition-colors flex items-center justify-between group">
+                                    GeoSolutions & Engineering Services <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                                   </a>
                                 </li>
                                 <li>
-                                  <a href="/services/marine-intelligence" className="text-sm font-bold hover:text-emerald-400 transition-colors flex items-center justify-between group">
-                                    Marine Intelligence <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                                  <a href="/services/metocean-marine-solutions" className="text-sm font-bold hover:text-emerald-400 transition-colors flex items-center justify-between group">
+                                    Metocean & Marine Solutions <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                                   </a>
                                 </li>
                                 <li>
-                                  <a href="/services/asset-integrity-management" className="text-sm font-bold hover:text-emerald-400 transition-colors flex items-center justify-between group">
-                                    Asset Integrity & Management <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                                  <a href="/services/integrated-construction-services" className="text-sm font-bold hover:text-emerald-400 transition-colors flex items-center justify-between group">
+                                    Integrated Construction Services <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                                   </a>
                                 </li>
                               </ul>
@@ -455,8 +455,7 @@ const Projects: React.FC = () => {
       <section className="py-20 md:py-32 bg-slate-50 border-t border-slate-200 reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-16">
-            <span className="text-emerald-700 font-bold uppercase tracking-wider text-sm mb-4 block">Client & Institutional Endorsements</span>
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">Institutional Confidence</h2>
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">Client Endorsements</h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">

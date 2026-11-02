@@ -87,9 +87,8 @@ const Partners: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             <div className="lg:col-span-7 space-y-6">
-              <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block">Integration Model</span>
               <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
-                Indigenous Execution Enhanced by Global Technology
+                Technology Partnerships & Indigenous Execution
               </h2>
               <p className="text-slate-600 text-lg leading-relaxed font-normal">
                 At PIGL, we believe that delivering engineering certainty in challenging physical environments requires the synthesis of deep local operating knowledge and high-fidelity technological tools.
@@ -205,7 +204,7 @@ const Partners: React.FC = () => {
                       href={`/services/${serviceId}`}
                       className="inline-flex items-center text-emerald-700 font-bold hover:text-emerald-900 transition-colors group"
                     >
-                      Explore {serviceTitle} <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                      View Division Capabilities <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                     </a>
 
                     {partner.website && (
@@ -232,7 +231,6 @@ const Partners: React.FC = () => {
         <div className="absolute inset-0 bg-emerald-950/30 z-0"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
           <div className="max-w-3xl text-left">
-            <p className="text-emerald-400 font-black text-xs uppercase tracking-[0.2em] mb-3">Partner Engagement</p>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
               Interested in technology partnership or specialist deployment?
             </h2>

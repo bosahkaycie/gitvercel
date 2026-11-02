@@ -618,8 +618,7 @@ const Services: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
           
           <div className="reveal max-w-3xl border-l-4 border-emerald-700 pl-6">
-            <span className="text-emerald-700 font-bold text-xs uppercase tracking-[0.2em] block mb-2">PIGL Master Service Architecture</span>
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">Four Operating Divisions</h2>
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">Operating Divisions</h2>
             <p className="text-lg md:text-xl text-slate-600 leading-relaxed font-normal">
               Authoritative engineering divisions delivering accurate data, deep marine insight, infrastructure construction, and sustainable industrial solutions across Nigeria and Sub-Saharan Africa.
             </p>
@@ -674,11 +673,10 @@ const Services: React.FC = () => {
                     {platform.short_description || platform.description}
                   </p>
 
-                  {/* Service Family Summary (Distinct Lines, High Legibility) */}
+                  {/* Capabilities Summary */}
                   <div className="bg-white p-5 border border-slate-200/90 mb-7">
-                    <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
-                      <h4 className="text-emerald-900 font-bold text-xs uppercase tracking-wider">Core Service Families</h4>
-                      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Capabilities</span>
+                    <div className="mb-3 border-b border-slate-100 pb-2">
+                      <h4 className="text-emerald-900 font-bold text-xs uppercase tracking-wider">Capabilities</h4>
                     </div>
                     <ul className="space-y-2">
                       {repItems.slice(0, 4).map((item: string, rIdx: number) => (
@@ -690,13 +688,13 @@ const Services: React.FC = () => {
                     </ul>
                   </div>
 
-                  {/* Clear Explore Division Action */}
+                  {/* Clear View Capabilities Action */}
                   <div className="pt-2 mt-auto">
                     <a 
                       href={`/services/${platformSlug}`} 
                       className="inline-flex items-center px-6 py-3.5 bg-emerald-800 text-white font-bold text-xs uppercase tracking-widest hover:bg-emerald-900 transition-all group"
                     >
-                      <span>Explore Division Capabilities</span>
+                      <span>View Capabilities</span>
                       <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                     </a>
                   </div>
@@ -716,11 +714,8 @@ const Services: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div className="max-w-2xl">
-              <span className="text-emerald-400 font-bold uppercase tracking-widest text-xs mb-3 block">
-                The PIGL Lifecycle
-              </span>
               <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
-                How We Deliver Engineering Certainty
+                Delivery Methodology
               </h2>
             </div>
 
