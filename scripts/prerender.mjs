@@ -216,24 +216,28 @@ const routes = [
   },
   {
     path: '/about',
-    title: 'About PIGL | ISO Certified Engineering Contractor',
-    description: 'Polaris Integrated and GeoSolutions Limited is an indigenous Nigerian engineering leader delivering site investigations, marine observation, and construction support across Sub-Saharan Africa.',
-    badge: 'Corporate Background',
+    title: 'About PIGL | Engineering & Technical Solutions Company',
+    description: 'Polaris Integrated & GeoSolutions Limited (PIGL) is a Nigerian engineering and technical solutions company serving the energy, infrastructure and industrial sectors.',
+    badge: 'About PIGL',
     h1: 'About PIGL',
-    intro: 'Polaris Integrated and GeoSolutions Limited is an indigenous Nigerian engineering leader delivering reliable site data, ground investigations, reality capture, and field construction for swamp, land, and offshore projects.',
+    intro: 'Polaris Integrated & GeoSolutions Limited (PIGL) is a Nigerian engineering and technical solutions company serving the energy, infrastructure and industrial sectors.',
     sectionsHtml: `
       <section style="margin-bottom: 2.5rem;">
-        <h2 style="color: #34d399; font-size: 1.5rem; margin-bottom: 1rem;">Company Overview & Technical Heritage</h2>
+        <h2 style="color: #34d399; font-size: 1.5rem; margin-bottom: 1rem;">Engineering and Technical Solutions</h2>
         <p style="color: #cbd5e1; line-height: 1.7; font-size: 1rem; margin-bottom: 1.5rem;">
-          Founded as an indigenous engineering and survey contractor, PIGL delivers high-accuracy field data and industrial construction solutions across Nigeria and West Africa. We maintain over 20 years of field engineering experience, operating in compliance with Nigerian Content Development and Monitoring Board (NCDMB) and NUPRC regulations.
+          Polaris Integrated & GeoSolutions Limited (PIGL) brings together geoscience, marine, digital mapping, construction and industrial solutions to address technical challenges across different operating environments. Our work combines engineering knowledge, specialist equipment, field experience and technology to help clients make informed decisions and deliver their operations effectively.
+        </p>
+        <h2 style="color: #34d399; font-size: 1.5rem; margin-bottom: 1rem;">Why Clients Work With PIGL</h2>
+        <p style="color: #cbd5e1; line-height: 1.7; font-size: 1rem; margin-bottom: 1.5rem;">
+          Clients partner with PIGL for our safety in execution, technical and commercial value, engineering capacity and strategic partnerships, and adaptability in solving complex operational problems across Nigeria.
+        </p>
+        <h2 style="color: #34d399; font-size: 1.5rem; margin-bottom: 1rem;">Our Business Divisions</h2>
+        <p style="color: #cbd5e1; line-height: 1.7; font-size: 1rem; margin-bottom: 1.5rem;">
+          Our multidisciplinary operations are structured into four divisions: GeoSolutions & Engineering Services (GES), Metocean & Marine Solutions (MMS), Integrated Construction Services (ICS), and Industrial Solutions (IS).
         </p>
         <h2 style="color: #34d399; font-size: 1.5rem; margin-bottom: 1rem;">Quality, Health, Safety & Environment</h2>
-        <p style="color: #cbd5e1; line-height: 1.7; font-size: 1rem; margin-bottom: 1.5rem;">
-          PIGL operates dual certified management systems: ISO 9001:2015 for Quality Management and ISO 45001:2018 for Occupational Health and Safety, maintaining an unbroken track record of over 500,000 safe man-hours with zero Lost Time Injuries (LTI).
-        </p>
-        <h2 style="color: #34d399; font-size: 1.5rem; margin-bottom: 1rem;">Our Operating Divisions</h2>
         <p style="color: #cbd5e1; line-height: 1.7; font-size: 1rem;">
-          Our multidisciplinary operations are structured into four divisions: GeoSolutions & Engineering Services (GES), Metocean & Marine Solutions (MMS), Integrated Construction Services (ICS), and Industrial Solutions (IS).
+          PIGL operates dual certified management systems: ISO 9001:2015 for Quality Management and ISO 45001:2018 for Occupational Health and Safety, maintaining an unbroken track record of over 500,000 safe man-hours.
         </p>
       </section>
     `

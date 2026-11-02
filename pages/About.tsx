@@ -1,7 +1,6 @@
-import React from 'react';
-import { TEAM, CORE_VALUES } from '../site_data';
+import React, { useEffect } from 'react';
+import { TEAM } from '../site_data';
 import { useTeamMembers } from '../hooks/useSupabaseData';
-import BootsImg from '../assets/IMG_6170.jpg';
 import AboutBg from '../assets/teaching.jpeg';
 import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
 import InfraSketchImg from '../assets/infrastructure_sketch.jpg';
@@ -11,16 +10,15 @@ import YouTubeFacade from '../components/YouTubeFacade';
 // Authentic Operations Photography
 import OpLogisticsBaseImg from '../assets/operations/pigl_logistics_base_aerial.jpg';
 import OpMarineCrewImg from '../assets/operations/pigl_marine_crew_vessel.jpg';
-import OpWeldingImg from '../assets/operations/pigl_pipeline_marine_welding.jpg';
-import OpGeomaticsImg from '../assets/operations/pigl_geomatics_survey_quay.jpg';
-import OpOffshoreBargeImg from '../assets/operations/pigl_offshore_geotech_drilling_barge.jpg';
-import OpLaserManifoldImg from '../assets/operations/pigl_3d_laser_scan_manifold_station.jpg';
-import OpPipelineSwampCatImg from '../assets/operations/pigl_pipeline_construction_swamp_cat.jpg';
-import OpDrillCrewCasingImg from '../assets/operations/pigl_offshore_drill_crew_casing.jpg';
 
 const About: React.FC = () => {
   const { teamMembers } = useTeamMembers();
-  React.useEffect(() => {
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const observerOptions = {
       threshold: 0.1,
       rootMargin: '0px 0px -50px 0px'
@@ -38,9 +36,9 @@ const About: React.FC = () => {
     revealElements.forEach(el => observer.observe(el));
 
     return () => observer.disconnect();
-  }, []);
+  }, [teamMembers]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const params = new URLSearchParams(window.location.hash.split('?')[1]);
     const section = params.get('section');
     if (section) {
@@ -56,18 +54,18 @@ const About: React.FC = () => {
   return (
     <div className="flex flex-col bg-white font-sans">
       
-      {/* Clean Hero Header */}
+      {/* 1. Hero Header */}
       <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-32 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
             src={AboutBg} 
-            alt="About PIGL" 
+            alt="About PIGL - Engineering and Technical Solutions" 
             className="w-full h-full object-cover opacity-30 grayscale-[0.1]"
             loading="eager"
             fetchPriority="high"
             decoding="async"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-900/50 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/60 to-transparent"></div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-300 mb-10">
@@ -76,332 +74,567 @@ const About: React.FC = () => {
             <span className="text-white">About Us</span>
           </div>
           
-            <div className="max-w-4xl">
+          <div className="max-w-4xl">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight mb-8">
               About PIGL
             </h1>
             <p className="text-xl md:text-2xl text-slate-300 font-normal leading-relaxed">
-              Polaris Integrated and GeoSolutions Limited is an indigenous Nigerian engineering leader, delivering reliable site data, ground investigations, reality capture, and field construction for swamp, land, and offshore projects.
+              Polaris Integrated & GeoSolutions Limited (PIGL) is a Nigerian engineering and technical solutions company serving the energy, infrastructure and industrial sectors.
             </p>
           </div>
         </div>
 
-        {/* Continuous Reflective Energy Line at the base of the Hero & Breadcrumb section */}
+        {/* Continuous Reflective Energy Line at the base of the Hero section */}
         <div className="absolute bottom-0 left-0 right-0 z-20">
           <ReflectiveEnergyLine dark={true} />
         </div>
       </section>
 
-      {/* Corporate Narrative & Heritage */}
-      <section id="heritage" className="py-20 md:py-32 bg-white reveal">
+      {/* 2. Corporate Introduction & Documentary */}
+      <section id="introduction" className="py-20 md:py-28 bg-white reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
-            <div className="space-y-8">
-              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight tracking-tight">Over 20 Years of Field Engineering Experience</h2>
-              <div className="space-y-6 text-slate-600 text-lg leading-relaxed font-normal">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+            
+            {/* Left Narrative Column */}
+            <div className="lg:col-span-7 space-y-6">
+              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight tracking-tight">
+                Engineering and Technical Solutions
+              </h2>
+              
+              <div className="space-y-5 text-slate-600 text-base md:text-lg leading-relaxed font-normal">
                 <p>
-                  Polaris Integrated and GeoSolutions Limited (PIGL) has built over 20 years of operating experience as a dependable indigenous engineering company in Nigeria. We specialise in complex engineering and ground investigations across onshore, swamp, and offshore environments, delivering accurate data and practical solutions for energy and infrastructure operators.
+                  Polaris Integrated & GeoSolutions Limited (PIGL) is a Nigerian engineering and technical solutions company serving the energy, infrastructure and industrial sectors.
                 </p>
                 <p>
-                  Our track record is built on precision, technical integrity, and an uncompromising commitment to safety. Certified to ISO 9001:2015 and ISO 45001:2018, we adhere to recognised international engineering standards across all operations.
+                  We bring together geoscience, marine, digital mapping, construction and industrial solutions to address technical challenges across different operating environments. Our work combines engineering knowledge, specialist equipment, field experience and technology to help clients make informed decisions and deliver their operations effectively.
+                </p>
+                <p>
+                  We understand that clients need more than a service provider. They need a team that can work safely, understand operational requirements, deploy the right technical resources and deliver solutions that make commercial and operational sense.
+                </p>
+                <p>
+                  That understanding shapes how we approach every assignment. We continuously assess new technologies, develop our technical capabilities and work with specialist technology partners to respond to changing industry needs. Whether undertaking an investigation, supporting marine operations, delivering infrastructure or implementing industrial treatment systems, our focus remains on practical solutions, responsible execution and lasting value.
                 </p>
               </div>
-              <div className="flex items-center space-x-8 pt-4 border-t border-slate-100">
+
+              {/* Verified Credentials Summary */}
+              <div className="pt-6 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <p className="text-3xl font-bold text-slate-900 leading-none">ISO</p>
-                  <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest mt-2">Certified Management Systems</p>
+                  <p className="text-2xl font-black text-slate-900 leading-none">ISO</p>
+                  <p className="text-xs font-bold text-slate-800 uppercase tracking-wider mt-1.5">9001:2015 & 45001:2018</p>
+                  <p className="text-xs text-slate-500 mt-1 leading-snug">Certified Quality & Occupational Health and Safety Management Systems.</p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-slate-900 leading-none">NCDMB</p>
-                  <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest mt-2">Compliant Contractor</p>
+                  <p className="text-2xl font-black text-slate-900 leading-none">100%</p>
+                  <p className="text-xs font-bold text-slate-800 uppercase tracking-wider mt-1.5">Nigerian-Owned Company</p>
+                  <p className="text-xs text-slate-500 mt-1 leading-snug">Indigenous engineering firm registered and compliant under the NOGICD Act.</p>
                 </div>
               </div>
-              <div className="pt-6">
+
+              <div className="pt-4 flex flex-wrap items-center gap-4">
                 <a
                   href={ProfilePDF}
                   download="PIGL_Company_Profile.pdf"
-                  className="inline-flex items-center px-8 py-3.5 border-2 border-emerald-950 text-emerald-950 font-bold hover:bg-emerald-950 hover:text-white transition-colors"
+                  className="inline-flex items-center px-8 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm uppercase tracking-wider transition-colors shadow-sm"
                 >
-                  <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                  <svg className="w-4 h-4 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
                   Download Company Profile
+                </a>
+                <a
+                  href="/contact"
+                  className="inline-flex items-center px-8 py-3.5 border-2 border-slate-300 hover:border-emerald-700 text-slate-800 hover:text-emerald-700 font-bold text-sm uppercase tracking-wider transition-colors"
+                >
+                  Contact Our Team
                 </a>
               </div>
             </div>
-            <div className="relative h-[400px] md:h-[600px] bg-slate-950 flex items-center justify-center overflow-hidden">
-              <YouTubeFacade
-                videoId="sExrHCIGkH0"
-                title="The Inspiring Journey of PIGL"
-                poster="/assets/operations/pigl_offshore_geotech_drilling_barge.jpg"
-                className="w-full h-full border-0 absolute inset-0"
-              />
+
+            {/* Right Video / Corporate Documentary Column */}
+            <div className="lg:col-span-5 space-y-4">
+              <div className="border border-slate-200 bg-slate-950 shadow-md overflow-hidden">
+                <YouTubeFacade
+                  videoId="sExrHCIGkH0"
+                  title="PIGL Corporate Documentary & Overview"
+                  poster="/assets/operations/pigl_offshore_geotech_drilling_barge.jpg"
+                  duration="6:20"
+                  className="w-full aspect-video border-0"
+                />
+              </div>
+              <div className="p-4 bg-slate-50 border border-slate-200">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 block mb-1">Corporate Documentary</span>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Overview of PIGL field operations, geotechnical drilling vessels, reality capture surveys, and pipeline execution across Nigerian energy corridors.
+                </p>
+              </div>
             </div>
+
           </div>
         </div>
       </section>
 
-      {/* Vision & Mission */}
-      <section id="vision" className="py-20 md:py-32 bg-slate-50 border-y border-slate-200 reveal">
+      {/* 3. Why Clients Work With PIGL */}
+      <section id="why-pigl" className="py-20 md:py-28 bg-slate-50 border-y border-slate-200 reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
-            <div className="bg-white p-10 md:p-16 border border-slate-200 shadow-sm flex flex-col justify-center space-y-6">
-              <h3 className="text-slate-900 font-bold text-2xl tracking-tight">Our Vision</h3>
-              <p className="text-lg text-slate-600 leading-relaxed font-normal">
-                "To become the leading integrated engineering and geosolutions provider for the future of the energy industry in Sub-Saharan Africa."
-              </p>
-            </div>
-            <div className="bg-emerald-950 text-white p-10 md:p-16 border border-emerald-900 shadow-sm flex flex-col justify-center space-y-6">
-              <h3 className="text-white font-bold text-2xl tracking-tight">Our Mission</h3>
-              <p className="text-lg text-emerald-100/90 leading-relaxed font-normal">
-                "Employing modern technology, experienced professionals, and safe working practices to create lasting value for our clients, stakeholders, and host communities."
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Core Values Section */}
-      <section id="values" className="py-20 md:py-32 bg-white border-b border-slate-200 reveal">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">Core Values</h2>
-            <p className="text-slate-600 text-lg mt-4 font-normal">
-              At the heart of all our operations across Sub-Saharan Africa are four primary values that guarantee technical quality, safety, and dependable delivery.
+          <div className="max-w-3xl mb-14">
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">
+              Why Clients Work With PIGL
+            </h2>
+            <p className="text-slate-600 text-base md:text-lg mt-3 font-normal leading-relaxed">
+              We combine technical competence, field resources and sound commercial practices to support critical operations and capital projects.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {CORE_VALUES.map((value, idx) => (
-              <div key={idx} className="bg-slate-50 p-8 border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col space-y-4">
-                <div className="w-12 h-12 bg-emerald-50 rounded-lg flex items-center justify-center border border-emerald-100 text-2xl">
-                  {value.icon}
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 tracking-tight">{value.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed font-normal flex-grow">
-                  {value.description}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+            {/* 1. Safety in Execution */}
+            <div className="bg-white p-8 md:p-10 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-mono font-bold text-emerald-800 uppercase tracking-widest block mb-2">01 • Operating Practice</span>
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
+                  Safety in Execution
+                </h3>
+                <p className="text-slate-600 text-base leading-relaxed font-normal">
+                  We recognise the demands and risks associated with engineering and field operations. Safety considerations inform our planning, personnel deployment and execution practices.
                 </p>
               </div>
-            ))}
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                <span>Audited Under ISO 45001:2018</span>
+              </div>
+            </div>
+
+            {/* 2. Technical and Commercial Value */}
+            <div className="bg-white p-8 md:p-10 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-mono font-bold text-emerald-800 uppercase tracking-widest block mb-2">02 • Project Delivery</span>
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
+                  Technical and Commercial Value
+                </h3>
+                <p className="text-slate-600 text-base leading-relaxed font-normal">
+                  We focus on fit-for-purpose solutions, efficient use of resources and technical approaches that address the client's actual requirements.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                <span>Fit-for-Purpose Engineering Design</span>
+              </div>
+            </div>
+
+            {/* 3. Capacity and Technical Partnerships */}
+            <div className="bg-white p-8 md:p-10 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-mono font-bold text-emerald-800 uppercase tracking-widest block mb-2">03 • Resources & Reach</span>
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
+                  Capacity and Technical Partnerships
+                </h3>
+                <p className="text-slate-600 text-base leading-relaxed font-normal">
+                  Our engineering personnel, specialist equipment and relationships with technology providers strengthen our ability to undertake diverse technical assignments.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                <span>Specialist Equipment & Global Technology Alliances</span>
+              </div>
+            </div>
+
+            {/* 4. Adaptability and Problem-Solving */}
+            <div className="bg-white p-8 md:p-10 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-mono font-bold text-emerald-800 uppercase tracking-widest block mb-2">04 • Engineering Solutions</span>
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
+                  Adaptability and Problem-Solving
+                </h3>
+                <p className="text-slate-600 text-base leading-relaxed font-normal">
+                  We continue to develop our capabilities and evaluate emerging technologies, applying them where they offer practical benefits to our clients and their operations.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                <span>Field-Tested Methods in Challenging Environments</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* HSE Policy Section */}
-      <section id="hse" className="py-20 md:py-32 bg-white reveal">
+      {/* 4. Our Business Divisions */}
+      <section id="divisions" className="py-20 md:py-28 bg-white reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
-            <div className="order-2 lg:order-1 relative h-[400px] md:h-[600px] bg-slate-100 overflow-hidden border border-slate-200 shadow-md group">
-              <img src={OpMarineCrewImg} alt="PIGL Offshore Marine Crew in Safety Gear" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" decoding="async" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/20 to-transparent pointer-events-none" />
-              <div className="absolute bottom-5 left-5 right-5 text-white">
-                <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider block mb-1">Goal Zero Culture in Action</span>
-                <p className="text-xs sm:text-sm font-semibold drop-shadow">PIGL offshore crew adhering to ISO 45001 safety protocols aboard marine vessel Platt Joe Joe Lagos</p>
+          <div className="max-w-3xl mb-14">
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">
+              Our Business Divisions
+            </h2>
+            <p className="text-slate-600 text-base md:text-lg mt-3 font-normal leading-relaxed">
+              PIGL operates through four specialized engineering and technical divisions, bringing together dedicated teams, calibrated equipment and certified procedures to address operational requirements.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Division 1: GES */}
+            <div className="p-8 border border-slate-200 bg-white hover:border-emerald-600 transition-colors flex flex-col justify-between shadow-2xs">
+              <div>
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                  <span className="text-xs font-mono font-bold text-emerald-800">01 • DIVISION</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">GES</span>
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
+                  GeoSolutions & Engineering Services
+                </h3>
+                <p className="text-slate-600 text-sm md:text-base leading-relaxed font-normal mb-6">
+                  Geotechnical site investigations, 20-tonne hydraulic CPT testing, deep borehole drilling, marine geophysical surveys, bathymetric mapping, geohazard evaluation, and Leica RTC360 3D reality capture.
+                </p>
+              </div>
+              <div>
+                <a
+                  href="/services/geosolutions-engineering-services"
+                  className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-700 hover:text-emerald-900 transition-colors"
+                >
+                  Explore GES Capabilities <span className="ml-2">→</span>
+                </a>
               </div>
             </div>
-            <div className="order-1 lg:order-2 space-y-8">
-              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight tracking-tight">Health, Safety & Environment (HSE)</h2>
-              <p className="text-slate-600 text-lg leading-relaxed font-normal">
-                Safety is not just a policy at PIGL, it is our core culture. We operate under a "Goal Zero" mindset, striving for zero injuries, zero lost-time incidents, and complete environmental care. Our management systems are audited and certified to ISO 9001:2015 and ISO 45001:2018 to ensure the highest standard of protection for our workers and our communities.
-              </p>
-              <div className="pt-4 space-y-3">
-                {[
-                  'Zero Lost Time Injuries (LTI)',
-                  'Certified to ISO 9001:2015 and ISO 45001:2018',
-                  'Comprehensive Risk Assessments Before Every Task',
-                  'Proactive Environmental Stewardship'
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center space-x-3">
-                    <span className="text-emerald-600 text-lg">✓</span>
-                    <span className="text-base font-bold text-slate-700">{item}</span>
+
+            {/* Division 2: MMS */}
+            <div className="p-8 border border-slate-200 bg-white hover:border-emerald-600 transition-colors flex flex-col justify-between shadow-2xs">
+              <div>
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                  <span className="text-xs font-mono font-bold text-emerald-800">02 • DIVISION</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">MMS</span>
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
+                  Metocean & Marine Solutions
+                </h3>
+                <p className="text-slate-600 text-sm md:text-base leading-relaxed font-normal mb-6">
+                  Autonomous oceanographic telemetry buoys, ADCP current profiling, metocean wave and weather forecasting, marine environmental baseline surveys, and offshore marine advisory services across West Africa.
+                </p>
+              </div>
+              <div>
+                <a
+                  href="/services/metocean-marine-solutions"
+                  className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-700 hover:text-emerald-900 transition-colors"
+                >
+                  Explore MMS Capabilities <span className="ml-2">→</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Division 3: ICS */}
+            <div className="p-8 border border-slate-200 bg-white hover:border-emerald-600 transition-colors flex flex-col justify-between shadow-2xs">
+              <div>
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                  <span className="text-xs font-mono font-bold text-emerald-800">03 • DIVISION</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">ICS</span>
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
+                  Integrated Construction Services
+                </h3>
+                <p className="text-slate-600 text-sm md:text-base leading-relaxed font-normal mb-6">
+                  Pipeline installation, horizontal directional drilling (HDD), mechanical spool fabrication, structural welding, industrial civil infrastructure, and right-of-way construction in swamp and land corridors.
+                </p>
+              </div>
+              <div>
+                <a
+                  href="/services/integrated-construction-services"
+                  className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-700 hover:text-emerald-900 transition-colors"
+                >
+                  Explore ICS Capabilities <span className="ml-2">→</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Division 4: IS */}
+            <div className="p-8 border border-slate-200 bg-white hover:border-emerald-600 transition-colors flex flex-col justify-between shadow-2xs">
+              <div>
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                  <span className="text-xs font-mono font-bold text-emerald-800">04 • DIVISION</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">IS</span>
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
+                  Industrial Solutions
+                </h3>
+                <p className="text-slate-600 text-sm md:text-base leading-relaxed font-normal mb-6">
+                  Produced water treatment skids, industrial wastewater recovery, accredited water quality laboratory testing, environmental remediation, and specialty industrial procurement.
+                </p>
+              </div>
+              <div>
+                <a
+                  href="/services/industrial-solutions"
+                  className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-700 hover:text-emerald-900 transition-colors"
+                >
+                  Explore IS Capabilities <span className="ml-2">→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Our People and Resources */}
+      <section id="people-resources" className="py-20 md:py-28 bg-slate-50 border-t border-slate-200 reveal">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mb-14">
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">
+              Our People and Resources
+            </h2>
+            <p className="text-slate-600 text-base md:text-lg mt-3 font-normal leading-relaxed">
+              Our operational capability rests on experienced engineering personnel, dedicated operations yards, and specialist equipment deployed across Nigerian operational corridors.
+            </p>
+          </div>
+
+          {/* Operational Staging Base Feature */}
+          <div className="bg-slate-950 text-white p-8 md:p-14 mb-16 border border-slate-800 shadow-xl overflow-hidden relative">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              <div className="lg:col-span-7 space-y-5">
+                <span className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-widest block">Operational Base & Workshop</span>
+                <h3 className="text-2xl md:text-4xl font-bold text-white tracking-tight leading-tight">
+                  Logistics Yard & Mobilisation Base
+                </h3>
+                <p className="text-slate-300 text-base leading-relaxed font-normal">
+                  To support fast-track swamp and offshore mobilisations, PIGL maintains a dedicated operations yard, container staging facility, and equipment maintenance workshop in Port Harcourt, Rivers State.
+                </p>
+                <p className="text-slate-400 text-sm leading-relaxed font-normal">
+                  Our facility houses operations office cabins, heavy equipment parking, soil laboratory sample preparation stations, and offshore survey equipment storage—guaranteeing rapid mobilisation readiness for urgent client field campaigns.
+                </p>
+                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-800">
+                  <div>
+                    <span className="text-xl md:text-2xl font-black text-emerald-400 block">24/7</span>
+                    <span className="text-xs text-slate-400">Mobilisation Ready</span>
                   </div>
-                ))}
+                  <div>
+                    <span className="text-xl md:text-2xl font-black text-emerald-400 block">Hub</span>
+                    <span className="text-xs text-slate-400">Port Harcourt Base</span>
+                  </div>
+                  <div>
+                    <span className="text-xl md:text-2xl font-black text-emerald-400 block">100%</span>
+                    <span className="text-xs text-slate-400">Secured Facility</span>
+                  </div>
+                </div>
+              </div>
+              <div className="lg:col-span-5">
+                <div className="relative aspect-[16/11] overflow-hidden border border-slate-800 shadow-2xl bg-slate-900 group">
+                  <img
+                    src={OpLogisticsBaseImg}
+                    alt="PIGL Logistics Staging Base & Container Yard - Aerial"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute bottom-3 left-3 right-3 text-white">
+                    <p className="text-xs font-medium text-slate-200">Port Harcourt Staging Yard & Maintenance Workshop</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+
+          {/* Technical Leadership */}
+          <div className="mb-14">
+            <h3 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-2">
+              Technical Leadership & Management
+            </h3>
+            <p className="text-slate-600 text-sm md:text-base font-normal mb-8">
+              Guided by experienced engineering executives and operational leaders with decades of field execution experience across West Africa.
+            </p>
+
+            {(() => {
+              const activeTeam = (teamMembers && teamMembers.length > 0)
+                ? teamMembers.filter(m => m.status === 'active')
+                : TEAM;
+
+              return (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {activeTeam.map((member, idx) => (
+                    <div key={(member as any).id || idx} className="bg-white p-5 border border-slate-200 shadow-2xs flex flex-col justify-between">
+                      <div>
+                        <div className="relative w-full aspect-[4/5] mb-4 bg-slate-200 overflow-hidden">
+                          <img
+                            src={member.image}
+                            alt={member.name}
+                            className="w-full h-full object-cover object-top"
+                            loading="lazy"
+                            decoding="async"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = '/assets/management/steve.png';
+                            }}
+                          />
+                        </div>
+                        <h4 className="text-base font-bold text-slate-900">{member.name}</h4>
+                        <p className="text-xs font-bold text-emerald-700 mt-0.5">{member.role}</p>
+                      </div>
+                      {(member as any).department && (member as any).department !== 'Executive Management' && (
+                        <p className="text-[11px] text-slate-500 mt-2 pt-2 border-t border-slate-100">{(member as any).department}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Local Content & Technical Workforce Development */}
+          <div className="p-8 md:p-10 bg-white border border-slate-200 shadow-2xs">
+            <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
+              Local Content & Technical Capacity Building
+            </h3>
+            <p className="text-slate-600 text-base leading-relaxed font-normal">
+              PIGL is a 100% indigenous Nigerian engineering company committed to the Nigerian Oil and Gas Industry Content Development (NOGICD) Act. We invest continuously in training Nigerian surveyors, geotechnical engineers, laboratory analysts and technicians to operate advanced instrumentation and maintain rigorous engineering standards on Nigerian projects.
+            </p>
+          </div>
+
         </div>
       </section>
 
-      {/* Local Content & Community */}
-      <section id="local-content" className="relative py-20 md:py-32 bg-slate-50 border-y border-slate-200 reveal overflow-hidden">
-        {/* Subtle Architectural Line-Art Watermark */}
-        <div 
-          className="absolute inset-0 pointer-events-none select-none z-0 bg-no-repeat bg-cover bg-center opacity-[0.035] mix-blend-multiply filter grayscale contrast-125"
-          style={{ backgroundImage: `url(${InfraSketchImg})` }}
-          aria-hidden="true"
-        />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">Local Content & Community Engagement</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
-            <div className="space-y-6 p-10 bg-white border border-slate-200 shadow-sm hover:shadow-xl transition-shadow hover-lift">
-              <h3 className="text-slate-900 font-bold text-xl tracking-tight">Local Content Development</h3>
-              <p className="text-lg text-slate-600 leading-relaxed font-normal">
-                PIGL is a 100% indigenous Nigerian company. We are dedicated to the Nigerian Oil and Gas Industry Content Development (NOGICD) Act. We invest heavily in training local surveyors, engineers, and technicians to handle specialised equipment and international engineering methods on Nigerian soil.
-              </p>
-              <div className="pt-4 border-t border-slate-100">
-                <p className="text-sm font-bold text-emerald-700">Supporting NCDMB Initiatives</p>
-              </div>
-            </div>
+      {/* 6. Quality, Health, Safety and Environment */}
+      <section id="qhse" className="py-20 md:py-28 bg-white border-t border-slate-200 reveal">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             
-            <div className="space-y-6 p-10 bg-white border border-slate-200 shadow-sm hover:shadow-xl transition-shadow hover-lift">
-              <h3 className="text-slate-900 font-bold text-xl tracking-tight">Community Relations</h3>
-              <p className="text-lg text-slate-600 leading-relaxed font-normal">
-                We believe in shared prosperity. Our operations prioritise peaceful co-existence with host communities, providing employment opportunities, supporting local businesses, and engaging in transparent dialogue to ensure mutually beneficial project execution.
-              </p>
-              <div className="pt-4 border-t border-slate-100">
-                <p className="text-sm font-bold text-emerald-700">Niger Delta Community Partnership</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Operational Infrastructure & Logistics Staging Base */}
-      <section id="infrastructure" className="py-20 md:py-32 bg-slate-950 text-white reveal overflow-hidden relative">
-        <div className="absolute inset-0 bg-tech-grid pointer-events-none opacity-20" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
-                Logistics Yard & Mobilisation Base
-              </h2>
-              <div className="space-y-4 text-slate-300 text-base md:text-lg leading-relaxed font-normal">
-                <p>
-                  To support fast-track offshore and swamp mobilizations, PIGL maintains a dedicated, fully-secured operations yard, container staging facility, and equipment maintenance workshop in Port Harcourt, Rivers State.
-                </p>
-                <p className="text-sm md:text-base text-slate-400">
-                  Our facility houses operations office cabins, heavy equipment parking, soil laboratory sample prep stations, and offshore survey equipment storage—guaranteeing 24/7 mobilization readiness for urgent client field campaigns.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-800">
-                <div className="p-3 bg-slate-900 border border-slate-800">
-                  <span className="text-2xl font-black text-emerald-400 block">24/7</span>
-                  <span className="text-xs text-slate-400 font-medium">Mobilization Ready</span>
-                </div>
-                <div className="p-3 bg-slate-900 border border-slate-800">
-                  <span className="text-2xl font-black text-emerald-400 block">100%</span>
-                  <span className="text-xs text-slate-400 font-medium">Secured Facility</span>
-                </div>
-                <div className="p-3 bg-slate-900 border border-slate-800 col-span-2 sm:col-span-1">
-                  <span className="text-2xl font-black text-emerald-400 block">Hub</span>
-                  <span className="text-xs text-slate-400 font-medium">Niger Delta Corridors</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative aspect-[16/11] overflow-hidden border border-slate-800 shadow-2xl bg-slate-900 group">
-              <img
-                src={OpLogisticsBaseImg}
-                alt="PIGL Logistics Staging Base & Container Yard - Drone Aerial"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                loading="lazy"
+            <div className="lg:col-span-6 relative aspect-[4/3] bg-slate-100 overflow-hidden border border-slate-200 shadow-md group">
+              <img 
+                src={OpMarineCrewImg} 
+                alt="PIGL Offshore Marine Crew adhering to ISO 45001 safety protocols" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                loading="lazy" 
+                decoding="async" 
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
               <div className="absolute bottom-4 left-4 right-4 text-white">
-                <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider block">Field Operations Base</span>
-                <p className="text-xs sm:text-sm font-semibold drop-shadow">PIGL logistics container yard, field equipment staging, and operations hub</p>
+                <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider block mb-1">Safety Governance</span>
+                <p className="text-xs sm:text-sm font-semibold">PIGL marine crew conducting operational risk review aboard offshore vessel</p>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Corporate Resources - Company Profile */}
-      <section className="py-20 md:py-32 bg-white reveal">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24 items-center">
-            <div className="space-y-8">
-              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight tracking-tight">Company Profile</h2>
-              <p className="text-slate-600 text-lg font-normal leading-relaxed">
-                Download our detailed company profile to explore our full range of capabilities, technical specifications, and past project portfolios.
-              </p>
+            <div className="lg:col-span-6 space-y-6">
+              <div>
+                <span className="text-xs font-mono font-bold text-emerald-800 uppercase tracking-widest block mb-2">Standards & Governance</span>
+                <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight tracking-tight">
+                  Quality, Health, Safety and Environment
+                </h2>
+              </div>
+              
+              <div className="space-y-4 text-slate-600 text-base md:text-lg leading-relaxed font-normal">
+                <p>
+                  Safety and quality management are integral to our operational planning and execution. We maintain an uncompromising focus on risk reduction, personnel protection, and environmental stewardship across all field assignments.
+                </p>
+                <p className="text-sm md:text-base text-slate-600">
+                  Our operating systems are certified to ISO 9001:2015 for quality management and ISO 45001:2018 for occupational health and safety. Every assignment operates under strict risk assessments, task-specific safety procedures, and documented performance standards.
+                </p>
+              </div>
+
+              <div className="pt-2 space-y-3">
+                {[
+                  'ISO 9001:2015 Certified Quality Management Systems',
+                  'ISO 45001:2018 Certified Occupational Health and Safety',
+                  'Documented safety performance of over 500,000 safe man-hours',
+                  'Comprehensive task risk assessments and daily toolbox meetings',
+                  'Proactive environmental protection and waste management'
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center space-x-3">
+                    <span className="text-emerald-700 font-bold text-base">✓</span>
+                    <span className="text-sm md:text-base font-semibold text-slate-800">{item}</span>
+                  </div>
+                ))}
+              </div>
+
               <div className="pt-4">
                 <a
-                  href="/assets/PIGL_COMPANY_PROFILE.pdf"
-                  download="PIGL_Company_Profile.pdf"
-                  className="inline-flex items-center space-x-3 px-8 py-4 bg-emerald-950 text-white font-bold tracking-wide hover:bg-emerald-800 transition-colors"
+                  href="/hsse"
+                  className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-700 hover:text-emerald-900 transition-colors"
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                  <span>Download PDF</span>
+                  View Full Quality & HSSEQ Policy <span className="ml-2">→</span>
                 </a>
               </div>
             </div>
 
-            <div className="relative bg-slate-100 p-8 border border-slate-200">
-              <img
-                src="/assets/PIGL_COMPANY_PROFILE.jpg"
-                alt="PIGL Company Profile Preview"
-                className="w-full max-w-sm mx-auto object-cover border border-slate-200 shadow-sm"
-                loading="lazy"
-                decoding="async"
-              />
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Technology and Industry Partnerships */}
+      <section id="partnerships" className="py-20 md:py-28 bg-slate-50 border-t border-slate-200 reveal">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mb-14">
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">
+              Technology and Industry Partnerships
+            </h2>
+            <p className="text-slate-600 text-base md:text-lg mt-3 font-normal leading-relaxed">
+              We collaborate with specialist international technology providers and equipment manufacturers to integrate proven instrumentation, telemetry systems and treatment technologies into Nigerian operations.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+            {/* Partner 1: Frankstar */}
+            <div className="p-8 bg-white border border-slate-200 shadow-2xs flex flex-col justify-between">
+              <div>
+                <span className="text-xs font-mono font-bold text-emerald-800 uppercase tracking-widest block mb-2">Metocean Technology</span>
+                <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-3">
+                  Frankstar Technology
+                </h3>
+                <p className="text-slate-600 text-sm leading-relaxed font-normal mb-4">
+                  Collaboration for autonomous oceanographic weather buoys, real-time wave and current profiling, meteorological telemetry, and marine operational forecasting.
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-100 text-xs font-bold text-slate-700">
+                Oceanographic Telemetry Systems
+              </div>
+            </div>
+
+            {/* Partner 2: CoaleXpert */}
+            <div className="p-8 bg-white border border-slate-200 shadow-2xs flex flex-col justify-between">
+              <div>
+                <span className="text-xs font-mono font-bold text-emerald-800 uppercase tracking-widest block mb-2">Process & Water Treatment</span>
+                <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-3">
+                  CoaleXpert
+                </h3>
+                <p className="text-slate-600 text-sm leading-relaxed font-normal mb-4">
+                  Technology partnership for high-efficiency produced water treatment, oil separation systems, and modular skids for regulatory compliance and reinjection.
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-100 text-xs font-bold text-slate-700">
+                Produced Water Recovery Skids
+              </div>
+            </div>
+
+            {/* Partner 3: Geospatial & Survey Instrumentation */}
+            <div className="p-8 bg-white border border-slate-200 shadow-2xs flex flex-col justify-between">
+              <div>
+                <span className="text-xs font-mono font-bold text-emerald-800 uppercase tracking-widest block mb-2">Geospatial & Subsea Sensors</span>
+                <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-3">
+                  Specialist Instrumentation
+                </h3>
+                <p className="text-slate-600 text-sm leading-relaxed font-normal mb-4">
+                  Deployment of Leica RTC360 3D laser scanners, acoustic USBL subsea navigation, multibeam bathymetry, and high-thrust 20-tonne hydraulic CPT systems.
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-100 text-xs font-bold text-slate-700">
+                Calibrated Field Equipment
+              </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Management Team */}
-      <section id="management" className="py-20 md:py-32 bg-slate-50 border-t border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">Management Team</h2>
+          <div>
+            <a
+              href="/partners"
+              className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-700 hover:text-emerald-900 transition-colors"
+            >
+              View Technology Partners & Capabilities <span className="ml-2">→</span>
+            </a>
           </div>
-          
-          {(() => {
-            const activeTeam = (teamMembers && teamMembers.length > 0)
-              ? teamMembers.filter(m => m.status === 'active')
-              : TEAM;
-
-            return (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
-                {activeTeam.map((member, idx) => (
-                  <div key={(member as any).id || idx} className="group">
-                    <div className="relative w-full aspect-[4/5] mb-6 bg-slate-200 overflow-hidden">
-                      <img
-                        src={member.image}
-                        alt={member.name}
-                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
-                        loading="lazy"
-                        decoding="async"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src = '/assets/management/steve.png';
-                        }}
-                      />
-                      {member.linkedin && (
-                        <a
-                          href={member.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`${member.name} LinkedIn`}
-                          className="absolute bottom-4 right-4 w-10 h-10 bg-white flex items-center justify-center text-slate-900 hover:text-emerald-700 hover:bg-slate-50 transition-colors shadow-sm"
-                        >
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                          </svg>
-                        </a>
-                      )}
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-1">{member.name}</h3>
-                    <p className="text-sm font-bold text-emerald-700">{member.role}</p>
-                    {(member as any).department && (member as any).department !== 'Executive Management' && (
-                      <p className="text-xs text-slate-500 mt-0.5">{(member as any).department}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            );
-          })()}
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* 8. Call to Action */}
       <section className="bg-emerald-950 py-24 md:py-32 text-center px-4">
-        <h2 className="text-4xl md:text-5xl font-bold text-white mb-8 tracking-tight max-w-4xl mx-auto">Discuss Your Engineering and Survey Requirements</h2>
-        <a href="/contact" className="inline-flex items-center bg-emerald-500 text-white font-bold px-10 py-4 hover:bg-white hover:text-emerald-950 transition-colors shadow-lg">
+        <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight max-w-4xl mx-auto">
+          Discuss Your Engineering and Technical Requirements
+        </h2>
+        <p className="text-emerald-100/90 text-base md:text-lg max-w-2xl mx-auto mb-10 font-normal leading-relaxed">
+          Speak with our engineering team to review site characterisation, marine observation, infrastructure construction or industrial water solutions.
+        </p>
+        <a 
+          href="/contact" 
+          className="inline-flex items-center bg-white text-slate-950 hover:bg-emerald-500 hover:text-white font-bold px-10 py-4 text-xs md:text-sm uppercase tracking-wider transition-colors shadow-lg"
+        >
           Contact Our Engineering Team <span className="ml-3 font-normal text-xl">→</span>
         </a>
       </section>
+      
     </div>
   );
 };
