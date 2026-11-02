@@ -716,29 +716,26 @@ const Home: React.FC = () => {
                 </h2>
                 <div className="space-y-4 text-slate-600 text-base sm:text-lg leading-relaxed font-normal">
                   <p>
-                    Polaris Integrated & GeoSolutions Limited provides geoscience and survey services, marine observation, infrastructure construction and industrial water treatment for energy, infrastructure and industrial clients.
-                  </p>
-                  <p className="text-sm sm:text-base">
-                    Certified to ISO 9001:2015 and ISO 45001:2018 with over 500,000 safe man-hours, our experienced engineers, survey spreads, and specialised field equipment deliver reliable technical results from initial site investigation to long-term asset operations.
+                    Polaris Integrated & GeoSolutions Limited (PIGL) is a Nigerian engineering and technical services company working across geoscience, marine, construction and industrial water services. We support energy, infrastructure and industrial clients through site investigation, survey and monitoring, construction and water-treatment services.
                   </p>
                 </div>
 
-                {/* Engineering Capabilities Progression Cards */}
+                {/* Capability Summary Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-5">
                   <div className="p-3.5 bg-slate-50 border border-slate-200/90">
-                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Phase 1: Investigation</div>
+                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Investigation & Survey</div>
                     <div className="text-xs font-bold text-slate-900 mt-1">Site Characterisation</div>
-                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">20-tonne CPT, borehole drilling & oceanographic buoys</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">Geotechnical investigations, CPT, borehole drilling, geophysical and hydrographic surveys.</div>
                   </div>
                   <div className="p-3.5 bg-slate-50 border border-slate-200/90">
-                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Phase 2: Construction</div>
-                    <div className="text-xs font-bold text-slate-900 mt-1">Infrastructure Delivery</div>
-                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">Pipeline installation, structural welding & swamp construction</div>
+                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Marine Observation</div>
+                    <div className="text-xs font-bold text-slate-900 mt-1">Metocean & Environmental Monitoring</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">Oceanographic observations, marine monitoring, buoy deployment and environmental data collection.</div>
                   </div>
                   <div className="p-3.5 bg-slate-50 border border-slate-200/90">
-                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Phase 3: Verification</div>
-                    <div className="text-xs font-bold text-slate-900 mt-1">3D Reality Capture</div>
-                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">3D laser scanning using Leica RTC360 & as-built modelling</div>
+                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Construction & Digital Engineering</div>
+                    <div className="text-xs font-bold text-slate-900 mt-1">Infrastructure & Reality Capture</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">Pipeline installation, civil works, mechanical installation, 3D laser scanning and as-built modelling.</div>
                   </div>
                 </div>
               </div>
@@ -770,36 +767,36 @@ const Home: React.FC = () => {
                 className="rounded-none border-slate-200"
               />
 
-              {/* Verified Credentials Card filling the remaining height */}
+              {/* Corporate Credentials Panel filling the remaining height */}
               <div className="p-6 bg-slate-50 border border-slate-200 shadow-xs flex-1 flex flex-col justify-center">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
                   <div className="flex items-center space-x-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700">Verified Corporate Credentials</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700">Corporate Credentials</span>
                   </div>
-                  <span className="text-[11px] font-mono font-bold text-emerald-700">ISO Certified & NCDMB Compliant</span>
+                  <span className="text-[11px] font-mono font-bold text-emerald-700">ISO 9001:2015 | ISO 45001:2018</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{settings?.stat_years_experience || '20+'}</div>
-                    <div className="text-xs font-bold text-slate-800">Years Field Experience</div>
-                    <p className="text-[11px] text-slate-500 leading-snug">Indigenous engineering delivering energy infrastructure across Sub-Saharan Africa.</p>
+                    <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{settings?.stat_years_experience || '15+'}</div>
+                    <div className="text-xs font-bold text-slate-800">Years of Experience</div>
+                    <p className="text-[11px] text-slate-500 leading-snug">Engineering and technical service experience across investigation, survey and infrastructure assignments.</p>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{settings?.stat_safe_hours || '500k+'}</div>
-                    <div className="text-xs font-bold text-slate-800">Safe Man-Hours</div>
-                    <p className="text-[11px] text-slate-500 leading-snug">Uncompromising Goal Zero LTI culture across swamp and offshore operational sites.</p>
+                    <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{settings?.stat_safe_hours || '500K+'}</div>
+                    <div className="text-xs font-bold text-slate-800">Recorded Safe Man-Hours</div>
+                    <p className="text-[11px] text-slate-500 leading-snug">Recorded safety performance across field and operational activities.</p>
                   </div>
                   <div className="space-y-1">
                     <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">ISO</div>
                     <div className="text-xs font-bold text-slate-800">9001:2015 & 45001:2018</div>
-                    <p className="text-[11px] text-slate-500 leading-snug">Audited international quality management and occupational safety systems.</p>
+                    <p className="text-[11px] text-slate-500 leading-snug">Quality management and occupational health and safety management systems.</p>
                   </div>
                   <div className="space-y-1">
                     <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">100%</div>
-                    <div className="text-xs font-bold text-slate-800">Indigenous Firm</div>
-                    <p className="text-[11px] text-slate-500 leading-snug">Committed to local workforce empowerment, training, and host community partnership.</p>
+                    <div className="text-xs font-bold text-slate-800">Nigerian-Owned Company</div>
+                    <p className="text-[11px] text-slate-500 leading-snug">An indigenous Nigerian company supporting local technical capacity and workforce participation.</p>
                   </div>
                 </div>
               </div>
