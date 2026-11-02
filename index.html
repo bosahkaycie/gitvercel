@@ -300,97 +300,101 @@
   </script>
 </head>
 
-<body class="bg-slate-50 text-slate-900 antialiased selection:bg-emerald-500 selection:text-white">
-  <div id="root">
-    <!-- Initial Crawlable & Accessible Static Semantic Shell (Hydrated by React on Mount) -->
-    <header class="bg-slate-950 text-white border-b border-slate-800 py-4 px-6">
-      <div class="max-w-7xl mx-auto flex items-center justify-between">
-        <a href="/" class="flex items-center gap-3 text-white font-bold tracking-wider text-lg" aria-label="Polaris Integrated & GeoSolutions Home">
-          <span class="text-emerald-500">PIGL</span> | Polaris Integrated & GeoSolutions Limited
-        </a>
-        <nav class="hidden md:flex items-center gap-6 text-sm text-slate-300 font-medium" aria-label="Main Navigation">
-          <a href="/services" class="hover:text-emerald-400 transition-colors">Services</a>
-          <a href="/services/geosolutions-engineering-services" class="hover:text-emerald-400 transition-colors">GeoSolutions (GES)</a>
-          <a href="/services/metocean-marine-solutions" class="hover:text-emerald-400 transition-colors">Metocean (MMS)</a>
-          <a href="/services/integrated-construction-services" class="hover:text-emerald-400 transition-colors">Construction (ICS)</a>
-          <a href="/services/industrial-solutions" class="hover:text-emerald-400 transition-colors">Industrial (IS)</a>
-          <a href="/about" class="hover:text-emerald-400 transition-colors">About</a>
-          <a href="/projects" class="hover:text-emerald-400 transition-colors">Projects</a>
-          <a href="/contact" class="hover:text-emerald-400 transition-colors">Contact</a>
-        </nav>
-      </div>
-    </header>
+<body class="bg-slate-950 text-slate-100 antialiased selection:bg-emerald-500 selection:text-white" style="background-color: #020617; color: #f8fafc; margin: 0; min-height: 100vh;">
+  <div id="root" style="background-color: #020617; min-height: 100vh;"></div>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div class="max-w-4xl">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold mb-6">
-          <span>ISO 9001:2015 &amp; ISO 45001:2018 Certified Indigenous Engineering Contractor</span>
+  <!-- Fallback Crawlable & Accessible Semantic Shell for Search Engines & Non-JS Browsers -->
+  <noscript>
+    <div style="background-color: #020617; color: #f8fafc; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 2rem;">
+      <header style="border-bottom: 1px solid #1e293b; padding-bottom: 1.5rem; margin-bottom: 2rem;">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <a href="/" style="color: #10b981; font-weight: 800; font-size: 1.25rem; text-decoration: none; letter-spacing: 0.05em;">
+            PIGL <span style="color: #cbd5e1; font-weight: 500;">| Polaris Integrated &amp; GeoSolutions Limited</span>
+          </a>
+          <nav style="display: flex; gap: 1.25rem; flex-wrap: wrap; font-size: 0.9rem;">
+            <a href="/services" style="color: #94a3b8; text-decoration: none;">Services</a>
+            <a href="/services/geosolutions-engineering-services" style="color: #94a3b8; text-decoration: none;">GeoSolutions (GES)</a>
+            <a href="/services/metocean-marine-solutions" style="color: #94a3b8; text-decoration: none;">Metocean (MMS)</a>
+            <a href="/services/integrated-construction-services" style="color: #94a3b8; text-decoration: none;">Construction (ICS)</a>
+            <a href="/services/industrial-solutions" style="color: #94a3b8; text-decoration: none;">Industrial (IS)</a>
+            <a href="/about" style="color: #94a3b8; text-decoration: none;">About</a>
+            <a href="/projects" style="color: #94a3b8; text-decoration: none;">Projects</a>
+            <a href="/contact" style="color: #94a3b8; text-decoration: none;">Contact</a>
+          </nav>
         </div>
-        <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-6">
-          Geotechnical Engineering, Geophysical Surveys &amp; 3D Reality Capture in Nigeria
-        </h1>
-        <p class="text-lg text-slate-700 leading-relaxed mb-8">
-          Polaris Integrated &amp; GeoSolutions Limited (PIGL) is a certified engineering leader delivering 20-ton hydraulic CPT testing, deep borehole drilling, marine geophysical surveys, bathymetry, Leica RTC360 digital twin laser scanning, and pipeline construction across Port Harcourt, Lagos, the Niger Delta, and offshore Nigeria.
-        </p>
+      </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
-          <article class="p-6 bg-white border border-slate-200 rounded-lg shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 mb-2">
-              <a href="/services/geosolutions-engineering-services" class="text-emerald-700 hover:text-emerald-800">
-                01. GeoSolutions &amp; Engineering Services (GES)
-              </a>
-            </h2>
-            <p class="text-slate-600 text-sm leading-relaxed mb-4">
-              Geotechnical investigations, 20-ton hydraulic CPT soil testing, deep boreholes, high-resolution marine seismic surveys, bathymetry, geohazard assessments, and Leica RTC360 3D reality capture.
-            </p>
-            <a href="/services/geosolutions-engineering-services" class="text-xs font-semibold uppercase tracking-wider text-emerald-600 hover:text-emerald-700">Explore GES Division &rarr;</a>
-          </article>
+      <main style="max-width: 1200px; margin: 0 auto;">
+        <div style="max-width: 900px;">
+          <div style="display: inline-block; padding: 0.35rem 0.85rem; border-radius: 9999px; background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.8rem; font-weight: 600; margin-bottom: 1.25rem; border: 1px solid rgba(16, 185, 129, 0.3);">
+            ISO 9001:2015 &amp; ISO 45001:2018 Certified Indigenous Engineering Contractor
+          </div>
+          <h1 style="font-size: 2.25rem; font-weight: 800; line-height: 1.25; margin: 0 0 1.25rem 0; color: #f8fafc;">
+            Geotechnical Engineering, Geophysical Surveys &amp; 3D Reality Capture in Nigeria
+          </h1>
+          <p style="font-size: 1.1rem; line-height: 1.6; color: #94a3b8; margin-bottom: 2rem;">
+            Polaris Integrated &amp; GeoSolutions Limited (PIGL) is a certified engineering leader delivering 20-ton hydraulic CPT testing, deep borehole drilling, marine geophysical surveys, bathymetry, Leica RTC360 digital twin laser scanning, and pipeline construction across Port Harcourt, Lagos, the Niger Delta, and offshore Nigeria.
+          </p>
 
-          <article class="p-6 bg-white border border-slate-200 rounded-lg shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 mb-2">
-              <a href="/services/metocean-marine-solutions" class="text-emerald-700 hover:text-emerald-800">
-                02. Metocean &amp; Marine Solutions (MMS)
-              </a>
-            </h2>
-            <p class="text-slate-600 text-sm leading-relaxed mb-4">
-              Autonomous oceanographic buoy telemetry, ADCP Doppler current profiling, MetOcean forecasting, marine environmental baseline surveys, and offshore marine advisory across West Africa.
-            </p>
-            <a href="/services/metocean-marine-solutions" class="text-xs font-semibold uppercase tracking-wider text-emerald-600 hover:text-emerald-700">Explore MMS Division &rarr;</a>
-          </article>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+            <article style="padding: 1.5rem; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;">
+              <h2 style="font-size: 1.1rem; font-weight: 700; margin-top: 0; margin-bottom: 0.75rem;">
+                <a href="/services/geosolutions-engineering-services" style="color: #34d399; text-decoration: none;">
+                  01. GeoSolutions &amp; Engineering Services (GES)
+                </a>
+              </h2>
+              <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.5; margin-bottom: 1rem;">
+                Geotechnical investigations, 20-ton hydraulic CPT soil testing, deep boreholes, high-resolution marine seismic surveys, bathymetry, geohazard assessments, and Leica RTC360 3D reality capture.
+              </p>
+              <a href="/services/geosolutions-engineering-services" style="color: #10b981; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none;">Explore GES Division &rarr;</a>
+            </article>
 
-          <article class="p-6 bg-white border border-slate-200 rounded-lg shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 mb-2">
-              <a href="/services/integrated-construction-services" class="text-emerald-700 hover:text-emerald-800">
-                03. Integrated Construction Services (ICS)
-              </a>
-            </h2>
-            <p class="text-slate-600 text-sm leading-relaxed mb-4">
-              Pipeline installation, horizontal directional drilling (HDD), mechanical spool fabrication, industrial civil infrastructure, piling, and swamp terrain energy corridor delivery.
-            </p>
-            <a href="/services/integrated-construction-services" class="text-xs font-semibold uppercase tracking-wider text-emerald-600 hover:text-emerald-700">Explore ICS Division &rarr;</a>
-          </article>
+            <article style="padding: 1.5rem; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;">
+              <h2 style="font-size: 1.1rem; font-weight: 700; margin-top: 0; margin-bottom: 0.75rem;">
+                <a href="/services/metocean-marine-solutions" style="color: #34d399; text-decoration: none;">
+                  02. Metocean &amp; Marine Solutions (MMS)
+                </a>
+              </h2>
+              <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.5; margin-bottom: 1rem;">
+                Autonomous oceanographic buoy telemetry, ADCP Doppler current profiling, MetOcean forecasting, marine environmental baseline surveys, and offshore marine advisory across West Africa.
+              </p>
+              <a href="/services/metocean-marine-solutions" style="color: #10b981; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none;">Explore MMS Division &rarr;</a>
+            </article>
 
-          <article class="p-6 bg-white border border-slate-200 rounded-lg shadow-sm">
-            <h2 class="text-xl font-bold text-slate-900 mb-2">
-              <a href="/services/industrial-solutions" class="text-emerald-700 hover:text-emerald-800">
-                04. Industrial Solutions (IS)
-              </a>
-            </h2>
-            <p class="text-slate-600 text-sm leading-relaxed mb-4">
-              Produced water treatment skids, industrial wastewater recovery, certified water quality laboratory testing, environmental remediation, and specialty industrial procurement.
-            </p>
-            <a href="/services/industrial-solutions" class="text-xs font-semibold uppercase tracking-wider text-emerald-600 hover:text-emerald-700">Explore IS Division &rarr;</a>
-          </article>
+            <article style="padding: 1.5rem; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;">
+              <h2 style="font-size: 1.1rem; font-weight: 700; margin-top: 0; margin-bottom: 0.75rem;">
+                <a href="/services/integrated-construction-services" style="color: #34d399; text-decoration: none;">
+                  03. Integrated Construction Services (ICS)
+                </a>
+              </h2>
+              <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.5; margin-bottom: 1rem;">
+                Pipeline installation, horizontal directional drilling (HDD), mechanical spool fabrication, industrial civil infrastructure, piling, and swamp terrain energy corridor delivery.
+              </p>
+              <a href="/services/integrated-construction-services" style="color: #10b981; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none;">Explore ICS Division &rarr;</a>
+            </article>
+
+            <article style="padding: 1.5rem; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;">
+              <h2 style="font-size: 1.1rem; font-weight: 700; margin-top: 0; margin-bottom: 0.75rem;">
+                <a href="/services/industrial-solutions" style="color: #34d399; text-decoration: none;">
+                  04. Industrial Solutions (IS)
+                </a>
+              </h2>
+              <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.5; margin-bottom: 1rem;">
+                Produced water treatment skids, industrial wastewater recovery, certified water quality laboratory testing, environmental remediation, and specialty industrial procurement.
+              </p>
+              <a href="/services/industrial-solutions" style="color: #10b981; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none;">Explore IS Division &rarr;</a>
+            </article>
+          </div>
+
+          <div style="border-top: 1px solid #1e293b; padding-top: 1.5rem; color: #94a3b8; font-size: 0.875rem;">
+            <p style="font-weight: 600; color: #f8fafc; margin-bottom: 0.25rem;">Operating Headquarters &amp; Laboratory:</p>
+            <address style="font-style: normal; margin-bottom: 0.5rem;">#3 Diamond Close, Castle &amp; Green Estate, Off Eneka Link Road, Port Harcourt, Rivers State, Nigeria</address>
+            <p style="margin: 0;">Telephone: <a href="tel:+2348097081333" style="color: #34d399; text-decoration: none;">+234-809-7081-333</a> | Email: <a href="mailto:hello@polarisigl.com" style="color: #34d399; text-decoration: none;">hello@polarisigl.com</a></p>
+          </div>
         </div>
-
-        <div class="mt-8 pt-8 border-t border-slate-200 text-sm text-slate-600">
-          <p class="font-semibold text-slate-800">Operating Headquarters &amp; Laboratory:</p>
-          <address class="not-italic mt-1">#3 Diamond Close, Castle &amp; Green Estate, Off Eneka Link Road, Port Harcourt, Rivers State, Nigeria</address>
-          <p class="mt-1">Telephone: <a href="tel:+2348097081333" class="text-emerald-700">+234-809-7081-333</a> | Email: <a href="mailto:hello@polarisigl.com" class="text-emerald-700">hello@polarisigl.com</a></p>
-        </div>
-      </div>
-    </main>
-  </div>
+      </main>
+    </div>
+  </noscript>
   <script type="module" src="./index.tsx"></script>
 </body>
 
