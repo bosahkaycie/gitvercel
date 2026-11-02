@@ -21,7 +21,7 @@ const routes = [
     title: 'Polaris Integrated & GeoSolutions (PIGL) | Geoscience, Marine, Construction & Industrial Solutions',
     description: 'Polaris Integrated & GeoSolutions Limited provides geoscience and survey services, marine observation, infrastructure construction and industrial water treatment for energy, infrastructure and industrial clients in Nigeria.',
     badge: 'ISO 9001:2015 & ISO 45001:2018 Certified Management Systems',
-    h1: 'Engineering Expertise Across Geoscience, Marine, Construction and Industrial Operations.',
+    h1: 'About PIGL',
     intro: 'Polaris Integrated & GeoSolutions Limited provides geoscience and survey services, marine observation, infrastructure construction and industrial water treatment for energy, infrastructure and industrial clients.',
     sectionsHtml: `
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">

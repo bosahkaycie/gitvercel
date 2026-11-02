@@ -444,7 +444,7 @@ const Home: React.FC = () => {
 
   return (
     <div className="flex flex-col font-sans bg-white">
-      <h1 className="sr-only">Engineering expertise across geoscience, marine, construction and industrial operations.</h1>
+      <h1 className="sr-only">About PIGL</h1>
 
       {/* 1. Hero Section with Looping Background Video & Content Slider */}
       <section 
@@ -708,7 +708,7 @@ const Home: React.FC = () => {
             <div className="lg:col-span-6 flex flex-col justify-between space-y-6">
               <div>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
-                  Engineering Expertise Across Geoscience, Marine, Construction and Industrial Operations.
+                  About PIGL
                 </h2>
                 <div className="space-y-4 text-slate-600 text-base sm:text-lg leading-relaxed font-normal">
                   <p>

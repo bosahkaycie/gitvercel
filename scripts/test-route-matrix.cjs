@@ -63,7 +63,7 @@ const ROUTES_TO_TEST = [
   {
     route: '/',
     expectedPage: 'Homepage',
-    expectedH1: 'Engineering expertise across geoscience, marine, construction and industrial operations.',
+    expectedH1: 'About PIGL',
     expectedTitleSnippet: 'Polaris Integrated & GeoSolutions'
   },
   {
