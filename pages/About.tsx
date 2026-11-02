@@ -204,7 +204,6 @@ const About: React.FC = () => {
             {/* 1. Safety in Execution */}
             <div className="bg-white p-8 md:p-10 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
               <div>
-                <span className="text-[11px] font-mono font-bold text-emerald-800 uppercase tracking-widest block mb-2">01 • Operating Practice</span>
                 <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
                   Safety in Execution
                 </h3>
@@ -220,7 +219,6 @@ const About: React.FC = () => {
             {/* 2. Technical and Commercial Value */}
             <div className="bg-white p-8 md:p-10 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
               <div>
-                <span className="text-[11px] font-mono font-bold text-emerald-800 uppercase tracking-widest block mb-2">02 • Project Delivery</span>
                 <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
                   Technical and Commercial Value
                 </h3>
@@ -236,7 +234,6 @@ const About: React.FC = () => {
             {/* 3. Capacity and Technical Partnerships */}
             <div className="bg-white p-8 md:p-10 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
               <div>
-                <span className="text-[11px] font-mono font-bold text-emerald-800 uppercase tracking-widest block mb-2">03 • Resources & Reach</span>
                 <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
                   Capacity and Technical Partnerships
                 </h3>
@@ -252,7 +249,6 @@ const About: React.FC = () => {
             {/* 4. Adaptability and Problem-Solving */}
             <div className="bg-white p-8 md:p-10 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
               <div>
-                <span className="text-[11px] font-mono font-bold text-emerald-800 uppercase tracking-widest block mb-2">04 • Engineering Solutions</span>
                 <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
                   Adaptability and Problem-Solving
                 </h3>
