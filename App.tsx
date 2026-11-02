@@ -7,24 +7,121 @@ import ScrollToTop from './components/ScrollToTop';
 import WhatsAppButton from './components/WhatsAppButton';
 import { trackPageView, useSiteSettings } from './hooks/useSupabaseData';
 
+// Resilient dynamic import wrapper that handles stale chunk 404s after new deployments
+function lazyWithRetry<T extends React.ComponentType<any>>(
+  factory: () => Promise<{ default: T }>
+): React.LazyExoticComponent<T> {
+  return React.lazy(async () => {
+    try {
+      return await factory();
+    } catch (error: any) {
+      console.warn('Chunk loading failed, attempting automatic reload:', error);
+      const reloadKey = 'pigl_chunk_retry_' + (typeof window !== 'undefined' ? window.location.pathname : '');
+      const alreadyRetried = typeof window !== 'undefined' && window.sessionStorage.getItem(reloadKey);
+      if (!alreadyRetried && typeof window !== 'undefined') {
+        window.sessionStorage.setItem(reloadKey, 'true');
+        window.location.reload();
+      }
+      throw error;
+    }
+  });
+}
+
 // Route-based code splitting for GTmetrix Grade A performance and ultra-fast initial load
-const Home = React.lazy(() => import('./pages/Home'));
-const About = React.lazy(() => import('./pages/About'));
-const Services = React.lazy(() => import('./pages/Services'));
-const ServiceDetail = React.lazy(() => import('./pages/ServiceDetail'));
-const Projects = React.lazy(() => import('./pages/Projects'));
-const Contact = React.lazy(() => import('./pages/Contact'));
-const Careers = React.lazy(() => import('./pages/Careers'));
-const News = React.lazy(() => import('./pages/News'));
-const Blog = React.lazy(() => import('./pages/Blog'));
-const BlogPost = React.lazy(() => import('./pages/BlogPost'));
-const HSSE = React.lazy(() => import('./pages/HSSE'));
-const Partners = React.lazy(() => import('./pages/Partners'));
-const VendorHub = React.lazy(() => import('./pages/VendorHub'));
-const Videos = React.lazy(() => import('./pages/Videos'));
-const AdminLayout = React.lazy(() => import('./pages/admin/AdminLayout'));
-const SearchOverlay = React.lazy(() => import('./components/SearchOverlay'));
-const MaintenanceUpdateScreen = React.lazy(() => import('./components/MaintenanceUpdateScreen'));
+const Home = lazyWithRetry(() => import('./pages/Home'));
+const About = lazyWithRetry(() => import('./pages/About'));
+const Services = lazyWithRetry(() => import('./pages/Services'));
+const ServiceDetail = lazyWithRetry(() => import('./pages/ServiceDetail'));
+const Projects = lazyWithRetry(() => import('./pages/Projects'));
+const Contact = lazyWithRetry(() => import('./pages/Contact'));
+const Careers = lazyWithRetry(() => import('./pages/Careers'));
+const News = lazyWithRetry(() => import('./pages/News'));
+const Blog = lazyWithRetry(() => import('./pages/Blog'));
+const BlogPost = lazyWithRetry(() => import('./pages/BlogPost'));
+const HSSE = lazyWithRetry(() => import('./pages/HSSE'));
+const Partners = lazyWithRetry(() => import('./pages/Partners'));
+const VendorHub = lazyWithRetry(() => import('./pages/VendorHub'));
+const Videos = lazyWithRetry(() => import('./pages/Videos'));
+const AdminLayout = lazyWithRetry(() => import('./pages/admin/AdminLayout'));
+const SearchOverlay = lazyWithRetry(() => import('./components/SearchOverlay'));
+const MaintenanceUpdateScreen = lazyWithRetry(() => import('./components/MaintenanceUpdateScreen'));
+
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error?: Error;
+}
+
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('ErrorBoundary caught:', error, errorInfo);
+    const isChunkError =
+      error?.name === 'ChunkLoadError' ||
+      error?.message?.includes('Failed to fetch dynamically imported module') ||
+      error?.message?.includes('dynamically imported module') ||
+      error?.message?.includes('loading chunk');
+
+    if (isChunkError && typeof window !== 'undefined') {
+      const reloadKey = 'pigl_eb_retry_' + window.location.pathname;
+      if (!window.sessionStorage.getItem(reloadKey)) {
+        window.sessionStorage.setItem(reloadKey, 'true');
+        window.location.reload();
+      }
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center">
+          <div className="max-w-md bg-slate-900 border border-slate-800 p-8 rounded-lg shadow-2xl">
+            <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4 text-emerald-400">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">Updating Engineering Portal</h2>
+            <p className="text-sm text-slate-400 mb-6">
+              A new version of the website has been deployed. Please reload to display the updated content.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.sessionStorage.clear();
+                    window.location.reload();
+                  }
+                }}
+                className="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider rounded transition-colors cursor-pointer"
+              >
+                Reload Page
+              </button>
+              <a
+                href="/"
+                className="px-6 py-2.5 border border-slate-700 hover:border-slate-500 text-slate-300 font-bold text-xs uppercase tracking-wider rounded transition-colors"
+              >
+                Return Home
+              </a>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const normalizePath = (rawPath?: string): string => {
   if (!rawPath) return '/';
@@ -436,9 +533,11 @@ const App: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar currentPath={currentPath} onSearchClick={() => setIsSearchOpen(true)} />
       <main className="flex-grow">
-        <Suspense fallback={<PageFallback />}>
-          {renderPage()}
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={<PageFallback />}>
+            {renderPage()}
+          </Suspense>
+        </ErrorBoundary>
       </main>
       {currentPath !== '/vendors/portal' && <Footer />}
       <WhatsAppButton />

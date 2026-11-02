@@ -20,8 +20,8 @@ const About: React.FC = () => {
 
   useEffect(() => {
     const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
+      threshold: 0.05,
+      rootMargin: '0px 0px 50px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -35,19 +35,34 @@ const About: React.FC = () => {
     const revealElements = document.querySelectorAll('.reveal');
     revealElements.forEach(el => observer.observe(el));
 
-    return () => observer.disconnect();
-  }, [teamMembers]);
+    // Fallback timer: guarantees all sections are visible even if observer is delayed or blocked
+    const timer = setTimeout(() => {
+      revealElements.forEach(el => el.classList.add('active'));
+    }, 600);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.hash.split('?')[1]);
-    const section = params.get('section');
-    if (section) {
-      setTimeout(() => {
-        const element = document.getElementById(section);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 500);
+    try {
+      const searchParams = new URLSearchParams(window.location.search);
+      const searchSection = searchParams.get('section');
+      const hashSection = window.location.hash ? window.location.hash.replace(/^#/, '') : null;
+      const targetId = searchSection || hashSection;
+
+      if (targetId) {
+        setTimeout(() => {
+          const element = document.getElementById(targetId);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 300);
+      }
+    } catch (e) {
+      // Ignore URL parsing errors
     }
   }, []);
 
