@@ -26,6 +26,15 @@ const AdminLayout = React.lazy(() => import('./pages/admin/AdminLayout'));
 const SearchOverlay = React.lazy(() => import('./components/SearchOverlay'));
 const MaintenanceUpdateScreen = React.lazy(() => import('./components/MaintenanceUpdateScreen'));
 
+const normalizePath = (rawPath?: string): string => {
+  if (!rawPath) return '/';
+  let path = rawPath.split('?')[0].split('#')[0];
+  if (path.length > 1 && path.endsWith('/')) {
+    path = path.replace(/\/+$/, '');
+  }
+  return path || '/';
+};
+
 const PageFallback: React.FC = () => (
   <div className="min-h-screen w-full flex items-center justify-center bg-slate-950">
     <div className="flex flex-col items-center gap-3">
@@ -37,12 +46,12 @@ const PageFallback: React.FC = () => (
 
 const App: React.FC = () => {
   const { settings } = useSiteSettings();
-  const [currentPath, setCurrentPath] = useState(window.location.pathname || '/');
+  const [currentPath, setCurrentPath] = useState(() => normalizePath(typeof window !== 'undefined' ? window.location.pathname : '/'));
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     const handleLocationChange = () => {
-      let path = window.location.pathname || '/';
+      let path = normalizePath(window.location.pathname);
       // Check for legacy service URLs and redirect cleanly
       if (path.startsWith('/services/')) {
         const legacyId = path.split('/services/')[1];
@@ -361,7 +370,11 @@ const App: React.FC = () => {
 
   const renderPage = () => {
     if (currentPath.startsWith('/services/')) {
-      return <ServiceDetail currentPath={currentPath} />;
+      const serviceId = currentPath.split('/services/')[1];
+      if (serviceId) {
+        return <ServiceDetail currentPath={currentPath} />;
+      }
+      return <Services />;
     }
     if (currentPath.startsWith('/blog/')) {
       return <BlogPost currentPath={currentPath} />;
@@ -388,7 +401,6 @@ const App: React.FC = () => {
       case '/contact':
         return <Contact />;
       case '/vendors':
-        return <VendorHub initialTab="register" />;
       case '/vendors/register':
       case '/vendor-registration':
         return <VendorHub initialTab="register" />;
@@ -400,7 +412,23 @@ const App: React.FC = () => {
       case '/watch':
         return <Videos />;
       default:
-        return <Home />;
+        return (
+          <div className="min-h-[70vh] bg-slate-950 text-white flex flex-col items-center justify-center px-4 py-24 text-center">
+            <span className="text-emerald-500 font-mono text-sm uppercase tracking-widest mb-3">404 — Page Not Found</span>
+            <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">The requested engineering page does not exist.</h1>
+            <p className="text-slate-400 max-w-lg mb-8 text-base">
+              The link you followed may be outdated or the page has moved within our four operating divisions.
+            </p>
+            <div className="flex gap-4">
+              <a href="/services" className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider rounded transition-colors">
+                Explore Services
+              </a>
+              <a href="/" className="px-6 py-3 border border-slate-700 hover:border-slate-500 text-slate-200 font-bold text-xs uppercase tracking-wider rounded transition-colors">
+                Return Home
+              </a>
+            </div>
+          </div>
+        );
     }
   };
 

@@ -584,12 +584,12 @@ const Services: React.FC = () => {
           <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-8">
             <a href="/" className="hover:text-white transition-colors">Home</a>
             <span className="text-slate-600">/</span>
-            <span className="text-white">Capabilities</span>
+            <span className="text-white">Services</span>
           </div>
 
           <div className="max-w-4xl">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight mb-8">
-              Specialist Engineering Divisions
+              Our Services
             </h1>
             <p className="text-xl md:text-2xl text-slate-300 font-normal leading-relaxed">
               Geoscience, marine observation, infrastructure construction, and industrial water treatment across Nigeria and Sub-Saharan Africa.
