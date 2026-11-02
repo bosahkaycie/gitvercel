@@ -280,8 +280,7 @@ const About: React.FC = () => {
             {/* Division 1: GES */}
             <div className="p-8 border border-slate-200 bg-white hover:border-emerald-600 transition-colors flex flex-col justify-between shadow-2xs">
               <div>
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-                  <span className="text-xs font-mono font-bold text-emerald-800">01 • DIVISION</span>
+                <div className="flex items-center justify-end mb-4 pb-3 border-b border-slate-100">
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-500">GES</span>
                 </div>
                 <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
@@ -304,8 +303,7 @@ const About: React.FC = () => {
             {/* Division 2: MMS */}
             <div className="p-8 border border-slate-200 bg-white hover:border-emerald-600 transition-colors flex flex-col justify-between shadow-2xs">
               <div>
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-                  <span className="text-xs font-mono font-bold text-emerald-800">02 • DIVISION</span>
+                <div className="flex items-center justify-end mb-4 pb-3 border-b border-slate-100">
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-500">MMS</span>
                 </div>
                 <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
@@ -328,8 +326,7 @@ const About: React.FC = () => {
             {/* Division 3: ICS */}
             <div className="p-8 border border-slate-200 bg-white hover:border-emerald-600 transition-colors flex flex-col justify-between shadow-2xs">
               <div>
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-                  <span className="text-xs font-mono font-bold text-emerald-800">03 • DIVISION</span>
+                <div className="flex items-center justify-end mb-4 pb-3 border-b border-slate-100">
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-500">ICS</span>
                 </div>
                 <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
@@ -352,8 +349,7 @@ const About: React.FC = () => {
             {/* Division 4: IS */}
             <div className="p-8 border border-slate-200 bg-white hover:border-emerald-600 transition-colors flex flex-col justify-between shadow-2xs">
               <div>
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-                  <span className="text-xs font-mono font-bold text-emerald-800">04 • DIVISION</span>
+                <div className="flex items-center justify-end mb-4 pb-3 border-b border-slate-100">
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-500">IS</span>
                 </div>
                 <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight mb-3">
