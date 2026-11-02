@@ -284,7 +284,7 @@ export const MASTER_SERVICE_DELIVERABLES: Record<string, Record<string, ServiceD
     'marine-compliance': {
       title: 'Marine environmental compliance and water quality monitoring',
       description: 'Offshore seawater and sediment quality monitoring campaigns collecting CTD (Conductivity, Temperature, Depth) profiles, turbidity, dissolved oxygen, and hydrocarbon trace measurements across offshore exploration blocks and oil terminal tanker loading zones.',
-      deliverablesOutput: 'Environmental Compliance Monitoring Reports, CTD depth gradient profile graphs, accredited water chemistry laboratory analysis, and regulatory environmental filings.',
+      deliverablesOutput: 'Environmental Compliance Monitoring Reports, CTD depth gradient profile graphs, water chemistry laboratory analysis, and regulatory environmental filings.',
       standards: 'NUPRC EGASPIN Guidelines, OSPAR Environmental Monitoring Standards, MARPOL 73/78'
     },
     'pipeline-route-surveys': {

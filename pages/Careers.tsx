@@ -144,7 +144,7 @@ const Careers: React.FC = () => {
               Careers at PIGL
             </h1>
             <p className="text-xl md:text-2xl text-slate-300 font-normal leading-relaxed">
-              Building the future of Sub-Saharan energy requires the sharpest minds. Come innovate with us and help create a safe and liveable world.
+              Join our multidisciplinary engineering teams delivering geotechnical investigations, marine surveys, pipeline construction, and industrial water systems across Nigeria.
             </p>
           </div>
         </div>
@@ -160,17 +160,17 @@ const Careers: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
             <div className="space-y-8">
-              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight tracking-tight">Empowering Indigenous Talent</h2>
+              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight tracking-tight">Professional Development & Field Careers</h2>
               <p className="text-slate-600 text-lg leading-relaxed font-normal">
-                At PIGL, we believe our people are our most valuable asset. We provide a platform for engineers, surveyors, and project managers to work with specialised survey equipment, geotechnical rigs, and 3D reality capture tools in challenging field environments.
+                At PIGL, we provide an operational environment where engineers, hydrographers, geoscientists, and technicians work directly with specialised survey spreads, 20-tonne CPT rigs, and 3D reality capture equipment in complex field environments.
               </p>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-4">
                 {[
-                  { title: 'Advanced Tech', desc: 'Work with Leica Geosystems Reality Capture gear.' },
-                  { title: 'Safety Culture', desc: 'Our zero-harm policy ensures you go home safe.' },
-                  { title: 'Growth Paths', desc: 'Continuous learning and ISO-certified training.' },
-                  { title: 'Impact', desc: 'Be part of Nigeria\'s most critical energy infrastructure.' }
+                  { title: 'Field Instrumentation', desc: 'Deploy with 20-tonne CPT rigs, Leica laser scanners, and marine survey spreads.' },
+                  { title: 'Health & Safety', desc: 'Work under audited ISO 45001:2018 occupational safety protocols.' },
+                  { title: 'Professional Growth', desc: 'Structured technical training and hands-on operational mentorship.' },
+                  { title: 'Infrastructure Impact', desc: 'Contribute directly to major energy and civil infrastructure projects across Nigeria.' }
                 ].map((item, idx) => (
                   <div key={idx} className="bg-slate-50 p-6 border border-slate-200">
                     <h4 className="text-emerald-700 font-bold mb-2">{item.title}</h4>

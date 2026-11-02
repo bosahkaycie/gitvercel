@@ -838,7 +838,7 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
             {((service.slug === 'geosolutions-engineering-services' || id === 'geosolutions-engineering-services' || id === 'ground-intelligence') ? [
               {
                 q: "Where does PIGL deliver geotechnical engineering services in Nigeria?",
-                a: "Polaris Integrated & GeoSolutions Limited (PIGL) operates throughout Nigeria with active mobilisation bases in Port Harcourt, Lagos, Warri, and Bonny Island. We mobilise 20-tonne hydraulic Cone Penetration Testing (CPT) equipment, deep borehole drilling rigs, and accredited soil mechanics laboratories across swamp, coastal, land, and offshore environments."
+                a: "Polaris Integrated & GeoSolutions Limited (PIGL) operates throughout Nigeria with active mobilisation bases in Port Harcourt, Lagos, Warri, and Bonny Island. We mobilise 20-tonne hydraulic Cone Penetration Testing (CPT) equipment, deep borehole drilling rigs, and comprehensive soil mechanics testing laboratories across swamp, coastal, land, and offshore environments."
               },
               {
                 q: "What capabilities distinguish PIGL's geophysical survey operations?",
@@ -846,7 +846,7 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
               },
               {
                 q: "What is 3D reality capture and what accuracy can PIGL deliver?",
-                a: "3D reality capture digitises physical assets into millimeter-accurate point clouds and 3D digital twins. Utilizing industrial-grade Leica RTC360 terrestrial laser scanners, PIGL delivers high-precision registered point clouds, as-built 3D CAD/BIM models, clash detection reports, and digital twins for brownfield facilities, offshore platforms, and infrastructure."
+                a: "3D reality capture digitises physical assets into millimetre-accurate point clouds and 3D digital twins. Utilizing industrial-grade Leica RTC360 terrestrial laser scanners, PIGL delivers high-precision registered point clouds, as-built 3D CAD/BIM models, clash detection reports, and digital twins for brownfield facilities, offshore platforms, and infrastructure."
               },
               {
                 q: "What geotechnical laboratory tests and certifications do you provide?",

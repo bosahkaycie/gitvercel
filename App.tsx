@@ -169,20 +169,20 @@ const App: React.FC = () => {
 
     const pageTitles: { [key: string]: string } = {
       '/': 'Polaris Integrated & GeoSolutions (PIGL) | Geoscience, Marine, Construction & Industrial Solutions',
-      '/about': 'About PIGL | ISO Certified Indigenous Engineering Leader',
+      '/about': 'About PIGL | ISO Certified Engineering Contractor',
       '/services': 'Specialist Engineering Divisions | PIGL Nigeria',
-      '/partners': 'Strategic Alliances & Technology Partners | PIGL',
+      '/partners': 'Technology Partners & Engineering Alliances | PIGL',
       '/projects': 'Executed Engineering Projects & Case Studies | PIGL',
-      '/careers': 'Careers at PIGL | Indigenous Engineering Talent',
+      '/careers': 'Careers at PIGL | Engineering Opportunities in Nigeria',
       '/news': 'News & Technical Insights | PIGL Nigeria',
       '/blog': 'Engineering News & Technical Insights | PIGL Nigeria',
       '/hsse': 'HSSEQ Standards & ISO Certifications | PIGL Safety',
       '/contact': 'Contact PIGL | Engineering Offices in Port Harcourt & Lagos',
-      '/vendors': 'Vendor Onboarding & Tax Compliance Portal | PIGL Nigeria',
+      '/vendors': 'Vendor Onboarding & Compliance Portal | PIGL Nigeria',
       '/vendors/register': 'Vendor Registration Form PIGL/F/VOTC/AHR/037 | PIGL',
       '/vendor-registration': 'Vendor Registration Form PIGL/F/VOTC/AHR/037 | PIGL',
       '/vendors/portal': 'Vendor Status Tracker & Compliance Dossier | PIGL',
-      '/videos': 'Official Video Hub & Corporate Documentary | PIGL Nigeria',
+      '/videos': 'Operations & Engineering Video Library | PIGL Nigeria',
       '/media': 'Media Center & Technical Video Showcase | PIGL Nigeria',
       '/watch': 'Watch Corporate Documentary & Field Demos | PIGL Nigeria',
       '/admin': 'PIGL CMS Portal | Engineering Administration'
@@ -198,16 +198,16 @@ const App: React.FC = () => {
       if (service) {
         if (id === 'geosolutions-engineering-services') {
           activeTitle = 'GeoSolutions & Engineering Services | PIGL';
-          activeDesc = 'Geotechnical investigations, 20-tonne hydraulic Cone Penetration Testing (CPT), deep borehole drilling, marine geophysical surveys, hydrography, and 3D laser scanning using Leica RTC360 equipment across Nigeria.';
+          activeDesc = 'PIGL undertakes geophysical and hydrographic surveys, geotechnical investigations, positioning, geospatial data acquisition and reality capture to support engineering design and infrastructure development.';
         } else if (id === 'metocean-marine-solutions') {
           activeTitle = 'Metocean & Marine Solutions | PIGL';
-          activeDesc = 'Oceanographic buoy deployment and real-time data collection, Acoustic Doppler Current Profiler (ADCP) measurements, metocean forecasting, and marine environmental baseline surveys across the Gulf of Guinea.';
+          activeDesc = 'We provide marine observation, oceanographic monitoring, forecasting and environmental survey services to support offshore planning, marine operations and environmental assessment.';
         } else if (id === 'integrated-construction-services') {
           activeTitle = 'Integrated Construction Services | PIGL';
-          activeDesc = 'Pipeline installation, heavy civil infrastructure, structural mechanical fabrication, and pre-commissioning testing, with engineering and construction support in swamp terrain.';
+          activeDesc = 'We undertake pipeline installation, civil infrastructure, mechanical fabrication and installation, and construction support for industrial and energy projects.';
         } else if (id === 'industrial-solutions') {
           activeTitle = 'Industrial Solutions | PIGL';
-          activeDesc = 'Produced water treatment skids, industrial and domestic water treatment plants, accredited water quality laboratory testing, and industrial wastewater treatment and resource recovery.';
+          activeDesc = 'We provide produced-water treatment, industrial and domestic water systems, laboratory analysis and wastewater treatment services for industrial and environmental applications.';
         } else {
           activeTitle = `${service.title} | PIGL Specialist Engineering`;
           activeDesc = service.description;

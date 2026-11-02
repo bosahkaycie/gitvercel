@@ -229,7 +229,7 @@ export const SERVICE_DETAILS_MAP: Record<string, ServiceDetail> = {
   'geosolutions-engineering-services': {
     id: 'geosolutions-engineering-services',
     engineeringProblemAddressed: "Inadequate ground characterisation, uncharted seabed geohazards, structural foundation settlement, and brownfield spatial clashes directly cause costly piling redesigns, pipeline touchdown failures, and prolonged construction delays across complex Nigerian deltaic and marine terrains.",
-    longDescription: "Polaris Integrated & GeoSolutions Limited (PIGL) delivers multidisciplinary site investigation, geophysics, hydrography, 20-tonne hydraulic Cone Penetration Testing (CPT), precise positioning, 3D laser scanning using Leica RTC360 equipment, and accredited materials laboratory testing. Operating across onshore, nearshore, swamp, and deepwater corridors throughout Nigeria and the Gulf of Guinea, we provide verified subsurface and spatial intelligence to support engineering design, statutory regulatory approvals, and field execution.",
+    longDescription: "Polaris Integrated & GeoSolutions Limited (PIGL) delivers multidisciplinary site investigation, geophysics, hydrography, 20-tonne hydraulic Cone Penetration Testing (CPT), precise positioning, 3D laser scanning using Leica RTC360 equipment, and materials laboratory testing. Operating across onshore, nearshore, swamp, and deepwater corridors throughout Nigeria and the Gulf of Guinea, we provide verified subsurface and spatial data to support engineering design, statutory regulatory approvals, and field execution.",
     businessValue: "Quantifies subsurface geohazards prior to foundation commitment, optimises deep foundation and piling design depths, eliminates brownfield clash rework through dimensional control, and establishes regulatory compliance across critical infrastructure.",
     standards: [
       'BS 5930 / Eurocode 7 (BS EN 1997) — Geotechnical Investigation & Testing',
@@ -265,7 +265,7 @@ export const SERVICE_DETAILS_MAP: Record<string, ServiceDetail> = {
       'Deep rotary soil boring, standard penetration testing (SPT) & undisturbed core sampling',
       'High-precision DGNSS surface positioning, subsea acoustic tracking (USBL/LBL) & rig moves',
       'High-speed terrestrial 3D laser scanning using Leica RTC360 equipment & dimensional metrology',
-      'Accredited laboratory triaxial shear, consolidation oedometer & materials testing'
+      'Laboratory triaxial shear, consolidation oedometer & materials testing'
     ],
     equipment: [
       '20-Tonne Heavy-Duty Hydraulic Cone Penetration Testing (CPT) Track & Pontoon Systems',
@@ -401,7 +401,7 @@ export const SERVICE_DETAILS_MAP: Record<string, ServiceDetail> = {
   'industrial-solutions': {
     id: 'industrial-solutions',
     engineeringProblemAddressed: "High oil-in-water (OIW) concentrations in produced water, mineral scaling, strict regulatory discharge penalties, and contaminated water supplies threaten operating licences, disposal well life, and environmental compliance across energy and industrial operations.",
-    longDescription: "Industrial Solutions (IS) is PIGL's division for engineered water treatment, separation technology, and environmental laboratory services. In strategic technical partnership with CoaleXpert, PIGL delivers modular produced water treatment systems, coalescing oil-water separation skids, and nutshell filtration units conditioning effluent for subsurface reinjection or compliant discharge. We also engineer industrial reverse osmosis (RO) desalination plants, deep hydrogeological boreholes, industrial wastewater treatment and resource recovery systems, and operate an accredited analytical water laboratory.",
+    longDescription: "Industrial Solutions (IS) is PIGL's division for engineered water treatment, separation technology, and environmental laboratory services. In strategic technical partnership with CoaleXpert, PIGL delivers modular produced water treatment systems, coalescing oil-water separation skids, and nutshell filtration units conditioning effluent for subsurface reinjection or compliant discharge. We also engineer industrial reverse osmosis (RO) desalination plants, deep hydrogeological boreholes, industrial wastewater treatment and resource recovery systems, and operate a dedicated analytical water quality laboratory.",
     businessValue: "Guarantees compliance with NUPRC EGASPIN and FMEnv environmental discharge limits, protects disposal wells against formation plugging, provides reliable potable and process water supplies, and supports water resource recovery.",
     standards: [
       'NUPRC Environmental Guidelines & Standards for Petroleum (EGASPIN)',

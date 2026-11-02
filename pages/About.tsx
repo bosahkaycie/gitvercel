@@ -97,23 +97,23 @@ const About: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
             <div className="space-y-8">
-              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight tracking-tight">Over 20 Years of Technical Excellence</h2>
+              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight tracking-tight">Over 20 Years of Field Engineering Experience</h2>
               <div className="space-y-6 text-slate-600 text-lg leading-relaxed font-normal">
                 <p>
-                  Polaris Integrated and GeoSolutions Limited (PIGL) has built a 20-year reputation as a dependable indigenous leader in the Nigerian energy sector. We specialize in complex engineering and ground investigations across diverse terrains, providing dependable, practical solutions for our clients.
+                  Polaris Integrated and GeoSolutions Limited (PIGL) has built over 20 years of operating experience as a dependable indigenous engineering company in Nigeria. We specialise in complex engineering and ground investigations across onshore, swamp, and offshore environments, delivering accurate data and practical solutions for energy and infrastructure operators.
                 </p>
                 <p>
-                  Our track record is built on precision, honesty, and an uncompromising commitment to safety. Certified to ISO 9001:2015 and ISO 45001:2018, we adhere to recognized global standards across all operations in Sub-Saharan Africa.
+                  Our track record is built on precision, technical integrity, and an uncompromising commitment to safety. Certified to ISO 9001:2015 and ISO 45001:2018, we adhere to recognised international engineering standards across all operations.
                 </p>
               </div>
               <div className="flex items-center space-x-8 pt-4 border-t border-slate-100">
                 <div>
                   <p className="text-3xl font-bold text-slate-900 leading-none">ISO</p>
-                  <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest mt-2">Certified Organization</p>
+                  <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest mt-2">Certified Management Systems</p>
                 </div>
                 <div>
                   <p className="text-3xl font-bold text-slate-900 leading-none">NCDMB</p>
-                  <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest mt-2">Compliant Partner</p>
+                  <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest mt-2">Compliant Contractor</p>
                 </div>
               </div>
               <div className="pt-6">

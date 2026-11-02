@@ -157,10 +157,10 @@ const Videos: React.FC = () => {
 
           <div className="max-w-3xl">
             <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-4">
-              PIGL Video Hub & Operations in Action
+              Operations & Field Execution Videos
             </h1>
             <p className="text-base md:text-lg text-slate-300 font-normal leading-relaxed">
-              Explore our official corporate documentary, hydraulic CPT field operations, 3D laser scanning reality capture, and high-assurance energy infrastructure case studies.
+              Video records of corporate operations, 20-tonne hydraulic CPT field campaigns, 3D laser scanning reality capture, and pipeline construction projects across Nigeria.
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-3">

@@ -255,33 +255,33 @@ const Home: React.FC = () => {
 
   const heroSlides = (sliders.length > 0 ? sliders : [
     {
-      id: '3bd59604-1015-41e0-bcb1-c087fa769342',
-      phase: 'LIFECYCLE PHASE 01 // METOCEAN & MARINE SOLUTIONS',
-      title: 'Metocean & Marine Solutions',
-      description: 'Real-time ocean observation, metocean forecasting, marine environmental monitoring, and operational advisory across maritime domains.',
-      cta_text: 'Explore Division Capabilities',
-      cta_url: '/services/metocean-marine-solutions',
-      video_url: FrankstarLoopVideo,
-      desktop_image: '/assets/new_ocean.webp',
-      mobile_image: '/assets/DJI_0003.jpg'
-    },
-    {
       id: 'c72b6c96-00ff-48d7-9589-1f2ef3a24aee',
-      phase: 'LIFECYCLE PHASE 02 // GEOSOLUTIONS & ENGINEERING',
+      phase: 'DIVISION 01 // GEOSOLUTIONS & ENGINEERING SERVICES',
       title: 'GeoSolutions & Engineering Services',
-      description: 'Accurate data. Deeper insight. Smarter engineering. High-resolution seismic, geophysical & hydrographic survey, geotechnical investigation, reality capture, and laboratory testing.',
-      cta_text: 'Explore Division Capabilities',
+      description: 'PIGL undertakes geophysical and hydrographic surveys, geotechnical investigations, positioning, geospatial data acquisition and reality capture to support engineering design and infrastructure development.',
+      cta_text: 'View Capabilities',
       cta_url: '/services/geosolutions-engineering-services',
       video_url: OffshoreIntelVideo,
       desktop_image: '/assets/seismic_survey.webp',
       mobile_image: '/assets/DJI_0003.jpg'
     },
     {
+      id: '3bd59604-1015-41e0-bcb1-c087fa769342',
+      phase: 'DIVISION 02 // METOCEAN & MARINE SOLUTIONS',
+      title: 'Metocean & Marine Solutions',
+      description: 'We provide marine observation, oceanographic monitoring, forecasting and environmental survey services to support offshore planning, marine operations and environmental assessment.',
+      cta_text: 'View Capabilities',
+      cta_url: '/services/metocean-marine-solutions',
+      video_url: FrankstarLoopVideo,
+      desktop_image: '/assets/new_ocean.webp',
+      mobile_image: '/assets/DJI_0003.jpg'
+    },
+    {
       id: '52f9111a-7fc9-4668-9f04-3fdbb37ef77d',
-      phase: 'LIFECYCLE PHASE 03 // INTEGRATED CONSTRUCTION SERVICES',
+      phase: 'DIVISION 03 // INTEGRATED CONSTRUCTION SERVICES',
       title: 'Integrated Construction Services',
-      description: 'From engineering preparation to successful project delivery. Integrated pipeline construction, civil infrastructure, structural steel fabrication, and commissioning support.',
-      cta_text: 'Explore Division Capabilities',
+      description: 'We undertake pipeline installation, civil infrastructure, mechanical fabrication and installation, and construction support for industrial and energy projects.',
+      cta_text: 'View Capabilities',
       cta_url: '/services/integrated-construction-services',
       video_url: PipelineConstructionVideo,
       desktop_image: '/assets/newpipeline.webp',
@@ -289,10 +289,10 @@ const Home: React.FC = () => {
     },
     {
       id: '9f5faf33-0d6b-4373-b86b-c989b330ba60',
-      phase: 'LIFECYCLE PHASE 04 // INDUSTRIAL SOLUTIONS',
+      phase: 'DIVISION 04 // INDUSTRIAL SOLUTIONS',
       title: 'Industrial Solutions',
-      description: 'Cleaner water. Healthier communities. Sustainable industries. Produced water treatment, industrial & domestic water solutions, water laboratory analysis, and wastewater recovery.',
-      cta_text: 'Explore Division Capabilities',
+      description: 'We provide produced-water treatment, industrial and domestic water systems, laboratory analysis and wastewater treatment services for industrial and environmental applications.',
+      cta_text: 'View Capabilities',
       cta_url: '/services/industrial-solutions',
       video_url: DigitalIntelVideo,
       desktop_image: '/assets/water_treatment_skid.jpg',
@@ -708,50 +708,50 @@ const Home: React.FC = () => {
             <div className="lg:col-span-6 flex flex-col justify-between space-y-6">
               <div>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
-                  Engineering Expertise Across Geoscience, Marine, Construction & Industrial Operations
+                  Engineering Expertise Across Geoscience, Marine, Construction and Industrial Operations.
                 </h2>
                 <div className="space-y-4 text-slate-600 text-base sm:text-lg leading-relaxed font-normal">
                   <p>
-                    Polaris Integrated & GeoSolutions Limited provides geoscience and survey services, marine observation, infrastructure construction and industrial water treatment for energy, infrastructure and industrial clients in Nigeria.
+                    Polaris Integrated & GeoSolutions Limited provides geoscience and survey services, marine observation, infrastructure construction and industrial water treatment for energy, infrastructure and industrial clients.
                   </p>
                   <p className="text-sm sm:text-base">
-                    Certified to ISO 9001:2015 and ISO 45001:2018 with over 500,000 safe man-hours, our experienced engineers, survey spreads, and specialised ground rigs deliver trusted results from initial site survey to long-term asset operations.
+                    Certified to ISO 9001:2015 and ISO 45001:2018 with over 500,000 safe man-hours, our experienced engineers, survey spreads, and specialised field equipment deliver reliable technical results from initial site investigation to long-term asset operations.
                   </p>
                 </div>
 
-                {/* Engineering Lifecycle Continuum Cards */}
+                {/* Engineering Capabilities Progression Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-5">
                   <div className="p-3.5 bg-slate-50 border border-slate-200/90">
-                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Phase 1: Discover</div>
-                    <div className="text-xs font-bold text-slate-900 mt-1">Site Characterization</div>
-                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">CPT soil testing, seismic profiling & ocean buoys</div>
+                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Phase 1: Investigation</div>
+                    <div className="text-xs font-bold text-slate-900 mt-1">Site Characterisation</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">20-tonne CPT, borehole drilling & oceanographic buoys</div>
                   </div>
                   <div className="p-3.5 bg-slate-50 border border-slate-200/90">
-                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Phase 2: Build</div>
-                    <div className="text-xs font-bold text-slate-900 mt-1">Swamp Field Delivery</div>
-                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">Pipeline construction, certified welding & rig positioning</div>
+                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Phase 2: Construction</div>
+                    <div className="text-xs font-bold text-slate-900 mt-1">Infrastructure Delivery</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">Pipeline installation, structural welding & swamp construction</div>
                   </div>
                   <div className="p-3.5 bg-slate-50 border border-slate-200/90">
-                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Phase 3: Verify</div>
+                    <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Phase 3: Verification</div>
                     <div className="text-xs font-bold text-slate-900 mt-1">3D Reality Capture</div>
-                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">Millimeter Leica LiDAR & operating digital twins</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">3D laser scanning using Leica RTC360 & as-built modelling</div>
                   </div>
                 </div>
               </div>
 
               <div className="pt-4 flex flex-wrap items-center gap-4">
                 <a
-                  href="/about"
+                  href="/services"
                   className="px-7 py-4 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md hover:shadow-lg inline-flex items-center group rounded-md"
                 >
-                  <span>Know more about us</span>
+                  <span>Explore Our Services</span>
                   <span className="ml-2.5 group-hover:translate-x-1 transition-transform">→</span>
                 </a>
                 <a
                   href="/contact"
                   className="px-7 py-4 border-2 border-slate-300 hover:border-emerald-700 text-slate-800 hover:text-emerald-700 font-bold text-xs sm:text-sm uppercase tracking-wider transition-all rounded-md"
                 >
-                  Request Consultation
+                  Contact Our Team
                 </a>
               </div>
             </div>
@@ -779,7 +779,7 @@ const Home: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{settings?.stat_years_experience || '20+'}</div>
-                    <div className="text-xs font-bold text-slate-800">Years Industry Leadership</div>
+                    <div className="text-xs font-bold text-slate-800">Years Field Experience</div>
                     <p className="text-[11px] text-slate-500 leading-snug">Indigenous engineering delivering energy infrastructure across Sub-Saharan Africa.</p>
                   </div>
                   <div className="space-y-1">
@@ -1262,7 +1262,7 @@ const Home: React.FC = () => {
                 <CountUp end={100} suffix="%" />
               </span>
               <div className="space-y-2">
-                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Indigenous & NCDMB Certified</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Indigenous Ownership & NCDMB Compliance</h3>
                 <p className="text-slate-600 text-sm md:text-base leading-relaxed font-normal">
                   100% Nigerian ownership and technical stewardship, advancing domestic engineering capacity in geosolutions and infrastructure delivery.
                 </p>
@@ -1273,9 +1273,9 @@ const Home: React.FC = () => {
             <div className="space-y-4 p-6 sm:p-8 bg-slate-50/80 border border-slate-200/80 shadow-xs">
               <span className="text-5xl md:text-6xl font-black text-emerald-700 block tracking-tighter">ISO</span>
               <div className="space-y-2">
-                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Dual-Certified Systems</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">ISO 9001:2015 & ISO 45001:2018 Management Systems</h3>
                 <p className="text-slate-600 text-sm md:text-base leading-relaxed font-normal">
-                  Certified to ISO 9001:2015 (Quality Management) and ISO 45001:2018 (Occupational Health & Safety) across all project disciplines.
+                  Certified to ISO 9001:2015 (Quality Management) and ISO 45001:2018 (Occupational Health & Safety) across all operational disciplines.
                 </p>
               </div>
             </div>

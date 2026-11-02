@@ -39,10 +39,10 @@ const SERVICE_DIVISIONS_MENU: ServiceDivisionMenuItem[] = [
     id: 'metocean-marine-solutions',
     title: 'Metocean & Marine Solutions',
     acronym: 'MMS',
-    description: 'Advanced metocean data, marine forecasting, and offshore operational intelligence.',
+    description: 'Marine observation, oceanographic monitoring, and metocean forecasting.',
     representativeServices: [
       { label: 'Metocean Observation & Monitoring', href: '/services/metocean-marine-solutions#metocean-observation-monitoring' },
-      { label: 'Marine Forecasting & Intelligence', href: '/services/metocean-marine-solutions#marine-forecasting-intelligence' },
+      { label: 'Marine Forecasting & Metocean Data', href: '/services/metocean-marine-solutions#marine-forecasting-intelligence' },
       { label: 'Marine Environmental Services', href: '/services/metocean-marine-solutions#marine-environmental-services' },
     ],
     exploreHref: '/services/metocean-marine-solutions',
@@ -63,7 +63,7 @@ const SERVICE_DIVISIONS_MENU: ServiceDivisionMenuItem[] = [
     id: 'industrial-solutions',
     title: 'Industrial Solutions',
     acronym: 'IS',
-    description: 'Produced water treatment, certified environmental lab, and resource recovery.',
+    description: 'Produced water treatment, water systems, and laboratory testing.',
     representativeServices: [
       { label: 'Produced Water Treatment Solutions', href: '/services/industrial-solutions#produced-water-treatment-solutions' },
       { label: 'Industrial & Domestic Water Solutions', href: '/services/industrial-solutions#industrial-domestic-water-solutions' },

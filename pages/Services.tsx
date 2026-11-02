@@ -293,11 +293,11 @@ const Services: React.FC = () => {
                 {/* Technical Overview */}
                 <div className="border-b border-slate-100 pb-12 reveal">
                   <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-6">
-                    Technical Overview & Nigerian Field Context
+                    Technical Overview
                   </h2>
                   <div className="prose prose-slate max-w-none text-slate-600 text-lg leading-relaxed font-normal space-y-6">
                     <p className="font-semibold text-slate-900 text-xl leading-relaxed">
-                      Advanced indigenous engineering capability designed to address the most demanding technical requirements across Nigerian swamp, coastal, land, and offshore assets.
+                      Engineering capabilities delivered across Nigerian swamp, coastal, land, and offshore environments.
                     </p>
                     <p>
                       {selectedService.full_description || selectedDetails?.longDescription}
@@ -322,14 +322,11 @@ const Services: React.FC = () => {
                   </div>
                 )}
 
-                {/* Specialized Services under Ground Intelligence */}
+                {/* Capabilities */}
                 {selectedSubServices.length > 0 && (
                   <div className="border-b border-slate-100 pb-12 reveal">
-                    <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">
-                      Specialized Engineering Capabilities
-                    </span>
                     <h3 className="text-2xl font-bold text-slate-900 tracking-tight mb-6">
-                      Services Under {selectedService.title}
+                      Capabilities
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {selectedSubServices.map((sub, i) => (
@@ -368,11 +365,8 @@ const Services: React.FC = () => {
                   <div className="bg-emerald-950 text-white p-8 md:p-12 relative overflow-hidden reveal">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-800/10 rounded-full blur-2xl"></div>
                     <div className="relative z-10">
-                      <span className="text-emerald-400 font-black text-xs uppercase tracking-widest block mb-3">
-                        Client Value & Integrity Assurance
-                      </span>
                       <h3 className="text-2xl font-bold tracking-tight mb-4">
-                        Why Operators Partner with PIGL
+                        Commercial Value & Quality Assurance
                       </h3>
                       <p className="text-emerald-100 text-lg leading-relaxed font-normal">
                         {selectedService.business_value || selectedDetails?.businessValue}
@@ -504,11 +498,8 @@ const Services: React.FC = () => {
               <div className="mt-20 border-t border-slate-200 pt-16 reveal">
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b border-slate-200">
                   <div>
-                    <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">
-                      Operational Documentation & Field Assets
-                    </span>
                     <h3 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
-                      Field Operations & Instrumentation Gallery
+                      Equipment & Field Operations
                     </h3>
                   </div>
                   <span className="text-xs font-mono text-slate-500 uppercase tracking-wider mt-2 md:mt-0">
@@ -555,9 +546,8 @@ const Services: React.FC = () => {
             {/* Localized Consultation Form Section */}
             <div className="mt-20 border border-slate-200 bg-slate-50 p-8 md:p-16 reveal">
               <div className="max-w-3xl">
-                <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-3">Service Consultation</span>
                 <h3 className="text-3xl font-bold text-slate-900 tracking-tight mb-4">
-                  Request a Technical Consultation
+                  Technical Consultation
                 </h3>
                 <p className="text-slate-600 text-lg mb-10 leading-relaxed font-normal">
                   Inquire about specialized deployment of <strong>{selectedService.title}</strong> for your project. Our lead engineers will review your technical specifications and provide operational scoping.
