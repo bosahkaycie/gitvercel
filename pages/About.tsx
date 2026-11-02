@@ -239,7 +239,7 @@ const About: React.FC = () => {
             <div className="space-y-6 p-10 bg-white border border-slate-200 shadow-sm hover:shadow-xl transition-shadow hover-lift">
               <h3 className="text-slate-900 font-bold text-xl tracking-tight">Local Content Development</h3>
               <p className="text-lg text-slate-600 leading-relaxed font-normal">
-                PIGL is a 100% indigenous Nigerian company. We are dedicated to the Nigerian Oil and Gas Industry Content Development (NOGICD) Act. We invest heavily in training local surveyors, engineers, and technicians to handle world-class technology on local soil.
+                PIGL is a 100% indigenous Nigerian company. We are dedicated to the Nigerian Oil and Gas Industry Content Development (NOGICD) Act. We invest heavily in training local surveyors, engineers, and technicians to handle specialised equipment and international engineering methods on Nigerian soil.
               </p>
               <div className="pt-4 border-t border-slate-100">
                 <p className="text-sm font-bold text-emerald-700">Supporting NCDMB Initiatives</p>
@@ -249,7 +249,7 @@ const About: React.FC = () => {
             <div className="space-y-6 p-10 bg-white border border-slate-200 shadow-sm hover:shadow-xl transition-shadow hover-lift">
               <h3 className="text-slate-900 font-bold text-xl tracking-tight">Community Relations</h3>
               <p className="text-lg text-slate-600 leading-relaxed font-normal">
-                We believe in shared prosperity. Our operations prioritize peaceful co-existence with host communities, providing employment opportunities, supporting local business, and engaging in transparent dialogue to ensure mutually beneficial project execution.
+                We believe in shared prosperity. Our operations prioritise peaceful co-existence with host communities, providing employment opportunities, supporting local businesses, and engaging in transparent dialogue to ensure mutually beneficial project execution.
               </p>
               <div className="pt-4 border-t border-slate-100">
                 <p className="text-sm font-bold text-emerald-700">Niger Delta Community Partnership</p>

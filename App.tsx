@@ -147,37 +147,37 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const metaDescriptions: { [key: string]: string } = {
-      '/': 'Polaris Integrated and GeoSolutions Limited (PIGL) is an ISO 9001:2015 & 45001:2018 certified geotechnical company, marine geophysical survey firm, and 3D reality capture specialist near you in Nigeria. Certified 20-ton CPT rigs, deep soil drilling, seismic surveys, and digital twins.',
-      '/about': 'Discover PIGL\'s 20-year heritage of engineering excellence, ISO 9001:2015 & 45001:2018 certifications, and 100% indigenous Nigerian ownership.',
-      '/services': 'Explore PIGL\'s specialist engineering divisions: GeoSolutions & Geotechnical Services, Metocean & Marine Solutions, 3D Reality Capture, Integrated Construction, and Industrial Solutions.',
+      '/': 'Polaris Integrated & GeoSolutions Limited provides geoscience and survey services, marine observation, infrastructure construction and industrial water treatment for energy, infrastructure and industrial clients in Nigeria.',
+      '/about': 'Polaris Integrated and GeoSolutions Limited is an indigenous Nigerian engineering leader delivering site investigations, marine observation, and construction support across Sub-Saharan Africa.',
+      '/services': 'Explore PIGL\'s four operating divisions: GeoSolutions & Engineering Services (GES), Metocean & Marine Solutions (MMS), Integrated Construction Services (ICS), and Industrial Solutions (IS).',
       '/partners': 'PIGL Strategic Alliances & Global Technology Partnerships with Frankstar Technology, CoaleXpert, and NPK Flanges & Industrial Piping.',
-      '/projects': 'Case studies of major engineering, reality capture, and geosolutions projects delivered for leading operators across swamp, coastal, land, and offshore terrains.',
+      '/projects': 'Review completed engineering, reality capture, geotechnical survey, and pipeline construction projects delivered for energy and infrastructure clients across Nigeria.',
       '/careers': 'Join the PIGL engineering team in Port Harcourt and across Nigeria. Grow your career with an indigenous leader in geosolutions and energy infrastructure.',
       '/news': 'Latest updates, technical milestones, and industry perspectives from Polaris Integrated and GeoSolutions Limited.',
       '/blog': 'Technical updates, project milestones, and engineering insights from Polaris Integrated and GeoSolutions Limited.',
       '/hsse': 'Health, Safety, Security, Environment & Quality (HSSEQ) at PIGL. Certified ISO 9001:2015 and ISO 45001:2018 with over 500,000+ safe man-hours and zero LTI.',
-      '/contact': 'Connect with PIGL engineering desks in Port Harcourt, Lagos, and Abuja for project scoping, technical consultations, and field deployments.',
+      '/contact': 'Contact Polaris Integrated & GeoSolutions Limited for project consultations, technical scoping, and field mobilisation across Nigeria.',
       '/vendors': 'Polaris Integrated & GeoSolutions Limited Vendor Onboarding & Tax Compliance Portal. Standardized registration Form PIGL/F/VOTC/AHR/037.',
       '/vendors/register': 'Digital Vendor Onboarding & Tax Compliance Form PIGL/F/VOTC/AHR/037 Rev 00 - PIGL Procurement & Finance Onboarding Wizard.',
       '/vendor-registration': 'Digital Vendor Onboarding & Tax Compliance Form PIGL/F/VOTC/AHR/037 Rev 00 - PIGL Procurement & Finance Onboarding Wizard.',
       '/vendors/portal': 'PIGL Vendor Status Tracker & Compliance Dossier Lookup. Check onboarding progress and print official verification receipts.',
-      '/videos': 'Explore Polaris Integrated & GeoSolutions Limited (PIGL) official video hub, corporate documentary, 3D laser scanning field demos, 20-ton CPT geotechnical testing, and pipeline integrity operations.',
+      '/videos': 'Explore Polaris Integrated & GeoSolutions Limited (PIGL) official video hub, corporate documentary, 3D laser scanning field demos, 20-tonne CPT geotechnical testing, and pipeline integrity operations.',
       '/media': 'PIGL Official Media Hub, Technical Videos & Corporate Documentary Showcase.',
       '/watch': 'Watch PIGL Corporate Documentary and Engineering Demonstrations.',
       '/admin': 'PIGL Content Management System - Administrative Control Center'
     };
 
     const pageTitles: { [key: string]: string } = {
-      '/': 'PIGL | Geoscience, Marine, Engineering & Industrial Solutions in Nigeria',
+      '/': 'Polaris Integrated & GeoSolutions (PIGL) | Geoscience, Marine, Construction & Industrial Solutions',
       '/about': 'About PIGL | ISO Certified Indigenous Engineering Leader',
-      '/services': 'Engineering Services & Specialist Divisions | PIGL Nigeria',
+      '/services': 'Specialist Engineering Divisions | PIGL Nigeria',
       '/partners': 'Strategic Alliances & Technology Partners | PIGL',
-      '/projects': 'Engineering Case Studies & Executed Projects | PIGL',
+      '/projects': 'Executed Engineering Projects & Case Studies | PIGL',
       '/careers': 'Careers at PIGL | Indigenous Engineering Talent',
       '/news': 'News & Technical Insights | PIGL Nigeria',
       '/blog': 'Engineering News & Technical Insights | PIGL Nigeria',
       '/hsse': 'HSSEQ Standards & ISO Certifications | PIGL Safety',
-      '/contact': 'Contact PIGL | Geotechnical & Engineering Consultations',
+      '/contact': 'Contact PIGL | Engineering Offices in Port Harcourt & Lagos',
       '/vendors': 'Vendor Onboarding & Tax Compliance Portal | PIGL Nigeria',
       '/vendors/register': 'Vendor Registration Form PIGL/F/VOTC/AHR/037 | PIGL',
       '/vendor-registration': 'Vendor Registration Form PIGL/F/VOTC/AHR/037 | PIGL',
@@ -197,20 +197,20 @@ const App: React.FC = () => {
       const service = SERVICES.find(s => s.id === id);
       if (service) {
         if (id === 'geosolutions-engineering-services') {
-          activeTitle = 'GeoSolutions & Engineering Services in Nigeria | PIGL';
-          activeDesc = 'Certified geotechnical investigations, 20-ton hydraulic CPT testing, deep borehole drilling, marine geophysical surveys, bathymetry, Leica RTC360 3D reality capture, and digital twins across Nigeria.';
+          activeTitle = 'GeoSolutions & Engineering Services | PIGL';
+          activeDesc = 'Geotechnical investigations, 20-tonne hydraulic Cone Penetration Testing (CPT), deep borehole drilling, marine geophysical surveys, hydrography, and 3D laser scanning using Leica RTC360 equipment across Nigeria.';
         } else if (id === 'metocean-marine-solutions') {
-          activeTitle = 'Metocean & Marine Solutions in Nigeria | PIGL';
-          activeDesc = 'Autonomous oceanographic buoy telemetry, marine environmental monitoring, ADCP Doppler current profiling, MetOcean forecasting, and marine operational advisory across the Gulf of Guinea.';
+          activeTitle = 'Metocean & Marine Solutions | PIGL';
+          activeDesc = 'Oceanographic buoy deployment and real-time data collection, Acoustic Doppler Current Profiler (ADCP) measurements, metocean forecasting, and marine environmental baseline surveys across the Gulf of Guinea.';
         } else if (id === 'integrated-construction-services') {
-          activeTitle = 'Pipeline, Civil & Integrated Construction Services | PIGL';
-          activeDesc = 'Comprehensive energy infrastructure delivery: pipeline construction, horizontal directional drilling (HDD), mechanical spool fabrication, industrial civil infrastructure, and piling.';
+          activeTitle = 'Integrated Construction Services | PIGL';
+          activeDesc = 'Pipeline installation, heavy civil infrastructure, structural mechanical fabrication, and pre-commissioning testing, with engineering and construction support in swamp terrain.';
         } else if (id === 'industrial-solutions') {
-          activeTitle = 'Produced Water, Industrial Water & Wastewater Treatment | PIGL';
-          activeDesc = 'Advanced produced water treatment skids, industrial wastewater recovery, water quality laboratory analysis, environmental engineering, and specialty industrial procurement.';
+          activeTitle = 'Industrial Solutions | PIGL';
+          activeDesc = 'Produced water treatment skids, industrial and domestic water treatment plants, accredited water quality laboratory testing, and industrial wastewater treatment and resource recovery.';
         } else {
-          activeTitle = `${service.title} (${service.abbreviation}) | Geotechnical & Engineering | PIGL`;
-          activeDesc = `${service.positioning ? `"${service.positioning}" — ` : ''}${service.description}`;
+          activeTitle = `${service.title} | PIGL Specialist Engineering`;
+          activeDesc = service.description;
         }
       }
     } else if (currentPath.startsWith('/blog/')) {

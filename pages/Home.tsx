@@ -258,7 +258,7 @@ const Home: React.FC = () => {
       id: '3bd59604-1015-41e0-bcb1-c087fa769342',
       phase: 'LIFECYCLE PHASE 01 // METOCEAN & MARINE SOLUTIONS',
       title: 'Metocean & Marine Solutions',
-      description: 'Real-time ocean observation, MetOcean forecasting, marine environmental monitoring, and operational advisory across maritime domains.',
+      description: 'Real-time ocean observation, metocean forecasting, marine environmental monitoring, and operational advisory across maritime domains.',
       cta_text: 'Explore Division Capabilities',
       cta_url: '/services/metocean-marine-solutions',
       video_url: FrankstarLoopVideo,
@@ -444,7 +444,7 @@ const Home: React.FC = () => {
 
   return (
     <div className="flex flex-col font-sans bg-white">
-      <h1 className="sr-only">Polaris Integrated & GeoSolutions Limited (PIGL) - Engineering Intelligence & Geosolutions</h1>
+      <h1 className="sr-only">Engineering expertise across geoscience, marine, construction and industrial operations.</h1>
 
       {/* 1. Hero Section with Looping Background Video & Content Slider */}
       <section 
@@ -714,14 +714,14 @@ const Home: React.FC = () => {
                   </span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
-                  Two Decades of Indigenous Engineering Excellence
+                  Engineering Expertise Across Geoscience, Marine, Construction & Industrial Operations
                 </h2>
                 <div className="space-y-4 text-slate-600 text-base sm:text-lg leading-relaxed font-normal">
                   <p>
-                    Polaris Integrated and GeoSolutions Limited (PIGL) is a 100% indigenous Nigerian engineering and geosolutions firm. We help energy and infrastructure companies understand their ground conditions, map subsea environments, capture accurate 3D facility models, and build dependable assets across Sub-Saharan Africa.
+                    Polaris Integrated & GeoSolutions Limited provides geoscience and survey services, marine observation, infrastructure construction and industrial water treatment for energy, infrastructure and industrial clients in Nigeria.
                   </p>
                   <p className="text-sm sm:text-base">
-                    Certified to ISO 9001:2015 and ISO 45001:2018 with over 500,000 safe man-hours, our experienced engineers, survey vessels, and specialized ground rigs deliver trusted results from initial site survey to long-term asset operations.
+                    Certified to ISO 9001:2015 and ISO 45001:2018 with over 500,000 safe man-hours, our experienced engineers, survey spreads, and specialised ground rigs deliver trusted results from initial site survey to long-term asset operations.
                   </p>
                 </div>
 
@@ -829,35 +829,35 @@ const Home: React.FC = () => {
                   </span>
                 </div>
                 <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight mb-4">
-                  One Seamless Journey: From Ground Truth to 3D Reality Capture
+                  From Site Investigation to Asset Verification
                 </h2>
                 <p className="text-slate-600 text-lg leading-relaxed font-normal mb-3">
                   When site exploration, engineering design, and post-build inspection are handled by disconnected vendors, critical data is lost in translation—leading to foundation settlement, design clashes, and costly offshore delays.
                 </p>
                 <p className="text-slate-600 text-base leading-relaxed font-normal mb-5">
-                  PIGL eliminates hand-off risk by serving as the <strong>single continuous thread of engineering truth</strong> throughout the life of your asset:
+                  PIGL eliminates hand-off risk by serving as a dependable, integrated engineering partner throughout the life of your asset:
                 </p>
 
                 <div className="space-y-3.5">
                   <div className="flex items-start space-x-3.5 p-3.5 bg-white border border-slate-200 shadow-2xs">
                     <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-mono font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
                     <div>
-                      <h4 className="text-sm font-bold text-slate-900">Before Breaking Ground: Site Characterization & Geotechnics</h4>
-                      <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">20-ton hydraulic CPT soundings, deep soil sampling, and MetOcean buoys define soil strength and marine hazard thresholds before design freeze.</p>
+                      <h4 className="text-sm font-bold text-slate-900">Before Breaking Ground: Site Characterisation & Geotechnics</h4>
+                      <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">20-tonne hydraulic Cone Penetration Testing (CPT), deep borehole sampling, and oceanographic buoys define soil strength and marine hazard thresholds before design freeze.</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3.5 p-3.5 bg-white border border-slate-200 shadow-2xs">
                     <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-mono font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
                     <div>
                       <h4 className="text-sm font-bold text-slate-900">During Execution: Precision Positioning & Swamp Pipeline Delivery</h4>
-                      <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">Certified swamp welding, right-of-way clearing, and sub-meter acoustic rig positioning in Niger Delta mangrove environments.</p>
+                      <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">Certified swamp welding, right-of-way clearing, and high-precision acoustic rig positioning in Niger Delta swamp environments.</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3.5 p-3.5 bg-white border border-slate-200 shadow-2xs">
                     <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-mono font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
                     <div>
                       <h4 className="text-sm font-bold text-slate-900">After Construction: 3D Reality Capture & Digital Twin Verification</h4>
-                      <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">Millimeter Leica RTC360 LiDAR scans create an immutable digital twin of the built asset—validating as-built tolerances and preventing brownfield clashes.</p>
+                      <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">3D laser scanning using Leica RTC360 equipment creates an accurate digital twin of the built asset—validating as-built tolerances and preventing brownfield clashes.</p>
                     </div>
                   </div>
                 </div>
@@ -1328,10 +1328,10 @@ const Home: React.FC = () => {
               </span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight mb-6">
-              World-Class Technology, Indigenous Mastery
+              Specialised Technology Alliances & Field Execution
             </h2>
             <p className="text-lg md:text-xl text-slate-600 font-normal leading-relaxed">
-              We connect global innovation directly to African energy corridors. Through strategic technology alliances with Frankstar, CoaleXpert, and NPK Automation, we deploy international-grade oceanographic telemetry, modular produced-water treatment, and engineered flow control—backed by 100% indigenous field execution.
+              We deploy specialised international technology across Nigerian energy and infrastructure corridors. Through technical alliances with Frankstar Technology, CoaleXpert, and NPK, we mobilise oceanographic telemetry, modular produced water treatment, and engineered piping and valves—delivered by qualified Nigerian engineers and technicians.
             </p>
           </div>
 

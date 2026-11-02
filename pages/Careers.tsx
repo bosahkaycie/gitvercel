@@ -162,7 +162,7 @@ const Careers: React.FC = () => {
             <div className="space-y-8">
               <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight tracking-tight">Empowering Indigenous Talent</h2>
               <p className="text-slate-600 text-lg leading-relaxed font-normal">
-                At PIGL, we believe our people are our most valuable asset. We provide a platform for engineers, surveyors, and project managers to work with world-class technology in challenging environments.
+                At PIGL, we believe our people are our most valuable asset. We provide a platform for engineers, surveyors, and project managers to work with specialised survey equipment, geotechnical rigs, and 3D reality capture tools in challenging field environments.
               </p>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-4">

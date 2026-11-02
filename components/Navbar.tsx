@@ -154,7 +154,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
         featured = {
           category: 'Corporate Overview',
           title: 'Precision & Integrity',
-          description: 'Indigenous Nigerian engineering leader in Sub-Surface Characterisation, 3D Reality Capture, MetOcean Systems, and Asset Assurance.',
+          description: 'Indigenous Nigerian engineering leader in Sub-Surface Characterisation, 3D Reality Capture, Metocean Systems, and Asset Assurance.',
           image: BootsImg,
           link: '/about'
         };
@@ -195,7 +195,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
       featured: {
         category: 'Corporate Overview',
         title: 'Precision & Integrity',
-        description: 'Indigenous Nigerian engineering leader in Sub-Surface Characterisation, 3D Reality Capture, MetOcean Systems, and Asset Assurance.',
+        description: 'Indigenous Nigerian engineering leader in Sub-Surface Characterisation, 3D Reality Capture, Metocean Systems, and Asset Assurance.',
         image: BootsImg,
         link: '/about'
       },

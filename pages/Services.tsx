@@ -599,10 +599,10 @@ const Services: React.FC = () => {
 
           <div className="max-w-4xl">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight mb-8">
-              Intelligence, Solutions & Engineering
+              Specialist Engineering Divisions
             </h1>
             <p className="text-xl md:text-2xl text-slate-300 font-normal leading-relaxed">
-              Transforming complex physical environments into actionable intelligence and dependable infrastructure across Sub-Saharan Africa.
+              Geoscience, marine observation, infrastructure construction, and industrial water treatment across Nigeria and Sub-Saharan Africa.
             </p>
           </div>
         </div>
@@ -655,16 +655,13 @@ const Services: React.FC = () => {
                   {/* Division Name & Acronym with clean alignment */}
                   <div className="mb-4">
                     <div className="flex items-center justify-between gap-3 mb-2">
-                      <span className="text-emerald-700 font-bold text-xs uppercase tracking-widest">
-                        0{idx + 1} • PIGL Division
-                      </span>
-                      <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-0.5 rounded shrink-0">
+                      <h3 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight leading-snug hover:text-emerald-700 transition-colors">
+                        <a href={`/services/${platformSlug}`}>{platform.title}</a>
+                      </h3>
+                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-0.5 rounded shrink-0">
                         {platform.abbreviation || 'PIGL'}
                       </span>
                     </div>
-                    <h3 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight leading-snug hover:text-emerald-700 transition-colors">
-                      <a href={`/services/${platformSlug}`}>{platform.title}</a>
-                    </h3>
                     {platform.positioning && (
                       <p className="text-sm font-semibold text-slate-500 mt-2">
                         {platform.positioning}

@@ -205,7 +205,7 @@ Operating across challenging terrains—including mangrove swamps, intertidal mu
 > *"Reaching 500,000 safe man-hours with zero LTI reflects the dedication of our field technicians and engineers who prioritize safety every single day. We will continue setting the benchmark for indigenous engineering reliability."*
 > — **Layefa Oruoghor**, HSSE Manager
 
-PIGL remains committed to delivering world-class engineering solutions while protecting our personnel, our clients, and the natural environment.`,
+PIGL remains committed to delivering high-integrity engineering solutions while protecting our personnel, our clients, and the natural environment.`,
     featured_image: '/assets/team.jpeg',
     author: 'Layefa Oruoghor (HSSE Manager)',
     category: 'HSSEQ & Safety',
@@ -225,7 +225,7 @@ export const FALLBACK_SLIDERS: CMSSlider[] = [
     id: "3bd59604-1015-41e0-bcb1-c087fa769342",
     title: "Metocean & Marine Solutions",
     subtitle: "LIFECYCLE PHASE 01 // METOCEAN & MARINE SOLUTIONS",
-    description: "Real-time ocean observation, MetOcean forecasting, marine environmental monitoring, and operational advisory across maritime domains.",
+    description: "Real-time ocean observation, metocean forecasting, marine environmental monitoring, and operational advisory across maritime domains.",
     desktop_image: "/assets/new_ocean.webp",
     mobile_image: "/assets/DJI_0003.jpg",
     video_url: "/assets/FRANKSTAR LOOP.mp4",
@@ -405,7 +405,7 @@ const FALLBACK_JOBS: JobOpening[] = [
     description: 'Lead onshore and swamp hydraulic cone penetration testing (CPTu), deep soil boring campaigns, foundation engineering, and laboratory data synthesis.',
     requirements: [
       'B.Eng / M.Sc in Civil / Geotechnical Engineering or Geology (COREN / COMEG registered)',
-      'Minimum 5 years active field experience with 20-ton CPT rigs, pontoon drilling units, and soil mechanics',
+      'Minimum 5 years active field experience with 20-tonne CPT rigs, pontoon drilling units, and soil mechanics',
       'Proficiency with Plaxis, GeoStudio, or gINT geotechnical software',
       'Strong HSSE compliance record in oilfield operating environments'
     ],
@@ -445,7 +445,7 @@ const FALLBACK_JOBS: JobOpening[] = [
   },
   {
     id: 'job-3',
-    title: 'Marine & MetOcean Systems Specialist',
+    title: 'Marine & Metocean Systems Specialist',
     department: 'Offshore Intelligence',
     location: 'Port Harcourt / Offshore Bonny',
     type: 'Full-time',
@@ -461,7 +461,7 @@ const FALLBACK_JOBS: JobOpening[] = [
       'Deploy and service oceanographic telemetry buoys and coastal weather stations',
       'Monitor real-time marine data streams and validate oceanographic observations',
       'Troubleshoot sensor arrays, marine telemetry transmitters, and mooring assemblies',
-      'Produce technical MetOcean summaries for offshore operational safety'
+      'Produce technical metocean summaries for offshore operational safety'
     ],
     status: 'active',
     display_order: 3,
@@ -537,7 +537,7 @@ export const FALLBACK_VIDEOS: CMSVideoItem[] = [
     description: 'A comprehensive visual exploration of PIGL indigenous engineering heritage, ground characterisation, sub-centimeter reality capture, and high-assurance field execution across Nigerian energy corridors.',
     highlights: [
       'Indigenous Tier-1 Engineering Heritage & Vision',
-      'Ground Intelligence: In-situ 20-Ton CPT & Soil Mechanics',
+      'Ground Intelligence: In-situ 20-Tonne CPT & Soil Mechanics',
       'Digital Intelligence: 3D Reality Capture & Digital Twin As-Builts',
       'Pipeline Integrity, Mechanical Fabrication & Welding',
       'HSSEQ Excellence: Zero LTI & ISO 9001 / ISO 45001 Governance'
@@ -550,14 +550,14 @@ export const FALLBACK_VIDEOS: CMSVideoItem[] = [
   {
     id: 'cpt-operations',
     youtubeId: 'sExrHCIGkH0',
-    title: 'Ground Intelligence: 20-Ton Hydraulic CPT & Swamp Soil Characterisation',
+    title: 'Ground Intelligence: 20-Tonne Hydraulic CPT & Swamp Soil Characterisation',
     category: 'ground',
     categoryLabel: 'Ground Intelligence',
     duration: '04:45',
     publishDate: '2026',
     description: 'Field footage of PIGL hydraulic cone penetration testing (CPT) units and amphibious pontoon rigs operating in complex Niger Delta swamp and coastal formations to eliminate foundation failure risks.',
     highlights: [
-      '20-Ton Heavy-Duty Hydraulic Thrust Rigs',
+      '20-Tonne Heavy-Duty Hydraulic Thrust Rigs',
       'Continuous Tip Resistance & Sleeve Friction Telemetry',
       'Amphibious Pontoon Shallow Water Operations',
       'Deep Foundation & Piling Engineering Data'
@@ -570,7 +570,7 @@ export const FALLBACK_VIDEOS: CMSVideoItem[] = [
   {
     id: 'laser-scanning',
     youtubeId: 'sExrHCIGkH0',
-    title: 'Digital Intelligence: Leica RTC360 3D Reality Capture & Asset Digitalization',
+    title: 'Digital Intelligence: Leica RTC360 3D Reality Capture & Digital Twin Modelling',
     category: 'digital',
     categoryLabel: 'Digital Intelligence',
     duration: '03:52',
@@ -610,7 +610,7 @@ export const FALLBACK_VIDEOS: CMSVideoItem[] = [
   {
     id: 'offshore-marine',
     youtubeId: 'sExrHCIGkH0',
-    title: 'Offshore Intelligence: Multi-Beam Bathymetry & MetOcean Telemetry Buoys',
+    title: 'Offshore Intelligence: Multi-Beam Bathymetry & Metocean Telemetry Buoys',
     category: 'marine',
     categoryLabel: 'Offshore & Marine',
     duration: '04:10',

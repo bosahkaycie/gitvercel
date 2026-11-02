@@ -119,10 +119,10 @@ const Contact: React.FC = () => {
           
           <div className="max-w-4xl">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight mb-8">
-              Connect With Us
+              Contact PIGL
             </h1>
             <p className="text-xl md:text-2xl text-slate-300 font-normal leading-relaxed">
-              Ready to start your next project? Get in touch with our experts.
+              Discuss project specifications, technical scoping, and field mobilisation with our engineering teams in Port Harcourt and Lagos.
             </p>
           </div>
         </div>

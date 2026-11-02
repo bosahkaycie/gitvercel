@@ -32,14 +32,14 @@ const OFFICIAL_VIDEOS: CMSVideoItem[] = [
   {
     id: 'cpt-operations',
     youtubeId: 'sExrHCIGkH0',
-    title: 'Ground Intelligence: 20-Ton Hydraulic CPT & Swamp Soil Characterisation',
+    title: 'Ground Intelligence: 20-Tonne Hydraulic CPT & Swamp Soil Characterisation',
     category: 'ground',
     categoryLabel: 'Ground Intelligence',
     duration: '04:45',
     publishDate: '2026',
     description: 'Field footage of PIGL hydraulic cone penetration testing (CPT) units and amphibious pontoon rigs operating in complex Niger Delta swamp and coastal formations to eliminate foundation failure risks.',
     highlights: [
-      '20-Ton Heavy-Duty Hydraulic Thrust Rigs',
+      '20-Tonne Heavy-Duty Hydraulic Thrust Rigs',
       'Continuous Tip Resistance & Sleeve Friction Telemetry',
       'Amphibious Pontoon Shallow Water Operations',
       'Deep Foundation & Piling Engineering Data'
@@ -49,7 +49,7 @@ const OFFICIAL_VIDEOS: CMSVideoItem[] = [
   {
     id: 'laser-scanning',
     youtubeId: 'sExrHCIGkH0',
-    title: 'Digital Intelligence: Leica RTC360 3D Reality Capture & Asset Digitalization',
+    title: 'Digital Intelligence: Leica RTC360 3D Reality Capture & Digital Twin Modelling',
     category: 'digital',
     categoryLabel: 'Digital Intelligence',
     duration: '03:52',
@@ -83,7 +83,7 @@ const OFFICIAL_VIDEOS: CMSVideoItem[] = [
   {
     id: 'offshore-marine',
     youtubeId: 'sExrHCIGkH0',
-    title: 'Offshore Intelligence: Multi-Beam Bathymetry & MetOcean Telemetry Buoys',
+    title: 'Offshore Intelligence: Multi-Beam Bathymetry & Metocean Telemetry Buoys',
     category: 'marine',
     categoryLabel: 'Offshore & Marine',
     duration: '04:10',

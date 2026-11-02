@@ -199,7 +199,7 @@ const Projects: React.FC = () => {
               Executed Projects & Field Case Studies
             </h1>
             <p className="text-xl md:text-2xl text-slate-300 font-normal leading-relaxed">
-              A showcase of engineering precision, 3D reality capture, and zero-incident delivery across complex Nigerian terrain.
+              Selected engineering case studies in geotechnical investigations, marine surveys, 3D laser scanning, and pipeline construction across Nigeria.
             </p>
           </div>
         </div>

@@ -73,7 +73,7 @@ export const SERVICE_GALLERY_PRESETS: Record<string, { url: string; title: strin
   'geosolutions-engineering-services': [
     {
       url: '/assets/cpt.png',
-      title: '20-Ton Heavy-Duty Hydraulic CPT Rig',
+      title: '20-Tonne Hydraulic CPT Rig',
       caption: 'Continuous hydraulic piezocone penetration testing (CPTu) providing high-resolution soil mechanics & stratigraphy.'
     },
     {
@@ -94,7 +94,7 @@ export const SERVICE_GALLERY_PRESETS: Record<string, { url: string; title: strin
     {
       url: '/assets/operations/pigl_3d_reality_capture_jetty_plant.jpg',
       title: '3D Reality Capture & Digital Engineering',
-      caption: 'High-density terrestrial laser scanning and Scan-to-BIM modeling of process facilities and pipeline manifolds.'
+      caption: 'High-density terrestrial laser scanning and Scan-to-BIM modelling of process facilities and pipeline manifolds.'
     },
     {
       url: '/assets/seismic_survey.png',
@@ -107,7 +107,7 @@ export const SERVICE_GALLERY_PRESETS: Record<string, { url: string; title: strin
   'metocean-marine-solutions': [
     {
       url: '/assets/marine_intel_metocean.jpg',
-      title: 'Offshore MetOcean Observation & Telemetry',
+      title: 'Offshore Metocean Observation & Telemetry',
       caption: 'Continuous oceanographic monitoring in partnership with Frankstar Technology deploying telemetry buoys and current profilers.'
     },
     {
@@ -118,7 +118,7 @@ export const SERVICE_GALLERY_PRESETS: Record<string, { url: string; title: strin
     {
       url: '/assets/operations/pigl_offshore_winch_pigl_container.jpg',
       title: 'Survey Deck Winch & Instrumented Laboratory',
-      caption: 'Mobilization of deck handling equipment and specialized offshore instrumentation laboratory for marine environmental monitoring.'
+      caption: 'Mobilisation of deck handling equipment and specialised offshore instrumentation laboratory for marine environmental monitoring.'
     },
     {
       url: '/assets/field_operations_marine.jpg',
@@ -128,11 +128,11 @@ export const SERVICE_GALLERY_PRESETS: Record<string, { url: string; title: strin
     {
       url: '/assets/new-ocean.png',
       title: 'Real-Time Ocean Dynamics & Forecasting',
-      caption: 'Deployment of wave models, current modeling, and weather window forecasting for offshore operational safety.'
+      caption: 'Deployment of wave models, current modelling, and weather window forecasting for offshore operational safety.'
     },
     {
       url: '/assets/new-barge.png',
-      title: 'Nearshore MetOcean Sensor Spread',
+      title: 'Nearshore Metocean Sensor Spread',
       caption: 'Deploying Acoustic Doppler Current Profilers (ADCP) and tidal monitoring stations across delta estuaries.'
     }
   ],
@@ -229,7 +229,7 @@ export const SERVICE_DETAILS_MAP: Record<string, ServiceDetail> = {
   'geosolutions-engineering-services': {
     id: 'geosolutions-engineering-services',
     engineeringProblemAddressed: "Inadequate ground characterisation, uncharted seabed geohazards, structural foundation settlement, and brownfield spatial clashes directly cause costly piling redesigns, pipeline touchdown failures, and prolonged construction delays across complex Nigerian deltaic and marine terrains.",
-    longDescription: "Polaris Integrated & GeoSolutions Limited (PIGL) delivers multidisciplinary site investigation, geophysics, hydrography, 20-ton piezocone penetration testing (CPTu), precise positioning, terrestrial 3D laser scanning (Scan-to-BIM), and accredited materials laboratory testing. Operating across onshore, nearshore, swamp, and deepwater corridors throughout Nigeria and the Gulf of Guinea, we provide verified subsurface and spatial intelligence to support engineering design, statutory regulatory approvals, and field execution.",
+    longDescription: "Polaris Integrated & GeoSolutions Limited (PIGL) delivers multidisciplinary site investigation, geophysics, hydrography, 20-tonne hydraulic Cone Penetration Testing (CPT), precise positioning, 3D laser scanning using Leica RTC360 equipment, and accredited materials laboratory testing. Operating across onshore, nearshore, swamp, and deepwater corridors throughout Nigeria and the Gulf of Guinea, we provide verified subsurface and spatial intelligence to support engineering design, statutory regulatory approvals, and field execution.",
     businessValue: "Quantifies subsurface geohazards prior to foundation commitment, optimises deep foundation and piling design depths, eliminates brownfield clash rework through dimensional control, and establishes regulatory compliance across critical infrastructure.",
     standards: [
       'BS 5930 / Eurocode 7 (BS EN 1997) — Geotechnical Investigation & Testing',
@@ -261,14 +261,14 @@ export const SERVICE_DETAILS_MAP: Record<string, ServiceDetail> = {
     methodology: [
       'High-resolution 2D/UHR seismic profiling & shallow gas geohazard detection',
       'Dual-frequency multibeam bathymetry, side-scan sonar & sub-bottom profiling',
-      'Continuous hydraulic 20-ton piezocone penetration testing (CPTu) profiling',
+      'Continuous hydraulic 20-tonne Cone Penetration Testing (CPT) and piezocone (CPTu) profiling',
       'Deep rotary soil boring, standard penetration testing (SPT) & undisturbed core sampling',
       'High-precision DGNSS surface positioning, subsea acoustic tracking (USBL/LBL) & rig moves',
-      'High-speed terrestrial 3D laser scanning (Scan-to-BIM) & dimensional metrology',
+      'High-speed terrestrial 3D laser scanning using Leica RTC360 equipment & dimensional metrology',
       'Accredited laboratory triaxial shear, consolidation oedometer & materials testing'
     ],
     equipment: [
-      '20-Ton Heavy-Duty Hydraulic Piezocone (CPTu) Track & Pontoon Systems',
+      '20-Tonne Heavy-Duty Hydraulic Cone Penetration Testing (CPT) Track & Pontoon Systems',
       'Modular Pontoon Drilling Barges & Deep Rotary Soil Boring Spreads',
       'Dual-Frequency Multibeam Echo Sounders & Digital Dual-Frequency Side-Scan Sonar',
       'High-Resolution Sub-Bottom Profilers (Chirp & Boomer Acoustic Systems)',
@@ -330,7 +330,7 @@ export const SERVICE_DETAILS_MAP: Record<string, ServiceDetail> = {
       'Iridium Satellite & Cellular Real-Time Oceanographic Telemetry Modems'
     ],
     partnerCallout: {
-      title: 'Strategic MetOcean Technology Partnership',
+      title: 'Strategic Metocean Technology Partnership',
       description: 'Through our strategic alliance with Frankstar Technology, PIGL deploys calibrated oceanographic weather buoys, directional wave sensors, ADCP current profiling spreads, and real-time meteorological intelligence across Nigerian waters.',
       partnerName: 'Frankstar Technology',
       website: 'https://www.frankstartech.com/'
@@ -346,7 +346,7 @@ export const SERVICE_DETAILS_MAP: Record<string, ServiceDetail> = {
   'integrated-construction-services': {
     id: 'integrated-construction-services',
     engineeringProblemAddressed: "Complex swamp and tidal wetland terrain, corrosive soil chemistry, seasonal flooding, and difficult logistics frequently cause pipeline installation delays, joint weld defects, foundation washout, and prolonged downtime across energy transit corridors.",
-    longDescription: "Integrated Construction Services (ICS) is PIGL's engineering delivery arm for oil and gas pipelines, heavy civil infrastructure, mechanical fabrication, and pre-commissioning execution. Operating across onshore, swamp, and coastal corridors, our teams execute API 1104 standard pipeline installation, swamp trenching, field joint coating, river crossings, reinforced concrete foundations, structural steel erection, and pre-commissioning testing to statutory NUPRC standards.",
+    longDescription: "Integrated Construction Services (ICS) is PIGL's engineering delivery arm for oil and gas pipelines, heavy civil infrastructure, mechanical fabrication, and pre-commissioning execution. Operating across onshore, swamp, and coastal corridors, our teams execute API 1104 standard pipeline installation, swamp trenching, field joint coating, river crossings, reinforced concrete foundations, structural steel erection, and pre-commissioning testing to statutory NUPRC standards, providing specialised engineering and construction support in swamp terrain.",
     businessValue: "Bridges engineering design with field construction execution. Guarantees weld integrity and hydrostatic test compliance, eliminates field rework through geodetic alignment, and achieves structured handover to API, ASME, and NUPRC codes.",
     standards: [
       'API 1104 — Welding of Pipelines & Related Facilities',
@@ -401,7 +401,7 @@ export const SERVICE_DETAILS_MAP: Record<string, ServiceDetail> = {
   'industrial-solutions': {
     id: 'industrial-solutions',
     engineeringProblemAddressed: "High oil-in-water (OIW) concentrations in produced water, mineral scaling, strict regulatory discharge penalties, and contaminated water supplies threaten operating licences, disposal well life, and environmental compliance across energy and industrial operations.",
-    longDescription: "Industrial Solutions (IS) is PIGL's division for engineered water treatment, separation technology, and environmental laboratory services. In strategic technical partnership with CoaleXpert, PIGL delivers modular produced water treatment systems, coalescing oil-water separation skids, and nutshell filtration units conditioning effluent for subsurface reinjection or compliant discharge. We also engineer industrial reverse osmosis (RO) desalination plants, deep hydrogeological boreholes, effluent treatment plants (ETP), and operate an accredited analytical water laboratory.",
+    longDescription: "Industrial Solutions (IS) is PIGL's division for engineered water treatment, separation technology, and environmental laboratory services. In strategic technical partnership with CoaleXpert, PIGL delivers modular produced water treatment systems, coalescing oil-water separation skids, and nutshell filtration units conditioning effluent for subsurface reinjection or compliant discharge. We also engineer industrial reverse osmosis (RO) desalination plants, deep hydrogeological boreholes, industrial wastewater treatment and resource recovery systems, and operate an accredited analytical water laboratory.",
     businessValue: "Guarantees compliance with NUPRC EGASPIN and FMEnv environmental discharge limits, protects disposal wells against formation plugging, provides reliable potable and process water supplies, and supports water resource recovery.",
     standards: [
       'NUPRC Environmental Guidelines & Standards for Petroleum (EGASPIN)',

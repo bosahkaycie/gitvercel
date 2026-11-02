@@ -317,13 +317,15 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
       const isMms = service.slug === 'metocean-marine-solutions' || id === 'metocean-marine-solutions';
       
       const pageTitle = isGes
-        ? 'Geotechnical Company & Geophysical Surveys | 3D Reality Capture | PIGL GES'
+        ? 'GeoSolutions & Engineering Services | PIGL'
         : isMms
-        ? 'Metocean & Marine Geophysical Solutions | Oceanographic Intelligence | PIGL MMS'
-        : (service.meta_title || `${service.title} (${service.abbreviation || 'Division'}) | PIGL Specialist Engineering`);
+        ? 'Metocean & Marine Solutions | PIGL'
+        : (service.meta_title || `${service.title} | PIGL Specialist Engineering`);
 
       const metaDescription = isGes
-        ? 'Certified geotechnical company near you. 20-ton hydraulic CPT testing, marine geophysical surveys, deep borehole soil drilling, Leica RTC360 3D reality capture, and digital twins across Nigeria.'
+        ? 'Geotechnical investigations, 20-tonne hydraulic Cone Penetration Testing (CPT), deep borehole drilling, marine geophysical surveys, hydrography, and 3D laser scanning using Leica RTC360 equipment across Nigeria.'
+        : isMms
+        ? 'Oceanographic buoy deployment and real-time data collection, Acoustic Doppler Current Profiler (ADCP) measurements, metocean forecasting, and marine environmental baseline surveys across the Gulf of Guinea.'
         : (service.meta_description || service.short_description || service.description || '');
 
       document.title = pageTitle;
@@ -578,10 +580,10 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 reveal">
               <div className="max-w-3xl">
                 <span className="text-emerald-700 font-bold text-xs uppercase tracking-wider block mb-2">
-                  Core Capabilities
+                  Capabilities
                 </span>
                 <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight leading-tight">
-                  Capabilities Under {service.abbreviation ? `${service.abbreviation} — ` : ''}{service.title}
+                  Capabilities
                 </h3>
               </div>
               <p className="text-slate-600 text-sm md:text-base max-w-md mt-4 md:mt-0 font-normal leading-relaxed">
@@ -839,34 +841,34 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
               Frequently Asked Questions
             </span>
             <h3 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
-              Common Questions on {service.abbreviation || service.title}
+              Frequently Asked Questions
             </h3>
             <p className="text-slate-600 text-sm mt-3 font-normal leading-relaxed">
-              Technical answers regarding mobilization, standards compliance, equipment spreads, and geotechnical/geophysical deliverables.
+              Technical answers regarding mobilisation, standards compliance, equipment spreads, and geotechnical/geophysical deliverables.
             </p>
           </div>
 
           <div className="space-y-4 reveal">
             {((service.slug === 'geosolutions-engineering-services' || id === 'geosolutions-engineering-services' || id === 'ground-intelligence') ? [
               {
-                q: "Where can I find a certified geotechnical company near me in Nigeria?",
-                a: "Polaris Integrated & GeoSolutions Limited (PIGL) is an ISO 9001:2015 and ISO 45001:2018 certified geotechnical company operating throughout Nigeria with active mobilization bases in Port Harcourt, Lagos, Warri, and Bonny Island. We rapidly mobilize 20-ton hydraulic CPTu equipment, deep soil drilling rigs, and accredited soil mechanics laboratories across swamp, coastal, land, and offshore environments."
+                q: "Where does PIGL deliver geotechnical engineering services in Nigeria?",
+                a: "Polaris Integrated & GeoSolutions Limited (PIGL) operates throughout Nigeria with active mobilisation bases in Port Harcourt, Lagos, Warri, and Bonny Island. We mobilise 20-tonne hydraulic Cone Penetration Testing (CPT) equipment, deep borehole drilling rigs, and accredited soil mechanics laboratories across swamp, coastal, land, and offshore environments."
               },
               {
-                q: "What capabilities distinguish PIGL as a specialized geophysical company?",
-                a: "PIGL combines indigenous operational expertise with international-standard marine and terrestrial geophysical survey instruments. Our spreads include high-resolution sub-bottom profilers, dual-frequency side-scan sonars, multi-beam echo sounders, marine magnetometers, and electrical resistivity tomography (ERT) for pipeline route surveys, hazard detection, and seabed integrity."
+                q: "What capabilities distinguish PIGL's geophysical survey operations?",
+                a: "PIGL combines indigenous operational experience with specialised marine and terrestrial geophysical survey instruments. Our spreads include high-resolution sub-bottom profilers, dual-frequency side-scan sonars, multibeam echo sounders, marine magnetometers, and electrical resistivity tomography (ERT) for pipeline route surveys, hazard detection, and seabed integrity."
               },
               {
                 q: "What is 3D reality capture and what accuracy can PIGL deliver?",
-                a: "3D reality capture digitizes physical assets into millimeter-accurate point clouds and 3D digital twins. Utilizing industrial-grade Leica RTC360 terrestrial laser scanners and UAV photogrammetry, PIGL delivers sub-millimeter registered point clouds, as-built 3D CAD/BIM models, clash detection reports, and digital twins for brownfield facilities, offshore platforms, and infrastructure."
+                a: "3D reality capture digitises physical assets into millimeter-accurate point clouds and 3D digital twins. Utilizing industrial-grade Leica RTC360 terrestrial laser scanners, PIGL delivers high-precision registered point clouds, as-built 3D CAD/BIM models, clash detection reports, and digital twins for brownfield facilities, offshore platforms, and infrastructure."
               },
               {
                 q: "What geotechnical laboratory tests and certifications do you provide?",
                 a: "Our geotechnical testing laboratories in Port Harcourt and Lagos perform full soil and rock mechanics testing: Atterberg limits, sieve analysis, triaxial shear testing (UU, CU, CD), unconfined compression, direct shear, oedometer consolidation, permeability, and chemical aggressivity analysis in strict compliance with ASTM, BS 1377, and BS 5930."
               },
               {
-                q: "What is the typical mobilization timeline for geotechnical or geophysical surveys?",
-                a: "For onshore, swamp, and coastal survey operations in Nigeria, PIGL standard mobilization timelines range from 24 to 72 hours following notice to proceed and site access clearance. For offshore spreads requiring specialized vessels, mobilization schedules are coordinated to optimize operational weather windows."
+                q: "What is the typical mobilisation timeline for geotechnical or geophysical surveys?",
+                a: "For onshore, swamp, and coastal survey operations in Nigeria, PIGL standard mobilisation timelines range from 24 to 72 hours following notice to proceed and site access clearance. For offshore spreads requiring specialised vessels, mobilisation schedules are coordinated to optimise operational weather windows."
               }
             ] : [
               {
@@ -875,7 +877,7 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
               },
               {
                 q: `Where does PIGL deliver ${service.title} operations?`,
-                a: "PIGL provides engineering services across all key Nigerian operating theaters: onshore swamp fields in Rivers, Delta, and Bayelsa States, industrial complexes in Lagos and Ogun, and offshore deepwater concessions across the Gulf of Guinea."
+                a: "PIGL provides engineering services across all key Nigerian operating theatres: onshore swamp fields in Rivers, Delta, and Bayelsa States, industrial complexes in Lagos and Ogun, and offshore deepwater concessions across the Gulf of Guinea."
               },
               {
                 q: "How can our project team request a detailed engineering proposal?",

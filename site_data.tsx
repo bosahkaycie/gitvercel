@@ -104,37 +104,37 @@ export const GES_SERVICE_FAMILIES: SubService[] = [
   {
     id: 'geohazard-geoscan-seismic',
     title: 'Geohazard, Geoscan & Seismic Services',
-    description: 'High-resolution 2D/UHR seismic profiling, electrical resistivity tomography, and shallow gas hazard detection mitigating subsurface drilling and piling risks.',
+    description: 'High-resolution 2D and ultra-high-resolution (UHR) seismic profiling, electrical resistivity tomography, and shallow gas hazard detection to evaluate subsurface drilling and piling risks.',
     icon: '📊'
   },
   {
     id: 'geophysical-hydrographic-survey',
     title: 'Geophysical & Hydrographic Survey Services',
-    description: 'Dual-frequency multibeam bathymetry, side-scan sonar, and sub-bottom stratigraphy mapping seabed topography and subsea pipeline clearance corridors.',
+    description: 'Dual-frequency multibeam bathymetry, side-scan sonar imaging, and sub-bottom stratigraphy mapping seabed topography, navigation channels, and pipeline corridors.',
     icon: '🗺️'
   },
   {
     id: 'geotechnical-foundation-engineering',
     title: 'Geotechnical & Foundation Engineering Services',
-    description: 'Continuous 20-ton piezocone penetration testing (CPTu), deep borehole drilling, standard penetration testing (SPT), and foundation settlement analysis.',
+    description: '20-tonne hydraulic Cone Penetration Testing (CPT), deep borehole drilling, standard penetration testing (SPT), and foundation settlement analysis for onshore, swamp, and nearshore infrastructure.',
     icon: '🔬'
   },
   {
     id: 'precise-positioning-navigation',
     title: 'Precise Positioning & Navigation Services',
-    description: 'High-precision DGNSS surface positioning, subsea acoustic tracking (USBL/LBL), and geodetic control networks for offshore rigs, barges, and pipelay.',
+    description: 'Differential GNSS (DGNSS) surface positioning, subsea acoustic tracking (USBL/LBL), and geodetic control networks for offshore rigs, barges, and pipelay operations.',
     icon: '🧭'
   },
   {
     id: 'geospatial-reality-capture-digital-engineering',
     title: 'Geospatial, Reality Capture & Digital Engineering',
-    description: 'Terrestrial 3D laser scanning (Scan-to-BIM), dimensional metrology, GIS mapping, and operational digital twins eliminating brownfield clash rework.',
+    description: '3D laser scanning using Leica RTC360 equipment, dimensional control surveys, GIS spatial mapping, and digital twin modelling to support engineering design and prevent installation clashes.',
     icon: '📸'
   },
   {
     id: 'laboratory-services',
     title: 'Laboratory Services',
-    description: 'Accredited soil and rock mechanics testing, triaxial shear (UU/CU), consolidation oedometer tests, and construction materials compliance verification.',
+    description: 'Accredited soil and rock mechanics testing, including triaxial shear, consolidation oedometer tests, and construction materials compliance verification.',
     icon: '🧪'
   }
 ];
@@ -144,25 +144,25 @@ export const MMS_SERVICE_FAMILIES: SubService[] = [
   {
     id: 'metocean-observation-monitoring',
     title: 'Metocean Observation & Monitoring',
-    description: 'Deployment of directional wave buoys, ADCP current profiling arrays, and tide monitoring stations capturing real-time oceanographic parameters.',
+    description: 'Oceanographic buoy deployment and real-time data collection, Acoustic Doppler Current Profiler (ADCP) measurements, directional wave recording, and tidal gauging.',
     icon: '🌊'
   },
   {
     id: 'marine-forecasting-intelligence',
     title: 'Marine Forecasting & Intelligence',
-    description: 'High-resolution hydrodynamic modelling, squall early warning, and calibrated weather-window forecasts for offshore drilling and marine logistics.',
+    description: 'High-resolution hydrodynamic numerical modelling, squall early warning systems, and calibrated weather-window forecasts for offshore drilling and marine logistics.',
     icon: '🌦️'
   },
   {
     id: 'marine-environmental-services',
     title: 'Marine Environmental Services',
-    description: 'Offshore baseline environmental surveys, benthic grab sampling, CTD water column profiling, and sediment characterisation for statutory compliance.',
+    description: 'Offshore baseline environmental surveys, benthic grab sampling, conductivity-temperature-depth (CTD) water column profiling, and sediment characterisation for statutory compliance.',
     icon: '🌿'
   },
   {
     id: 'marine-advisory-operational-support',
     title: 'Marine Advisory & Operational Support',
-    description: 'Derivation of 10/50/100-year extreme metocean design criteria, vessel mooring analyses, and marine warranty engineering advisory.',
+    description: 'Derivation of 10-year, 50-year, and 100-year extreme metocean design criteria, vessel mooring analyses, and marine warranty engineering advisory.',
     icon: '🛡️'
   }
 ];
@@ -172,25 +172,25 @@ export const ICS_SERVICE_FAMILIES: SubService[] = [
   {
     id: 'pipeline-construction-installation',
     title: 'Pipeline Construction & Installation',
-    description: 'Flowline and trunkline installation, amphibious swamp trenching, pipe stringing, field joint coating, and pipeline lowering-in across wetland terrain.',
+    description: 'Flowline and trunkline installation, trenching, pipe stringing, field joint coating, and pipeline lowering-in, providing engineering and construction support in swamp terrain.',
     icon: '🏗️'
   },
   {
     id: 'civil-infrastructure-construction',
     title: 'Civil & Infrastructure Construction',
-    description: 'Heavy industrial foundations, reinforced concrete bunds, piling caps, access roads, and stormwater drainage for industrial and energy facilities.',
+    description: 'Heavy industrial foundations, reinforced concrete bund walls, piling caps, access roads, and stormwater drainage for industrial and energy facilities.',
     icon: '🚜'
   },
   {
     id: 'mechanical-fabrication-installation',
     title: 'Mechanical, Fabrication & Installation',
-    description: 'Certified structural steel fabrication, process piping spool manufacturing, equipment alignment, and non-destructive examination (NDE).',
+    description: 'Structural steel fabrication, process piping spool manufacture, mechanical equipment alignment, and non-destructive testing (NDT).',
     icon: '⚙️'
   },
   {
     id: 'project-delivery-testing-commissioning',
     title: 'Project Delivery, Testing & Commissioning Support',
-    description: 'Hydrostatic pressure testing, caliper cleaning pigging, nitrogen purging, and statutory pre-commissioning verification for operational handover.',
+    description: 'Hydrostatic pressure testing, pipeline caliper cleaning pigging, nitrogen purging, and statutory pre-commissioning verification for operational handover.',
     icon: '📋'
   }
 ];
@@ -200,25 +200,25 @@ export const IS_SERVICE_FAMILIES: SubService[] = [
   {
     id: 'produced-water-treatment-solutions',
     title: 'Produced Water Treatment Solutions',
-    description: 'High-efficiency coalescing oil-water separation skids and filtration systems conditioning produced water for reinjection or compliant disposal.',
+    description: 'High-efficiency coalescing oil-water separation skids and filtration systems conditioning produced water for reinjection or compliant discharge.',
     icon: '💧'
   },
   {
     id: 'industrial-domestic-water-solutions',
     title: 'Industrial & Domestic Water Solutions',
-    description: 'Reverse osmosis (RO) desalination, deep water borehole abstraction, and multimedia filtration packages supplying potable and process water.',
+    description: 'Reverse osmosis (RO) desalination, water borehole drilling, and multimedia filtration packages supplying potable and process water.',
     icon: '🚰'
   },
   {
     id: 'water-environmental-laboratory-services',
     title: 'Water & Environmental Laboratory Services',
-    description: 'Accredited analytical testing for oil-in-water concentration, heavy metal spectroscopy, BOD/COD demand, and microbiological parameters.',
+    description: 'Certified analytical laboratory testing for oil-in-water concentration, heavy metal spectroscopy, biological oxygen demand (BOD), chemical oxygen demand (COD), and microbiological parameters.',
     icon: '🧪'
   },
   {
     id: 'wastewater-treatment-resource-recovery',
     title: 'Wastewater Treatment & Resource Recovery',
-    description: 'Industrial effluent treatment plants (ETP), sewage treatment packages, and automated chemical dosing supporting environmental compliance.',
+    description: 'Industrial wastewater treatment and resource recovery, effluent treatment plants (ETP), sewage treatment packages, and automated chemical dosing supporting environmental compliance.',
     icon: '♻️'
   }
 ];
@@ -345,7 +345,7 @@ export const SERVICES: Service[] = [
     positioning: 'Accurate data. Deeper insight. Smarter engineering.',
     title: 'GeoSolutions & Engineering Services',
     tagline: 'Accurate data. Deeper insight. Smarter engineering.',
-    description: "Integrated site investigation, geophysics, hydrography, 20-ton piezocone CPTu testing, geodetic positioning, terrestrial 3D laser scanning, and accredited materials laboratory testing de-risking ground and foundation conditions across swamp, nearshore, and offshore assets.",
+    description: "Geotechnical investigations, 20-tonne hydraulic Cone Penetration Testing (CPT), deep borehole drilling, marine geophysical surveys, hydrography, 3D laser scanning using Leica RTC360 equipment, and accredited soil mechanics laboratory testing across onshore, swamp, and offshore environments.",
     items: [
       'Geohazard, Geoscan & Seismic Services',
       'Geophysical & Hydrographic Survey Services',
@@ -369,7 +369,7 @@ export const SERVICES: Service[] = [
     positioning: 'Real-time ocean insight. Safer operations. Informed decisions.',
     title: 'Metocean & Marine Solutions',
     tagline: 'Real-time ocean insight. Safer operations. Informed decisions.',
-    description: 'Continuous oceanographic data acquisition, metocean observation, real-time wave and current profiling, coastal hydrodynamic modelling, marine meteorological forecasting, and offshore environmental baseline surveys deployed with Frankstar Technology.',
+    description: 'Oceanographic buoy deployment and real-time data collection, Acoustic Doppler Current Profiler (ADCP) measurements, metocean forecasting, and marine environmental baseline surveys deployed with Frankstar Technology.',
     items: [
       'Metocean Observation & Monitoring',
       'Marine Forecasting & Intelligence',
@@ -382,7 +382,7 @@ export const SERVICES: Service[] = [
     division: 'Metocean & Marine Solutions',
     partnerBadge: {
       partnerName: 'Frankstar Technology',
-      role: 'Strategic MetOcean & Marine Intelligence Partner'
+      role: 'Strategic Metocean Technology Partner'
     }
   },
 
@@ -395,7 +395,7 @@ export const SERVICES: Service[] = [
     positioning: 'From engineering preparation to successful project delivery.',
     title: 'Integrated Construction Services',
     tagline: 'From engineering preparation to successful project delivery.',
-    description: "End-to-end construction execution spanning swamp and onshore pipeline installation, heavy civil infrastructure, structural mechanical fabrication, and pre-commissioning testing for energy facilities and industrial sites.",
+    description: "Pipeline installation, heavy civil infrastructure, structural mechanical fabrication, and pre-commissioning testing, with specialised engineering and construction support in swamp terrain.",
     items: [
       'Pipeline Construction & Installation',
       'Civil & Infrastructure Construction',
@@ -417,7 +417,7 @@ export const SERVICES: Service[] = [
     positioning: 'Cleaner water. Healthier communities. Sustainable industries.',
     title: 'Industrial Solutions',
     tagline: 'Cleaner water. Healthier communities. Sustainable industries.',
-    description: "Engineered produced-water treatment systems, coalescing oil-water separation skids, reverse osmosis desalination, accredited water laboratory analysis, and wastewater resource recovery engineered in partnership with CoaleXpert.",
+    description: "Produced water treatment skids, industrial and domestic water treatment plants, accredited water quality laboratory testing, and industrial wastewater treatment and resource recovery engineered in partnership with CoaleXpert.",
     items: [
       'Produced Water Treatment Solutions',
       'Industrial & Domestic Water Solutions',
@@ -439,8 +439,8 @@ export const PARTNERS: Partner[] = [
   {
     id: 'frankstar',
     name: 'Frankstar Technology',
-    role: 'Strategic MetOcean & Marine Intelligence Partner',
-    specialty: 'Oceanographic Observation, MetOcean Buoys & Real-Time Telemetry',
+    role: 'Strategic Metocean Technology Partner',
+    specialty: 'Oceanographic Observation, Metocean Buoys & Real-Time Telemetry',
     description: 'Through our partnership with Frankstar Technology, PIGL provides oceanographic weather buoys, wave monitoring, current profiling, and real-time marine weather data to support safe coastal and offshore operations.',
     capabilities: [
       'Oceanographic weather buoys for wave, current, and tidal monitoring',

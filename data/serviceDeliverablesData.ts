@@ -32,7 +32,7 @@ export const MASTER_SERVICE_DELIVERABLES: Record<string, Record<string, ServiceD
       standards: 'BS 5930 (Site Investigations), Eurocode 7 (EN 1997-1/2), ASTM D420, NUPRC Civil Engineering Guidelines'
     },
     'cone-penetration-testing': {
-      title: 'Hydraulic Cone Penetration Testing (20-Ton CPT & CPTu profiling)',
+      title: 'Hydraulic Cone Penetration Testing (20-Tonne CPT & CPTu profiling)',
       description: 'Continuous in-situ hydraulic piezocone penetration testing (CPTu) providing continuous profiling of cone tip resistance (qc), sleeve friction (fs), and dynamic pore pressure dissipation (u2). Enables immediate stratification of soil layers, shear strength determination, and empirical calculation of deep pile capacity in complex Niger Delta clays and sands.',
       deliverablesOutput: 'Continuous digital CPTu profiles (.GEF and .AGS4 format), soil behavior type (SBT) classification charts, undrained shear strength (Su) models, and piling bearing capacity calculations.',
       standards: 'ASTM D5778, Eurocode 7 (BS EN ISO 22476-1), ISSMGE Technical Standards'
