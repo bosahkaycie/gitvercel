@@ -38,7 +38,7 @@ import {
   useEmailSubscribers,
   useFollowUpEmails
 } from '../../hooks/useSupabaseData';
-import { IconMenu, IconSun, IconMoon, IconExternal } from '../../components/admin/AdminIcons';
+import { IconMenu, IconSun, IconMoon, IconExternal, IconUserCircle, IconSettings, IconLogout, IconChevronDown } from '../../components/admin/AdminIcons';
 import AdminNotificationCenter from '../../components/admin/AdminNotificationCenter';
 
 const AdminLayout: React.FC = () => {
@@ -68,6 +68,18 @@ const AdminLayout: React.FC = () => {
     }
   });
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState<boolean>(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsUserDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const toggleSidebarCollapse = () => {
     setIsSidebarCollapsed(prev => {
@@ -423,8 +435,10 @@ const AdminLayout: React.FC = () => {
         );
       case 'media':
         return <AdminMedia theme={theme} />;
+      case 'corporate-profile':
+        return <AdminSettings theme={theme} initialTab="profile" />;
       case 'settings':
-        return <AdminSettings theme={theme} />;
+        return <AdminSettings theme={theme} initialTab="smtp" />;
       default:
         return (
           <AdminDashboard
@@ -448,25 +462,108 @@ const AdminLayout: React.FC = () => {
     }
   };
 
-  const tabLabels: Record<string, string> = {
-    dashboard: 'Dashboard Overview',
-    campaigns: 'Email Campaigns & Newsletters',
-    followups: 'Follow Up and Broadcast',
-    services: 'Services & Capabilities',
-    projects: 'Projects & Case Studies',
-    partners: 'Technology Partners',
-    team: 'Executive Management Team',
-    vendors: 'Vendor Onboarding Desk',
-    careers: 'Careers & Applications',
-    inquiries: 'Inquiries & RFPs',
-    blog: 'Publications & News',
-    sliders: 'Homepage Banners',
-    videos: 'Video Showcase & Corporate Reels',
-    navigation: 'Navigation & Page Architecture',
-    profile: 'Administrator Profile & Security',
-    users: 'Admin Team & Roles',
-    media: 'Media Library',
-    settings: 'Database & Infrastructure'
+  const tabMeta: Record<string, { group: string; title: string; description: string }> = {
+    dashboard: {
+      group: 'Overview',
+      title: 'Dashboard Overview',
+      description: 'System health, recent activities, inquiry metrics, and core operational statistics.'
+    },
+    navigation: {
+      group: 'Website Management',
+      title: 'Navigation & Pages',
+      description: 'Configure header navigation structure, dropdown menus, footer link columns, and search engine metadata.'
+    },
+    sliders: {
+      group: 'Website Management',
+      title: 'Homepage Banners',
+      description: 'Manage high-resolution hero banners, background video loops, headlines, and call-to-action buttons.'
+    },
+    services: {
+      group: 'Website Management',
+      title: 'Services & Capabilities',
+      description: 'Manage engineering divisions, technical capabilities, equipment specifications, and core deliverables.'
+    },
+    projects: {
+      group: 'Website Management',
+      title: 'Projects & Case Studies',
+      description: 'Document executed field operations, client references, technical scopes, and project milestones.'
+    },
+    videos: {
+      group: 'Website Management',
+      title: 'Video Showcase Hub',
+      description: 'Curate corporate video reels, offshore operations footage, and technical demonstration media.'
+    },
+    partners: {
+      group: 'Website Management',
+      title: 'Technology Partners',
+      description: 'Manage international technology alliances, equipment manufacturer partnerships, and verified logos.'
+    },
+    blog: {
+      group: 'Website Management',
+      title: 'Publications & News',
+      description: 'Publish technical articles, corporate announcements, whitepapers, and industry insights.'
+    },
+    media: {
+      group: 'Website Management',
+      title: 'Media Library',
+      description: 'Centralised repository for high-resolution photography, diagrams, PDFs, and corporate collateral.'
+    },
+    inquiries: {
+      group: 'Business Operations',
+      title: 'Inquiries & RFPs',
+      description: 'Track, review, assign, and respond to incoming technical inquiries, RFPs, and consultation requests.'
+    },
+    vendors: {
+      group: 'Business Operations',
+      title: 'Vendor Onboarding Desk',
+      description: 'Review contractor pre-qualification submissions, statutory compliance documentation, and verification status.'
+    },
+    careers: {
+      group: 'Business Operations',
+      title: 'Careers & CV Inbox',
+      description: 'Post career opportunities, manage openings, and review submitted candidate applications and CVs.'
+    },
+    campaigns: {
+      group: 'Marketing',
+      title: 'Campaigns & Newsletters',
+      description: 'Draft, schedule, and broadcast email campaigns and newsletters to client and stakeholder lists.'
+    },
+    followups: {
+      group: 'Marketing',
+      title: 'Follow Up & Broadcast',
+      description: 'Direct communication desk for sending follow-up messages and targeted operational updates.'
+    },
+    team: {
+      group: 'Organisation',
+      title: 'Management Team',
+      description: 'Maintain executive leadership profiles, qualifications, operational roles, and governance information.'
+    },
+    'corporate-profile': {
+      group: 'Organisation',
+      title: 'Corporate Profile & Company Information',
+      description: 'Maintain verified corporate details, RC number, headquarters address, telephone contacts, and download profile PDF.'
+    },
+    settings: {
+      group: 'Administration',
+      title: 'Corporate & System Settings',
+      description: 'Configure corporate contact channels, SMTP email server delivery, and database infrastructure.'
+    },
+    users: {
+      group: 'Administration',
+      title: 'Admin Team & Roles',
+      description: 'Manage administrative team accounts, role-based access control permissions, and account status.'
+    },
+    profile: {
+      group: 'Administration',
+      title: 'Admin Profile & Security',
+      description: 'Update your administrator name, avatar, contact email, and secure sign-in password.'
+    }
+  };
+
+  const currentMeta = tabMeta[currentTab] || {
+    group: 'Management',
+    title: 'Dashboard Overview',
+    description: 'System overview and core operations.'
   };
 
   return (
@@ -492,98 +589,177 @@ const AdminLayout: React.FC = () => {
 
       {/* Main Content Wrapper (Fixed Header + Independent Scroll Area) */}
       <div className="flex-1 flex flex-col min-w-0 h-screen max-h-screen overflow-hidden">
-        {/* Top Header Bar (Responsive for Mobile & Desktop) */}
-        <header className={`h-16 shrink-0 border-b px-4 sm:px-6 flex items-center justify-between z-30 transition-colors ${
+        {/* Top Header Bar */}
+        <header className={`shrink-0 border-b z-30 transition-colors ${
           theme === 'dark' 
-            ? 'bg-slate-900/90 border-slate-800 backdrop-blur-md text-white' 
-            : 'bg-white/95 border-slate-200 backdrop-blur-md text-slate-900 shadow-sm'
+            ? 'bg-slate-900/95 border-slate-800 text-white' 
+            : 'bg-white border-slate-200 text-slate-900 shadow-2xs'
         }`}>
-          {/* Left: Mobile Hamburger Menu & Active Page Title */}
-          <div className="flex items-center space-x-3 sm:space-x-4 overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden p-2 rounded-xl text-slate-500 hover:text-white hover:bg-slate-800 transition-colors focus:outline-none"
-              aria-label="Open sidebar menu"
-            >
-              <IconMenu className="w-5 h-5 text-emerald-500" />
-            </button>
+          {/* Top Row: Navigation & Action Controls */}
+          <div className="h-14 px-4 sm:px-6 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60">
+            {/* Left: Mobile Menu & Breadcrumbs */}
+            <div className="flex items-center space-x-3 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(true)}
+                className="md:hidden p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                aria-label="Open sidebar menu"
+              >
+                <IconMenu className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              </button>
 
-            <div className="flex items-center space-x-2 text-xs sm:text-sm font-semibold truncate">
-              <span className="text-slate-400 hidden sm:inline">PIGL Portal</span>
-              <span className="text-slate-500 hidden sm:inline">/</span>
-              <span className="text-emerald-500 font-bold truncate">
-                {tabLabels[currentTab] || 'Management'}
-              </span>
+              <nav aria-label="Breadcrumb" className="flex items-center space-x-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 truncate">
+                <span className="text-slate-400 dark:text-slate-500 hidden sm:inline">PIGL CMS</span>
+                <span className="text-slate-300 dark:text-slate-600 hidden sm:inline">/</span>
+                <span className="text-slate-500 dark:text-slate-400 hidden sm:inline">{currentMeta.group}</span>
+                <span className="text-slate-300 dark:text-slate-600 hidden sm:inline">/</span>
+                <span className="font-bold text-slate-900 dark:text-slate-200 truncate">{currentMeta.title}</span>
+              </nav>
+            </div>
+
+            {/* Right: Public Site, Notification, Theme & User Dropdown */}
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              {/* Live Public Site Button */}
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="View live public website"
+                className="hidden lg:inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-700/80"
+              >
+                <IconExternal className="w-3.5 h-3.5" />
+                <span>Live Site</span>
+              </a>
+
+              {/* Real-time Activity Notification Bell */}
+              <AdminNotificationCenter
+                inquiries={inquiries}
+                vendors={vendors}
+                applications={applications}
+                followUps={followUps}
+                auditLogs={auditLogs}
+                onNavigateTab={(tab) => setCurrentTab(tab)}
+                theme={theme}
+              />
+
+              {/* Theme Toggle Button */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+                className={`p-1.5 sm:p-2 rounded-lg transition-colors border ${
+                  theme === 'dark'
+                    ? 'bg-slate-800 text-amber-400 border-slate-700 hover:bg-slate-700'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                {theme === 'dark' ? <IconSun className="w-4 h-4" /> : <IconMoon className="w-4 h-4 text-indigo-600" />}
+              </button>
+
+              {/* User Profile & Account Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsUserDropdownOpen(prev => !prev)}
+                  className={`flex items-center space-x-2 p-1 sm:px-2.5 sm:py-1.5 rounded-lg transition-all border ${
+                    isUserDropdownOpen
+                      ? 'bg-emerald-50 text-emerald-950 border-emerald-300 dark:bg-slate-800 dark:border-slate-700'
+                      : theme === 'dark'
+                      ? 'bg-slate-800/80 text-slate-200 border-slate-700 hover:bg-slate-800'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  <div className="w-6 h-6 rounded-md bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-bold text-xs flex items-center justify-center overflow-hidden shrink-0">
+                    {user?.avatar_url ? (
+                      <img src={user.avatar_url} alt={user.full_name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span>{user?.full_name?.charAt(0) || user?.email?.charAt(0) || 'A'}</span>
+                    )}
+                  </div>
+                  <span className="text-xs font-semibold hidden md:inline truncate max-w-[120px]">
+                    {user?.full_name || 'My Account'}
+                  </span>
+                  <IconChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isUserDropdownOpen && (
+                  <div className={`absolute right-0 mt-1.5 w-56 rounded-xl border shadow-xl py-1.5 z-50 text-xs ${
+                    theme === 'dark'
+                      ? 'bg-slate-900 border-slate-800 text-slate-200'
+                      : 'bg-white border-slate-200 text-slate-800 shadow-lg'
+                  }`}>
+                    <div className="px-3.5 py-2 border-b border-slate-100 dark:border-slate-800">
+                      <p className="font-bold truncate text-slate-900 dark:text-white">
+                        {user?.full_name || 'Administrator'}
+                      </p>
+                      <p className="text-[11px] text-slate-500 font-mono truncate">
+                        {user?.email}
+                      </p>
+                      <span className="inline-block mt-1 px-1.5 py-0.5 rounded text-[10px] font-bold font-mono uppercase bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        {user?.role || 'Super Admin'}
+                      </span>
+                    </div>
+
+                    <div className="py-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCurrentTab('profile');
+                          setIsUserDropdownOpen(false);
+                        }}
+                        className="w-full px-3.5 py-2 text-left flex items-center space-x-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      >
+                        <IconUserCircle className="w-4 h-4 text-slate-400" />
+                        <span>Admin Profile & Security</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCurrentTab('settings');
+                          setIsUserDropdownOpen(false);
+                        }}
+                        className="w-full px-3.5 py-2 text-left flex items-center space-x-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      >
+                        <IconSettings className="w-4 h-4 text-slate-400" />
+                        <span>Corporate & System Settings</span>
+                      </button>
+                    </div>
+
+                    <div className="border-t border-slate-100 dark:border-slate-800 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsUserDropdownOpen(false);
+                          logout();
+                        }}
+                        className="w-full px-3.5 py-2 text-left flex items-center space-x-2.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors font-medium"
+                      >
+                        <IconLogout className="w-4 h-4" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Right: Quick Action Controls */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            {/* Real-time Activity Notification Bell */}
-            <AdminNotificationCenter
-              inquiries={inquiries}
-              vendors={vendors}
-              applications={applications}
-              followUps={followUps}
-              auditLogs={auditLogs}
-              onNavigateTab={(tab) => setCurrentTab(tab)}
-              theme={theme}
-            />
-
-            {/* Theme Toggle Button */}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-              className={`p-2 rounded-xl transition-all border ${
-                theme === 'dark' 
-                  ? 'bg-slate-800 text-amber-400 border-slate-700 hover:bg-slate-700' 
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 shadow-sm'
-              }`}
-            >
-              {theme === 'dark' ? <IconSun className="w-4 h-4" /> : <IconMoon className="w-4 h-4 text-indigo-600" />}
-            </button>
-
-            {/* Profile Quick Access Pill */}
-            <button
-              type="button"
-              onClick={() => setCurrentTab('profile')}
-              title="Edit Admin Profile & Password"
-              className={`flex items-center space-x-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl transition-all border ${
-                currentTab === 'profile'
-                  ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm'
-                  : theme === 'dark'
-                    ? 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 border-slate-700/60'
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
-              }`}
-            >
-              <div className="w-6 h-6 rounded-lg bg-emerald-600/30 border border-emerald-500/40 text-emerald-400 font-bold text-xs flex items-center justify-center overflow-hidden shrink-0">
-                {user?.avatar_url ? (
-                  <img src={user.avatar_url} alt={user.full_name} className="w-full h-full object-cover" />
-                ) : (
-                  <span>{user?.full_name?.charAt(0) || user?.email?.charAt(0) || 'A'}</span>
-                )}
-              </div>
-              <span className="text-xs font-semibold hidden md:inline truncate max-w-[120px]">
-                {user?.full_name || 'My Profile'}
-              </span>
-            </button>
-
-            {/* Live Public Site Button */}
-            <a
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden lg:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-emerald-400 hover:bg-slate-800/60 transition-all border border-transparent hover:border-slate-700"
-            >
-              <IconExternal className="w-3.5 h-3.5" />
-              <span>Public Site</span>
-            </a>
+          {/* Contextual Page Header Row (Consistent Page Title & Short Description) */}
+          <div className="px-4 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h1 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                {currentMeta.title}
+              </h1>
+              <p className="text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 mt-0.5 leading-normal max-w-3xl">
+                {currentMeta.description}
+              </p>
+            </div>
           </div>
         </header>
 
-        {/* Main Scrollable Content Area (Smooth scrolling with invisible scrollbar) */}
+        {/* Main Scrollable Content Area */}
         <main className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 lg:p-8 w-full max-w-7xl mx-auto no-scrollbar scrollbar-none">
           {renderContent()}
         </main>

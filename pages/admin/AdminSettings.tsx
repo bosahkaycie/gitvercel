@@ -18,14 +18,21 @@ import {
 
 interface AdminSettingsProps {
   theme?: 'light' | 'dark';
+  initialTab?: 'profile' | 'smtp' | 'database';
 }
 
-const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light' }) => {
+const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialTab }) => {
   const isConnected = isSupabaseConfigured();
   const isDark = theme === 'dark';
   const { settings, loading: settingsLoading, saveSettings } = useSiteSettings();
 
-  const [activeTab, setActiveTab] = useState<'profile' | 'smtp' | 'database'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'smtp' | 'database'>(() => initialTab || 'profile');
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   // Corporate Profile State
   const [phone, setPhone] = useState(settings.phone || '+234-(0) 809 7081 333');
