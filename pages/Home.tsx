@@ -1181,56 +1181,82 @@ const Home: React.FC = () => {
       {/* Client & Industry Relationships Logo Carousel */}
       <ClientLogoCarousel />
 
-      {/* 6. Section: Operational Stats & Dual ISO Certification */}
-      <section className="relative bg-white py-24 md:py-32 border-b border-slate-200 reveal overflow-hidden">
-        {/* Subtle Architectural Infrastructure Line-Art Watermark */}
+      {/* 6. Section: Operational Credentials & Performance Indicators */}
+      <section className="relative bg-slate-50/50 py-20 md:py-28 border-b border-slate-200 reveal overflow-hidden">
+        {/* Extremely Subtle Watermark Background */}
         <div 
-          className="absolute inset-0 pointer-events-none select-none z-0 bg-no-repeat bg-cover bg-center opacity-[0.035] mix-blend-multiply filter grayscale contrast-125"
+          className="absolute inset-0 pointer-events-none select-none z-0 bg-no-repeat bg-cover bg-center opacity-[0.015] mix-blend-multiply filter grayscale"
           style={{ backgroundImage: `url(${InfraSketchImg})` }}
           aria-hidden="true"
         />
-        {/* Subtle Topographic Contour Background */}
-        <div className="absolute inset-0 bg-contour-lines pointer-events-none opacity-40 z-0" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
             
-            {/* Stat 1 */}
-            <div className="space-y-4 p-6 sm:p-8 bg-slate-50/80 border border-slate-200/80 shadow-xs relative">
-              <div className="flex items-center space-x-3">
-                <span className="text-5xl md:text-6xl font-black text-emerald-700 block tracking-tighter">
-                  0<span className="text-3xl md:text-4xl ml-2 font-bold uppercase tracking-normal">LTI</span>
-                </span>
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">{settings?.stat_safe_hours || '500k+'} Safe Field Hours</h3>
-                <p className="text-slate-600 text-sm md:text-base leading-relaxed font-normal">
-                  Zero Lost Time Injuries across swamp, coastal, and offshore terrains—proving that complex engineering can return every surveyor and engineer home safely.
+            {/* Indicator 1: 0 LTI */}
+            <div className="flex flex-col justify-between p-7 sm:p-8 bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 group">
+              <div>
+                <div className="mb-4">
+                  <span className="text-4xl sm:text-5xl font-black text-emerald-700 tracking-tight block font-sans">
+                    0 <span className="text-2xl sm:text-3xl font-extrabold text-emerald-800">LTI</span>
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 tracking-tight leading-snug mb-2">
+                  Lost Time Injuries
+                </h3>
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal">
+                  Zero lost time injuries across swamp, coastal and offshore operations.
                 </p>
               </div>
             </div>
 
-            {/* Stat 2 */}
-            <div className="space-y-4 p-6 sm:p-8 bg-slate-50/80 border border-slate-200/80 shadow-xs">
-              <span className="text-5xl md:text-6xl font-black text-emerald-700 block tracking-tighter">
-                <CountUp end={100} suffix="%" />
-              </span>
-              <div className="space-y-2">
-                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Indigenous Ownership & NCDMB Compliance</h3>
-                <p className="text-slate-600 text-sm md:text-base leading-relaxed font-normal">
-                  100% Nigerian ownership and technical stewardship, advancing domestic engineering capacity in geosolutions and infrastructure delivery.
+            {/* Indicator 2: 500,000+ Safe Field Hours */}
+            <div className="flex flex-col justify-between p-7 sm:p-8 bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 group">
+              <div>
+                <div className="mb-4">
+                  <span className="text-4xl sm:text-5xl font-black text-emerald-700 tracking-tight block font-sans">
+                    {settings?.stat_safe_hours ? settings.stat_safe_hours : '500,000+'}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 tracking-tight leading-snug mb-2">
+                  Safe Field Hours
+                </h3>
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal">
+                  A record of safe field operations across PIGL's engineering and survey activities.
                 </p>
               </div>
             </div>
 
-            {/* Stat 3 */}
-            <div className="space-y-4 p-6 sm:p-8 bg-slate-50/80 border border-slate-200/80 shadow-xs">
-              <span className="text-5xl md:text-6xl font-black text-emerald-700 block tracking-tighter">ISO</span>
-              <div className="space-y-2">
-                <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">ISO 9001:2015 & ISO 45001:2018 Management Systems</h3>
-                <p className="text-slate-600 text-sm md:text-base leading-relaxed font-normal">
-                  Certified to ISO 9001:2015 (Quality Management) and ISO 45001:2018 (Occupational Health & Safety) across all operational disciplines.
+            {/* Indicator 3: 100% Nigerian Ownership */}
+            <div className="flex flex-col justify-between p-7 sm:p-8 bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 group">
+              <div>
+                <div className="mb-4">
+                  <span className="text-4xl sm:text-5xl font-black text-emerald-700 tracking-tight block font-sans">
+                    100%
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 tracking-tight leading-snug mb-2">
+                  Nigerian Ownership
+                </h3>
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal">
+                  Indigenous ownership and technical capacity supporting engineering and infrastructure delivery.
+                </p>
+              </div>
+            </div>
+
+            {/* Indicator 4: ISO Certified Management Systems */}
+            <div className="flex flex-col justify-between p-7 sm:p-8 bg-white border border-slate-200/90 rounded-2xl shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 group">
+              <div>
+                <div className="mb-4">
+                  <span className="text-2xl sm:text-[26px] font-black text-emerald-700 tracking-tight block leading-tight font-sans">
+                    ISO 9001:2015 &amp; ISO 45001:2018
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 tracking-tight leading-snug mb-2">
+                  Certified Management Systems
+                </h3>
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal">
+                  Quality management and occupational health and safety management systems.
                 </p>
               </div>
             </div>
