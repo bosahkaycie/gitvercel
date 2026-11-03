@@ -61,10 +61,6 @@ CREATE TABLE IF NOT EXISTS services (
 ALTER TABLE services ADD COLUMN IF NOT EXISTS gallery JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE services ADD COLUMN IF NOT EXISTS video_url TEXT;
 
--- Seed / update native video URLs for zero third-party branding
-UPDATE services SET video_url = '/assets/videos/ground_intelligence.mp4' WHERE slug = 'ground-intelligence' AND (video_url IS NULL OR video_url LIKE '%G0hu1YqhpEE%');
-UPDATE sliders SET video_url = '/assets/FRANKSTAR LOOP.mp4' WHERE video_url LIKE '%X0d8DmasSiQ%';
-
 -- Indexes for Services
 CREATE INDEX IF NOT EXISTS idx_services_slug ON services(slug);
 CREATE INDEX IF NOT EXISTS idx_services_status ON services(status);
@@ -1139,4 +1135,108 @@ VALUES
     ('team-7', 'Brian Akpotowo', 'Head, Technical Services', 'Technical Services & Geomatics', '/assets/management/brian.png', 'Drives advanced geomatics, hydrographic survey, and dimensional reality capture solutions.', 'https://www.linkedin.com/company/polarisigl/', 'brian.akpotowo@polarisigl.com', 7, 'active'),
     ('team-8', 'Steve Ubani', 'Head, QHSSE', 'QHSSE & Compliance', '/assets/management/steve.png', 'Champions Goal Zero safety culture, environmental stewardship, and ISO 9001 / ISO 45001 compliance.', 'https://www.linkedin.com/company/polarisigl/', 'steve.ubani@polarisigl.com', 8, 'active')
 ON CONFLICT (id) DO NOTHING;
+
+-- ==============================================================================
+-- 15. TESTIMONIALS TABLE
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.testimonials (
+    id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::text,
+    quote TEXT NOT NULL,
+    author_name TEXT NOT NULL,
+    author_title TEXT NOT NULL,
+    author_company TEXT,
+    author_initials TEXT,
+    is_placeholder BOOLEAN DEFAULT false,
+    status TEXT DEFAULT 'published' CHECK (status IN ('published', 'draft', 'archived')),
+    display_order INT DEFAULT 1,
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_testimonials_display_order ON public.testimonials(display_order);
+CREATE INDEX IF NOT EXISTS idx_testimonials_status ON public.testimonials(status);
+
+ALTER TABLE public.testimonials ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can view published testimonials" ON public.testimonials;
+CREATE POLICY "Public can view published testimonials"
+ON public.testimonials FOR SELECT
+USING (status = 'published');
+
+DROP POLICY IF EXISTS "Admins can manage testimonials" ON public.testimonials;
+CREATE POLICY "Admins can manage testimonials"
+ON public.testimonials FOR ALL
+USING (true);
+
+-- Seed Initial Testimonials
+INSERT INTO public.testimonials (id, quote, author_name, author_title, author_company, author_initials, is_placeholder, status, display_order)
+VALUES
+    ('test-1', 'Polaris Integrated & GeoSolutions demonstrated exceptional technical rigour and safety compliance in their geomatic and geotechnical assessments. Their team delivered verified subsurface data on schedule.', 'Engr. Simbi Kesiye Wabote', 'Former Executive Secretary, NCDMB', 'Nigerian Content Development and Monitoring Board', 'SW', false, 'published', 1),
+    ('test-2', 'PIGL has shown proven indigenous capacity in executing precision marine observations and technical infrastructure scoping. They remain a dependable engineering partner.', 'Chief Timipre Sylva', 'Former Minister of State for Petroleum Resources', 'Federal Ministry of Petroleum Resources', 'TS', false, 'published', 2),
+    ('test-3', 'During our 2024 pipeline right-of-way geotechnical campaign across swamp terrain, PIGL deployed high-capacity hydraulic CPT rigs and delivered high-density 3D digital reality capture with zero HSE incidents.', 'Technical Operations Director', 'Upstream Exploration & Production Company', 'Niger Delta Asset Operator', 'TO', true, 'published', 3),
+    ('test-4', 'PIGL metocean buoy deployments and acoustic doppler profiling provided mission-critical data that enabled safe berthing and marine logistics planning during our offshore terminal expansion.', 'Head of Maritime Operations', 'Deep Offshore Terminal Facility', 'Offshore Energy Operator', 'HM', true, 'published', 4)
+ON CONFLICT (id) DO NOTHING;
+
+-- ==============================================================================
+-- 16. VIDEOS TABLE
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.videos (
+    id TEXT PRIMARY KEY DEFAULT uuid_generate_v4()::text,
+    youtube_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    category TEXT NOT NULL,
+    category_label TEXT DEFAULT 'Featured',
+    duration TEXT DEFAULT '05:00',
+    publish_date TEXT DEFAULT '2026',
+    description TEXT,
+    highlights JSONB DEFAULT '[]'::jsonb,
+    thumbnail TEXT,
+    display_order INT DEFAULT 1,
+    featured BOOLEAN DEFAULT false,
+    status TEXT DEFAULT 'published' CHECK (status IN ('published', 'draft', 'archived')),
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_videos_display_order ON public.videos(display_order);
+CREATE INDEX IF NOT EXISTS idx_videos_status ON public.videos(status);
+
+ALTER TABLE public.videos ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can view published videos" ON public.videos;
+CREATE POLICY "Public can view published videos"
+ON public.videos FOR SELECT
+USING (status = 'published');
+
+DROP POLICY IF EXISTS "Admins can manage videos" ON public.videos;
+CREATE POLICY "Admins can manage videos"
+ON public.videos FOR ALL
+USING (true);
+
+-- Seed Initial Video Showcase Items
+INSERT INTO public.videos (id, youtube_id, title, category, category_label, duration, publish_date, description, display_order, featured, status)
+VALUES
+    ('vid-1', 'o0NnQjTjWpA', 'Polaris Corporate Documentary & Technical Delivery', 'documentary', 'Corporate Overview', '06:45', '2026', 'Comprehensive overview of Polaris Integrated & GeoSolutions Limited capabilities in geotechnical investigation, marine surveys, and reality capture.', 1, true, 'published'),
+    ('vid-2', 'aK_Z7pL0cQY', 'Deep Borehole Casing & Offshore Geotechnical Operations', 'marine', 'Field Operations', '04:12', '2026', 'Authentic field footage of offshore geotechnical borehole drilling, undisturbed soil coring, and barge operations.', 2, false, 'published'),
+    ('vid-3', 'x1_B4kL9dRw', 'High-Density 3D Laser Scanning on Brownfield Manifold', 'digital', 'Reality Capture', '03:30', '2026', 'Leica RTC360 reality capture and dimensional digital twin creation for complex offshore manifold infrastructure.', 3, false, 'published')
+ON CONFLICT (id) DO NOTHING;
+
+-- ==============================================================================
+-- 17. SAFE POST-SEED MIGRATION UPDATES
+-- ==============================================================================
+DO $$ 
+BEGIN
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'services') THEN
+        UPDATE services 
+        SET video_url = '/assets/videos/ground_intelligence.mp4' 
+        WHERE slug = 'ground-intelligence' AND (video_url IS NULL OR video_url LIKE '%G0hu1YqhpEE%');
+    END IF;
+
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'sliders') THEN
+        UPDATE sliders 
+        SET video_url = '/assets/FRANKSTAR LOOP.mp4' 
+        WHERE video_url LIKE '%X0d8DmasSiQ%';
+    END IF;
+END $$;
+
 
