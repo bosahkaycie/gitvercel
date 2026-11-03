@@ -107,69 +107,77 @@ const About: React.FC = () => {
       </section>
 
       {/* 2. Corporate Introduction & Documentary */}
-      <section id="introduction" className="py-20 md:py-28 bg-white reveal">
+      <section id="introduction" className="py-16 md:py-24 bg-white reveal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-start">
             
             {/* Left Narrative Column */}
-            <div className="lg:col-span-7 space-y-6">
-              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight tracking-tight">
-                Engineering and Technical Solutions
-              </h2>
-              
-              <div className="space-y-5 text-slate-600 text-base md:text-lg leading-relaxed font-normal">
-                <p>
-                  Polaris Integrated & GeoSolutions Limited (PIGL) is a Nigerian engineering and technical solutions company serving the energy, infrastructure and industrial sectors.
-                </p>
-                <p>
-                  We bring together geoscience, marine, digital mapping, construction and industrial solutions to address technical challenges across different operating environments. Our work combines engineering knowledge, specialist equipment, field experience and technology to help clients make informed decisions and deliver their operations effectively.
-                </p>
-                <p>
-                  We understand that clients need more than a service provider. They need a team that can work safely, understand operational requirements, deploy the right technical resources and deliver solutions that make commercial and operational sense.
-                </p>
-                <p>
-                  That understanding shapes how we approach every assignment. We continuously assess new technologies, develop our technical capabilities and work with specialist technology partners to respond to changing industry needs. Whether undertaking an investigation, supporting marine operations, delivering infrastructure or implementing industrial treatment systems, our focus remains on practical solutions, responsible execution and lasting value.
-                </p>
-              </div>
-
-              {/* Verified Credentials Summary */}
-              <div className="pt-6 border-t border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="bg-slate-50 p-3.5 border border-slate-200">
-                  <p className="text-xl font-black text-slate-900 leading-none">{settings?.stat_safe_hours || '500k+'}</p>
-                  <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mt-1.5">Safe Man-Hours</p>
-                  <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">Zero Lost Time Injuries (LTI) across active sites.</p>
-                </div>
-                <div className="bg-slate-50 p-3.5 border border-slate-200">
-                  <p className="text-xl font-black text-slate-900 leading-none">{settings?.stat_years_experience || '20+'}</p>
-                  <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mt-1.5">Years Experience</p>
-                  <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">Subsurface, marine, and construction delivery.</p>
-                </div>
-                <div className="bg-slate-50 p-3.5 border border-slate-200">
-                  <p className="text-xl font-black text-slate-900 leading-none">ISO</p>
-                  <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mt-1.5">9001 & 45001</p>
-                  <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">Audited Quality & Occupational Health & Safety.</p>
-                </div>
-                <div className="bg-slate-50 p-3.5 border border-slate-200">
-                  <p className="text-xl font-black text-slate-900 leading-none">100%</p>
-                  <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mt-1.5">Quality Control</p>
-                  <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">Calibrated instrumentation & certified QA/QC.</p>
+            <div className="lg:col-span-7 space-y-8">
+              <div>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight tracking-tight mb-5">
+                  About PIGL
+                </h2>
+                
+                <div className="space-y-4 text-slate-600 text-base md:text-lg leading-relaxed font-normal">
+                  <p>
+                    Polaris Integrated &amp; GeoSolutions Limited (PIGL) is a Nigerian engineering and technical solutions company serving the energy, infrastructure and industrial sectors.
+                  </p>
+                  <p>
+                    We bring together geoscience, marine, digital mapping, construction and industrial solutions to address technical challenges across different operating environments. Our work combines engineering knowledge, specialist equipment, field experience and technology to help clients make informed decisions and deliver their operations effectively.
+                  </p>
+                  <p>
+                    We understand that clients need more than a service provider. They need a team that can work safely, understand operational requirements, deploy the right technical resources and deliver solutions that make commercial and operational sense.
+                  </p>
+                  <p>
+                    That understanding shapes how we approach every assignment. We continuously assess new technologies, develop our technical capabilities and work with specialist technology partners to respond to changing industry needs.
+                  </p>
                 </div>
               </div>
 
-              <div className="pt-4 flex flex-wrap items-center gap-4">
+              {/* Text-Based Capability Presentation */}
+              <div className="pt-8 border-t border-slate-200/80">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8">
+                  <div className="space-y-1.5">
+                    <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+                      Investigation &amp; Survey
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                      Geotechnical boreholes, 20-tonne hydraulic CPT testing, marine geophysics, bathymetry, and geohazard evaluations.
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+                      Marine Observation
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                      Autonomous metocean buoys, ADCP current profiling, wave forecasting, and marine environmental baseline surveys.
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+                      Construction &amp; Digital Engineering
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                      Pipeline installation, civil infrastructure, structural steel fabrication, and Leica RTC360 3D reality capture.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 flex flex-wrap items-center gap-4">
                 <a
-                  href={ProfilePDF}
-                  download="PIGL_Company_Profile.pdf"
-                  className="inline-flex items-center px-8 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm uppercase tracking-wider transition-colors shadow-sm"
+                  href="/services"
+                  className="inline-flex items-center px-7 py-3.5 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs hover:shadow-md transition-all group cursor-pointer"
                 >
-                  <svg className="w-4 h-4 mr-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Download Company Profile
+                  <span>Explore Our Services</span>
+                  <span className="ml-2 transform group-hover:translate-x-1 transition-transform duration-200">→</span>
                 </a>
                 <a
                   href="/contact"
-                  className="inline-flex items-center px-8 py-3.5 border-2 border-slate-300 hover:border-emerald-700 text-slate-800 hover:text-emerald-700 font-bold text-sm uppercase tracking-wider transition-colors"
+                  className="inline-flex items-center px-7 py-3.5 bg-white hover:bg-slate-50 text-slate-800 hover:text-emerald-800 font-bold text-xs uppercase tracking-wider rounded-xl border border-slate-300 hover:border-slate-400 transition-all shadow-2xs cursor-pointer"
                 >
                   Contact Our Team
                 </a>
@@ -177,21 +185,17 @@ const About: React.FC = () => {
             </div>
 
             {/* Right Video / Corporate Documentary Column */}
-            <div className="lg:col-span-5 space-y-4">
-              <div className="border border-slate-200 bg-slate-950 shadow-md overflow-hidden">
+            <div className="lg:col-span-5">
+              <div className="border border-slate-200/90 rounded-2xl bg-slate-950 shadow-sm hover:shadow-xl transition-shadow duration-300 overflow-hidden">
                 <YouTubeFacade
                   videoId="sExrHCIGkH0"
                   title="PIGL Corporate Documentary & Overview"
                   poster="/assets/operations/pigl_offshore_geotech_drilling_barge.jpg"
                   duration="6:20"
+                  showBadge={false}
+                  showOverlayText={false}
                   className="w-full aspect-video border-0"
                 />
-              </div>
-              <div className="p-4 bg-slate-50 border border-slate-200">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 block mb-1">Corporate Documentary</span>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Overview of PIGL field operations, geotechnical drilling vessels, reality capture surveys, and pipeline execution across Nigerian energy corridors.
-                </p>
               </div>
             </div>
 
