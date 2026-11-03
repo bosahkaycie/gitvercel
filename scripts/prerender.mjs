@@ -294,7 +294,7 @@ const routes = [
     path: '/contact',
     title: 'Contact PIGL | Engineering Offices in Port Harcourt & Lagos',
     description: 'Contact Polaris Integrated & GeoSolutions Limited for project enquiries, technical clarifications, and field engagements across Nigeria.',
-    badge: 'Direct Technical Engagement',
+    badge: '',
     h1: 'A conversation is a good place to start.',
     intro: 'Whether you have a project enquiry, need technical clarification or would like to discuss a potential engagement, our team is ready to hear from you. We respond within one business day, usually sooner.',
     sectionsHtml: `
@@ -477,9 +477,9 @@ function generateHtmlForRoute(config) {
 
       <main style="max-width: 1200px; margin: 0 auto;">
         <div style="max-width: 900px;">
-          <div style="display: inline-block; padding: 0.35rem 0.85rem; border-radius: 9999px; background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.8rem; font-weight: 600; margin-bottom: 1.25rem; border: 1px solid rgba(16, 185, 129, 0.3);">
+          ${config.badge ? `<div style="display: inline-block; padding: 0.35rem 0.85rem; border-radius: 9999px; background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.8rem; font-weight: 600; margin-bottom: 1.25rem; border: 1px solid rgba(16, 185, 129, 0.3);">
             ${config.badge}
-          </div>
+          </div>` : ''}
           <h1 style="font-size: 2.25rem; font-weight: 800; line-height: 1.25; margin: 0 0 1.25rem 0; color: #f8fafc;">
             ${config.h1}
           </h1>

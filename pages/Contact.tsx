@@ -158,9 +158,6 @@ const Contact: React.FC = () => {
           </div>
           
           <div className="max-w-4xl">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 bg-emerald-950/80 border border-emerald-800/60 rounded text-emerald-300 text-xs font-bold uppercase tracking-wider mb-6">
-              <span>Direct Technical Engagement</span>
-            </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-6">
               A conversation is a good place to start.
             </h1>
