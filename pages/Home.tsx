@@ -213,6 +213,10 @@ const Home: React.FC = () => {
   const [activeCollageImage, setActiveCollageImage] = useState<{ src: string; alt: string; title: string } | null>(null);
   const [navScrolled, setNavScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState<'Intelligence' | 'Solutions & Engineering'>('Intelligence');
+  const servicesCarouselRef = useRef<HTMLDivElement>(null);
+  const [activeServiceSlide, setActiveServiceSlide] = useState(0);
+  const [canScrollServiceLeft, setCanScrollServiceLeft] = useState(false);
+  const [canScrollServiceRight, setCanScrollServiceRight] = useState(true);
 
   // Video and Animation Performance Telemetry
   const heroRef = useRef<HTMLElement>(null);
@@ -409,51 +413,99 @@ const Home: React.FC = () => {
     ['Ground Intelligence', 'Digital Intelligence', 'Offshore Intelligence', 'Intelligence'].includes(s.division)
   );
 
-  // Performance-Engineered Continuous Marquee for Services Carousel
-  // Uses IntersectionObserver to completely halt layout calculations when out of viewport,
-  // preventing main-thread layout thrashing and long tasks during initial page load.
-  useEffect(() => {
-    const track = document.getElementById('services-carousel-track');
+  // Authoritative four canonical engineering divisions for homepage presentation
+  const canonicalServiceDivisions = [
+    {
+      id: 'geosolutions-engineering-services',
+      num: '01',
+      abbr: 'GES',
+      title: 'GeoSolutions & Engineering Services',
+      tagline: 'Geoscience, Geotechnics, Survey & 3D Reality Capture',
+      description: 'PIGL undertakes geophysical and hydrographic surveys, geotechnical investigations, positioning, geospatial data acquisition and reality capture to support engineering design and infrastructure development.',
+      image: '/assets/operations/pigl_offshore_geotech_drilling_barge.jpg',
+      capabilities: ['Geohazard & Seismic Surveys', 'Hydrographic & Bathymetric Mapping', '20-Tonne CPT & Geotechnics', 'Leica RTC360 3D Reality Capture']
+    },
+    {
+      id: 'metocean-marine-solutions',
+      num: '02',
+      abbr: 'MMS',
+      title: 'Metocean & Marine Solutions',
+      tagline: 'Oceanographic Monitoring, Buoy Telemetry & Marine Forecasting',
+      description: 'We provide marine observation, oceanographic monitoring, forecasting and environmental survey services to support offshore planning, marine operations and environmental assessment.',
+      image: '/assets/marine_intel_metocean.jpg',
+      capabilities: ['Metocean Telemetry Buoys', 'ADCP Current & Wave Profiling', 'Offshore Marine Forecasting', 'Hydrodynamic Numerical Modeling']
+    },
+    {
+      id: 'integrated-construction-services',
+      num: '03',
+      abbr: 'ICS',
+      title: 'Integrated Construction Services',
+      tagline: 'Pipeline Right-of-Way, Civil Infrastructure & Marine Spools',
+      description: 'We undertake pipeline installation, civil infrastructure, mechanical fabrication and installation, and construction support for industrial and energy projects.',
+      image: '/assets/newpipeline.png',
+      capabilities: ['Pipeline Installation & Trenching', 'Swamp RoW Heavy Civil Works', 'Structural Spool Fabrication', 'NDT Integrity & Hydrotesting']
+    },
+    {
+      id: 'industrial-solutions',
+      num: '04',
+      abbr: 'IS',
+      title: 'Industrial Solutions',
+      tagline: 'Produced Water Treatment, Demulsification & Environmental Plants',
+      description: 'We provide produced-water treatment, industrial and domestic water systems, laboratory analysis and wastewater treatment services for industrial and environmental applications.',
+      image: '/assets/water_treatment_skid.jpg',
+      capabilities: ['Produced-Water Skid Systems', 'Industrial Effluent Treatment', 'Demulsifier Chemical Injection', 'Certified Environmental Lab Testing']
+    }
+  ];
+
+  // Discrete, responsive carousel scroll controls
+  const scrollServicesCarousel = (direction: 'left' | 'right') => {
+    const track = servicesCarouselRef.current;
     if (!track) return;
-    
-    let isHovered = false;
-    let isTrackVisible = false;
-    let animId: number;
-    let halfWidth = track.scrollWidth / 2;
+    const card = track.querySelector<HTMLElement>('[data-carousel-card]');
+    const cardWidth = card ? card.offsetWidth : 360;
+    const gap = 24; // 1.5rem (gap-6)
+    const scrollAmount = cardWidth + gap;
 
-    const observer = new IntersectionObserver(([entry]) => {
-      isTrackVisible = entry.isIntersecting;
-      if (entry.isIntersecting) {
-        halfWidth = track.scrollWidth / 2;
-      }
-    }, { threshold: 0.05 });
+    track.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth'
+    });
+  };
 
-    observer.observe(track);
-    
-    const handleMouseEnter = () => { isHovered = true; };
-    const handleMouseLeave = () => { isHovered = false; };
-    
-    track.addEventListener('mouseenter', handleMouseEnter);
-    track.addEventListener('mouseleave', handleMouseLeave);
-    
-    const step = () => {
-      if (isTrackVisible && !isHovered && track) {
-        track.scrollLeft += 0.8;
-        if (track.scrollLeft >= halfWidth) {
-          track.scrollLeft -= halfWidth;
-        }
-      }
-      animId = requestAnimationFrame(step);
-    };
-    
-    animId = requestAnimationFrame(step);
-    
-    return () => {
-      cancelAnimationFrame(animId);
-      observer.disconnect();
-      track.removeEventListener('mouseenter', handleMouseEnter);
-      track.removeEventListener('mouseleave', handleMouseLeave);
-    };
+  const scrollServicesCarouselToIndex = (targetIndex: number) => {
+    const track = servicesCarouselRef.current;
+    if (!track) return;
+    const card = track.querySelector<HTMLElement>('[data-carousel-card]');
+    const cardWidth = card ? card.offsetWidth : 360;
+    const gap = 24;
+    track.scrollTo({
+      left: targetIndex * (cardWidth + gap),
+      behavior: 'smooth'
+    });
+  };
+
+  const updateCarouselScrollStatus = () => {
+    const track = servicesCarouselRef.current;
+    if (!track) return;
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    setCanScrollServiceLeft(track.scrollLeft > 15);
+    setCanScrollServiceRight(track.scrollLeft < maxScroll - 15);
+
+    const card = track.querySelector<HTMLElement>('[data-carousel-card]');
+    if (card) {
+      const cardWidth = card.offsetWidth + 24;
+      const index = Math.round(track.scrollLeft / cardWidth);
+      setActiveServiceSlide(Math.min(Math.max(index, 0), canonicalServiceDivisions.length - 1));
+    }
+  };
+
+  useEffect(() => {
+    const track = servicesCarouselRef.current;
+    if (!track) return;
+    updateCarouselScrollStatus();
+    const handleResize = () => updateCarouselScrollStatus();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Close modal on ESC key
@@ -1017,7 +1069,7 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. Section: What We Do - Continuous Carousel */}
+      {/* 5. Section: What We Do - Refined Snap Services Carousel */}
       <section id="our-services" className="relative py-24 md:py-32 bg-white reveal overflow-hidden">
         {/* Subtle Background Contour Lines & Depth */}
         <div className="absolute inset-0 bg-contour-lines pointer-events-none opacity-80" />
@@ -1028,90 +1080,151 @@ const Home: React.FC = () => {
           {/* Header with Carousel Navigation Controls */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div className="max-w-2xl">
-              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">
-                Services
+              <span className="text-xs font-bold text-emerald-800 uppercase tracking-widest block mb-2 font-mono">
+                Four Specialist Operating Divisions
+              </span>
+              <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+                Services & Capabilities
               </h2>
               <p className="text-slate-600 text-base md:text-lg font-normal leading-relaxed">
-                Converting physical environments, complex subsurfaces, and maritime conditions into high-fidelity data and execution.
+                Converting physical environments, complex subsurfaces, and maritime conditions into high-fidelity data, reliable structures, and certified execution.
               </p>
             </div>
 
-            {/* Carousel Controls */}
+            {/* Carousel Navigation Controls */}
             <div className="flex items-center space-x-3 self-start md:self-end">
+              {/* Slide Counter Pill */}
+              <div className="px-3.5 py-2 bg-slate-100 border border-slate-200/80 rounded-lg text-xs font-mono font-bold text-slate-700 shadow-2xs">
+                <span className="text-emerald-800">0{activeServiceSlide + 1}</span>
+                <span className="text-slate-400 mx-1.5">/</span>
+                <span>0{canonicalServiceDivisions.length}</span>
+              </div>
+
               <button
-                onClick={() => {
-                  const container = document.getElementById('services-carousel-track');
-                  if (container) {
-                    container.scrollBy({ left: -380, behavior: 'smooth' });
-                  }
-                }}
-                className="w-11 h-11 border border-slate-300 hover:border-emerald-700 bg-white hover:bg-emerald-50 text-slate-800 hover:text-emerald-700 flex items-center justify-center transition-all shadow-xs"
-                aria-label="Previous service"
+                onClick={() => scrollServicesCarousel('left')}
+                disabled={!canScrollServiceLeft}
+                className="w-11 h-11 border border-slate-300 hover:border-emerald-700 bg-white hover:bg-emerald-50 text-slate-800 hover:text-emerald-700 disabled:opacity-35 disabled:hover:bg-white disabled:hover:border-slate-300 disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-all shadow-xs cursor-pointer"
+                aria-label="Previous service division"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+                </svg>
               </button>
               <button
-                onClick={() => {
-                  const container = document.getElementById('services-carousel-track');
-                  if (container) {
-                    container.scrollBy({ left: 380, behavior: 'smooth' });
-                  }
-                }}
-                className="w-11 h-11 border border-slate-300 hover:border-emerald-700 bg-white hover:bg-emerald-50 text-slate-800 hover:text-emerald-700 flex items-center justify-center transition-all shadow-xs"
-                aria-label="Next service"
+                onClick={() => scrollServicesCarousel('right')}
+                disabled={!canScrollServiceRight}
+                className="w-11 h-11 border border-slate-300 hover:border-emerald-700 bg-white hover:bg-emerald-50 text-slate-800 hover:text-emerald-700 disabled:opacity-35 disabled:hover:bg-white disabled:hover:border-slate-300 disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-all shadow-xs cursor-pointer"
+                aria-label="Next service division"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" /></svg>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             </div>
           </div>
 
-          {/* Continuous Left Marquee Carousel Track with Subtle Shimmer */}
+          {/* Corrected Carousel Track with Snap Alignment and Zero Cut-Offs */}
           <div
+            ref={servicesCarouselRef}
             id="services-carousel-track"
-            className="flex space-x-6 overflow-x-auto pb-6 scrollbar-none no-scrollbar cursor-grab active:cursor-grabbing select-none"
+            onScroll={updateCarouselScrollStatus}
+            className="flex space-x-6 overflow-x-auto pb-6 scrollbar-none no-scrollbar snap-x snap-mandatory scroll-smooth px-1 select-none"
           >
-            {[...effectiveServices, ...effectiveServices].map((service, sIdx) => (
+            {canonicalServiceDivisions.map((division, idx) => (
               <div 
-                key={`${service.id}-${sIdx}`} 
-                className="flex-shrink-0 w-[300px] sm:w-[360px] md:w-[390px] group flex flex-col bg-white border border-slate-200 hover:border-emerald-700/60 hover:shadow-2xl transition-all duration-500 overflow-hidden card-shimmer relative"
+                key={division.id} 
+                data-carousel-card="true"
+                className="snap-start flex-shrink-0 w-[88vw] sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] group flex flex-col bg-white border border-slate-200/90 hover:border-emerald-600/60 hover:shadow-2xl hover:shadow-slate-200/80 rounded-2xl transition-all duration-400 overflow-hidden relative hover:-translate-y-2 h-full shadow-xs"
               >
-                {/* Engineering Corner Bracket Accent */}
-                <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-emerald-600/30 group-hover:border-emerald-600 transition-colors z-20 pointer-events-none" />
-
-                <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
+                {/* Visual Image with Hover Zoom and Vignette */}
+                <div className="relative aspect-[16/10] overflow-hidden bg-slate-900 rounded-t-2xl">
                   <img
-                    src={(service as any).card_image || (service as any).hero_image || (service as any).image || SERVICES.find(s => s.id === service.id)?.image || '/assets/field_operations_marine.jpg'}
-                    alt={`${service.title} - Polaris Integrated & GeoSolutions`}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    src={division.image}
+                    alt={`${division.title} - Polaris Integrated & GeoSolutions`}
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     loading="lazy"
                     decoding="async"
                     onError={(e) => {
                       (e.currentTarget as HTMLImageElement).src = '/assets/field_operations_marine.jpg';
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                </div>
+                  {/* Subtle Dark Vignette Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent opacity-40 group-hover:opacity-75 transition-opacity duration-300 pointer-events-none" />
 
-                <div className="p-6 sm:p-7 flex-grow flex flex-col justify-between space-y-5">
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-900 tracking-tight group-hover:text-emerald-700 transition-colors mb-3 leading-snug">
-                      <a href={`/services/${service.id}`}>{service.title}</a>
-                    </h3>
-                    <p className="text-slate-600 text-sm leading-relaxed font-normal mb-2 line-clamp-4">
-                      {service.description}
-                    </p>
+                  {/* Glassmorphic Division Tag Pill */}
+                  <div className="absolute top-3.5 left-3.5 bg-slate-950/85 backdrop-blur-md text-emerald-300 font-mono text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full border border-emerald-500/30 shadow-md pointer-events-none">
+                    Division {division.num}
                   </div>
 
+                  {/* Acronym Badge */}
+                  <div className="absolute top-3.5 right-3.5 bg-emerald-800/90 backdrop-blur-md text-white font-mono text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-md pointer-events-none">
+                    {division.abbr}
+                  </div>
+                </div>
+
+                {/* Card Content with Full Visibility and Robust Spacing */}
+                <div className="p-6 sm:p-7 flex-grow flex flex-col justify-between space-y-4">
+                  <div>
+                    <span className="text-[11px] font-mono font-semibold text-emerald-800 uppercase tracking-wide block mb-1.5">
+                      {division.tagline}
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight group-hover:text-emerald-800 transition-colors duration-200 leading-snug">
+                      <a href={`/services/${division.id}`} className="hover:underline">
+                        {division.title}
+                      </a>
+                    </h3>
+                    <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal mt-2.5 line-clamp-3">
+                      {division.description}
+                    </p>
+
+                    {/* Capabilities Quick List */}
+                    <div className="mt-4 pt-3.5 border-t border-slate-100">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 block mb-2">
+                        Core Domains
+                      </span>
+                      <ul className="space-y-1.5">
+                        {division.capabilities.slice(0, 3).map((cap, cIdx) => (
+                          <li key={cIdx} className="flex items-start text-xs font-medium text-slate-700">
+                            <span className="text-emerald-600 font-bold mr-1.5 leading-none">›</span>
+                            <span className="leading-snug">{cap}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Action Link Footer */}
                   <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                     <a
-                      href={`/services/${service.id}`}
-                      className="inline-flex items-center text-emerald-700 font-bold hover:text-emerald-900 text-xs sm:text-sm uppercase tracking-wider transition-colors group-hover:translate-x-1 duration-300"
+                      href={`/services/${division.id}`}
+                      className="inline-flex items-center text-emerald-800 hover:text-emerald-950 font-bold text-xs uppercase tracking-wider transition-colors group-hover:translate-x-1 duration-200"
                     >
-                      View Capabilities <span className="ml-2">→</span>
+                      <span>Explore Capabilities</span>
+                      <span className="ml-2 font-bold">→</span>
                     </a>
                   </div>
                 </div>
+
+                {/* Sleek Green Bottom Accent on Hover */}
+                <div className="h-1 w-full bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left absolute bottom-0 left-0" />
               </div>
+            ))}
+          </div>
+
+          {/* Interactive Slide Pagination Indicator Dots */}
+          <div className="flex items-center justify-center space-x-2.5 mt-8">
+            {canonicalServiceDivisions.map((div, dIdx) => (
+              <button
+                key={div.id}
+                onClick={() => scrollServicesCarouselToIndex(dIdx)}
+                className={`transition-all duration-300 rounded-full cursor-pointer ${
+                  activeServiceSlide === dIdx
+                    ? 'w-8 h-2.5 bg-emerald-800 shadow-sm'
+                    : 'w-2.5 h-2.5 bg-slate-300 hover:bg-slate-400'
+                }`}
+                aria-label={`Go to slide ${dIdx + 1}: ${div.title}`}
+                aria-current={activeServiceSlide === dIdx ? 'true' : 'false'}
+              />
             ))}
           </div>
 

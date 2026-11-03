@@ -623,50 +623,56 @@ const Services: React.FC = () => {
                 <div 
                   key={platform.id} 
                   id={platformSlug} 
-                  className="flex flex-col border border-slate-200/90 bg-slate-50/70 hover:bg-slate-50 hover:shadow-xl transition-all duration-300 p-7 sm:p-9 lg:p-10 reveal hover-lift h-full"
+                  className="group flex flex-col bg-white border border-slate-200/90 hover:border-emerald-600/60 rounded-2xl p-7 sm:p-8 lg:p-9 shadow-xs hover:shadow-2xl hover:shadow-slate-200/80 transition-all duration-400 ease-out hover:-translate-y-2 h-full relative overflow-hidden reveal"
                 >
-                  <a href={`/services/${platformSlug}`} className="relative aspect-[16/10] bg-slate-200 mb-7 overflow-hidden group block">
+                  {/* Editorial Division Image with Subtle Hover Zoom and Vignette */}
+                  <a href={`/services/${platformSlug}`} className="relative aspect-[16/10] bg-slate-900 rounded-xl overflow-hidden mb-7 block">
                     <img
                       src={platform.card_image || platform.hero_image || platform.image}
                       alt={`${platform.title} - PIGL Indigenous Engineering`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                       loading="lazy"
                       decoding="async"
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src = '/assets/field_operations_marine.jpg';
                       }}
                     />
-                    <div className="absolute top-4 left-4 bg-emerald-950/90 backdrop-blur-sm text-emerald-300 text-xs font-bold uppercase tracking-wider px-3 py-1.5 border border-emerald-700/50">
+                    {/* Subtle Overlay Vignette */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent opacity-40 group-hover:opacity-75 transition-opacity duration-300 pointer-events-none" />
+
+                    {/* Modern Glassmorphic Division Badge */}
+                    <div className="absolute top-3.5 left-3.5 bg-slate-950/85 backdrop-blur-md text-emerald-300 text-xs font-mono font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full border border-emerald-500/30 shadow-md">
                       Division 0{idx + 1}
                     </div>
                   </a>
 
-                  {/* Division Name & Acronym with clean alignment */}
+                  {/* Division Name & Acronym with clean hierarchy */}
                   <div className="mb-4">
                     <div className="flex items-center justify-between gap-3 mb-2">
-                      <h3 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight leading-snug hover:text-emerald-700 transition-colors">
+                      <h3 className="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight leading-snug group-hover:text-emerald-800 transition-colors duration-200">
                         <a href={`/services/${platformSlug}`}>{platform.title}</a>
                       </h3>
-                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-0.5 rounded shrink-0">
+                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200/70 px-2.5 py-1 rounded-md shrink-0">
                         {platform.abbreviation || 'PIGL'}
                       </span>
                     </div>
                     {platform.positioning && (
-                      <p className="text-sm font-semibold text-slate-500 mt-2">
+                      <p className="text-xs sm:text-sm font-semibold text-emerald-800 uppercase tracking-wide font-mono mt-1.5">
                         {platform.positioning}
                       </p>
                     )}
                   </div>
 
                   {/* Concise Description */}
-                  <p className="text-base text-slate-600 font-normal leading-relaxed mb-6 flex-grow">
+                  <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed mb-6 flex-grow">
                     {platform.short_description || platform.description}
                   </p>
 
-                  {/* Capabilities Summary */}
-                  <div className="bg-white p-5 border border-slate-200/90 mb-7">
-                    <div className="mb-3 border-b border-slate-100 pb-2">
-                      <h4 className="text-emerald-900 font-bold text-xs uppercase tracking-wider">Capabilities</h4>
+                  {/* Capabilities Summary Block */}
+                  <div className="bg-slate-50/90 rounded-xl p-5 border border-slate-200/80 mb-7 shadow-xs">
+                    <div className="mb-3 border-b border-slate-200/60 pb-2 flex items-center justify-between">
+                      <h4 className="text-emerald-950 font-bold text-xs uppercase tracking-wider font-mono">Specialist Capabilities</h4>
+                      <span className="text-[10px] font-mono font-semibold text-slate-500">{repItems.length} Domains</span>
                     </div>
                     <ul className="space-y-2">
                       {repItems.slice(0, 4).map((item: string, rIdx: number) => (
@@ -679,15 +685,18 @@ const Services: React.FC = () => {
                   </div>
 
                   {/* Clear View Capabilities Action */}
-                  <div className="pt-2 mt-auto">
+                  <div className="pt-2 mt-auto flex items-center justify-between">
                     <a 
                       href={`/services/${platformSlug}`} 
-                      className="inline-flex items-center px-6 py-3.5 bg-emerald-800 text-white font-bold text-xs uppercase tracking-widest hover:bg-emerald-900 transition-all group"
+                      className="inline-flex items-center px-6 py-3.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs uppercase tracking-widest rounded-lg shadow-sm hover:shadow-md transition-all duration-200 group/btn"
                     >
-                      <span>View Capabilities</span>
-                      <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                      <span>Explore Capabilities</span>
+                      <span className="ml-2 group-hover/btn:translate-x-1.5 transition-transform duration-200">→</span>
                     </a>
                   </div>
+
+                  {/* Sleek Green Bottom Accent on Hover */}
+                  <div className="h-1 w-full bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left absolute bottom-0 left-0" />
                 </div>
               );
             })}
