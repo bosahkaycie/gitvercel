@@ -118,11 +118,6 @@ const Network: React.FC = () => {
                       }`}
                     >
                       <div>
-                        {/* Eyebrow: Role / Specialty */}
-                        <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block mb-2 font-mono">
-                          {partner.role}
-                        </span>
-
                         {/* Organisation Name */}
                         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4 group-hover:text-emerald-900 transition-colors duration-200">
                           {partner.name}
@@ -152,7 +147,7 @@ const Network: React.FC = () => {
                       </div>
 
                       {/* Action Links Row (Anchored to bottom) */}
-                      <div className="pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4 mt-6">
+                      <div className="pt-6 border-t border-slate-100 flex items-center gap-4 mt-6">
                         {partner.website ? (
                           <a
                             href={partner.website}
@@ -170,16 +165,6 @@ const Network: React.FC = () => {
                             Verified Technical Relationship
                           </span>
                         )}
-
-                        <a
-                          href={`/services/${(partner as any).serviceId || (partner as any).service_id || 'geosolutions-engineering-services'}`}
-                          className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-emerald-800 transition-colors group/cta"
-                        >
-                          <span>View Associated Division</span>
-                          <span className="ml-1.5 transform group-hover/cta:translate-x-1 transition-transform duration-200">
-                            →
-                          </span>
-                        </a>
                       </div>
                     </div>
                   </div>
