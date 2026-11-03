@@ -21,8 +21,6 @@ interface ExtendedTeamMember {
 
 const Teams: React.FC = () => {
   const { teamMembers, loading } = useTeamMembers();
-  const [selectedDept, setSelectedDept] = useState<string>('All');
-  const [isFilterTransitioning, setIsFilterTransitioning] = useState<boolean>(false);
   const [visibleCardIds, setVisibleCardIds] = useState<Set<string>>(new Set());
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -125,53 +123,12 @@ const Teams: React.FC = () => {
         };
       });
 
-  const departments = [
-    'All',
-    'Executive Leadership',
-    'Technical Operations & Geosciences',
-    'QHSE & Commercial Governance'
-  ];
-
-  const filteredMembers = selectedDept === 'All'
-    ? activeMembers
-    : activeMembers.filter(m => {
-        const dept = m.department || '';
-        if (selectedDept === 'Executive Leadership') {
-          return dept.includes('Executive') || dept.includes('Management') || dept.includes('Corporate Officers');
-        }
-        if (selectedDept === 'Technical Operations & Geosciences') {
-          return dept.includes('Technical') || dept.includes('Operations') || dept.includes('Intelligence') || dept.includes('Engineering');
-        }
-        if (selectedDept === 'QHSE & Commercial Governance') {
-          return dept.includes('QHSE') || dept.includes('Compliance') || dept.includes('Commercial') || dept.includes('Finance') || dept.includes('Administration');
-        }
-        return dept === selectedDept;
-      });
-
-  // Calculate count per department for polished pill indicators
-  const getDeptCount = (deptName: string): number => {
-    if (deptName === 'All') return activeMembers.length;
-    return activeMembers.filter(m => {
-      const d = m.department || '';
-      if (deptName === 'Executive Leadership') {
-        return d.includes('Executive') || d.includes('Management') || d.includes('Corporate Officers');
-      }
-      if (deptName === 'Technical Operations & Geosciences') {
-        return d.includes('Technical') || d.includes('Operations') || d.includes('Intelligence') || d.includes('Engineering');
-      }
-      if (deptName === 'QHSE & Commercial Governance') {
-        return d.includes('QHSE') || d.includes('Compliance') || d.includes('Commercial') || d.includes('Finance') || d.includes('Administration');
-      }
-      return d === deptName;
-    }).length;
-  };
-
   // Scroll entrance animation using IntersectionObserver
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) {
       // Mark all cards visible immediately
-      const allIds = new Set(filteredMembers.map(m => m.id));
+      const allIds = new Set(activeMembers.map(m => m.id));
       setVisibleCardIds(allIds);
       return;
     }
@@ -198,17 +155,7 @@ const Teams: React.FC = () => {
     cards.forEach((card) => observer.observe(card));
 
     return () => observer.disconnect();
-  }, [filteredMembers]);
-
-  // Handle department change with smooth fade transition
-  const handleDepartmentChange = (dept: string) => {
-    if (dept === selectedDept) return;
-    setIsFilterTransitioning(true);
-    setTimeout(() => {
-      setSelectedDept(dept);
-      setIsFilterTransitioning(false);
-    }, 180);
-  };
+  }, [activeMembers]);
 
   return (
     <div className="flex flex-col min-h-screen bg-white font-sans">
@@ -253,42 +200,7 @@ const Teams: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. Department Filters - Modern Pill Navigation */}
-      <section className="bg-slate-50 border-b border-slate-200 sticky top-16 md:top-20 z-30 shadow-xs backdrop-blur-md bg-slate-50/95">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center overflow-x-auto py-3.5 space-x-2.5 scrollbar-none no-scrollbar">
-            {departments.map((dept) => {
-              const isSelected = selectedDept === dept;
-              const count = getDeptCount(dept);
-              return (
-                <button
-                  key={dept}
-                  onClick={() => handleDepartmentChange(dept)}
-                  className={`group relative px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg whitespace-nowrap transition-all duration-200 flex items-center space-x-2 cursor-pointer ${
-                    isSelected
-                      ? 'bg-emerald-800 text-white shadow-md shadow-emerald-900/10'
-                      : 'bg-white text-slate-700 hover:text-slate-900 border border-slate-200 hover:border-slate-300 hover:bg-slate-100/70'
-                  }`}
-                  aria-pressed={isSelected}
-                >
-                  <span>{dept}</span>
-                  <span
-                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full transition-colors ${
-                      isSelected
-                        ? 'bg-emerald-950/60 text-emerald-200'
-                        : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
-                    }`}
-                  >
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Team Grid with Staggered Entrance & Refined Hover */}
+      {/* 2. Team Grid with Staggered Entrance & Refined Hover */}
       <section className="py-16 md:py-24 bg-white flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading && (
@@ -299,11 +211,9 @@ const Teams: React.FC = () => {
 
           <div
             ref={gridRef}
-            className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 lg:gap-8 transition-opacity duration-200 ${
-              isFilterTransitioning ? 'opacity-0 scale-[0.99]' : 'opacity-100 scale-100'
-            }`}
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 lg:gap-8"
           >
-            {filteredMembers.map((member, idx) => {
+            {activeMembers.map((member, idx) => {
               const isVisible = visibleCardIds.has(member.id);
               // Stagger delay calculation: each card delays gently by 60ms up to 360ms
               const staggerDelay = `${Math.min(idx * 60, 360)}ms`;
@@ -377,9 +287,9 @@ const Teams: React.FC = () => {
             })}
           </div>
 
-          {filteredMembers.length === 0 && (
+          {activeMembers.length === 0 && (
             <div className="text-center py-16 bg-slate-50 border border-slate-200 rounded-2xl">
-              <p className="text-slate-600 font-medium">No team profiles found for this discipline.</p>
+              <p className="text-slate-600 font-medium">No team profiles found.</p>
             </div>
           )}
 
