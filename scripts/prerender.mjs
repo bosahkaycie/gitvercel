@@ -246,7 +246,7 @@ const routes = [
     path: '/teams',
     title: 'Our Teams & Technical Leadership | PIGL Nigeria',
     description: 'Meet the executive leadership and specialist technical professionals driving engineering, marine, geoscience, and construction excellence at PIGL.',
-    badge: 'Multidisciplinary Engineering Talent',
+    badge: '',
     h1: 'Our Teams',
     intro: 'Multidisciplinary engineering specialists, registered surveyors, oceanographers, and operational leaders delivering verified solutions across West Africa.',
     sectionsHtml: `

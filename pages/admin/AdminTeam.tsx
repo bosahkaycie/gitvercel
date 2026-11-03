@@ -575,9 +575,6 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
 
                 {/* Bottom Overlay Info */}
                 <div className="absolute bottom-3 left-3 right-3 text-white">
-                  <p className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider truncate">
-                    {member.department || 'Executive Management'}
-                  </p>
                   <h3 className="text-base font-bold tracking-tight truncate leading-tight drop-shadow-sm">
                     {member.name}
                   </h3>

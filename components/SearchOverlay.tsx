@@ -149,7 +149,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
       if (matchesTerms(matchText)) {
         searchResults.push({
           title: member.name,
-          description: `Executive Management | ${member.role}`,
+          description: member.role,
           category: 'Team',
           link: `/about`,
           badgeColor: 'bg-blue-50 text-blue-800 border border-blue-100'
