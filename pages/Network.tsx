@@ -45,9 +45,6 @@ const Network: React.FC = () => {
           </div>
 
           <div className="max-w-3xl">
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block mb-3 font-mono">
-              Commercial, Technical &amp; Operational Relationships
-            </span>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-tight mb-6">
               Our Network
             </h1>

@@ -278,7 +278,7 @@ const routes = [
     path: '/network',
     title: 'Our Network & Technology Partnerships | PIGL',
     description: 'Discover PIGL\'s global technology alliances, authorised representations, and collaborative delivery network supporting energy and infrastructure sectors.',
-    badge: 'Technology Alliances & Representations',
+    badge: '',
     h1: 'Our Network',
     intro: 'Global technology alliances, authorised distributorships, and specialist delivery partners enabling international-standard engineering solutions in Nigeria.',
     sectionsHtml: `
