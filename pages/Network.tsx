@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { PARTNERS } from '../site_data';
 import { usePartners } from '../hooks/useSupabaseData';
 import MarineIntelImg from '../assets/marine_intel_metocean.jpg';
@@ -11,18 +11,10 @@ import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 const Network: React.FC = () => {
   const { partners: dynamicPartners, loading } = usePartners();
   const displayPartners = dynamicPartners && dynamicPartners.length > 0 ? dynamicPartners : PARTNERS;
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  const categories = [
-    'All',
-    'Strategic and Technical Relationships',
-    'Authorised Distributorships and Representations',
-    'Technology and Delivery Collaborations'
-  ];
 
   const getPartnerCategory = (partner: any): string => {
     if (partner.relationship_type) return partner.relationship_type;
@@ -31,10 +23,6 @@ const Network: React.FC = () => {
     if (partner.id === 'npk') return 'Authorised Distributorships and Representations';
     return 'Strategic and Technical Relationships';
   };
-
-  const filteredPartners = selectedCategory === 'All'
-    ? displayPartners
-    : displayPartners.filter(p => getPartnerCategory(p) === selectedCategory);
 
   const partnerImages: Record<string, string> = {
     frankstar: MarineIntelImg,
@@ -83,28 +71,7 @@ const Network: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. Relationship Category Filters */}
-      <section className="bg-slate-50 border-b border-slate-200 sticky top-16 md:top-20 z-30 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center overflow-x-auto py-4 space-x-2 scrollbar-none">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded whitespace-nowrap transition-all ${
-                  selectedCategory === cat
-                    ? 'bg-emerald-800 text-white shadow-sm'
-                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Organisations List */}
+      {/* 2. Organisations List */}
       <section className="py-16 md:py-24 bg-white flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading && (
@@ -114,7 +81,7 @@ const Network: React.FC = () => {
           )}
 
           <div className="space-y-16">
-            {filteredPartners.map((partner, idx) => {
+            {displayPartners.map((partner, idx) => {
               const categoryBadge = getPartnerCategory(partner);
               const contextImage = partnerImages[partner.id] || partner.logo_url || MarineIntelImg;
 
@@ -218,9 +185,9 @@ const Network: React.FC = () => {
             })}
           </div>
 
-          {filteredPartners.length === 0 && (
+          {displayPartners.length === 0 && (
             <div className="text-center py-16 bg-slate-50 border border-slate-200">
-              <p className="text-slate-600 font-medium">No organisations found in this category.</p>
+              <p className="text-slate-600 font-medium">No organisations found in the network directory.</p>
             </div>
           )}
 
