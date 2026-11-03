@@ -417,43 +417,27 @@ const Home: React.FC = () => {
   const canonicalServiceDivisions = [
     {
       id: 'geosolutions-engineering-services',
-      num: '01',
-      abbr: 'GES',
       title: 'GeoSolutions & Engineering Services',
-      tagline: 'Geoscience, Geotechnics, Survey & 3D Reality Capture',
-      description: 'PIGL undertakes geophysical and hydrographic surveys, geotechnical investigations, positioning, geospatial data acquisition and reality capture to support engineering design and infrastructure development.',
+      description: 'Geophysical & hydrographic surveys, geotechnical investigations, positioning and high-density 3D reality capture.',
       image: '/assets/operations/pigl_offshore_geotech_drilling_barge.jpg',
-      capabilities: ['Geohazard & Seismic Surveys', 'Hydrographic & Bathymetric Mapping', '20-Tonne CPT & Geotechnics', 'Leica RTC360 3D Reality Capture']
     },
     {
       id: 'metocean-marine-solutions',
-      num: '02',
-      abbr: 'MMS',
       title: 'Metocean & Marine Solutions',
-      tagline: 'Oceanographic Monitoring, Buoy Telemetry & Marine Forecasting',
-      description: 'We provide marine observation, oceanographic monitoring, forecasting and environmental survey services to support offshore planning, marine operations and environmental assessment.',
+      description: 'Oceanographic monitoring, metocean telemetry buoys, marine forecasting and coastal environmental surveys.',
       image: '/assets/marine_intel_metocean.jpg',
-      capabilities: ['Metocean Telemetry Buoys', 'ADCP Current & Wave Profiling', 'Offshore Marine Forecasting', 'Hydrodynamic Numerical Modeling']
     },
     {
       id: 'integrated-construction-services',
-      num: '03',
-      abbr: 'ICS',
       title: 'Integrated Construction Services',
-      tagline: 'Pipeline Right-of-Way, Civil Infrastructure & Marine Spools',
-      description: 'We undertake pipeline installation, civil infrastructure, mechanical fabrication and installation, and construction support for industrial and energy projects.',
+      description: 'Pipeline installation, swamp RoW civil works, structural spool fabrication and asset integrity testing.',
       image: '/assets/newpipeline.png',
-      capabilities: ['Pipeline Installation & Trenching', 'Swamp RoW Heavy Civil Works', 'Structural Spool Fabrication', 'NDT Integrity & Hydrotesting']
     },
     {
       id: 'industrial-solutions',
-      num: '04',
-      abbr: 'IS',
       title: 'Industrial Solutions',
-      tagline: 'Produced Water Treatment, Demulsification & Environmental Plants',
-      description: 'We provide produced-water treatment, industrial and domestic water systems, laboratory analysis and wastewater treatment services for industrial and environmental applications.',
+      description: 'Produced water treatment, demulsification skid systems, environmental laboratory testing and effluent management.',
       image: '/assets/water_treatment_skid.jpg',
-      capabilities: ['Produced-Water Skid Systems', 'Industrial Effluent Treatment', 'Demulsifier Chemical Injection', 'Certified Environmental Lab Testing']
     }
   ];
 
@@ -1069,7 +1053,7 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. Section: What We Do - Refined Snap Services Carousel */}
+      {/* 5. Section: What We Do - Image-Led Full-Bleed Photographic Division Cards */}
       <section id="our-services" className="relative py-24 md:py-32 bg-white reveal overflow-hidden">
         {/* Subtle Background Contour Lines & Depth */}
         <div className="absolute inset-0 bg-contour-lines pointer-events-none opacity-80" />
@@ -1078,7 +1062,7 @@ const Home: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           {/* Header with Carousel Navigation Controls */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 md:mb-12 gap-6">
             <div className="max-w-2xl">
               <span className="text-xs font-bold text-emerald-800 uppercase tracking-widest block mb-2 font-mono">
                 Four Specialist Operating Divisions
@@ -1091,8 +1075,8 @@ const Home: React.FC = () => {
               </p>
             </div>
 
-            {/* Carousel Navigation Controls */}
-            <div className="flex items-center space-x-3 self-start md:self-end">
+            {/* Carousel Navigation Controls (Visible on mobile where horizontal swipe is active) */}
+            <div className="flex md:hidden items-center space-x-3 self-start">
               {/* Slide Counter Pill */}
               <div className="px-3.5 py-2 bg-slate-100 border border-slate-200/80 rounded-lg text-xs font-mono font-bold text-slate-700 shadow-2xs">
                 <span className="text-emerald-800">0{activeServiceSlide + 1}</span>
@@ -1123,96 +1107,59 @@ const Home: React.FC = () => {
             </div>
           </div>
 
-          {/* Corrected Carousel Track with Snap Alignment and Zero Cut-Offs */}
+          {/* Full Photographic Cards: 4 Balanced Columns on Desktop, 2 on Tablet, Swipeable on Mobile */}
           <div
             ref={servicesCarouselRef}
             id="services-carousel-track"
             onScroll={updateCarouselScrollStatus}
-            className="flex space-x-6 overflow-x-auto pb-6 scrollbar-none no-scrollbar snap-x snap-mandatory scroll-smooth px-1 select-none"
+            className="flex md:grid md:grid-cols-2 xl:grid-cols-4 gap-6 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-none no-scrollbar snap-x snap-mandatory md:snap-none select-none"
           >
-            {canonicalServiceDivisions.map((division, idx) => (
-              <div 
-                key={division.id} 
+            {canonicalServiceDivisions.map((division) => (
+              <a
+                key={division.id}
+                href={`/services/${division.id}`}
                 data-carousel-card="true"
-                className="snap-start flex-shrink-0 w-[88vw] sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] group flex flex-col bg-white border border-slate-200/90 hover:border-emerald-600/60 hover:shadow-2xl hover:shadow-slate-200/80 rounded-2xl transition-all duration-400 overflow-hidden relative hover:-translate-y-2 h-full shadow-xs"
+                className="snap-start flex-shrink-0 w-[84vw] sm:w-[calc(50%-12px)] md:w-auto group relative aspect-[4/5] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 ease-out flex flex-col justify-between p-6 sm:p-7 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 cursor-pointer"
               >
-                {/* Visual Image with Hover Zoom and Vignette */}
-                <div className="relative aspect-[16/10] overflow-hidden bg-slate-900 rounded-t-2xl">
-                  <img
-                    src={division.image}
-                    alt={`${division.title} - Polaris Integrated & GeoSolutions`}
-                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                    loading="lazy"
-                    decoding="async"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/assets/field_operations_marine.jpg';
-                    }}
-                  />
-                  {/* Subtle Dark Vignette Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent opacity-40 group-hover:opacity-75 transition-opacity duration-300 pointer-events-none" />
+                {/* 1. Full-Bleed Background Photograph */}
+                <img
+                  src={division.image}
+                  alt={`${division.title} - Polaris Integrated & GeoSolutions`}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = '/assets/field_operations_marine.jpg';
+                  }}
+                />
 
-                  {/* Glassmorphic Division Tag Pill */}
-                  <div className="absolute top-3.5 left-3.5 bg-slate-950/85 backdrop-blur-md text-emerald-300 font-mono text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full border border-emerald-500/30 shadow-md pointer-events-none">
-                    Division {division.num}
-                  </div>
+                {/* 2. Restrained Dark Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/70 to-slate-950/30 group-hover:via-slate-950/65 transition-colors duration-500 pointer-events-none" />
 
-                  {/* Acronym Badge */}
-                  <div className="absolute top-3.5 right-3.5 bg-emerald-800/90 backdrop-blur-md text-white font-mono text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-md pointer-events-none">
-                    {division.abbr}
-                  </div>
-                </div>
+                {/* 3. Top Space: Clean, Zero Clutter */}
+                <div className="relative z-10" />
 
-                {/* Card Content with Full Visibility and Robust Spacing */}
-                <div className="p-6 sm:p-7 flex-grow flex flex-col justify-between space-y-4">
-                  <div>
-                    <span className="text-[11px] font-mono font-semibold text-emerald-800 uppercase tracking-wide block mb-1.5">
-                      {division.tagline}
-                    </span>
-                    <h3 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight group-hover:text-emerald-800 transition-colors duration-200 leading-snug">
-                      <a href={`/services/${division.id}`} className="hover:underline">
-                        {division.title}
-                      </a>
-                    </h3>
-                    <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal mt-2.5 line-clamp-3">
-                      {division.description}
-                    </p>
+                {/* 4. Bottom Composition: Prominent Title, Short Description, Minimal Link */}
+                <div className="relative z-10 flex flex-col justify-end space-y-3">
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight leading-snug group-hover:text-emerald-300 transition-colors duration-200">
+                    {division.title}
+                  </h3>
 
-                    {/* Capabilities Quick List */}
-                    <div className="mt-4 pt-3.5 border-t border-slate-100">
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 block mb-2">
-                        Core Domains
-                      </span>
-                      <ul className="space-y-1.5">
-                        {division.capabilities.slice(0, 3).map((cap, cIdx) => (
-                          <li key={cIdx} className="flex items-start text-xs font-medium text-slate-700">
-                            <span className="text-emerald-600 font-bold mr-1.5 leading-none">›</span>
-                            <span className="leading-snug">{cap}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
+                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-normal line-clamp-3">
+                    {division.description}
+                  </p>
 
-                  {/* Action Link Footer */}
-                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                    <a
-                      href={`/services/${division.id}`}
-                      className="inline-flex items-center text-emerald-800 hover:text-emerald-950 font-bold text-xs uppercase tracking-wider transition-colors group-hover:translate-x-1 duration-200"
-                    >
-                      <span>Explore Capabilities</span>
-                      <span className="ml-2 font-bold">→</span>
-                    </a>
+                  <div className="pt-2 flex items-center text-xs font-semibold uppercase tracking-wider text-emerald-400 group-hover:text-emerald-300 transition-colors duration-200">
+                    <span>Explore capabilities</span>
+                    <span className="ml-2 transform group-hover:translate-x-1.5 transition-transform duration-200 font-bold">→</span>
                   </div>
                 </div>
-
-                {/* Sleek Green Bottom Accent on Hover */}
-                <div className="h-1 w-full bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left absolute bottom-0 left-0" />
-              </div>
+              </a>
             ))}
           </div>
 
-          {/* Interactive Slide Pagination Indicator Dots */}
-          <div className="flex items-center justify-center space-x-2.5 mt-8">
+          {/* Interactive Slide Pagination Indicator Dots (Visible on mobile / tablet) */}
+          <div className="flex md:hidden items-center justify-center space-x-2.5 mt-6">
             {canonicalServiceDivisions.map((div, dIdx) => (
               <button
                 key={div.id}
