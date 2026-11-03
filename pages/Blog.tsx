@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useBlogPosts } from '../hooks/useSupabaseData';
-import NewsBg from '../assets/IMG_6614.jpg';
 import ConferenceKeynoteImg from '../assets/pigl_conference_keynote.jpg';
 import InternationalPartnerImg from '../assets/pigl_international_partner.jpg';
 import FieldTeamSwampImg from '../assets/pigl_field_team_swamp.jpg';
@@ -14,20 +13,33 @@ const Blog: React.FC = () => {
   const [subscribed, setSubscribed] = useState<boolean>(false);
   const { posts, loading } = useBlogPosts(selectedCategory === 'All' ? undefined : selectedCategory);
 
-  const categories = ['All', 'Articles', 'Technical Updates', 'News'];
+  // Dynamic distinct categories extracted from published posts
+  const categories = useMemo(() => {
+    const list = Array.from(new Set(posts.map(p => p.category).filter(Boolean)));
+    // Ensure standard engineering categories are represented if in list
+    return ['All', ...list];
+  }, [posts]);
 
-  const filteredPosts = posts.filter(post => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      post.title.toLowerCase().includes(q) ||
-      post.excerpt.toLowerCase().includes(q) ||
-      post.tags.some(t => t.toLowerCase().includes(q))
-    );
-  });
-
-  const featuredPost = filteredPosts.find(p => p.featured) || filteredPosts[0];
-  const regularPosts = filteredPosts.filter(p => p.id !== featuredPost?.id);
+  // Filtered and sorted published posts
+  const filteredPosts = useMemo(() => {
+    let result = posts.filter(post => post.status === 'published');
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        post =>
+          post.title.toLowerCase().includes(q) ||
+          (post.excerpt && post.excerpt.toLowerCase().includes(q)) ||
+          (post.category && post.category.toLowerCase().includes(q)) ||
+          (post.tags && post.tags.some(t => t.toLowerCase().includes(q)))
+      );
+    }
+    // Promoted featured article first, followed by chronologically latest
+    return [...result].sort((a, b) => {
+      if (a.featured && !b.featured) return -1;
+      if (!a.featured && b.featured) return 1;
+      return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+    });
+  }, [posts, searchQuery]);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +47,7 @@ const Blog: React.FC = () => {
     setSubscribed(true);
     setTimeout(() => {
       setEmailSubscribe('');
-    }, 3000);
+    }, 3500);
   };
 
   return (
@@ -51,7 +63,7 @@ const Blog: React.FC = () => {
             loading="eager"
             fetchPriority="high"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-950/40"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-950/40" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -63,7 +75,7 @@ const Blog: React.FC = () => {
           
           <div className="max-w-3xl">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight tracking-tight mb-5">
-              Engineering Insights & Articles
+              Engineering Insights &amp; Articles
             </h1>
             <p className="text-lg md:text-xl text-slate-300 font-normal leading-relaxed">
               Deep dives into subsurface characterisation, offshore telemetry, 3D laser capture, and asset assurance across Nigeria's energy sector.
@@ -71,14 +83,14 @@ const Blog: React.FC = () => {
           </div>
         </div>
 
-        {/* Continuous Reflective Energy Line at the base of the Hero & Breadcrumb section */}
+        {/* Continuous Reflective Energy Line at the base of the Hero section */}
         <div className="absolute bottom-0 left-0 right-0 z-20">
           <ReflectiveEnergyLine dark={true} />
         </div>
       </section>
 
       {/* 2. Filter & Search Bar */}
-      <div className="bg-white border-b border-slate-200 sticky top-[64px] lg:top-[80px] z-30 shadow-sm">
+      <div className="bg-white border-b border-slate-200 sticky top-[64px] lg:top-[80px] z-30 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           
           {/* Categories */}
@@ -87,9 +99,9 @@ const Blog: React.FC = () => {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
+                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all whitespace-nowrap cursor-pointer ${
                   selectedCategory === cat
-                    ? 'bg-emerald-800 text-white shadow-sm'
+                    ? 'bg-emerald-800 text-white shadow-xs'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
@@ -105,7 +117,7 @@ const Blog: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search articles, topics or tags..."
-              className="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-300 text-slate-900 focus:border-emerald-700 focus:bg-white focus:ring-1 focus:ring-emerald-700 outline-none transition-all"
+              className="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-300 text-slate-900 rounded-lg focus:border-emerald-700 focus:bg-white focus:ring-1 focus:ring-emerald-700 outline-none transition-all"
             />
             <svg className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -113,7 +125,8 @@ const Blog: React.FC = () => {
             {searchQuery && (
               <button 
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs font-bold cursor-pointer"
+                aria-label="Clear search query"
               >
                 ✕
               </button>
@@ -122,7 +135,7 @@ const Blog: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Main Articles Content */}
+      {/* 3. Main Articles Masonry Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         
         {loading && filteredPosts.length === 0 ? (
@@ -134,11 +147,11 @@ const Blog: React.FC = () => {
             <p className="text-xs font-bold uppercase tracking-wider text-slate-700">Loading Engineering Journal...</p>
           </div>
         ) : filteredPosts.length === 0 ? (
-          <div className="py-28 text-center bg-white border border-slate-200 p-12">
+          <div className="py-28 text-center bg-white border border-slate-200 rounded-2xl p-12">
             <p className="text-slate-600 text-base mb-4 font-medium">No publications found matching your search term.</p>
             <button
               onClick={() => { setSearchQuery(''); setSelectedCategory('All'); }}
-              className="px-6 py-2.5 bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider hover:bg-emerald-900 transition-colors"
+              className="px-6 py-2.5 bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider rounded-lg hover:bg-emerald-900 transition-colors cursor-pointer"
             >
               Reset Filters
             </button>
@@ -146,154 +159,120 @@ const Blog: React.FC = () => {
         ) : (
           <div className="space-y-16">
             
-            {/* Featured Article - Magazine Hero Layout */}
-            {featuredPost && (
-              <div className="relative bg-white border border-slate-200 overflow-hidden shadow-lg hover:border-emerald-700/60 transition-all duration-300 group">
-                <div className="grid grid-cols-1 lg:grid-cols-12">
-                  <div className="lg:col-span-7 h-72 sm:h-96 lg:h-[480px] relative overflow-hidden bg-slate-900">
-                    <img
-                      src={featuredPost.featured_image || FieldTeamSwampImg}
-                      alt={featuredPost.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = FieldTeamSwampImg;
-                      }}
-                    />
-                    <div className="absolute top-4 left-4 z-10">
-                      <span className="px-3 py-1 bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider shadow">
-                        Featured Cover Story
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="lg:col-span-5 p-8 sm:p-10 lg:p-12 flex flex-col justify-between space-y-6 bg-white">
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-3 text-xs text-slate-500 font-semibold">
-                        <span className="text-emerald-700 font-bold uppercase tracking-wider">{featuredPost.category}</span>
-                        <span>•</span>
-                        <span>{new Date(featuredPost.published_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                        <span>•</span>
-                        <span>{featuredPost.read_time || '5 min read'}</span>
-                      </div>
-
-                      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-950 leading-tight group-hover:text-emerald-800 transition-colors">
-                        <a href={`/blog/${featuredPost.slug}`}>
-                          {featuredPost.title}
-                        </a>
-                      </h2>
-
-                      <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-normal line-clamp-4">
-                        {featuredPost.excerpt}
-                      </p>
-
-                      {featuredPost.tags && featuredPost.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 pt-2">
-                          {featuredPost.tags.slice(0, 3).map((tag, idx) => (
-                            <span key={idx} className="px-2.5 py-0.5 bg-slate-100 text-slate-600 text-xs font-medium">
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="pt-6 border-t border-slate-100 flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center font-black text-emerald-900 text-sm">
-                          {featuredPost.author.charAt(0)}
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-slate-900">{featuredPost.author}</p>
-                          <p className="text-[11px] text-slate-500">Engineering Contributor</p>
-                        </div>
-                      </div>
-
-                      <a
-                        href={`/blog/${featuredPost.slug}`}
-                        className="inline-flex items-center px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs uppercase tracking-wider transition-colors group-hover:translate-x-1 duration-300"
-                      >
-                        Read Article <span className="ml-1.5">→</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Regular Posts Grid */}
-            {regularPosts.length > 0 && (
-              <div className="space-y-8">
-                <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-                  <div>
-                    <h3 className="text-2xl font-black text-slate-950 tracking-tight">
-                      Latest Articles & Technical Publications
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-1 font-medium">Showing {regularPosts.length} published intelligence insights</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {regularPosts.map((post, idx) => (
-                    <article
-                      key={post.id}
-                      className="bg-white border border-slate-200 hover:border-emerald-700/60 transition-all duration-300 flex flex-col group hover:shadow-xl"
+            {/* Masonry Article Grid: 3 columns on desktop, 2 on tablet, 1 on mobile */}
+            <div className="columns-1 md:columns-2 lg:columns-3 gap-8 [column-fill:_balance]">
+              {filteredPosts.map((post, idx) => {
+                const isFeatured = post.featured || idx === 0;
+                const fallbackImg = idx % 2 === 0 ? InternationalPartnerImg : ExhibitionConsultingImg;
+                const imgSrc = post.featured_image || (idx === 0 ? FieldTeamSwampImg : fallbackImg);
+                
+                return (
+                  <article
+                    key={post.id}
+                    className="break-inside-avoid mb-8 bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:border-slate-300 transition-all duration-300 group flex flex-col"
+                  >
+                    {/* Article Image Container */}
+                    <a
+                      href={`/blog/${post.slug}`}
+                      className="block relative overflow-hidden bg-slate-900"
                     >
-                      <div className="h-56 bg-slate-900 relative overflow-hidden">
-                        <img
-                          src={post.featured_image || (idx % 2 === 0 ? InternationalPartnerImg : ExhibitionConsultingImg)}
-                          alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          loading="lazy"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).src = idx % 2 === 0 ? InternationalPartnerImg : ExhibitionConsultingImg;
-                          }}
-                        />
-                      </div>
+                      <img
+                        src={imgSrc}
+                        alt={post.title}
+                        className={`w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 ${
+                          isFeatured
+                            ? 'aspect-[16/10] sm:aspect-[16/9]'
+                            : idx % 3 === 1
+                            ? 'aspect-[4/3]'
+                            : 'aspect-[16/10]'
+                        }`}
+                        loading={idx < 3 ? 'eager' : 'lazy'}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = FieldTeamSwampImg;
+                        }}
+                      />
+                      {/* Subtle dark gradient overlay on image */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none" />
+                    </a>
 
-                      <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                        <div className="space-y-3">
-                          <div className="flex items-center text-xs text-slate-500 space-x-2 font-medium">
-                            <span className="text-emerald-700 font-bold uppercase tracking-wider">{post.category}</span>
-                            <span>•</span>
-                            <span>{new Date(post.published_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                            <span>•</span>
-                            <span>{post.read_time || '4 min read'}</span>
-                          </div>
+                    {/* Editorial Content Container */}
+                    <div className="p-6 sm:p-7 flex flex-col justify-between flex-grow space-y-4">
+                      <div>
+                        {/* Metadata Row: Category, Date, Reading Time */}
+                        <div className="flex flex-wrap items-center text-xs text-slate-500 font-medium gap-x-2 gap-y-1 mb-3">
+                          <span className="text-emerald-800 font-bold uppercase tracking-wider text-[11px]">
+                            {post.category}
+                          </span>
+                          <span className="text-slate-300">•</span>
+                          <span>
+                            {new Date(post.published_at).toLocaleDateString('en-GB', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
+                            })}
+                          </span>
+                          {post.read_time && (
+                            <>
+                              <span className="text-slate-300">•</span>
+                              <span>{post.read_time}</span>
+                            </>
+                          )}
+                        </div>
 
-                          <h4 className="font-bold text-slate-900 text-lg leading-snug group-hover:text-emerald-800 transition-colors line-clamp-2">
-                            <a href={`/blog/${post.slug}`}>
-                              {post.title}
-                            </a>
-                          </h4>
+                        {/* Title */}
+                        <h2
+                          className={`font-bold text-slate-900 leading-snug tracking-tight group-hover:text-emerald-800 transition-colors duration-200 ${
+                            isFeatured
+                              ? 'text-xl sm:text-2xl font-extrabold'
+                              : 'text-lg sm:text-xl'
+                          }`}
+                        >
+                          <a href={`/blog/${post.slug}`} className="hover:underline">
+                            {post.title}
+                          </a>
+                        </h2>
 
-                          <p className="text-sm text-slate-600 line-clamp-3 leading-relaxed font-normal">
+                        {/* Excerpt */}
+                        {post.excerpt && (
+                          <p
+                            className={`text-slate-600 leading-relaxed font-normal mt-3 ${
+                              isFeatured
+                                ? 'text-sm sm:text-base line-clamp-4'
+                                : 'text-xs sm:text-sm line-clamp-3'
+                            }`}
+                          >
                             {post.excerpt}
                           </p>
-                        </div>
-
-                        <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                          <span className="text-xs text-slate-500 font-semibold truncate max-w-[150px]">
-                            By {post.author}
-                          </span>
-                          <a
-                            href={`/blog/${post.slug}`}
-                            className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-800 group-hover:text-emerald-950 group-hover:translate-x-1 transition-all"
-                          >
-                            Read More <span className="ml-1">→</span>
-                          </a>
-                        </div>
+                        )}
                       </div>
-                    </article>
-                  ))}
-                </div>
-              </div>
-            )}
+
+                      {/* Editorial Footer: Author & Read Link */}
+                      <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                        <span className="text-slate-600 font-semibold truncate max-w-[170px]">
+                          {post.author ? `By ${post.author}` : 'PIGL Technical Editorial'}
+                        </span>
+
+                        <a
+                          href={`/blog/${post.slug}`}
+                          className="inline-flex items-center text-emerald-800 font-bold uppercase tracking-wider text-[11px] group-hover:text-emerald-950 transition-colors"
+                        >
+                          <span>Read article</span>
+                          <span className="ml-1.5 transform group-hover:translate-x-1 transition-transform duration-200">
+                            →
+                          </span>
+                        </a>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
 
             {/* Newsletter & Technical Briefing CTA Card */}
-            <div className="bg-slate-900 text-white p-8 sm:p-12 border border-slate-800 mt-16 relative overflow-hidden">
+            <div className="bg-slate-900 text-white p-8 sm:p-12 border border-slate-800 rounded-2xl relative overflow-hidden shadow-lg">
               <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-emerald-700/10 rounded-full blur-3xl pointer-events-none" />
               <div className="max-w-3xl relative z-10 space-y-4">
-                <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block">
+                <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block font-mono">
                   Stay Informed
                 </span>
                 <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
@@ -304,7 +283,7 @@ const Blog: React.FC = () => {
                 </p>
 
                 {subscribed ? (
-                  <div className="bg-emerald-950 border border-emerald-700 p-4 text-emerald-300 text-xs font-bold">
+                  <div className="bg-emerald-950/80 border border-emerald-700 p-4 rounded-lg text-emerald-300 text-xs font-bold">
                     ✓ Thank you! You have subscribed to PIGL Technical Briefings.
                   </div>
                 ) : (
@@ -315,11 +294,11 @@ const Blog: React.FC = () => {
                       value={emailSubscribe}
                       onChange={(e) => setEmailSubscribe(e.target.value)}
                       placeholder="Enter your corporate email address..."
-                      className="flex-1 px-4 py-3 bg-slate-950 border border-slate-700 text-white text-xs focus:border-emerald-500 outline-none"
+                      className="flex-1 px-4 py-3 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs focus:border-emerald-500 outline-none transition-colors"
                     />
                     <button
                       type="submit"
-                      className="px-6 py-3 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider transition-colors"
+                      className="px-6 py-3 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors cursor-pointer"
                     >
                       Subscribe
                     </button>
