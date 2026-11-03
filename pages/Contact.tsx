@@ -443,29 +443,6 @@ const Contact: React.FC = () => {
                       />
                     </div>
                     
-                    {/* Service / Operating Division Selection */}
-                    <div className="space-y-1.5">
-                      <label 
-                        htmlFor="contact-service"
-                        className="block text-xs font-bold uppercase tracking-wider text-slate-700 font-mono"
-                      >
-                        Operating Division / Service Area
-                      </label>
-                      <select
-                        id="contact-service"
-                        name="service"
-                        value={formData.service}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl focus:border-emerald-700 focus:ring-1 focus:ring-emerald-700 outline-none transition-all text-sm text-slate-800"
-                      >
-                        <option value="Geosolutions Services">GeoSolutions & Engineering Services (GES)</option>
-                        <option value="Metocean & Marine Solutions (MMS)">Metocean & Marine Solutions (MMS)</option>
-                        <option value="Integrated Construction Services (ICS)">Integrated Construction Services (ICS)</option>
-                        <option value="Industrial Solutions (IS)">Industrial Solutions (IS)</option>
-                        <option value="General Technical Consultation / Other">General Technical Consultation / Other</option>
-                      </select>
-                    </div>
-                    
                     {/* Message Field */}
                     <div className="space-y-1.5">
                       <label 
@@ -517,10 +494,6 @@ const Contact: React.FC = () => {
                         )}
                       </button>
                     </div>
-
-                    <p className="text-xs text-slate-500 text-center pt-1 font-normal">
-                      We treat technical documentation and project details with full confidentiality.
-                    </p>
                   </form>
                 </>
               )}
