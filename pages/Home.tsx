@@ -346,13 +346,43 @@ const Home: React.FC = () => {
     };
   });
 
+  const slideIntervalMs = (settings?.hero_slide_interval ? Number(settings.hero_slide_interval) : 10) * 1000;
+
   useEffect(() => {
     if (isHeroHovered || !isHeroVisible || heroSlides.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 12000);
+    }, slideIntervalMs);
     return () => clearInterval(timer);
-  }, [heroSlides.length, isHeroHovered, isHeroVisible]);
+  }, [heroSlides.length, isHeroHovered, isHeroVisible, slideIntervalMs]);
+
+  // Mobile Touch Swipe Handling
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleHeroTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleHeroTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const diffX = touchStartX.current - e.changedTouches[0].clientX;
+    const diffY = touchStartY.current - e.changedTouches[0].clientY;
+
+    // Only trigger horizontal slide if predominantly horizontal move (prevents vertical page scroll interference)
+    if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY) * 1.5) {
+      if (diffX > 0) {
+        // Swiped left -> next slide
+        setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+      } else {
+        // Swiped right -> previous slide
+        setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+      }
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
 
   useEffect(() => {
     const observerOptions = {
@@ -457,6 +487,8 @@ const Home: React.FC = () => {
         className="relative h-[80vh] sm:h-[86vh] md:h-[calc(100vh-48px)] min-h-[540px] max-h-[960px] overflow-hidden bg-slate-950 group"
         onMouseEnter={() => setIsHeroHovered(true)}
         onMouseLeave={() => setIsHeroHovered(false)}
+        onTouchStart={handleHeroTouchStart}
+        onTouchEnd={handleHeroTouchEnd}
       >
         
         {/* Dynamic Video & Image Backgrounds with Seamless Looping and Smooth Cross-Fades */}

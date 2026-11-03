@@ -5,6 +5,7 @@ import BrianImg from '../assets/management/brian.png';
 import SteveImg from '../assets/management/steve.png';
 import ProjectsBg from '../assets/slider.jpeg';
 import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
+import TestimonialsSection from '../components/TestimonialsSection';
 
 const InteractiveProjectCard: React.FC<{
   project: any;
@@ -452,43 +453,7 @@ const Projects: React.FC = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 md:py-32 bg-slate-50 border-t border-slate-200 reveal">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">Client Endorsements</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-            <div className="bg-white p-10 md:p-12 border border-slate-200 shadow-sm relative">
-              <div className="text-5xl text-emerald-700 opacity-20 font-serif absolute top-8 left-8">“</div>
-              <p className="text-xl text-slate-700 mb-8 leading-relaxed font-light relative z-10 pt-6">
-                "Polaris is one indigenous company we are proud to partner. We are excited with their contributions to local content development."
-              </p>
-              <div className="flex items-center space-x-4 border-t border-slate-100 pt-6">
-                <div className="w-12 h-12 bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">SW</div>
-                <div>
-                  <p className="font-bold text-slate-900">Engr. Simbi Wabote</p>
-                  <p className="text-xs text-slate-500 font-medium">Former Executive Secretary, NCDMB</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white p-10 md:p-12 border border-slate-200 shadow-sm relative">
-              <div className="text-5xl text-emerald-700 opacity-20 font-serif absolute top-8 left-8">“</div>
-              <p className="text-xl text-slate-700 mb-8 leading-relaxed font-light relative z-10 pt-6">
-                "I am happy with your growth and innovations to the Energy Industry. Keep it up and maintain the quality standards."
-              </p>
-              <div className="flex items-center space-x-4 border-t border-slate-100 pt-6">
-                <div className="w-12 h-12 bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">TS</div>
-                <div>
-                  <p className="font-bold text-slate-900">Chief Timipre Sylva</p>
-                  <p className="text-xs text-slate-500 font-medium">Former Minister of State for Petroleum Resources</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <TestimonialsSection />
     </div>
   );
 };

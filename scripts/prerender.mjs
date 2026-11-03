@@ -243,6 +243,54 @@ const routes = [
     `
   },
   {
+    path: '/teams',
+    title: 'Our Teams & Technical Leadership | PIGL Nigeria',
+    description: 'Meet the executive leadership and specialist technical professionals driving engineering, marine, geoscience, and construction excellence at PIGL.',
+    badge: 'Multidisciplinary Engineering Talent',
+    h1: 'Our Teams',
+    intro: 'Multidisciplinary engineering specialists, registered surveyors, oceanographers, and operational leaders delivering verified solutions across West Africa.',
+    sectionsHtml: `
+      <section style="margin-bottom: 2.5rem;">
+        <h2 style="color: #34d399; font-size: 1.5rem; margin-bottom: 1rem;">Engineering Leadership & Operational Expertise</h2>
+        <p style="color: #cbd5e1; line-height: 1.7; font-size: 1rem; margin-bottom: 1.5rem;">
+          Our multidisciplinary teams combine technical field rigour, registered certifications (COREN, SURCON, NISP), and international best practices across all operating environments.
+        </p>
+      </section>
+    `
+  },
+  {
+    path: '/projects',
+    title: 'Executed Engineering Projects | PIGL Track Record',
+    description: 'Explore executed engineering, survey, marine observation, and infrastructure projects delivered by Polaris Integrated & GeoSolutions across Nigeria.',
+    badge: 'Track Record & Technical Delivery',
+    h1: 'Executed Engineering Projects',
+    intro: 'A proven track record of engineering, geoscience, marine, and construction operations executed across onshore, swamp, and offshore environments.',
+    sectionsHtml: `
+      <section style="margin-bottom: 2.5rem;">
+        <h2 style="color: #34d399; font-size: 1.5rem; margin-bottom: 1rem;">Project Execution Across Complex Environments</h2>
+        <p style="color: #cbd5e1; line-height: 1.7; font-size: 1rem; margin-bottom: 1.5rem;">
+          PIGL delivers verified engineering solutions for national energy infrastructure, major industrial assets, and maritime installations.
+        </p>
+      </section>
+    `
+  },
+  {
+    path: '/network',
+    title: 'Our Network & Technology Partnerships | PIGL',
+    description: 'Discover PIGL\'s global technology alliances, authorised representations, and collaborative delivery network supporting energy and infrastructure sectors.',
+    badge: 'Technology Alliances & Representations',
+    h1: 'Our Network',
+    intro: 'Global technology alliances, authorised distributorships, and specialist delivery partners enabling international-standard engineering solutions in Nigeria.',
+    sectionsHtml: `
+      <section style="margin-bottom: 2.5rem;">
+        <h2 style="color: #34d399; font-size: 1.5rem; margin-bottom: 1rem;">Global Partnerships & Distributorships</h2>
+        <p style="color: #cbd5e1; line-height: 1.7; font-size: 1rem; margin-bottom: 1.5rem;">
+          PIGL collaborates with world-class technology OEMs and specialised engineering providers including Frankstar Technology, CoaleXpert, and NPK Automation.
+        </p>
+      </section>
+    `
+  },
+  {
     path: '/contact',
     title: 'Contact PIGL | Engineering Offices in Port Harcourt & Lagos',
     description: 'Contact Polaris Integrated & GeoSolutions Limited for project consultations, technical scoping, and field mobilisation across Nigeria.',

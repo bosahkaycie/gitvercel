@@ -138,9 +138,10 @@ const Footer: React.FC = () => {
                   id: 'fcol-governance',
                   title: 'Company & Governance',
                   links: [
-                    { id: '7', label: 'About Us', href: '/about', is_active: true },
-                    { id: '9', label: 'Strategic Partnerships', href: '/partners', is_active: true },
-                    { id: '10', label: 'Corporate Video Hub', href: '/videos', is_active: true },
+                    { id: '7', label: 'About PIGL', href: '/about', is_active: true },
+                    { id: '8', label: 'Teams', href: '/teams', is_active: true },
+                    { id: '9', label: 'Executed Projects', href: '/projects', is_active: true },
+                    { id: '10', label: 'Our Network', href: '/network', is_active: true },
                     { id: '11', label: 'Technical Blog', href: '/blog', is_active: true },
                     { id: '12', label: 'HSSE & Quality Policy', href: '/hsse', is_active: true },
                     { id: '13', label: 'Careers at PIGL', href: '/careers', is_active: true },

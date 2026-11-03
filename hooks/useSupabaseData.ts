@@ -25,7 +25,8 @@ import {
   FooterLinkItem,
   SitePageInfo,
   NavigationConfig,
-  CMSVideoItem
+  CMSVideoItem,
+  CMSTestimonial
 } from '../types';
 import CptThumbImg from '../assets/cpt.png';
 import DigitalThumbImg from '../assets/digital_intel_scanner.jpg';
@@ -336,6 +337,7 @@ const LOCAL_STORAGE_KEY_APPLICATIONS = 'pigl_cms_job_applications_v1';
 const LOCAL_STORAGE_KEY_SETTINGS = 'pigl_cms_site_settings_v1';
 const LOCAL_STORAGE_KEY_TEAM = 'pigl_cms_team_members_v1';
 const LOCAL_STORAGE_KEY_NAVIGATION = 'pigl_cms_navigation_config_v1';
+const LOCAL_STORAGE_KEY_TESTIMONIALS = 'pigl_cms_testimonials_v1';
 
 const FALLBACK_PROJECTS: CMSProject[] = PROJECTS.map((p, idx) => ({
   id: p.id,
@@ -361,12 +363,20 @@ const FALLBACK_PROJECTS: CMSProject[] = PROJECTS.map((p, idx) => ({
   updated_at: new Date().toISOString()
 }));
 
+const getPartnerRelationshipType = (id: string): string => {
+  if (id === 'frankstar') return 'Technology and Delivery Collaborations';
+  if (id === 'coalexpert') return 'Strategic and Technical Relationships';
+  if (id === 'npk') return 'Authorised Distributorships and Representations';
+  return 'Strategic and Technical Relationships';
+};
+
 const FALLBACK_PARTNERS: CMSPartner[] = PARTNERS.map((pt, idx) => ({
   id: pt.id,
   slug: pt.id,
   name: pt.name,
   role: pt.role,
   specialty: pt.specialty,
+  relationship_type: getPartnerRelationshipType(pt.id),
   description: pt.description,
   capabilities: pt.capabilities || [],
   website: pt.website || '',
@@ -517,6 +527,7 @@ const FALLBACK_SETTINGS: SiteSettings = {
   stat_safe_hours: '500k+',
   stat_completed_projects: '120+',
   stat_client_satisfaction: '99.4%',
+  hero_slide_interval: 10,
   maintenance_mode: false,
   maintenance_title: 'Website Undergoing Scheduled Systems Update',
   maintenance_message: 'Our corporate digital portal is currently undergoing scheduled engineering maintenance and infrastructure updates. All field operations, offshore surveying, and client project execution continue at full capacity.',
@@ -2608,6 +2619,186 @@ export const useTeamMembers = (adminMode = false) => {
 };
 
 // ==============================================================================
+// 9.5 TESTIMONIALS & CLIENT ENDORSEMENTS HOOK
+// ==============================================================================
+export const FALLBACK_TESTIMONIALS: CMSTestimonial[] = [
+  {
+    id: 'test-1',
+    author_name: 'Engr. Simbi Wabote',
+    author_title: 'Former Executive Secretary',
+    author_company: 'NCDMB (Nigerian Content Development & Monitoring Board)',
+    author_initials: 'SW',
+    quote: 'Polaris is one indigenous company we are proud to partner. We are excited with their contributions to local content development.',
+    is_placeholder: false,
+    status: 'published',
+    display_order: 1,
+    created_at: '2026-01-10T00:00:00Z',
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'test-2',
+    author_name: 'Chief Timipre Sylva',
+    author_title: 'Former Minister of State for Petroleum Resources',
+    author_company: 'Federal Ministry of Petroleum Resources, Nigeria',
+    author_initials: 'TS',
+    quote: 'I am happy with your growth and innovations to the Energy Industry. Keep it up and maintain the quality standards.',
+    is_placeholder: false,
+    status: 'published',
+    display_order: 2,
+    created_at: '2026-01-12T00:00:00Z',
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'test-3',
+    author_name: 'Project Director (Sample Placeholder)',
+    author_title: 'Subsea & Offshore Operations Lead',
+    author_company: 'Deepwater Field Operator',
+    author_initials: 'PD',
+    quote: 'PIGL demonstrated high technical rigour during marine positioning and seabed investigation campaigns, maintaining strict adherence to safety protocols and offshore schedule milestones.',
+    is_placeholder: true,
+    status: 'published',
+    display_order: 3,
+    created_at: '2026-02-01T00:00:00Z',
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'test-4',
+    author_name: 'Infrastructure Lead (Sample Placeholder)',
+    author_title: 'Pipeline Asset Delivery Manager',
+    author_company: 'Energy Infrastructure Group',
+    author_initials: 'IL',
+    quote: 'The 3D laser scanning point clouds and geotechnical ground truth provided the clarity needed to de-risk piping prefabrication and brownfield tie-in operations.',
+    is_placeholder: true,
+    status: 'published',
+    display_order: 4,
+    created_at: '2026-02-05T00:00:00Z',
+    updated_at: new Date().toISOString()
+  }
+];
+
+export const getStoredTestimonials = (): CMSTestimonial[] => {
+  try {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY_TESTIMONIALS);
+    if (saved) return JSON.parse(saved);
+  } catch (e) {
+    console.warn('Failed to load local testimonials', e);
+  }
+  return FALLBACK_TESTIMONIALS;
+};
+
+export const saveStoredTestimonials = (items: CMSTestimonial[]) => {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY_TESTIMONIALS, JSON.stringify(items));
+  } catch (e) {
+    console.warn('Failed to save local testimonials', e);
+  }
+};
+
+export const useTestimonials = (adminMode = false) => {
+  const [testimonials, setTestimonials] = useState<CMSTestimonial[]>(() => {
+    const local = getStoredTestimonials();
+    return adminMode ? local : local.filter(t => t.status === 'published');
+  });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchTestimonials = useCallback(async () => {
+    if (testimonials.length === 0) setLoading(true);
+    setError(null);
+    const client = getSupabaseClient();
+
+    if (!client) {
+      const local = getStoredTestimonials();
+      const filtered = adminMode ? local : local.filter(t => t.status === 'published');
+      setTestimonials(filtered.sort((a, b) => a.display_order - b.display_order));
+      setLoading(false);
+      return;
+    }
+
+    try {
+      let query = client.from('testimonials').select('*').order('display_order', { ascending: true });
+      if (!adminMode) {
+        query = query.eq('status', 'published');
+      }
+
+      const { data, error: sbError } = await query;
+      if (sbError) throw sbError;
+
+      if (data && data.length > 0) {
+        setTestimonials(data as CMSTestimonial[]);
+      } else {
+        const local = getStoredTestimonials();
+        setTestimonials(adminMode ? local : local.filter(t => t.status === 'published'));
+      }
+    } catch (err: any) {
+      const local = getStoredTestimonials();
+      setTestimonials(adminMode ? local : local.filter(t => t.status === 'published'));
+    } finally {
+      setLoading(false);
+    }
+  }, [adminMode, testimonials.length]);
+
+  useEffect(() => {
+    fetchTestimonials();
+  }, [fetchTestimonials]);
+
+  const saveTestimonial = async (testimonial: Partial<CMSTestimonial> & { quote: string; author_name: string }) => {
+    const isNew = !testimonial.id;
+    const payload: CMSTestimonial = {
+      id: testimonial.id || `test-${Date.now()}`,
+      quote: testimonial.quote,
+      author_name: testimonial.author_name,
+      author_title: testimonial.author_title || '',
+      author_company: testimonial.author_company || '',
+      author_initials: testimonial.author_initials || testimonial.author_name.slice(0, 2).toUpperCase(),
+      is_placeholder: testimonial.is_placeholder ?? false,
+      status: testimonial.status || 'published',
+      display_order: testimonial.display_order ?? (testimonials.length + 1),
+      created_at: testimonial.created_at || new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    const client = getSupabaseClient();
+    if (client) {
+      try {
+        if (isNew) {
+          await client.from('testimonials').insert([payload]);
+        } else {
+          await client.from('testimonials').update(payload).eq('id', payload.id);
+        }
+      } catch (err) {
+        console.warn('Supabase save testimonial error, falling back to local storage:', err);
+      }
+    }
+
+    const current = getStoredTestimonials();
+    const updated = isNew
+      ? [...current, payload]
+      : current.map(t => (t.id === payload.id ? payload : t));
+    updated.sort((a, b) => a.display_order - b.display_order);
+    saveStoredTestimonials(updated);
+    await fetchTestimonials();
+    return payload;
+  };
+
+  const deleteTestimonial = async (id: string) => {
+    const client = getSupabaseClient();
+    if (client) {
+      try {
+        await client.from('testimonials').delete().eq('id', id);
+      } catch (err) {
+        console.warn('Supabase delete testimonial error:', err);
+      }
+    }
+    const filtered = getStoredTestimonials().filter(t => t.id !== id);
+    saveStoredTestimonials(filtered);
+    await fetchTestimonials();
+  };
+
+  return { testimonials, loading, error, reload: fetchTestimonials, saveTestimonial, deleteTestimonial };
+};
+
+// ==============================================================================
 // 10. CAREERS & JOB OPENINGS HOOK
 // ==============================================================================
 export const getStoredJobs = (): JobOpening[] => {
@@ -4396,33 +4587,16 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
           id: 'sec-company',
           title: 'Company',
           links: [
-            { id: 'sub-overview', label: 'Company Overview', href: '/about?section=heritage', description: 'Our history, expertise and operational footprint' },
-            { id: 'sub-philosophy', label: 'Our Philosophy', href: '/about?section=vision', description: 'Our vision, mission and strategic objectives' },
-            { id: 'sub-values', label: 'Core Values', href: '/about?section=values', description: 'Professionalism, innovation, integrity and safety' },
-            { id: 'sub-management', label: 'Management Team', href: '/about?section=management', description: 'Experienced leaders driving project excellence' }
+            { id: 'sub-about', label: 'About PIGL', href: '/about', description: 'Indigenous engineering capability & track record' },
+            { id: 'sub-teams', label: 'Teams', href: '/teams', description: 'Executive leadership and specialist engineering disciplines' }
           ]
         },
         {
-          id: 'sec-quality',
-          title: 'Quality & Standards',
+          id: 'sec-network',
+          title: 'Standards & Network',
           links: [
-            { id: 'sub-certs', label: 'Certifications (ISO 9001 & 45001)', href: '/about', description: 'ISO 9001:2015, ISO 45001:2018 and regulatory permits' },
-            { id: 'sub-safety', label: 'Safety Performance (500k+ Safe Hours)', href: '/about', description: 'Track record of 500k+ safe man-hours & zero LTI' }
-          ]
-        },
-        {
-          id: 'sec-media',
-          title: 'Media & Videos',
-          links: [
-            { id: 'sub-video-hub', label: 'Corporate Video Hub & Documentary', href: '/videos', description: 'Watch our 4K official company overview and field demos' }
-          ]
-        },
-        {
-          id: 'sec-vendors',
-          title: 'Procurement & Vendors',
-          links: [
-            { id: 'sub-onboarding', label: 'Vendor Onboarding Desk', href: '/vendors', description: 'Form PIGL/F/VOTC/AHR/037 registration & compliance' },
-            { id: 'sub-tracker', label: 'Vendor Status Tracker', href: '/vendors/portal', description: 'Check onboarding progress & print official dossiers' }
+            { id: 'sub-qhse', label: 'QHSE Policy & Standards', href: '/hsse', description: 'ISO 9001:2015 & ISO 45001:2018 certified safety management' },
+            { id: 'sub-network', label: 'Our Network', href: '/network', description: 'Strategic alliances, representations & technology collaborations' }
           ]
         }
       ]
@@ -4441,13 +4615,13 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
       name: 'Projects',
       href: '/projects',
       type: 'standard',
-      is_active: false,
+      is_active: true,
       order: 4
     },
     {
-      id: 'nav-partners',
-      name: 'Partners',
-      href: '/partners',
+      id: 'nav-network',
+      name: 'Our Network',
+      href: '/network',
       type: 'standard',
       is_active: true,
       order: 5
@@ -4461,20 +4635,12 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
       order: 6
     },
     {
-      id: 'nav-careers',
-      name: 'Careers',
-      href: '/careers',
-      type: 'standard',
-      is_active: true,
-      order: 7
-    },
-    {
       id: 'nav-contact',
-      name: 'Contact Us',
+      name: 'Contact',
       href: '/contact',
       type: 'standard',
       is_active: true,
-      order: 8
+      order: 7
     }
   ],
   footer: {
@@ -4498,13 +4664,14 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
         order: 2,
         is_active: true,
         links: [
-          { id: 'flink-about', label: 'About Us', href: '/about', is_active: true, order: 1 },
-          { id: 'flink-partners', label: 'Strategic Partnerships', href: '/partners', is_active: true, order: 3 },
-          { id: 'flink-videos', label: 'Corporate Video Hub', href: '/videos', is_active: true, order: 4 },
-          { id: 'flink-blog', label: 'Technical Blog', href: '/blog', is_active: true, order: 5 },
-          { id: 'flink-hsse', label: 'HSSE & Quality Policy', href: '/hsse', is_active: true, order: 6 },
+          { id: 'flink-about', label: 'About PIGL', href: '/about', is_active: true, order: 1 },
+          { id: 'flink-teams', label: 'Teams', href: '/teams', is_active: true, order: 2 },
+          { id: 'flink-projects', label: 'Executed Projects', href: '/projects', is_active: true, order: 3 },
+          { id: 'flink-network', label: 'Our Network', href: '/network', is_active: true, order: 4 },
+          { id: 'flink-qhse', label: 'QHSE Standards', href: '/hsse', is_active: true, order: 5 },
+          { id: 'flink-blog', label: 'Technical Blog', href: '/blog', is_active: true, order: 6 },
           { id: 'flink-careers', label: 'Careers at PIGL', href: '/careers', is_active: true, order: 7 },
-          { id: 'flink-vendors', label: 'Vendor Onboarding & Compliance', href: '/vendors', is_active: true, order: 8 }
+          { id: 'flink-vendors', label: 'Vendor Onboarding', href: '/vendors', is_active: true, order: 8 }
         ]
       }
     ],
@@ -4539,6 +4706,17 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
       show_in_footer: true
     },
     {
+      id: 'pg-teams',
+      title: 'Leadership & Engineering Teams',
+      slug: '/teams',
+      description: 'Executive management and specialist engineering leaders across PIGL operating divisions.',
+      meta_title: 'Leadership & Engineering Teams | PIGL Nigeria',
+      meta_description: 'Meet the executive leadership and multidisciplinary engineering teams guiding PIGL operations across West Africa.',
+      is_published: true,
+      show_in_header: false,
+      show_in_footer: true
+    },
+    {
       id: 'pg-services',
       title: 'Specialist Services',
       slug: '/services',
@@ -4556,20 +4734,31 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
       description: 'Filterable portfolio of delivered engineering projects with scopes and metrics.',
       meta_title: 'Executed Projects & Case Studies | PIGL',
       meta_description: 'Case studies of mission-critical engineering deliveries for Chevron, TotalEnergies, Aradel, and major African energy operators.',
-      is_published: false,
-      show_in_header: false,
-      show_in_footer: false
-    },
-    {
-      id: 'pg-partners',
-      title: 'Strategic Partnerships',
-      slug: '/partners',
-      description: 'Technology partner alliances including Leica Geosystems, Sonardyne, and technical OEMs.',
-      meta_title: 'Technology Partners & OEM Alliances | PIGL',
-      meta_description: 'Authorized Leica Geosystems partners and international technical alliances providing state-of-the-art sensor hardware.',
       is_published: true,
       show_in_header: true,
       show_in_footer: true
+    },
+    {
+      id: 'pg-network',
+      title: 'Our Network',
+      slug: '/network',
+      description: 'Strategic alliances, authorized distributorships, and international technology partnerships.',
+      meta_title: 'Our Professional Network & Technology Alliances | PIGL',
+      meta_description: 'Discover PIGL professional network including strategic engineering alliances, OEM representations, and global technology partnerships.',
+      is_published: true,
+      show_in_header: true,
+      show_in_footer: true
+    },
+    {
+      id: 'pg-partners',
+      title: 'Strategic Partnerships (Alias)',
+      slug: '/partners',
+      description: 'Legacy route redirecting to Our Network.',
+      meta_title: 'Technology Partners & OEM Alliances | PIGL',
+      meta_description: 'Authorized Leica Geosystems partners and international technical alliances providing state-of-the-art sensor hardware.',
+      is_published: false,
+      show_in_header: false,
+      show_in_footer: false
     },
     {
       id: 'pg-careers',

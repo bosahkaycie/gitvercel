@@ -57,6 +57,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
   const [statSafeHours, setStatSafeHours] = useState(settings.stat_safe_hours || '500k+');
   const [statProjects, setStatProjects] = useState(settings.stat_completed_projects || '120+');
   const [statSatisfaction, setStatSatisfaction] = useState(settings.stat_client_satisfaction || '99.4%');
+  const [heroSlideInterval, setHeroSlideInterval] = useState<number>(settings.hero_slide_interval || 10);
 
   // Maintenance / Update Mode State
   const [maintenanceMode, setMaintenanceMode] = useState<boolean>(settings.maintenance_mode || false);
@@ -89,6 +90,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
       if (settings.stat_safe_hours) setStatSafeHours(settings.stat_safe_hours);
       if (settings.stat_completed_projects) setStatProjects(settings.stat_completed_projects);
       if (settings.stat_client_satisfaction) setStatSatisfaction(settings.stat_client_satisfaction);
+      if (settings.hero_slide_interval) setHeroSlideInterval(Number(settings.hero_slide_interval));
       if (settings.maintenance_mode !== undefined) setMaintenanceMode(settings.maintenance_mode);
       if (settings.maintenance_title) setMaintenanceTitle(settings.maintenance_title);
       if (settings.maintenance_message) setMaintenanceMessage(settings.maintenance_message);
@@ -156,7 +158,8 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
         stat_years_experience: statYears,
         stat_safe_hours: statSafeHours,
         stat_completed_projects: statProjects,
-        stat_client_satisfaction: statSatisfaction
+        stat_client_satisfaction: statSatisfaction,
+        hero_slide_interval: Number(heroSlideInterval) || 10
       });
       setProfileSuccessNotice('Corporate profile, contact details & metrics saved and published across the website!');
       setTimeout(() => setProfileSuccessNotice(null), 4000);
@@ -831,6 +834,24 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
                     isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                   }`}
                 />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                  Hero Slide Interval (Seconds)
+                </label>
+                <input
+                  type="number"
+                  min="3"
+                  max="30"
+                  value={heroSlideInterval}
+                  onChange={(e) => setHeroSlideInterval(Number(e.target.value))}
+                  placeholder="10"
+                  className={`w-full px-3.5 py-2.5 rounded-xl border font-mono font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/40 ${
+                    isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                  }`}
+                />
+                <p className="text-[10px] text-slate-500 mt-1">Default: 10s auto-transition between hero slides.</p>
               </div>
             </div>
           </div>

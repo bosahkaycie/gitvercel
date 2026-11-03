@@ -33,6 +33,8 @@ const About = lazyWithRetry(() => import('./pages/About'));
 const Services = lazyWithRetry(() => import('./pages/Services'));
 const ServiceDetail = lazyWithRetry(() => import('./pages/ServiceDetail'));
 const Projects = lazyWithRetry(() => import('./pages/Projects'));
+const Teams = lazyWithRetry(() => import('./pages/Teams'));
+const Network = lazyWithRetry(() => import('./pages/Network'));
 const Contact = lazyWithRetry(() => import('./pages/Contact'));
 const Careers = lazyWithRetry(() => import('./pages/Careers'));
 const News = lazyWithRetry(() => import('./pages/News'));
@@ -150,10 +152,9 @@ const App: React.FC = () => {
   useEffect(() => {
     const handleLocationChange = () => {
       let path = normalizePath(window.location.pathname);
-      // Check for legacy project URLs and redirect cleanly to /services
-      if (path === '/projects' || path.startsWith('/projects/') || path.startsWith('/projects?')) {
-        window.history.replaceState({}, '', '/services');
-        path = '/services';
+      if (path === '/our-network') {
+        window.history.replaceState({}, '', '/network');
+        path = '/network';
       } else if (path.startsWith('/services/')) {
         const legacyId = path.split('/services/')[1];
         if (LEGACY_SERVICE_MAP[legacyId]) {
@@ -219,9 +220,9 @@ const App: React.FC = () => {
     const checkHashRedirect = () => {
       if (window.location.hash) {
         let hashPath = window.location.hash.slice(1); // remove '#'
-        
-        if (hashPath === '/projects' || hashPath.startsWith('/projects/') || hashPath.startsWith('/projects?')) {
-          window.history.replaceState({}, '', '/services');
+
+        if (hashPath === '/our-network') {
+          window.history.replaceState({}, '', '/network');
           window.dispatchEvent(new Event('pushstate-changed'));
           return;
         }
@@ -266,7 +267,11 @@ const App: React.FC = () => {
       '/': 'Polaris Integrated & GeoSolutions Limited provides geoscience and survey services, marine observation, infrastructure construction and industrial water treatment for energy, infrastructure and industrial clients in Nigeria.',
       '/about': 'Polaris Integrated & GeoSolutions Limited (PIGL) is a Nigerian engineering and technical solutions company serving the energy, infrastructure and industrial sectors.',
       '/services': 'Explore PIGL\'s four operating divisions: GeoSolutions & Engineering Services (GES), Metocean & Marine Solutions (MMS), Integrated Construction Services (ICS), and Industrial Solutions (IS).',
-      '/partners': 'PIGL Strategic Alliances & Global Technology Partnerships with Frankstar Technology, CoaleXpert, and NPK Flanges & Industrial Piping.',
+      '/projects': 'Review completed engineering, reality capture, geotechnical survey, and pipeline construction projects delivered for energy and infrastructure clients across Nigeria.',
+      '/teams': 'Meet the executive leadership and multidisciplinary engineering teams guiding PIGL operations across West Africa.',
+      '/network': 'PIGL Strategic Alliances, Authorised Representations & Global Technology Partnerships with Frankstar Technology, CoaleXpert, and NPK Automation.',
+      '/our-network': 'PIGL Strategic Alliances, Authorised Representations & Global Technology Partnerships with Frankstar Technology, CoaleXpert, and NPK Automation.',
+      '/partners': 'PIGL Strategic Alliances & Global Technology Partnerships with Frankstar Technology, CoaleXpert, and NPK Automation.',
       '/careers': 'Join the PIGL engineering team in Port Harcourt and across Nigeria. Grow your career with an indigenous leader in geosolutions and energy infrastructure.',
       '/news': 'Latest updates, technical milestones, and industry perspectives from Polaris Integrated and GeoSolutions Limited.',
       '/blog': 'Technical updates, project milestones, and engineering insights from Polaris Integrated and GeoSolutions Limited.',
@@ -286,6 +291,10 @@ const App: React.FC = () => {
       '/': 'Polaris Integrated & GeoSolutions (PIGL) | Geoscience, Marine, Construction & Industrial Solutions',
       '/about': 'About PIGL | ISO Certified Engineering Contractor',
       '/services': 'Specialist Engineering Divisions | PIGL Nigeria',
+      '/projects': 'Executed Engineering Projects & Case Studies | PIGL',
+      '/teams': 'Leadership & Engineering Teams | PIGL Nigeria',
+      '/network': 'Our Professional Network & Technology Alliances | PIGL',
+      '/our-network': 'Our Professional Network & Technology Alliances | PIGL',
       '/partners': 'Technology Partners & Engineering Alliances | PIGL',
       '/careers': 'Careers at PIGL | Engineering Opportunities in Nigeria',
       '/news': 'News & Technical Insights | PIGL Nigeria',
@@ -399,11 +408,34 @@ const App: React.FC = () => {
           "name": s.title
         }))
       };
-    } else if (currentPath === '/partners') {
+    } else if (currentPath === '/projects') {
+      schemaData = {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": "PIGL Engineering Project Showcase",
+        "itemListElement": PROJECTS.map((p, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "url": `https://polarisigl.com/projects?id=${p.id}`,
+          "name": p.title
+        }))
+      };
+    } else if (currentPath === '/network' || currentPath === '/our-network' || currentPath === '/partners') {
       schemaData = {
         "@context": "https://schema.org",
         "@type": "AboutPage",
-        "name": "PIGL Strategic Partners & Technology Alliances",
+        "name": "PIGL Professional Network & Technology Alliances",
+        "publisher": {
+          "@type": "Organization",
+          "name": "Polaris Integrated and GeoSolutions Limited (PIGL)",
+          "url": "https://polarisigl.com/"
+        }
+      };
+    } else if (currentPath === '/teams') {
+      schemaData = {
+        "@context": "https://schema.org",
+        "@type": "AboutPage",
+        "name": "PIGL Leadership & Engineering Teams",
         "publisher": {
           "@type": "Organization",
           "name": "Polaris Integrated and GeoSolutions Limited (PIGL)",
@@ -462,10 +494,6 @@ const App: React.FC = () => {
   }
 
   const renderPage = () => {
-    if (currentPath === '/projects' || currentPath.startsWith('/projects/')) {
-      window.history.replaceState({}, '', '/services');
-      return <Services />;
-    }
     if (currentPath.startsWith('/services/')) {
       const serviceId = currentPath.split('/services/')[1];
       if (serviceId) {
@@ -481,13 +509,16 @@ const App: React.FC = () => {
         return <Home />;
       case '/about':
         return <About />;
+      case '/teams':
+        return <Teams />;
       case '/services':
         return <Services />;
+      case '/network':
+      case '/our-network':
       case '/partners':
-        return <Partners />;
+        return <Network />;
       case '/projects':
-        window.history.replaceState({}, '', '/services');
-        return <Services />;
+        return <Projects />;
       case '/careers':
         return <Careers />;
       case '/news':

@@ -171,6 +171,7 @@ export interface Partner {
   name: string;
   role: string;
   specialty: string;
+  relationship_type?: 'Strategic and Technical Relationships' | 'Authorised Distributorships and Representations' | 'Technology and Delivery Collaborations' | string;
   description: string;
   capabilities: string[];
   website?: string;
@@ -185,6 +186,7 @@ export interface CMSPartner {
   name: string;
   role: string;
   specialty: string;
+  relationship_type?: 'Strategic and Technical Relationships' | 'Authorised Distributorships and Representations' | 'Technology and Delivery Collaborations' | string;
   description: string;
   capabilities: string[];
   website?: string;
@@ -287,11 +289,26 @@ export interface SiteSettings {
   stat_safe_hours?: string;
   stat_completed_projects?: string;
   stat_client_satisfaction?: string;
+  hero_slide_interval?: number;
   maintenance_mode?: boolean;
   maintenance_title?: string;
   maintenance_message?: string;
   maintenance_estimated_time?: string;
   maintenance_video_url?: string;
+  updated_at?: string;
+}
+
+export interface CMSTestimonial {
+  id: string;
+  quote: string;
+  author_name: string;
+  author_title: string;
+  author_company?: string;
+  author_initials?: string;
+  is_placeholder: boolean;
+  status: 'published' | 'draft';
+  display_order: number;
+  created_at?: string;
   updated_at?: string;
 }
 

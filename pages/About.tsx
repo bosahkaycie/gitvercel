@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { TEAM } from '../site_data';
-import { useTeamMembers } from '../hooks/useSupabaseData';
+import { useTeamMembers, useSiteSettings } from '../hooks/useSupabaseData';
 import AboutBg from '../assets/teaching.jpeg';
 import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
 import InfraSketchImg from '../assets/infrastructure_sketch.jpg';
@@ -13,6 +13,7 @@ import OpMarineCrewImg from '../assets/operations/pigl_marine_crew_vessel.jpg';
 
 const About: React.FC = () => {
   const { teamMembers } = useTeamMembers();
+  const { settings } = useSiteSettings();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -132,16 +133,26 @@ const About: React.FC = () => {
               </div>
 
               {/* Verified Credentials Summary */}
-              <div className="pt-6 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <p className="text-2xl font-black text-slate-900 leading-none">ISO</p>
-                  <p className="text-xs font-bold text-slate-800 uppercase tracking-wider mt-1.5">9001:2015 & 45001:2018</p>
-                  <p className="text-xs text-slate-500 mt-1 leading-snug">Certified Quality & Occupational Health and Safety Management Systems.</p>
+              <div className="pt-6 border-t border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="bg-slate-50 p-3.5 border border-slate-200">
+                  <p className="text-xl font-black text-slate-900 leading-none">{settings?.stat_safe_hours || '500k+'}</p>
+                  <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mt-1.5">Safe Man-Hours</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">Zero Lost Time Injuries (LTI) across active sites.</p>
                 </div>
-                <div>
-                  <p className="text-2xl font-black text-slate-900 leading-none">100%</p>
-                  <p className="text-xs font-bold text-slate-800 uppercase tracking-wider mt-1.5">Nigerian-Owned Company</p>
-                  <p className="text-xs text-slate-500 mt-1 leading-snug">Indigenous engineering firm registered and compliant under the NOGICD Act.</p>
+                <div className="bg-slate-50 p-3.5 border border-slate-200">
+                  <p className="text-xl font-black text-slate-900 leading-none">{settings?.stat_years_experience || '20+'}</p>
+                  <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mt-1.5">Years Experience</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">Subsurface, marine, and construction delivery.</p>
+                </div>
+                <div className="bg-slate-50 p-3.5 border border-slate-200">
+                  <p className="text-xl font-black text-slate-900 leading-none">ISO</p>
+                  <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mt-1.5">9001 & 45001</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">Audited Quality & Occupational Health & Safety.</p>
+                </div>
+                <div className="bg-slate-50 p-3.5 border border-slate-200">
+                  <p className="text-xl font-black text-slate-900 leading-none">100%</p>
+                  <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mt-1.5">Quality Control</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">Calibrated instrumentation & certified QA/QC.</p>
                 </div>
               </div>
 
@@ -430,48 +441,41 @@ const About: React.FC = () => {
             </div>
           </div>
 
-          {/* Technical Leadership */}
-          <div className="mb-14">
-            <h3 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-2">
-              Technical Leadership & Management
-            </h3>
-            <p className="text-slate-600 text-sm md:text-base font-normal mb-8">
-              Guided by experienced engineering executives and operational leaders with decades of field execution experience across West Africa.
-            </p>
+          {/* Technical Leadership & Teams Overview */}
+          <div className="mb-14 p-8 sm:p-10 bg-slate-50 border border-slate-200">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-6">
+              <div className="max-w-2xl">
+                <span className="text-xs font-bold text-emerald-800 uppercase tracking-widest block mb-2">Multidisciplinary Engineering Talent</span>
+                <h3 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+                  Technical Leadership & Management
+                </h3>
+                <p className="text-slate-600 text-sm md:text-base font-normal mt-2 leading-relaxed">
+                  PIGL operations are guided by experienced corporate executives, registered geodetic surveyors, geotechnical engineers, oceanographers, and environmental specialists with extensive operating experience across West Africa.
+                </p>
+              </div>
+              <a
+                href="/teams"
+                className="inline-flex items-center px-6 py-3.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm shrink-0"
+              >
+                <span>View Full Team Directory</span>
+                <span className="ml-2">→</span>
+              </a>
+            </div>
 
-            {(() => {
-              const activeTeam = (teamMembers && teamMembers.length > 0)
-                ? teamMembers.filter(m => m.status === 'active')
-                : TEAM;
-
-              return (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {activeTeam.map((member, idx) => (
-                    <div key={(member as any).id || idx} className="bg-white p-5 border border-slate-200 shadow-2xs flex flex-col justify-between">
-                      <div>
-                        <div className="relative w-full aspect-[4/5] mb-4 bg-slate-200 overflow-hidden">
-                          <img
-                            src={member.image}
-                            alt={member.name}
-                            className="w-full h-full object-cover object-top"
-                            loading="lazy"
-                            decoding="async"
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).src = '/assets/management/steve.png';
-                            }}
-                          />
-                        </div>
-                        <h4 className="text-base font-bold text-slate-900">{member.name}</h4>
-                        <p className="text-xs font-bold text-emerald-700 mt-0.5">{member.role}</p>
-                      </div>
-                      {(member as any).department && (member as any).department !== 'Executive Management' && (
-                        <p className="text-[11px] text-slate-500 mt-2 pt-2 border-t border-slate-100">{(member as any).department}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              );
-            })()}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-slate-200 text-xs">
+              <div className="bg-white p-4 border border-slate-200">
+                <span className="font-bold text-slate-900 block mb-1">Executive Leadership</span>
+                <p className="text-slate-600">Strategic governance, financial integrity, and commercial alignment across all energy sector operations.</p>
+              </div>
+              <div className="bg-white p-4 border border-slate-200">
+                <span className="font-bold text-slate-900 block mb-1">Technical Operations</span>
+                <p className="text-slate-600">Certified field geoscientists, hydrographers, and reality capture managers directing daily field data acquisition.</p>
+              </div>
+              <div className="bg-white p-4 border border-slate-200">
+                <span className="font-bold text-slate-900 block mb-1">QHSE & Compliance</span>
+                <p className="text-slate-600">Rigorous safety governance safeguarding personnel, community stakeholders, and sensitive marine ecosystems.</p>
+              </div>
+            </div>
           </div>
 
           {/* Local Content & Technical Workforce Development */}

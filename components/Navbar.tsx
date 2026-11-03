@@ -145,12 +145,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
   }, [isOpen, isDownloadModalOpen]);
 
   const dynamicNavLinks = (navConfig?.header || [])
-    .filter(item => item.is_active && !item.href?.startsWith('/projects'))
+    .filter(item => item.is_active)
     .sort((a, b) => a.order - b.order)
     .map(item => {
       let layout: 'links' | 'services' | 'projects' = item.layout || (item.name === 'Services' ? 'services' : 'links');
       let featured = item.featured;
-      if (!featured && item.name === 'About us') {
+      if (!featured && (item.name === 'About us' || item.name === 'About')) {
         featured = {
           category: 'Corporate Overview',
           title: 'Precision & Integrity',
@@ -188,7 +188,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
   const navLinks = dynamicNavLinks.length > 0 ? dynamicNavLinks : [
     { name: 'Home', href: '/', type: 'standard' },
     {
-      name: 'About us',
+      name: 'About',
       href: '/about',
       type: 'mega',
       layout: 'links',
@@ -201,32 +201,17 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
       },
       sections: [
         {
-          title: 'Company',
+          title: 'Company Leadership',
           links: [
-            { label: 'Company Overview', href: '/about?section=heritage' },
-            { label: 'Our Philosophy', href: '/about?section=vision' },
-            { label: 'Core Values', href: '/about?section=values' },
-            { label: 'Management Team', href: '/about?section=management' },
+            { label: 'About PIGL', href: '/about' },
+            { label: 'Teams', href: '/teams' },
           ]
         },
         {
-          title: 'Quality & Standards',
+          title: 'Standards & Network',
           links: [
-            { label: 'Certifications (ISO 9001 & 45001)', href: '/about' },
-            { label: 'Safety Performance (500k+ Safe Hours)', href: '/about' },
-          ]
-        },
-        {
-          title: 'Media & Videos',
-          links: [
-            { label: 'Corporate Video Hub & Documentary', href: '/videos' },
-          ]
-        },
-        {
-          title: 'Procurement & Vendors',
-          links: [
-            { label: 'Vendor Onboarding Desk', href: '/vendors' },
-            { label: 'Vendor Status Tracker', href: '/vendors/portal' },
+            { label: 'QHSE Standards', href: '/hsse' },
+            { label: 'Our Network', href: '/network' },
           ]
         }
       ]
@@ -244,10 +229,10 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
         link: `/services/${SERVICES[0].id}`
       }
     },
-    { name: 'Partners', href: '/partners', type: 'standard' },
+    { name: 'Projects', href: '/projects', type: 'standard' },
+    { name: 'Our Network', href: '/network', type: 'standard' },
     { name: 'Blog', href: '/blog', type: 'standard' },
-    { name: 'Careers', href: '/careers', type: 'standard' },
-    { name: 'Contact Us', href: '/contact', type: 'standard' },
+    { name: 'Contact', href: '/contact', type: 'standard' },
   ];
 
   const handleMobileNavClick = (linkName: string, isMega: boolean, e: React.MouseEvent) => {

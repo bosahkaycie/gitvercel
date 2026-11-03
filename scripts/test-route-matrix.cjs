@@ -103,10 +103,22 @@ const ROUTES_TO_TEST = [
     expectedTitleSnippet: 'About PIGL'
   },
   {
+    route: '/teams',
+    expectedPage: 'Teams Page',
+    expectedH1: 'Our Teams',
+    expectedTitleSnippet: 'Teams'
+  },
+  {
     route: '/projects',
-    expectedPage: 'Projects Redirect to Services',
-    expectedH1: 'Our Services',
-    expectedTitleSnippet: 'Polaris Integrated'
+    expectedPage: 'Projects Page',
+    expectedH1: 'Executed Projects & Field Case',
+    expectedTitleSnippet: 'Executed Engineering Projects'
+  },
+  {
+    route: '/network',
+    expectedPage: 'Our Network Page',
+    expectedH1: 'Our Network',
+    expectedTitleSnippet: 'Network'
   },
   {
     route: '/contact',

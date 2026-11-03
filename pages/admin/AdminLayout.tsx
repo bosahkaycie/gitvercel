@@ -6,6 +6,7 @@ import AdminDirectFollowUp from './AdminDirectFollowUp';
 import AdminServices from './AdminServices';
 import AdminProjects from './AdminProjects';
 import AdminPartners from './AdminPartners';
+import AdminTestimonials from './AdminTestimonials';
 import AdminTeam from './AdminTeam';
 import AdminVendors from './AdminVendors';
 import AdminCareers from './AdminCareers';
@@ -31,6 +32,7 @@ import {
   useBlogPosts,
   useSliders,
   useVideos,
+  useTestimonials,
   useInquiries,
   useAdminUsers,
   useAuditLogs,
@@ -111,6 +113,7 @@ const AdminLayout: React.FC = () => {
   const { posts, loading: blogsLoading, savePost, deletePost } = useBlogPosts(undefined, true);
   const { sliders, loading: slidersLoading, saveSlider, deleteSlider, resetSliders } = useSliders(true);
   const { videos, loading: videosLoading, saveVideo, deleteVideo } = useVideos(true);
+  const { testimonials, loading: testimonialsLoading, saveTestimonial, deleteTestimonial } = useTestimonials(true);
   const { inquiries, loading: inquiriesLoading, updateInquiryStatus, deleteInquiry } = useInquiries();
   const { users, loading: usersLoading, saveUser, deleteUser, toggleUserStatus } = useAdminUsers();
   const { logs: auditLogs, logAction } = useAuditLogs();
@@ -228,6 +231,19 @@ const AdminLayout: React.FC = () => {
     return res;
   };
 
+  const handleSaveTestimonialWithLog = async (testimonial: any) => {
+    const res = await saveTestimonial(testimonial);
+    await logAction(`Saved testimonial: ${testimonial.author_name}`, 'testimonial', res?.id || testimonial.id, { author: testimonial.author_name });
+    return res;
+  };
+
+  const handleDeleteTestimonialWithLog = async (id: string) => {
+    const target = testimonials.find(t => t.id === id);
+    const res = await deleteTestimonial(id);
+    await logAction(`Deleted testimonial: ${target?.author_name || id}`, 'testimonial', id);
+    return res;
+  };
+
   if (authLoading) {
     const isDark = theme === 'dark';
     return (
@@ -331,6 +347,16 @@ const AdminLayout: React.FC = () => {
             loading={partnersLoading}
             onSave={handleSavePartnerWithLog}
             onDelete={handleDeletePartnerWithLog}
+            theme={theme}
+          />
+        );
+      case 'testimonials':
+        return (
+          <AdminTestimonials
+            testimonials={testimonials}
+            loading={testimonialsLoading}
+            onSave={handleSaveTestimonialWithLog}
+            onDelete={handleDeleteTestimonialWithLog}
             theme={theme}
           />
         );
@@ -497,6 +523,11 @@ const AdminLayout: React.FC = () => {
       group: 'Website Management',
       title: 'Technology Partners',
       description: 'Manage international technology alliances, equipment manufacturer partnerships, and verified logos.'
+    },
+    testimonials: {
+      group: 'Website Management',
+      title: 'Client Endorsements & Testimonials',
+      description: 'Manage verified client commendations, stakeholder statements, and clearly marked sample draft testimonials.'
     },
     blog: {
       group: 'Website Management',
