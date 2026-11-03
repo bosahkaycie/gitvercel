@@ -62,12 +62,14 @@ export const COLORS = {
 };
 
 export const CONTACT_CONFIG = {
-  phone: '+234-(0) 809 7081 333',
+  phone: '+234 809 7081 333',
   phoneRaw: '+2348097081333',
   emailInfo: 'info@polarisigl.com',
   emailSupport: 'support@polarisigl.com',
-  address: '#3, Diamond Close, Castle & Green Estate, Off Eneka Link Road, Port Harcourt, Rivers State, Nigeria',
-  addressShort: '#3, Diamond Close, Port Harcourt, Rivers State, Nigeria',
+  address: '#3 Diamond Close, Castle & Green Estate, Off Eneka Link Road, Port Harcourt, Rivers State, Nigeria',
+  addressShort: '#3 Diamond Close, Port Harcourt, Rivers State, Nigeria',
+  businessHours: 'Monday to Friday, 8:00 am to 5:00 pm',
+  whatsappMessage: 'Hello PIGL, I would like to make an enquiry about your services.',
   linkedin: 'https://www.linkedin.com/company/polarisigl/',
   youtube: 'https://www.youtube.com/embed/sExrHCIGkH0'
 };

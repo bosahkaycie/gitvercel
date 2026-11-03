@@ -293,28 +293,28 @@ const routes = [
   {
     path: '/contact',
     title: 'Contact PIGL | Engineering Offices in Port Harcourt & Lagos',
-    description: 'Contact Polaris Integrated & GeoSolutions Limited for project consultations, technical scoping, and field mobilisation across Nigeria.',
-    badge: 'Technical Consultation',
-    h1: 'Contact PIGL',
-    intro: 'Contact our lead engineering and technical scoping desks in Port Harcourt and Lagos for project feasibility, surveys, or construction inquiries.',
+    description: 'Contact Polaris Integrated & GeoSolutions Limited for project enquiries, technical clarifications, and field engagements across Nigeria.',
+    badge: 'Direct Technical Engagement',
+    h1: 'A conversation is a good place to start.',
+    intro: 'Whether you have a project enquiry, need technical clarification or would like to discuss a potential engagement, our team is ready to hear from you. We respond within one business day, usually sooner.',
     sectionsHtml: `
       <section style="margin-bottom: 2.5rem;">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
           <div style="padding: 1.5rem; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;">
-            <h3 style="color: #34d399; font-size: 1.1rem; margin-top: 0; margin-bottom: 0.75rem;">Port Harcourt Headquarters</h3>
+            <h3 style="color: #34d399; font-size: 1.1rem; margin-top: 0; margin-bottom: 0.75rem;">Corporate Headquarters</h3>
             <p style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem;">
               #3 Diamond Close, Castle & Green Estate, Off Eneka Link Road, Port Harcourt, Rivers State, Nigeria
             </p>
-            <p style="color: #94a3b8; font-size: 0.85rem;">Phone: +234-809-7081-333 | +234-803-708-1904</p>
-            <p style="color: #94a3b8; font-size: 0.85rem;">Email: hello@polarisigl.com</p>
+            <p style="color: #94a3b8; font-size: 0.85rem;">Phone: +234 809 7081 333</p>
+            <p style="color: #94a3b8; font-size: 0.85rem;">Email: info@polarisigl.com</p>
+            <p style="color: #94a3b8; font-size: 0.85rem;">Business Hours: Monday to Friday, 8:00 am to 5:00 pm</p>
           </div>
           <div style="padding: 1.5rem; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;">
-            <h3 style="color: #34d399; font-size: 1.1rem; margin-top: 0; margin-bottom: 0.75rem;">Lagos Liaison Desk</h3>
+            <h3 style="color: #34d399; font-size: 1.1rem; margin-top: 0; margin-bottom: 0.75rem;">Direct Messaging & WhatsApp</h3>
             <p style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem;">
-              Commercial Operations & Technical Liaison, Victoria Island, Lagos State, Nigeria
+              Direct engagement for technical enquiries, project feasibility and scope clarifications.
             </p>
-            <p style="color: #94a3b8; font-size: 0.85rem;">Phone: +234-809-7081-333</p>
-            <p style="color: #94a3b8; font-size: 0.85rem;">Email: hello@polarisigl.com</p>
+            <p style="color: #34d399; font-size: 0.9rem; font-weight: bold;">WhatsApp: +234 809 7081 333</p>
           </div>
         </div>
       </section>
