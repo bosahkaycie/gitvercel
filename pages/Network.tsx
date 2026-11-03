@@ -2,10 +2,9 @@ import React, { useEffect } from 'react';
 import { PARTNERS } from '../site_data';
 import { usePartners } from '../hooks/useSupabaseData';
 import MarineIntelImg from '../assets/marine_intel_metocean.jpg';
-import WaterTreatmentImg from '../assets/drilling.png';
+import WaterTreatmentSkidImg from '../assets/water_treatment_skid.jpg';
 import ProcurementImg from '../assets/procure.jpg';
 import NetworkHeroBg from '../assets/slider.jpeg';
-import FrankstarLogo from '../assets/frankstar_logo.png';
 import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 
 const Network: React.FC = () => {
@@ -16,24 +15,16 @@ const Network: React.FC = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  const getPartnerCategory = (partner: any): string => {
-    if (partner.relationship_type) return partner.relationship_type;
-    if (partner.id === 'frankstar') return 'Technology and Delivery Collaborations';
-    if (partner.id === 'coalexpert') return 'Strategic and Technical Relationships';
-    if (partner.id === 'npk') return 'Authorised Distributorships and Representations';
-    return 'Strategic and Technical Relationships';
-  };
-
   const partnerImages: Record<string, string> = {
     frankstar: MarineIntelImg,
-    coalexpert: WaterTreatmentImg,
+    coalexpert: WaterTreatmentSkidImg,
     npk: ProcurementImg
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-white font-sans">
       {/* 1. Hero Header */}
-      <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-28 overflow-hidden">
+      <section className="relative bg-slate-950 pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
             src={NetworkHeroBg}
@@ -54,10 +45,10 @@ const Network: React.FC = () => {
           </div>
 
           <div className="max-w-3xl">
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block mb-3">
-              Commercial, Technical & Operational Relationships
+            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block mb-3 font-mono">
+              Commercial, Technical &amp; Operational Relationships
             </span>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white tracking-tight leading-tight mb-6">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-tight mb-6">
               Our Network
             </h1>
             <p className="text-lg md:text-xl text-slate-300 font-normal leading-relaxed">
@@ -67,11 +58,11 @@ const Network: React.FC = () => {
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 z-20">
-          <ReflectiveEnergyLine />
+          <ReflectiveEnergyLine dark={true} />
         </div>
       </section>
 
-      {/* 2. Organisations List */}
+      {/* 2. Editorial Organisations Showcase (Alternating Layout) */}
       <section className="py-16 md:py-24 bg-white flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading && (
@@ -80,75 +71,82 @@ const Network: React.FC = () => {
             </div>
           )}
 
-          <div className="space-y-16">
+          <div className="space-y-16 lg:space-y-24">
             {displayPartners.map((partner, idx) => {
-              const categoryBadge = getPartnerCategory(partner);
-              const contextImage = partnerImages[partner.id] || partner.logo_url || MarineIntelImg;
+              const contextImage = partnerImages[partner.id] || (partner as any).image_url || MarineIntelImg;
+              const isReversed = idx % 2 === 1;
 
               return (
-                <div
+                <article
                   key={partner.id || idx}
                   id={partner.id}
-                  className="bg-white border border-slate-200 hover:border-emerald-600/70 hover:shadow-xl transition-all duration-300 overflow-hidden"
+                  className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-xs hover:shadow-2xl hover:shadow-slate-200/80 hover:border-slate-300 transition-all duration-300 ease-out group motion-reduce:transition-none motion-reduce:hover:transform-none"
                 >
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
-                    {/* Visual & Context Column */}
-                    <div className="lg:col-span-5 relative bg-slate-950 min-h-[260px] lg:min-h-full overflow-hidden">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 items-stretch">
+                    {/* Photographic Visual Column (Alternating on Desktop) */}
+                    <div
+                      className={`lg:col-span-6 relative bg-slate-950 min-h-[300px] sm:min-h-[380px] lg:min-h-[500px] overflow-hidden ${
+                        isReversed ? 'lg:order-2' : 'lg:order-1'
+                      }`}
+                    >
                       <img
                         src={contextImage}
                         alt={`${partner.name} - Technical Collaboration`}
-                        className="w-full h-full object-cover opacity-80"
-                        loading="lazy"
+                        className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none"
+                        loading={idx === 0 ? 'eager' : 'lazy'}
                         decoding="async"
                         onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src = '/assets/operations/pigl_subbottom_profiler_sb216s.jpg';
+                          (e.currentTarget as HTMLImageElement).src = MarineIntelImg;
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-slate-950/90 via-slate-950/40 to-transparent" />
-                      
-                      <div className="absolute bottom-6 left-6 right-6 text-white">
-                        <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider block mb-1">
-                          Operational Alignment
-                        </span>
-                        <p className="text-sm font-semibold text-slate-200">
-                          {partner.specialty}
-                        </p>
-                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-slate-950/80 via-slate-950/20 to-transparent pointer-events-none" />
+
+                      {/* Operational Alignment Callout on Photo Base */}
+                      {partner.specialty && (
+                        <div className="absolute bottom-6 left-6 right-6 text-white pointer-events-none z-10">
+                          <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider block mb-1">
+                            Operational Alignment
+                          </span>
+                          <p className="text-sm font-semibold text-slate-100 leading-snug">
+                            {partner.specialty}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Details Column */}
-                    <div className="lg:col-span-7 p-8 sm:p-10 flex flex-col justify-between">
+                    {/* Content Column */}
+                    <div
+                      className={`lg:col-span-6 p-8 sm:p-10 lg:p-12 flex flex-col justify-between ${
+                        isReversed ? 'lg:order-1' : 'lg:order-2'
+                      }`}
+                    >
                       <div>
-                        <div className="flex flex-wrap items-center gap-2 mb-4">
-                          <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
-                            {categoryBadge}
-                          </span>
-                          <span className="text-xs font-mono text-slate-400">
-                            {partner.serviceTitle}
-                          </span>
-                        </div>
+                        {/* Eyebrow: Role / Specialty */}
+                        <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider block mb-2 font-mono">
+                          {partner.role}
+                        </span>
 
-                        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-2">
+                        {/* Organisation Name */}
+                        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4 group-hover:text-emerald-900 transition-colors duration-200">
                           {partner.name}
                         </h2>
-                        <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-4">
-                          {partner.role}
-                        </p>
 
+                        {/* Narrative Description */}
                         <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 font-normal">
                           {partner.description}
                         </p>
 
+                        {/* Capabilities & Scope */}
                         {partner.capabilities && partner.capabilities.length > 0 && (
-                          <div className="mb-6 pt-4 border-t border-slate-100">
-                            <span className="text-xs font-bold text-slate-900 uppercase tracking-wider block mb-2">
-                              Capabilities & Scope:
+                          <div className="mb-6 pt-5 border-t border-slate-100">
+                            <span className="text-xs font-bold text-slate-900 uppercase tracking-wider block mb-3 font-mono">
+                              Capabilities &amp; Scope
                             </span>
-                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600">
-                              {partner.capabilities.map((cap, cIdx) => (
-                                <li key={cIdx} className="flex items-start">
-                                  <span className="text-emerald-600 font-bold mr-2">✓</span>
-                                  <span>{cap}</span>
+                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-slate-600">
+                              {partner.capabilities.map((cap: string, cIdx: number) => (
+                                <li key={cIdx} className="flex items-center space-x-2">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />
+                                  <span className="leading-snug">{cap}</span>
                                 </li>
                               ))}
                             </ul>
@@ -156,60 +154,74 @@ const Network: React.FC = () => {
                         )}
                       </div>
 
-                      <div className="pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                      {/* Action Links Row (Anchored to bottom) */}
+                      <div className="pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4 mt-6">
                         {partner.website ? (
                           <a
                             href={partner.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-800 hover:text-emerald-950 transition-colors"
+                            className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-800 hover:text-emerald-950 transition-colors group/link"
                           >
                             <span>Visit Official Website</span>
-                            <span className="ml-1.5">↗</span>
+                            <span className="ml-1.5 transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform duration-200">
+                              ↗
+                            </span>
                           </a>
                         ) : (
-                          <span className="text-xs text-slate-400 font-medium">Verified Relationship</span>
+                          <span className="text-xs text-slate-400 font-medium font-mono">
+                            Verified Technical Relationship
+                          </span>
                         )}
 
                         <a
-                          href={`/services/${partner.serviceId || 'geosolutions-engineering-services'}`}
-                          className="inline-flex items-center px-5 py-2.5 bg-slate-100 hover:bg-emerald-800 hover:text-white text-slate-800 text-xs font-bold uppercase tracking-wider transition-colors rounded"
+                          href={`/services/${(partner as any).serviceId || (partner as any).service_id || 'geosolutions-engineering-services'}`}
+                          className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-emerald-800 transition-colors group/cta"
                         >
-                          View Associated Division →
+                          <span>View Associated Division</span>
+                          <span className="ml-1.5 transform group-hover/cta:translate-x-1 transition-transform duration-200">
+                            →
+                          </span>
                         </a>
                       </div>
                     </div>
                   </div>
-                </div>
+                </article>
               );
             })}
           </div>
 
           {displayPartners.length === 0 && (
-            <div className="text-center py-16 bg-slate-50 border border-slate-200">
+            <div className="text-center py-16 bg-slate-50 border border-slate-200 rounded-2xl">
               <p className="text-slate-600 font-medium">No organisations found in the network directory.</p>
             </div>
           )}
 
-          {/* 4. Strategic Network Engagement Banner */}
-          <div className="mt-20 p-8 sm:p-12 bg-slate-900 text-white rounded-none border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
-            <div className="max-w-2xl">
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block mb-2">
-                Alliances & Technical Representations
+          {/* 3. Distinctive Collaboration CTA Banner */}
+          <div className="mt-20 lg:mt-28 p-10 sm:p-14 lg:p-16 bg-slate-900 text-white rounded-3xl border border-slate-800 relative overflow-hidden shadow-2xl">
+            <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-emerald-700/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="max-w-3xl relative z-10 space-y-4">
+              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block font-mono">
+                Alliances &amp; Technical Representations
               </span>
-              <h3 className="text-2xl font-bold tracking-tight text-white mb-2">
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
                 Explore Technical Collaboration With PIGL
               </h3>
-              <p className="text-slate-300 text-sm leading-relaxed">
+              <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-normal max-w-2xl">
                 We continuously evaluate specialist technical relationships, instrumentation distributorships, and engineering alliances to address evolving energy and infrastructure challenges in West Africa.
               </p>
+              <div className="pt-3">
+                <a
+                  href="/contact"
+                  className="inline-flex items-center px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-colors rounded-xl shadow-lg hover:shadow-emerald-900/30 group/btn cursor-pointer"
+                >
+                  <span>Contact Commercial Desk</span>
+                  <span className="ml-2 transform group-hover/btn:translate-x-1 transition-transform duration-200">
+                    →
+                  </span>
+                </a>
+              </div>
             </div>
-            <a
-              href="/contact"
-              className="px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-md shrink-0"
-            >
-              Contact Commercial Desk
-            </a>
           </div>
 
         </div>
@@ -219,4 +231,3 @@ const Network: React.FC = () => {
 };
 
 export default Network;
-
