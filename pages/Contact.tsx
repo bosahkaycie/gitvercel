@@ -159,7 +159,7 @@ const Contact: React.FC = () => {
           
           <div className="max-w-4xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-6">
-              A conversation is a good place to start.
+              The kettle is always on. Let&apos;s Chat!
             </h1>
             <p className="text-lg md:text-xl text-slate-300 font-normal leading-relaxed max-w-3xl">
               Whether you have a project enquiry, need technical clarification or would like to discuss a potential engagement, our team is ready to hear from you. We respond within one business day, usually sooner.

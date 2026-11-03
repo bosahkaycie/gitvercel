@@ -295,7 +295,7 @@ const routes = [
     title: 'Contact PIGL | Engineering Offices in Port Harcourt & Lagos',
     description: 'Contact Polaris Integrated & GeoSolutions Limited for project enquiries, technical clarifications, and field engagements across Nigeria.',
     badge: '',
-    h1: 'A conversation is a good place to start.',
+    h1: "The kettle is always on. Let's Chat!",
     intro: 'Whether you have a project enquiry, need technical clarification or would like to discuss a potential engagement, our team is ready to hear from you. We respond within one business day, usually sooner.',
     sectionsHtml: `
       <section style="margin-bottom: 2.5rem;">
