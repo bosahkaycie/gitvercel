@@ -135,8 +135,8 @@ const Blog: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Main Articles Masonry Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+      {/* 3. Main Articles Equal-Height Grid */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
         
         {loading && filteredPosts.length === 0 ? (
           <div className="py-28 text-center text-slate-500">
@@ -157,49 +157,43 @@ const Blog: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="space-y-16">
-            
-            {/* Masonry Article Grid: 3 columns on desktop, 2 on tablet, 1 on mobile */}
-            <div className="columns-1 md:columns-2 lg:columns-3 gap-8 [column-fill:_balance]">
+          <div>
+            {/* Equal-Height Editorial Article Grid: 3 columns desktop, 2 tablet, 1 mobile */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
               {filteredPosts.map((post, idx) => {
-                const isFeatured = post.featured || idx === 0;
                 const fallbackImg = idx % 2 === 0 ? InternationalPartnerImg : ExhibitionConsultingImg;
                 const imgSrc = post.featured_image || (idx === 0 ? FieldTeamSwampImg : fallbackImg);
                 
                 return (
                   <article
                     key={post.id}
-                    className="break-inside-avoid mb-8 bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:border-slate-300 transition-all duration-300 group flex flex-col"
+                    className="h-full flex flex-col bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:shadow-slate-200/70 hover:border-emerald-700/40 hover:-translate-y-1.5 transition-all duration-300 ease-out group motion-reduce:transition-none motion-reduce:hover:transform-none"
                   >
-                    {/* Article Image Container */}
+                    {/* Consistent 16:9 Image Container */}
                     <a
                       href={`/blog/${post.slug}`}
-                      className="block relative overflow-hidden bg-slate-900"
+                      className="block relative aspect-[16/9] w-full overflow-hidden bg-slate-900 shrink-0"
+                      tabIndex={-1}
+                      aria-hidden="true"
                     >
                       <img
                         src={imgSrc}
                         alt={post.title}
-                        className={`w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 ${
-                          isFeatured
-                            ? 'aspect-[16/10] sm:aspect-[16/9]'
-                            : idx % 3 === 1
-                            ? 'aspect-[4/3]'
-                            : 'aspect-[16/10]'
-                        }`}
+                        className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:transform-none"
                         loading={idx < 3 ? 'eager' : 'lazy'}
                         onError={(e) => {
                           (e.currentTarget as HTMLImageElement).src = FieldTeamSwampImg;
                         }}
                       />
-                      {/* Subtle dark gradient overlay on image */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none" />
+                      {/* Subtle dark gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-30 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none" />
                     </a>
 
                     {/* Editorial Content Container */}
-                    <div className="p-6 sm:p-7 flex flex-col justify-between flex-grow space-y-4">
+                    <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between">
                       <div>
                         {/* Metadata Row: Category, Date, Reading Time */}
-                        <div className="flex flex-wrap items-center text-xs text-slate-500 font-medium gap-x-2 gap-y-1 mb-3">
+                        <div className="flex flex-wrap items-center text-xs text-slate-500 font-medium gap-x-2 gap-y-1 mb-3 min-h-[36px]">
                           <span className="text-emerald-800 font-bold uppercase tracking-wider text-[11px]">
                             {post.category}
                           </span>
@@ -211,44 +205,26 @@ const Blog: React.FC = () => {
                               year: 'numeric'
                             })}
                           </span>
-                          {post.read_time && (
-                            <>
-                              <span className="text-slate-300">•</span>
-                              <span>{post.read_time}</span>
-                            </>
-                          )}
+                          <span className="text-slate-300">•</span>
+                          <span>{post.read_time || '4 min read'}</span>
                         </div>
 
-                        {/* Title */}
-                        <h2
-                          className={`font-bold text-slate-900 leading-snug tracking-tight group-hover:text-emerald-800 transition-colors duration-200 ${
-                            isFeatured
-                              ? 'text-xl sm:text-2xl font-extrabold'
-                              : 'text-lg sm:text-xl'
-                          }`}
-                        >
+                        {/* Title: Clamped to 2 lines for uniform card dimensions */}
+                        <h2 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug tracking-tight line-clamp-2 min-h-[3.25rem] sm:min-h-[3.5rem] group-hover:text-emerald-800 transition-colors duration-200">
                           <a href={`/blog/${post.slug}`} className="hover:underline">
                             {post.title}
                           </a>
                         </h2>
 
-                        {/* Excerpt */}
-                        {post.excerpt && (
-                          <p
-                            className={`text-slate-600 leading-relaxed font-normal mt-3 ${
-                              isFeatured
-                                ? 'text-sm sm:text-base line-clamp-4'
-                                : 'text-xs sm:text-sm line-clamp-3'
-                            }`}
-                          >
-                            {post.excerpt}
-                          </p>
-                        )}
+                        {/* Excerpt: Clamped to 3 lines */}
+                        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal mt-3 line-clamp-3 min-h-[4.25rem]">
+                          {post.excerpt || 'Read the full publication and technical analysis from Polaris Integrated & GeoSolutions Limited.'}
+                        </p>
                       </div>
 
-                      {/* Editorial Footer: Author & Read Link */}
-                      <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-                        <span className="text-slate-600 font-semibold truncate max-w-[170px]">
+                      {/* Editorial Footer: Author & Read Link (Anchored at bottom) */}
+                      <div className="pt-5 mt-6 border-t border-slate-100 flex items-center justify-between text-xs">
+                        <span className="text-slate-600 font-semibold truncate max-w-[170px]" title={post.author || 'PIGL Technical Editorial'}>
                           {post.author ? `By ${post.author}` : 'PIGL Technical Editorial'}
                         </span>
 
@@ -269,7 +245,7 @@ const Blog: React.FC = () => {
             </div>
 
             {/* Newsletter & Technical Briefing CTA Card */}
-            <div className="bg-slate-900 text-white p-8 sm:p-12 border border-slate-800 rounded-2xl relative overflow-hidden shadow-lg">
+            <div className="mt-12 bg-slate-900 text-white p-8 sm:p-12 border border-slate-800 rounded-2xl relative overflow-hidden shadow-lg">
               <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-emerald-700/10 rounded-full blur-3xl pointer-events-none" />
               <div className="max-w-3xl relative z-10 space-y-4">
                 <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block font-mono">
