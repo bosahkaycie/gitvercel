@@ -135,7 +135,7 @@ const AIChatbot: React.FC = () => {
         1. ASSIST: Answer questions about PIGL using the provided context.
         2. LEAD CAPTURE: If a user has a specific business inquiry or request, naturally ask for their name and email/phone so a human representative can follow up. 
         - Example: "I'd love to have one of our engineers reach out to you about that. May I get your name and email address?"
-        3. ROUTE: Guide users to relevant sections of the site (/services, /projects, /contact).
+        3. ROUTE: Guide users to relevant sections of the site (/services, /about, /contact).
 
         STRICT CONVERSATIONAL RULES:
         - Keep responses concise but polished.
@@ -144,8 +144,8 @@ const AIChatbot: React.FC = () => {
         - Avoid heavy markdown.
 
         CONTEXT:
-        - Services: ${SERVICES.map(s => s.title).join(', ')}. We specialize in 3D Reality Capture (Leica Partners), Pipeline Integrity, Civil Works, and Geosolutions.
-        - Projects: ${PROJECTS.map(p => p.title).join(', ')}. We have delivered for Chevron, TotalEnergies, Aradel, etc.
+        - Services: ${SERVICES.map(s => s.title).join(', ')}. We specialise in 3D Reality Capture (Leica Partners), Pipeline Integrity, Civil Works, and Geosolutions.
+        - Experience: Extensive field experience across energy, maritime, infrastructure and industrial sectors.
         - Authority: 20+ years of operation, ISO 9001:2015 certified, Authorized Leica Geosystems Partner in Nigeria.
         - Location: Based in Port Harcourt, Nigeria.
 
@@ -174,7 +174,7 @@ const AIChatbot: React.FC = () => {
       const suggestedLinks: { label: string; href: string }[] = [];
       const lowerText = aiText.toLowerCase();
       if (lowerText.includes('service') || lowerText.includes('solutions')) suggestedLinks.push({ label: 'Explore Services', href: '/services' });
-      if (lowerText.includes('project') || lowerText.includes('case study')) suggestedLinks.push({ label: 'View Projects', href: '/projects' });
+      if (lowerText.includes('project') || lowerText.includes('case study') || lowerText.includes('experience')) suggestedLinks.push({ label: 'Technical Services', href: '/services' });
       if (lowerText.includes('career') || lowerText.includes('job')) suggestedLinks.push({ label: 'Careers', href: '/careers' });
       if (lowerText.includes('contact') || lowerText.includes('call') || lowerText.includes('office')) suggestedLinks.push({ label: 'Get in Touch', href: '/contact' });
 

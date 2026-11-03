@@ -129,21 +129,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
       });
     });
 
-    // 2. Search Projects
-    PROJECTS.forEach(project => {
-      const matchText = `${project.title} ${project.description} ${project.category} ${project.location} ${project.scope || ''}`;
-      if (matchesTerms(matchText)) {
-        searchResults.push({
-          title: project.title,
-          description: project.description,
-          category: 'Projects',
-          link: `/projects?id=${project.id}`,
-          badgeColor: 'bg-orange-50 text-orange-800 border border-orange-100'
-        });
-      }
-    });
-
-    // 3. Search Partners & Technology
+    // 2. Search Partners & Technology
     PARTNERS.forEach(partner => {
       const matchText = `${partner.name} ${partner.role} ${partner.specialty} ${partner.description} ${partner.capabilities.join(' ')}`;
       if (matchesTerms(matchText)) {

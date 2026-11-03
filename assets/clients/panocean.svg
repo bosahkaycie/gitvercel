@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 70" width="300" height="70" fill="none">
+  <!-- Pan Ocean Emblem: Ocean Wave & Flame Droplet -->
+  <g transform="translate(10, 10)">
+    <circle cx="25" cy="25" r="23" fill="#0C2340"/>
+    <!-- Deep sea wave curve -->
+    <path d="M10 28 C16 20 22 34 30 24 C36 16 42 22 42 22 C40 34 32 42 22 42 C14 42 10 36 10 28 Z" fill="#0077C8"/>
+    <!-- Central flame droplet in gold -->
+    <path d="M25 12 C28 17 32 21 32 26 C32 30 29 33 25 33 C21 33 18 30 18 26 C18 21 22 17 25 12 Z" fill="#F4B223"/>
+  </g>
+  <!-- Wordmark -->
+  <g transform="translate(68, 33)">
+    <text font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="17" font-weight="900" fill="#0C2340" letter-spacing="1">PAN OCEAN</text>
+    <text x="1" y="16" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="9" font-weight="700" fill="#0077C8" letter-spacing="1.2">OIL CORPORATION (NIGERIA) LTD</text>
+  </g>
+</svg>

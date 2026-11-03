@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 70" width="310" height="70" fill="none">
+  <!-- Renaissance Africa Energy Emblem: Converging Energy Rays -->
+  <g transform="translate(10, 10)">
+    <!-- Stylized geometric R and energy starburst -->
+    <rect x="2" y="2" width="46" height="46" rx="10" fill="#0A2540"/>
+    <path d="M14 14 L14 36 M14 14 L28 14 C33 14 36 17 36 22 C36 27 33 30 28 30 L14 30 M26 30 L35 36" stroke="#E6A117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Solar energy dot -->
+    <circle cx="36" cy="14" r="3" fill="#00B074"/>
+  </g>
+  <!-- Wordmark -->
+  <g transform="translate(68, 34)">
+    <text font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="16" font-weight="900" fill="#0A2540" letter-spacing="1.2">RENAISSANCE</text>
+    <text x="1" y="16" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="10.5" font-weight="700" fill="#E6A117" letter-spacing="2">AFRICA ENERGY</text>
+  </g>
+</svg>

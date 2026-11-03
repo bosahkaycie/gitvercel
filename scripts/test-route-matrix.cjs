@@ -104,9 +104,9 @@ const ROUTES_TO_TEST = [
   },
   {
     route: '/projects',
-    expectedPage: 'Projects Page',
-    expectedH1: 'Executed Engineering Projects',
-    expectedTitleSnippet: 'Executed Engineering Projects'
+    expectedPage: 'Projects Redirect to Services',
+    expectedH1: 'Our Services',
+    expectedTitleSnippet: 'Polaris Integrated'
   },
   {
     route: '/contact',

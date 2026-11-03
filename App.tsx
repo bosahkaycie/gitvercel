@@ -150,8 +150,11 @@ const App: React.FC = () => {
   useEffect(() => {
     const handleLocationChange = () => {
       let path = normalizePath(window.location.pathname);
-      // Check for legacy service URLs and redirect cleanly
-      if (path.startsWith('/services/')) {
+      // Check for legacy project URLs and redirect cleanly to /services
+      if (path === '/projects' || path.startsWith('/projects/') || path.startsWith('/projects?')) {
+        window.history.replaceState({}, '', '/services');
+        path = '/services';
+      } else if (path.startsWith('/services/')) {
         const legacyId = path.split('/services/')[1];
         if (LEGACY_SERVICE_MAP[legacyId]) {
           const newPath = `/services/${LEGACY_SERVICE_MAP[legacyId]}`;
@@ -217,6 +220,12 @@ const App: React.FC = () => {
       if (window.location.hash) {
         let hashPath = window.location.hash.slice(1); // remove '#'
         
+        if (hashPath === '/projects' || hashPath.startsWith('/projects/') || hashPath.startsWith('/projects?')) {
+          window.history.replaceState({}, '', '/services');
+          window.dispatchEvent(new Event('pushstate-changed'));
+          return;
+        }
+
         if (hashPath.startsWith('/services/detail?id=')) {
           let id = new URLSearchParams(hashPath.split('?')[1]).get('id');
           if (id) {
@@ -258,7 +267,6 @@ const App: React.FC = () => {
       '/about': 'Polaris Integrated & GeoSolutions Limited (PIGL) is a Nigerian engineering and technical solutions company serving the energy, infrastructure and industrial sectors.',
       '/services': 'Explore PIGL\'s four operating divisions: GeoSolutions & Engineering Services (GES), Metocean & Marine Solutions (MMS), Integrated Construction Services (ICS), and Industrial Solutions (IS).',
       '/partners': 'PIGL Strategic Alliances & Global Technology Partnerships with Frankstar Technology, CoaleXpert, and NPK Flanges & Industrial Piping.',
-      '/projects': 'Review completed engineering, reality capture, geotechnical survey, and pipeline construction projects delivered for energy and infrastructure clients across Nigeria.',
       '/careers': 'Join the PIGL engineering team in Port Harcourt and across Nigeria. Grow your career with an indigenous leader in geosolutions and energy infrastructure.',
       '/news': 'Latest updates, technical milestones, and industry perspectives from Polaris Integrated and GeoSolutions Limited.',
       '/blog': 'Technical updates, project milestones, and engineering insights from Polaris Integrated and GeoSolutions Limited.',
@@ -279,7 +287,6 @@ const App: React.FC = () => {
       '/about': 'About PIGL | ISO Certified Engineering Contractor',
       '/services': 'Specialist Engineering Divisions | PIGL Nigeria',
       '/partners': 'Technology Partners & Engineering Alliances | PIGL',
-      '/projects': 'Executed Engineering Projects & Case Studies | PIGL',
       '/careers': 'Careers at PIGL | Engineering Opportunities in Nigeria',
       '/news': 'News & Technical Insights | PIGL Nigeria',
       '/blog': 'Engineering News & Technical Insights | PIGL Nigeria',
@@ -403,18 +410,6 @@ const App: React.FC = () => {
           "url": "https://polarisigl.com/"
         }
       };
-    } else if (currentPath === '/projects') {
-      schemaData = {
-        "@context": "https://schema.org",
-        "@type": "ItemList",
-        "name": "PIGL Engineering Project Showcase",
-        "itemListElement": PROJECTS.map((p, index) => ({
-          "@type": "ListItem",
-          "position": index + 1,
-          "url": `https://polarisigl.com/projects`,
-          "name": p.title
-        }))
-      };
     } else if (currentPath === '/videos' || currentPath === '/media' || currentPath === '/watch') {
       schemaData = {
         "@context": "https://schema.org",
@@ -467,6 +462,10 @@ const App: React.FC = () => {
   }
 
   const renderPage = () => {
+    if (currentPath === '/projects' || currentPath.startsWith('/projects/')) {
+      window.history.replaceState({}, '', '/services');
+      return <Services />;
+    }
     if (currentPath.startsWith('/services/')) {
       const serviceId = currentPath.split('/services/')[1];
       if (serviceId) {
@@ -487,7 +486,8 @@ const App: React.FC = () => {
       case '/partners':
         return <Partners />;
       case '/projects':
-        return <Projects />;
+        window.history.replaceState({}, '', '/services');
+        return <Services />;
       case '/careers':
         return <Careers />;
       case '/news':

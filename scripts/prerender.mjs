@@ -243,36 +243,6 @@ const routes = [
     `
   },
   {
-    path: '/projects',
-    title: 'Executed Engineering Projects & Case Studies | PIGL',
-    description: 'Review completed engineering, reality capture, geotechnical survey, and pipeline construction projects delivered for energy and infrastructure clients across Nigeria.',
-    badge: 'Selected Experience',
-    h1: 'Executed Engineering Projects',
-    intro: 'Review verified engineering, reality capture, geotechnical investigation, and pipeline construction projects delivered for energy and infrastructure clients across Nigeria.',
-    sectionsHtml: `
-      <section style="margin-bottom: 2.5rem;">
-        <h2 style="color: #34d399; font-size: 1.5rem; margin-bottom: 1rem;">Selected Project Track Record</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-          <article style="padding: 1.5rem; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;">
-            <h3 style="color: #f8fafc; font-size: 1.1rem; margin-top: 0; margin-bottom: 0.5rem;">AKK Gas Pipeline Survey & ROW Execution</h3>
-            <p style="color: #10b981; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.75rem;">Client: Brentex / Dover | Location: Kogi / Kaduna</p>
-            <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.5;">Route surveying, geodetic positioning, and geotechnical investigation for the 40" x 311km mainline gas pipeline installation.</p>
-          </article>
-          <article style="padding: 1.5rem; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;">
-            <h3 style="color: #f8fafc; font-size: 1.1rem; margin-top: 0; margin-bottom: 0.5rem;">Offshore Rig Positioning & Geotechnical Drilling</h3>
-            <p style="color: #10b981; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.75rem;">Client: WAV | Location: Escravos, Delta State</p>
-            <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.5;">Marine survey, seabed soil boring, and real-time rig positioning using DGPS and subsea acoustic telemetry.</p>
-          </article>
-          <article style="padding: 1.5rem; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;">
-            <h3 style="color: #f8fafc; font-size: 1.1rem; margin-top: 0; margin-bottom: 0.5rem;">Facility Reality Capture & Digital Twin</h3>
-            <p style="color: #10b981; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.75rem;">Client: Aradel | Location: Ogbele Field, Rivers State</p>
-            <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.5;">Full-scale 3D laser scanning using Leica RTC360 systems for brownfield asset revamp and structural assurance.</p>
-          </article>
-        </div>
-      </section>
-    `
-  },
-  {
     path: '/contact',
     title: 'Contact PIGL | Engineering Offices in Port Harcourt & Lagos',
     description: 'Contact Polaris Integrated & GeoSolutions Limited for project consultations, technical scoping, and field mobilisation across Nigeria.',
@@ -452,7 +422,6 @@ function generateHtmlForRoute(config) {
             <a href="/services/integrated-construction-services" style="color: #94a3b8; text-decoration: none;">Construction (ICS)</a>
             <a href="/services/industrial-solutions" style="color: #94a3b8; text-decoration: none;">Industrial (IS)</a>
             <a href="/about" style="color: #94a3b8; text-decoration: none;">About</a>
-            <a href="/projects" style="color: #94a3b8; text-decoration: none;">Projects</a>
             <a href="/contact" style="color: #94a3b8; text-decoration: none;">Contact</a>
           </nav>
         </div>

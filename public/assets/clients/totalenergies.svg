@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 70" width="280" height="70" fill="none">
+  <!-- TotalEnergies Dynamic Ribbon Logo -->
+  <g transform="translate(10, 8)">
+    <!-- Continuous loop ribbons -->
+    <!-- Red arc -->
+    <path d="M12 40 C12 22 25 10 40 10 C50 10 56 16 56 26 C56 34 50 42 40 46" stroke="#ED1C24" stroke-width="6.5" stroke-linecap="round"/>
+    <!-- Orange/Yellow sweep -->
+    <path d="M40 10 C48 10 58 18 58 28 C58 40 45 48 32 48 C20 48 12 38 12 28" stroke="#F58220" stroke-width="6" stroke-linecap="round"/>
+    <!-- Green/Blue accent curve -->
+    <path d="M24 16 C32 10 44 8 50 16 C56 24 50 36 38 42 C28 46 20 44 16 38" stroke="#009640" stroke-width="5" stroke-linecap="round"/>
+    <path d="M42 22 C48 26 50 34 44 40 C38 46 28 48 22 42" stroke="#0080C6" stroke-width="4.5" stroke-linecap="round"/>
+  </g>
+  <!-- TotalEnergies Wordmark -->
+  <g transform="translate(85, 43)">
+    <text font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="24" font-weight="800" fill="#ED1C24" letter-spacing="-0.5">Total<tspan fill="#0080C6" font-weight="700">Energies</tspan></text>
+  </g>
+</svg>

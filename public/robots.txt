@@ -3,7 +3,6 @@
 User-agent: *
 Allow: /
 Allow: /services/
-Allow: /projects/
 Allow: /news/
 Allow: /careers/
 Allow: /about/

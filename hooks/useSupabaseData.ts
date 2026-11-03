@@ -4441,7 +4441,7 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
       name: 'Projects',
       href: '/projects',
       type: 'standard',
-      is_active: true,
+      is_active: false,
       order: 4
     },
     {
@@ -4499,7 +4499,6 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
         is_active: true,
         links: [
           { id: 'flink-about', label: 'About Us', href: '/about', is_active: true, order: 1 },
-          { id: 'flink-projects', label: 'Executed Projects & Case Studies', href: '/projects', is_active: true, order: 2 },
           { id: 'flink-partners', label: 'Strategic Partnerships', href: '/partners', is_active: true, order: 3 },
           { id: 'flink-videos', label: 'Corporate Video Hub', href: '/videos', is_active: true, order: 4 },
           { id: 'flink-blog', label: 'Technical Blog', href: '/blog', is_active: true, order: 5 },
@@ -4557,9 +4556,9 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
       description: 'Filterable portfolio of delivered engineering projects with scopes and metrics.',
       meta_title: 'Executed Projects & Case Studies | PIGL',
       meta_description: 'Case studies of mission-critical engineering deliveries for Chevron, TotalEnergies, Aradel, and major African energy operators.',
-      is_published: true,
-      show_in_header: true,
-      show_in_footer: true
+      is_published: false,
+      show_in_header: false,
+      show_in_footer: false
     },
     {
       id: 'pg-partners',

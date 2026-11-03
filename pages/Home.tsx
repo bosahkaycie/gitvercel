@@ -36,6 +36,7 @@ import OpLaserManifoldImg from '../assets/operations/pigl_3d_laser_scan_manifold
 import OpRealityJettyImg from '../assets/operations/pigl_3d_reality_capture_jetty_plant.jpg';
 import OpPipelineSwampCatImg from '../assets/operations/pigl_pipeline_construction_swamp_cat.jpg';
 import YouTubeFacade from '../components/YouTubeFacade';
+import ClientLogoCarousel from '../components/ClientLogoCarousel';
 
 import { useSliders, useServices, useBlogPosts, useProjects, usePartners, useSiteSettings } from '../hooks/useSupabaseData';
 import { getYouTubeId, getYouTubeEmbedUrl, getYouTubeThumbnail } from '../utils/video';
@@ -996,12 +997,11 @@ const Home: React.FC = () => {
           {/* Header with Carousel Navigation Controls */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div className="max-w-2xl">
-              <div className="text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">Our Operating Divisions</div>
               <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">
-                Specialist Engineering Divisions
+                Services
               </h2>
               <p className="text-slate-600 text-base md:text-lg font-normal leading-relaxed">
-                Operating across four established engineering disciplines, delivering high-fidelity site characterisation, marine observation, infrastructure construction, and industrial process solutions.
+                Converting physical environments, complex subsurfaces, and maritime conditions into high-fidelity data and execution.
               </p>
             </div>
 
@@ -1063,11 +1063,6 @@ const Home: React.FC = () => {
 
                 <div className="p-6 sm:p-7 flex-grow flex flex-col justify-between space-y-5">
                   <div>
-                    {((service as any).abbreviation || (service as any).serviceNumber) && (
-                      <div className="text-[11px] font-bold tracking-widest text-emerald-700 uppercase mb-2">
-                        DIVISION {(service as any).serviceNumber || `0${(sIdx % 4) + 1}`} • {(service as any).abbreviation || 'CORE'}
-                      </div>
-                    )}
                     <h3 className="text-xl font-bold text-slate-900 tracking-tight group-hover:text-emerald-700 transition-colors mb-3 leading-snug">
                       <a href={`/services/${service.id}`}>{service.title}</a>
                     </h3>
@@ -1092,101 +1087,239 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 6. Section: Executed Projects & Case Studies */}
-      <section id="case-studies" className="relative py-24 md:py-32 bg-slate-50/70 border-t border-b border-slate-200 reveal overflow-hidden">
+      {/* Client & Industry Relationships Logo Carousel */}
+      <ClientLogoCarousel />
+
+      {/* 6. Section: Technical Experience & Operating Environments */}
+      <section id="experience" className="relative py-24 md:py-32 bg-slate-50/70 border-t border-b border-slate-200 reveal overflow-hidden">
         {/* Subtle Engineering Grid Background */}
         <div className="absolute inset-0 bg-tech-grid pointer-events-none opacity-40" />
         <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-            <div className="max-w-2xl">
-              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">
-                Executed Projects
+            <div className="max-w-3xl">
+              <div className="text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">Multidisciplinary Engineering Track Record</div>
+              <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">
+                Technical Experience & Operating Environments
               </h2>
-              <p className="text-slate-600 text-lg font-normal leading-relaxed mt-4">
-                Demonstrating engineering precision, safety, and dependable delivery across major energy assets.
+              <p className="text-slate-600 text-base md:text-lg font-normal leading-relaxed mt-4">
+                PIGL applies practical field experience, certified engineering methodologies, and advanced instrumentation to solve complex operational challenges across challenging terrestrial, marine, and industrial environments.
               </p>
             </div>
             <a
-              href="/projects"
-              className="inline-flex items-center text-emerald-800 hover:text-emerald-950 font-bold text-sm tracking-wide transition-colors group"
+              href="/services"
+              className="inline-flex items-center text-emerald-800 hover:text-emerald-950 font-bold text-sm tracking-wide transition-colors group shrink-0"
             >
-              View All Projects <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+              Explore All Divisions <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
             </a>
           </div>
 
-          {/* Clean 3-Project Grid with 3-Beat Narrative Arc & Corner Accents */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {effectiveProjects.slice(0, 3).map((project, idx) => (
-              <a
-                key={idx}
-                href={`/projects?id=${project.id}`}
-                className="group border border-slate-200 bg-white flex flex-col hover:border-emerald-700/60 hover:shadow-xl transition-all duration-300 overflow-hidden card-shimmer relative"
-              >
-                {/* Engineering Corner Bracket */}
-                <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-emerald-600/30 group-hover:border-emerald-600 transition-colors z-20 pointer-events-none" />
-
-                <div className="relative aspect-[16/10] overflow-hidden bg-slate-900">
-                  <img 
-                    src={project.image} 
-                    alt={project.title} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                    loading="lazy" 
-                    decoding="async" 
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/assets/operations/pigl_pipeline_construction_swamp_cat.jpg';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+          {/* 5 Technical Disciplines Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* 1. Geophysical & Geotechnical Investigations (Span 7) */}
+            <div className="lg:col-span-7 bg-white border border-slate-200 p-8 sm:p-10 flex flex-col justify-between hover:border-emerald-600/60 hover:shadow-xl transition-all duration-300 relative group overflow-hidden">
+              <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-emerald-600/30 group-hover:border-emerald-600 transition-colors pointer-events-none" />
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+                    Subsurface & Marine Ground Truth
+                  </span>
+                  <span className="text-xs font-mono text-slate-400">DISCIPLINE 01</span>
                 </div>
-
-                <div className="p-7 flex-grow flex flex-col justify-between space-y-4">
+                <h3 className="text-2xl font-bold text-slate-900 tracking-tight mb-3 group-hover:text-emerald-800 transition-colors">
+                  Geophysical & Geotechnical Investigations
+                </h3>
+                <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6">
+                  Comprehensive characterisation of subsoil and seabed strata to de-risk foundation engineering, pipeline alignments, and civil infrastructure. Operating across terrestrial terrains, intertidal mudflats, and deepwater marine locations.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-100 text-xs text-slate-600 mb-6">
                   <div>
-                    <div className="mb-2">
-                      <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                        Client: {project.client || 'Energy Sector'}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-900 leading-snug mb-3 tracking-tight group-hover:text-emerald-800 transition-colors">
-                      {project.title}
-                    </h3>
-
-                    {/* 3-Beat Narrative Arc */}
-                    <div className="space-y-2 mt-3 pt-3 border-t border-slate-100 text-xs">
-                      <div>
-                        <span className="font-mono font-bold text-slate-500 uppercase text-[10px] block">THE CHALLENGE:</span>
-                        <p className="text-slate-600 font-normal leading-relaxed line-clamp-2 mt-0.5">
-                          {project.challenge || project.description}
-                        </p>
-                      </div>
-                      <div className="pt-1.5">
-                        <span className="font-mono font-bold text-emerald-700 uppercase text-[10px] block">OUTCOME ACHIEVED:</span>
-                        <p className="text-slate-800 font-medium leading-relaxed line-clamp-1 mt-0.5">
-                          {project.results || 'Executed in accordance with approved engineering specifications and client standards.'}
-                        </p>
-                      </div>
-                    </div>
+                    <span className="font-bold text-slate-900 block mb-1">Key Methodologies:</span>
+                    <ul className="space-y-1 list-disc list-inside">
+                      <li>Deep borehole drilling & soil sampling</li>
+                      <li>20-Tonne CPTu piezocone penetration</li>
+                      <li>Sub-bottom profiling & seismic refraction</li>
+                      <li>Electrical resistivity tomography (ERT)</li>
+                    </ul>
                   </div>
-
-                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                    <span className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-800 group-hover:text-emerald-950 group-hover:translate-x-1 transition-all">
-                      Read Project Narrative <span className="ml-1.5">→</span>
-                    </span>
+                  <div>
+                    <span className="font-bold text-slate-900 block mb-1">Engineering Impact:</span>
+                    <p className="leading-relaxed">
+                      Delivers certified geotechnical ground models, soil stratigraphy, and foundation load capacities required for FEED and detailed engineering design.
+                    </p>
                   </div>
                 </div>
-              </a>
-            ))}
+              </div>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                <a
+                  href="/services/geosolutions-engineering-services"
+                  className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-800 hover:text-emerald-950 group-hover:translate-x-1 transition-all"
+                >
+                  View Geotechnical Capabilities <span className="ml-1.5">→</span>
+                </a>
+              </div>
+            </div>
+
+            {/* 2. Marine & Offshore Operations (Span 5) */}
+            <div className="lg:col-span-5 bg-white border border-slate-200 p-8 sm:p-10 flex flex-col justify-between hover:border-emerald-600/60 hover:shadow-xl transition-all duration-300 relative group overflow-hidden">
+              <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-emerald-600/30 group-hover:border-emerald-600 transition-colors pointer-events-none" />
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs font-bold uppercase tracking-wider text-cyan-800 bg-cyan-50 px-3 py-1 rounded-full border border-cyan-100">
+                    Maritime & Oceanographic
+                  </span>
+                  <span className="text-xs font-mono text-slate-400">DISCIPLINE 02</span>
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 tracking-tight mb-3 group-hover:text-cyan-800 transition-colors">
+                  Marine & Offshore Operations
+                </h3>
+                <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6">
+                  High-fidelity hydrographic surveying, offshore rig positioning, and real-time metocean observation to support offshore drilling programmes, navigation dredging, and subsea asset installations.
+                </p>
+                <div className="pt-4 border-t border-slate-100 text-xs text-slate-600 mb-6">
+                  <span className="font-bold text-slate-900 block mb-1">Core Deliverables:</span>
+                  <p className="leading-relaxed">
+                    Multibeam bathymetric charting, side-scan acoustic clearance, ADCP current/wave profiling, and DGPS precise offshore positioning.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                <a
+                  href="/services/metocean-marine-solutions"
+                  className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-800 hover:text-emerald-950 group-hover:translate-x-1 transition-all"
+                >
+                  View Marine Solutions <span className="ml-1.5">→</span>
+                </a>
+              </div>
+            </div>
+
+            {/* 3. Digital Mapping & Reality Capture (Span 4) */}
+            <div className="lg:col-span-4 bg-white border border-slate-200 p-8 flex flex-col justify-between hover:border-emerald-600/60 hover:shadow-xl transition-all duration-300 relative group overflow-hidden">
+              <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-emerald-600/30 group-hover:border-emerald-600 transition-colors pointer-events-none" />
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-3 py-1 rounded-full border border-amber-100">
+                    Spatial Intelligence
+                  </span>
+                  <span className="text-xs font-mono text-slate-400">DISCIPLINE 03</span>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-3 group-hover:text-amber-800 transition-colors">
+                  Digital Mapping & Reality Capture
+                </h3>
+                <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                  High-definition 3D laser scanning (Leica RTC360 & BLK), aerial UAV photogrammetry, and intelligent CAD/BIM modeling. Eliminates clash risks in congested brownfield facilities prior to piping fabrication.
+                </p>
+                <div className="pt-4 border-t border-slate-100 text-xs text-slate-600 mb-6">
+                  <span className="font-bold text-slate-900 block mb-1">Field Advantage:</span>
+                  <p className="leading-relaxed">
+                    Sub-millimetre point cloud precision, digital twins, and pipeline right-of-way corridor mapping without operational shutdowns.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                <a
+                  href="/services/geosolutions-engineering-services"
+                  className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-800 hover:text-emerald-950 group-hover:translate-x-1 transition-all"
+                >
+                  View Reality Capture <span className="ml-1.5">→</span>
+                </a>
+              </div>
+            </div>
+
+            {/* 4. Environmental & Water Solutions (Span 4) */}
+            <div className="lg:col-span-4 bg-white border border-slate-200 p-8 flex flex-col justify-between hover:border-emerald-600/60 hover:shadow-xl transition-all duration-300 relative group overflow-hidden">
+              <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-emerald-600/30 group-hover:border-emerald-600 transition-colors pointer-events-none" />
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs font-bold uppercase tracking-wider text-teal-800 bg-teal-50 px-3 py-1 rounded-full border border-teal-100">
+                    Process & Environment
+                  </span>
+                  <span className="text-xs font-mono text-slate-400">DISCIPLINE 04</span>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-3 group-hover:text-teal-800 transition-colors">
+                  Environmental & Water Solutions
+                </h3>
+                <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                  Engineering solutions for produced water treatment, industrial effluent clarification, deep groundwater abstraction, and comprehensive environmental baseline sampling to satisfy regulatory guidelines.
+                </p>
+                <div className="pt-4 border-t border-slate-100 text-xs text-slate-600 mb-6">
+                  <span className="font-bold text-slate-900 block mb-1">Technical Focus:</span>
+                  <p className="leading-relaxed">
+                    Hydrocarbon separation, industrial water recycling, laboratory water chemistry testing, and potable water treatment infrastructure.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                <a
+                  href="/services/industrial-solutions"
+                  className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-800 hover:text-emerald-950 group-hover:translate-x-1 transition-all"
+                >
+                  View Water Solutions <span className="ml-1.5">→</span>
+                </a>
+              </div>
+            </div>
+
+            {/* 5. Construction & Industrial Support (Span 4) */}
+            <div className="lg:col-span-4 bg-white border border-slate-200 p-8 flex flex-col justify-between hover:border-emerald-600/60 hover:shadow-xl transition-all duration-300 relative group overflow-hidden">
+              <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-emerald-600/30 group-hover:border-emerald-600 transition-colors pointer-events-none" />
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs font-bold uppercase tracking-wider text-orange-800 bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+                    Infrastructure Delivery
+                  </span>
+                  <span className="text-xs font-mono text-slate-400">DISCIPLINE 05</span>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-3 group-hover:text-orange-800 transition-colors">
+                  Construction & Industrial Support
+                </h3>
+                <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                  Mainline pipeline installation, swamp trenching, horizontal directional drilling (HDD) crossings, heavy civil foundation works, and piping prefabrication executed to stringent HSSEQ standards.
+                </p>
+                <div className="pt-4 border-t border-slate-100 text-xs text-slate-600 mb-6">
+                  <span className="font-bold text-slate-900 block mb-1">Field Capabilities:</span>
+                  <p className="leading-relaxed">
+                    Right-of-way civil construction, certified welding, hydrostatic pressure testing, non-destructive testing (NDT), and facility turnaround support.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                <a
+                  href="/services/integrated-construction-services"
+                  className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-emerald-800 hover:text-emerald-950 group-hover:translate-x-1 transition-all"
+                >
+                  View Construction Services <span className="ml-1.5">→</span>
+                </a>
+              </div>
+            </div>
           </div>
 
-          <div className="mt-16 text-center">
-            <a
-              href="/projects"
-              className="inline-flex items-center px-8 py-4 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-md"
-            >
-              View Full Projects & Case Studies Library <span className="ml-2">→</span>
-            </a>
+          {/* Bottom Callout Banner */}
+          <div className="mt-16 p-8 bg-slate-900 text-white rounded-none border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+            <div>
+              <h4 className="text-xl font-bold tracking-tight text-white mb-1">
+                Consult With Our Engineering & Operations Desk
+              </h4>
+              <p className="text-slate-400 text-sm max-w-2xl leading-relaxed">
+                Connect with our technical specialists in Port Harcourt and Lagos to discuss site investigations, marine monitoring, or industrial construction scopes.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-4 shrink-0">
+              <a
+                href="/services"
+                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-colors"
+              >
+                Explore All Services
+              </a>
+              <a
+                href="/contact"
+                className="px-6 py-3 border border-slate-600 hover:border-slate-400 text-slate-200 font-bold text-xs uppercase tracking-wider transition-colors"
+              >
+                Contact Us
+              </a>
+            </div>
           </div>
+
         </div>
       </section>
 
@@ -1637,14 +1770,14 @@ const Home: React.FC = () => {
           <div className="relative w-full max-w-5xl aspect-video rounded-xl overflow-hidden shadow-2xl bg-black animate-fade-in-scale">
             <button
               onClick={() => setIsVideoModalOpen(false)}
-              className="absolute top-4 right-4 z-10 w-12 h-12 bg-white hover:bg-emerald-500 text-slate-900 hover:text-white flex items-center justify-center transition-colors shadow-lg cursor-pointer"
+              className="absolute top-4 right-4 z-10 w-12 h-12 bg-white hover:bg-emerald-500 text-slate-900 hover:text-white flex items-center justify-center transition-colors shadow-lg"
               aria-label="Close video"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
             <iframe
               className="w-full h-full"
-              src={`https://www.youtube-nocookie.com/embed/${getYouTubeId(settings?.youtube_url) || 'sExrHCIGkH0'}?autoplay=1&rel=0&modestbranding=1`}
+              src="https://www.youtube-nocookie.com/embed/sExrHCIGkH0?autoplay=1&rel=0&modestbranding=1"
               title="PIGL Video Story"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

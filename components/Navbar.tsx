@@ -145,7 +145,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
   }, [isOpen, isDownloadModalOpen]);
 
   const dynamicNavLinks = (navConfig?.header || [])
-    .filter(item => item.is_active)
+    .filter(item => item.is_active && !item.href?.startsWith('/projects'))
     .sort((a, b) => a.order - b.order)
     .map(item => {
       let layout: 'links' | 'services' | 'projects' = item.layout || (item.name === 'Services' ? 'services' : 'links');
@@ -244,7 +244,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
         link: `/services/${SERVICES[0].id}`
       }
     },
-    { name: 'Projects', href: '/projects', type: 'standard' },
     { name: 'Partners', href: '/partners', type: 'standard' },
     { name: 'Blog', href: '/blog', type: 'standard' },
     { name: 'Careers', href: '/careers', type: 'standard' },
