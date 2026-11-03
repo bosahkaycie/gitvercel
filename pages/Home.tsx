@@ -996,11 +996,12 @@ const Home: React.FC = () => {
           {/* Header with Carousel Navigation Controls */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div className="max-w-2xl">
+              <div className="text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">Our Operating Divisions</div>
               <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">
-                Services
+                Specialist Engineering Divisions
               </h2>
               <p className="text-slate-600 text-base md:text-lg font-normal leading-relaxed">
-                Converting physical environments, complex subsurfaces, and maritime conditions into high-fidelity data and execution.
+                Operating across four established engineering disciplines, delivering high-fidelity site characterisation, marine observation, infrastructure construction, and industrial process solutions.
               </p>
             </div>
 
@@ -1062,6 +1063,11 @@ const Home: React.FC = () => {
 
                 <div className="p-6 sm:p-7 flex-grow flex flex-col justify-between space-y-5">
                   <div>
+                    {((service as any).abbreviation || (service as any).serviceNumber) && (
+                      <div className="text-[11px] font-bold tracking-widest text-emerald-700 uppercase mb-2">
+                        DIVISION {(service as any).serviceNumber || `0${(sIdx % 4) + 1}`} • {(service as any).abbreviation || 'CORE'}
+                      </div>
+                    )}
                     <h3 className="text-xl font-bold text-slate-900 tracking-tight group-hover:text-emerald-700 transition-colors mb-3 leading-snug">
                       <a href={`/services/${service.id}`}>{service.title}</a>
                     </h3>
@@ -1631,14 +1637,14 @@ const Home: React.FC = () => {
           <div className="relative w-full max-w-5xl aspect-video rounded-xl overflow-hidden shadow-2xl bg-black animate-fade-in-scale">
             <button
               onClick={() => setIsVideoModalOpen(false)}
-              className="absolute top-4 right-4 z-10 w-12 h-12 bg-white hover:bg-emerald-500 text-slate-900 hover:text-white flex items-center justify-center transition-colors shadow-lg"
+              className="absolute top-4 right-4 z-10 w-12 h-12 bg-white hover:bg-emerald-500 text-slate-900 hover:text-white flex items-center justify-center transition-colors shadow-lg cursor-pointer"
               aria-label="Close video"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
             <iframe
               className="w-full h-full"
-              src="https://www.youtube-nocookie.com/embed/sExrHCIGkH0?autoplay=1&rel=0&modestbranding=1"
+              src={`https://www.youtube-nocookie.com/embed/${getYouTubeId(settings?.youtube_url) || 'sExrHCIGkH0'}?autoplay=1&rel=0&modestbranding=1`}
               title="PIGL Video Story"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
