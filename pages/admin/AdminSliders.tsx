@@ -151,47 +151,45 @@ const AdminSliders: React.FC<AdminSlidersProps> = ({
         </div>
       )}
 
-      {/* Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 ${
+      {/* Action Bar (No Duplicate Header) */}
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
         isDark ? 'border-slate-800' : 'border-slate-200'
       }`}>
-        <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-            Homepage Sliders & Hero Visuals
-          </h1>
-          <p className={`text-xs sm:text-sm mt-1 leading-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Manage the carousel headlines, backgrounds, videos, and call-to-actions on the PIGL homepage.
-          </p>
-        </div>
+        <p className={`text-xs sm:text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+          Active hero banners and video loops displayed on the public homepage.
+        </p>
 
         <div className="flex items-center gap-2 self-start sm:self-auto">
           {onReset && (
             <button
               onClick={async () => {
-                if (window.confirm('Synchronize sliders with the latest 4 Operating Divisions from the codebase? Any local uncommitted changes will be aligned with the canonical repository slides.')) {
+                if (window.confirm('Reset homepage slides to the 4 canonical Operating Divisions?')) {
                   await onReset();
                   setToast({
                     type: 'success',
-                    message: 'Sliders successfully synchronized with the canonical 4 Operating Divisions.'
+                    message: 'Sliders synchronized with canonical Operating Divisions.'
                   });
                 }
               }}
-              className={`px-3.5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center space-x-2 border ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center space-x-2 border cursor-pointer ${
                 isDark
-                  ? "border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200"
-                  : "border-slate-300 bg-white hover:bg-slate-50 text-slate-700"
+                  ? 'border-slate-700 hover:bg-slate-800 text-slate-300'
+                  : 'border-slate-300 hover:bg-slate-100 text-slate-700'
               }`}
-              title="Synchronize sliders with codebase"
             >
-              <span>↻ Sync with Codebase</span>
+              <span>Reset Defaults</span>
             </button>
           )}
+
           <button
-            onClick={() => setIsCreating(true)}
-            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2"
+            onClick={() => {
+              setEditingSlider(null);
+              setIsCreating(true);
+            }}
+            className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 cursor-pointer"
           >
             <IconPlus className="w-4 h-4" />
-            <span>Add New Slide</span>
+            <span>Add Slide</span>
           </button>
         </div>
       </div>

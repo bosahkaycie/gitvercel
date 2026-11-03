@@ -147,39 +147,7 @@ const AdminVendors: React.FC<AdminVendorsProps> = ({
 
   return (
     <div className={`space-y-6 font-sans ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
-      
-      {/* Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 ${
-        isDark ? 'border-slate-800' : 'border-slate-200'
-      }`}>
-        <div>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-              Vendor Onboarding & Tax Compliance Desk
-            </h1>
-            <span className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold border ${
-              isDark ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800/50' : 'bg-emerald-100 text-emerald-900 border-emerald-300/60'
-            }`}>
-              FORM VOTC/037
-            </span>
-          </div>
-          <p className={`text-xs sm:text-sm mt-1 leading-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Review, audit, and approve new and existing vendor credentials (TIN, VAT status, NUBAN, and Section G sign-offs).
-          </p>
-        </div>
-
-        <a
-          href="/vendors/register"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 self-start sm:self-auto"
-        >
-          <IconExternal className="w-4 h-4" />
-          <span>Open Public Form</span>
-        </a>
-      </div>
-
-      {/* Toolbar */}
+      {/* Toolbar & Filter (No Duplicate Header) */}
       <div className={`p-4 rounded-2xl border shadow-xs flex flex-col sm:flex-row gap-4 items-center justify-between transition-colors ${
         isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
       }`}>

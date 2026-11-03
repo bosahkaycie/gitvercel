@@ -235,9 +235,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               {currentTimeStr}
             </span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
             {greeting}, {adminName}
-          </h1>
+          </h2>
           <p className={`text-xs max-w-xl ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
             Live overview of website telemetry, publications, technical inquiries, and corporate communications.
           </p>
@@ -536,10 +536,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </button>
             </div>
 
-            <span className={`text-xs font-mono font-bold px-2.5 py-1 rounded-lg border ${
-              isDark ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800/50' : 'bg-emerald-100 text-emerald-900 border-emerald-300/60'
+            <span className={`text-xs font-mono font-medium px-2.5 py-1 rounded-lg border ${
+              isDark ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-700 border-slate-200'
             }`}>
-              Live Telemetry
+              Traffic Overview
             </span>
           </div>
         </div>

@@ -402,25 +402,13 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
   return (
     <div className={`space-y-6 font-sans ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
       
-      {/* Page Header */}
-      <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-6 ${
+      {/* Action Bar (No Duplicate Header) */}
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
         isDark ? 'border-slate-800' : 'border-slate-200'
       }`}>
-        <div>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight">
-              Executive Management Team
-            </h1>
-            <span className={`px-2.5 py-1 rounded-lg text-xs font-bold font-mono border ${
-              isDark ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800/50' : 'bg-emerald-100 text-emerald-900 border-emerald-300/60'
-            }`}>
-              {teamMembers.length} Executives
-            </span>
-          </div>
-          <p className={`text-xs sm:text-sm mt-1 leading-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Manage leadership profiles for the public About Us page. Reorder display hierarchy, edit bios, and import personnel from CSV or JSON files.
-          </p>
-        </div>
+        <p className={`text-xs sm:text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+          Manage leadership and specialist profiles displayed across the website.
+        </p>
 
         <div className="flex items-center gap-2.5 flex-wrap">
           <button
@@ -431,19 +419,19 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
               setImportSuccessCount(null);
               setIsImportModalOpen(true);
             }}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-colors flex items-center space-x-2 ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-colors flex items-center space-x-2 cursor-pointer ${
               isDark
                 ? 'bg-slate-900 border-slate-700 text-slate-200 hover:bg-slate-800 hover:border-slate-600'
                 : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 shadow-xs'
             }`}
           >
             <IconUpload className="w-4 h-4 text-emerald-600" />
-            <span>Import from File</span>
+            <span>Import</span>
           </button>
 
           <button
             onClick={handleOpenAdd}
-            className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2"
+            className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 cursor-pointer"
           >
             <IconPlus className="w-4 h-4" />
             <span>Add Member</span>

@@ -160,31 +160,21 @@ const AdminServices: React.FC<AdminServicesProps> = ({
         </div>
       )}
 
-      {/* Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-5 ${
+      {/* Action Bar (No Duplicate Header) */}
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
         isDark ? 'border-slate-800' : 'border-slate-200'
       }`}>
-        <div>
-          <div className="flex items-center space-x-2.5">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-              Engineering Services & Deliverables
-            </h1>
-            <span className="px-2.5 py-0.5 text-xs font-mono font-bold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-300/40">
-              {services.length} Capabilities Active
-            </span>
-          </div>
-          <p className={`text-xs sm:text-sm mt-1 leading-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Manage technical services, equipment specifications, and Core Deliverables & Focal Points displayed across the website.
-          </p>
-        </div>
+        <p className={`text-xs sm:text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+          Manage services across PIGL's four multidisciplinary engineering divisions.
+        </p>
 
-        <div className="flex items-center space-x-2.5 self-start sm:self-auto">
+        <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
           {/* View Switcher */}
           <div className="flex items-center space-x-1 bg-slate-200/80 dark:bg-slate-800 p-1 rounded-xl">
             <button
               type="button"
               onClick={() => setActiveView('catalog')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeView === 'catalog'
                   ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
@@ -195,20 +185,20 @@ const AdminServices: React.FC<AdminServicesProps> = ({
             <button
               type="button"
               onClick={() => setActiveView('deliverables')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
                 activeView === 'deliverables'
                   ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-none"></span>
-              <span>Core Deliverables Matrix</span>
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+              <span>Core Deliverables</span>
             </button>
           </div>
 
           <button
             onClick={() => setIsCreating(true)}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center space-x-1.5 shadow-xs"
+            className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center space-x-1.5 shadow-xs cursor-pointer"
           >
             <IconPlus className="w-4 h-4" />
             <span>Add Service</span>

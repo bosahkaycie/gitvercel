@@ -1108,36 +1108,21 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
         </aside>
       )}
 
-      {/* Top Banner */}
-      <div className={`p-6 sm:p-8 rounded-2xl border transition-all ${
-        isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+      {/* Action Bar (No Duplicate Header) */}
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
+        isDark ? 'border-slate-800' : 'border-slate-200'
       }`}>
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 rounded-2xl">
-              <IconCampaign className="w-7 h-7" />
-            </div>
-            <div>
-              <div className="flex items-center space-x-3 mb-1">
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Campaigns & Newsletters</h1>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                  Broadcast Suite
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-slate-400">
-                Manage automated marketing blasts, client newsletters, and audience segments with zero pop-up disruption.
-              </p>
-            </div>
-          </div>
+        <p className={`text-xs sm:text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+          Manage client newsletters, verified subscribers, and targeted email communications.
+        </p>
 
-          <button
-            onClick={handleOpenNewCampaign}
-            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm rounded-xl shadow-lg hover:shadow-emerald-600/30 transition-all flex items-center space-x-2"
-          >
-            <IconPlus className="w-4 h-4" />
-            <span>Compose New Campaign</span>
-          </button>
-        </div>
+        <button
+          onClick={handleOpenNewCampaign}
+          className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all flex items-center space-x-2 shrink-0 cursor-pointer self-start sm:self-auto"
+        >
+          <IconPlus className="w-4 h-4" />
+          <span>Compose New Campaign</span>
+        </button>
       </div>
 
       {/* KPI Stats Grid */}

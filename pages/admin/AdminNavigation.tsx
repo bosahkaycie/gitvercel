@@ -29,9 +29,10 @@ import {
 
 interface AdminNavigationProps {
   theme?: 'light' | 'dark';
+  initialTab?: 'header' | 'footer' | 'pages';
 }
 
-export const AdminNavigation: React.FC<AdminNavigationProps> = ({ theme = 'light' }) => {
+export const AdminNavigation: React.FC<AdminNavigationProps> = ({ theme = 'light', initialTab }) => {
   const isDark = theme === 'dark';
   const {
     navConfig,
@@ -42,7 +43,13 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ theme = 'light
     resetToDefaults
   } = useNavigation(true);
 
-  const [activeTab, setActiveTab] = useState<'header' | 'footer' | 'pages'>('header');
+  const [activeTab, setActiveTab] = useState<'header' | 'footer' | 'pages'>(() => initialTab || 'header');
+
+  React.useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 

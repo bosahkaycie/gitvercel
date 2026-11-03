@@ -62,39 +62,17 @@ const AdminBlog: React.FC<AdminBlogProps> = ({
 
   return (
     <div className={`space-y-6 font-sans ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
-      {/* Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 ${
-        isDark ? 'border-slate-800' : 'border-slate-200'
-      }`}>
-        <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-            Blog & Technical Insights
-          </h1>
-          <p className={`text-xs sm:text-sm mt-1 leading-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Publish engineering articles, project milestones, and corporate developments to the public website.
-          </p>
-        </div>
-
-        <button
-          onClick={() => setIsCreating(true)}
-          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 self-start sm:self-auto"
-        >
-          <IconPlus className="w-4 h-4" />
-          <span>Write New Article</span>
-        </button>
-      </div>
-
-      {/* Filter Tabs */}
+      {/* Filter Tabs & Primary Action (No Duplicate Title) */}
       <div className={`flex flex-wrap items-center justify-between gap-4 border-b pb-4 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
         <div className="flex flex-wrap items-center gap-2">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setFilterCategory(cat)}
-              className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 filterCategory === cat
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
+                  ? (isDark ? 'bg-emerald-600 text-white' : 'bg-emerald-800 text-white')
+                  : (isDark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200')
               }`}
             >
               {cat}
@@ -117,6 +95,14 @@ const AdminBlog: React.FC<AdminBlogProps> = ({
             <option value="archived">Archived Only</option>
           </select>
         </div>
+
+        <button
+          onClick={() => setIsCreating(true)}
+          className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 shrink-0 cursor-pointer"
+        >
+          <IconPlus className="w-4 h-4" />
+          <span>Write Article</span>
+        </button>
       </div>
 
       {/* Posts Table */}

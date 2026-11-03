@@ -399,7 +399,7 @@ export interface ContactInquiry {
 export interface AuditLog {
   id: string;
   action: string;
-  entity_type: 'service' | 'blog' | 'slider' | 'video' | 'navigation' | 'media' | 'admin_user' | 'setting' | 'inquiry' | 'project' | 'partner' | 'team_member' | 'job_opening' | 'job_application' | 'vendor_application' | 'email_campaign' | 'email_subscriber';
+  entity_type: 'service' | 'blog' | 'slider' | 'video' | 'navigation' | 'media' | 'admin_user' | 'setting' | 'inquiry' | 'project' | 'partner' | 'team_member' | 'job_opening' | 'job_application' | 'vendor_application' | 'email_campaign' | 'email_subscriber' | 'testimonial';
   entity_id?: string;
   details?: Record<string, any>;
   user_email: string;

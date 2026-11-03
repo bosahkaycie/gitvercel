@@ -116,32 +116,20 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
 
   return (
     <div className={`space-y-6 font-sans ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
-      {/* Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 ${
+      {/* Action Bar (No Duplicate Header) */}
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
         isDark ? 'border-slate-800' : 'border-slate-200'
       }`}>
-        <div>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-              Administrator Team & Roles
-            </h1>
-            <span className={`px-2.5 py-1 rounded-lg text-xs font-bold font-mono border ${
-              isDark ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800/50' : 'bg-emerald-100 text-emerald-900 border-emerald-300/60'
-            }`}>
-              {users.length} Active
-            </span>
-          </div>
-          <p className={`text-xs sm:text-sm mt-1 leading-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Manage authorized portal administrators, assign role privileges, and control platform access permissions.
-          </p>
-        </div>
+        <p className={`text-xs sm:text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+          Manage administrator accounts, roles, and platform access permissions.
+        </p>
 
         <button
           onClick={openCreateModal}
-          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 self-start sm:self-auto"
+          className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 shrink-0 cursor-pointer self-start sm:self-auto"
         >
           <IconPlus className="w-4 h-4" />
-          <span>Add Administrator</span>
+          <span>Add User</span>
         </button>
       </div>
 

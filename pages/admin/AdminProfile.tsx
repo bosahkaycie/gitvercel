@@ -173,9 +173,9 @@ const AdminProfile: React.FC<AdminProfileProps> = ({
 
             <div>
               <div className="flex items-center space-x-3 mb-1">
-                <h1 className={`text-2xl sm:text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <h2 className={`text-2xl sm:text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   {fullName || 'Administrator'}
-                </h1>
+                </h2>
                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold font-mono border ${
                   isDark 
                     ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800/50' 

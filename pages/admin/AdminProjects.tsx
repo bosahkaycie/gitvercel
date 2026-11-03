@@ -65,36 +65,7 @@ const AdminProjects: React.FC<AdminProjectsProps> = ({
 
   return (
     <div className={`space-y-6 font-sans ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
-      {/* Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 ${
-        isDark ? 'border-slate-800' : 'border-slate-200'
-      }`}>
-        <div>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-              Projects & Engineering Case Studies
-            </h1>
-            <span className={`px-2.5 py-1 rounded-lg text-xs font-bold font-mono border ${
-              isDark ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800/50' : 'bg-emerald-100 text-emerald-900 border-emerald-300/60'
-            }`}>
-              {projects.length} Total
-            </span>
-          </div>
-          <p className={`text-xs sm:text-sm mt-1 leading-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Manage major Nigerian energy, offshore, pipeline, and infrastructure milestones displayed on the website.
-          </p>
-        </div>
-
-        <button
-          onClick={() => setIsCreating(true)}
-          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 self-start sm:self-auto"
-        >
-          <IconPlus className="w-4 h-4" />
-          <span>Add Project / Case Study</span>
-        </button>
-      </div>
-
-      {/* Toolbar & Filter */}
+      {/* Toolbar & Filter (No Duplicate Header) */}
       <div className={`p-4 rounded-2xl border shadow-xs flex flex-col sm:flex-row gap-4 items-center justify-between transition-colors ${
         isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
       }`}>
@@ -108,25 +79,34 @@ const AdminProjects: React.FC<AdminProjectsProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all ${
-              isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-500'
+              isDark ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400'
             }`}
           />
         </div>
 
-        <div className="flex items-center space-x-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setFilterCategory(cat)}
-              className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
-                filterCategory === cat
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
+          <div className="flex items-center space-x-2">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Category:</span>
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className={`px-3 py-2 text-xs border rounded-xl font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
+                isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
               }`}
             >
-              {cat}
-            </button>
-          ))}
+              {CATEGORIES.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            onClick={() => setIsCreating(true)}
+            className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 shrink-0 cursor-pointer"
+          >
+            <IconPlus className="w-4 h-4" />
+            <span>Add Project</span>
+          </button>
         </div>
       </div>
 

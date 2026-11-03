@@ -105,43 +105,21 @@ const AdminTestimonials: React.FC<AdminTestimonialsProps> = ({
 
   return (
     <div className={`space-y-6 font-sans ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
-      {/* Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 ${
+      {/* Action Bar (No Duplicate Title) */}
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b ${
         isDark ? 'border-slate-800' : 'border-slate-200'
       }`}>
-        <div>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-              Client Endorsements & Testimonials
-            </h1>
-            <span className={`px-2.5 py-1 rounded-lg text-xs font-bold font-mono border ${
-              isDark ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800/50' : 'bg-emerald-100 text-emerald-900 border-emerald-300/60'
-            }`}>
-              {testimonials.length} Total
-            </span>
-          </div>
-          <p className={`text-xs sm:text-sm mt-1 leading-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Manage verified client commendations and operational endorsements. Placeholders are visibly marked to prevent misrepresentation.
-          </p>
-        </div>
+        <p className={`text-xs sm:text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+          Sample or draft testimonials are labeled on the live site until formal client verification.
+        </p>
 
         <button
           onClick={openCreate}
-          className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 self-start sm:self-auto"
+          className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 shrink-0 self-start sm:self-auto cursor-pointer"
         >
           <IconPlus className="w-4 h-4" />
-          <span>Add Endorsement</span>
+          <span>Add Testimonial</span>
         </button>
-      </div>
-
-      {/* Warning Notice about Placeholder Testimonials */}
-      <div className={`p-4 rounded-xl border flex items-start gap-3 ${
-        isDark ? 'bg-amber-950/30 border-amber-800/50 text-amber-200' : 'bg-amber-50 border-amber-200 text-amber-900'
-      }`}>
-        <IconAlert className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-        <div className="text-xs leading-relaxed">
-          <span className="font-bold">Content Governance Protocol:</span> Testimonials flagged as <code className="font-mono font-bold bg-amber-500/20 px-1 py-0.5 rounded">Sample / Placeholder</code> will display a distinct Draft notice on the public website. Only uncheck this flag once formal client verification and written corporate clearance have been received.
-        </div>
       </div>
 
       {/* Testimonials List */}
@@ -157,70 +135,70 @@ const AdminTestimonials: React.FC<AdminTestimonialsProps> = ({
         <div className={`p-12 border rounded-2xl text-center text-sm font-medium ${
           isDark ? 'bg-slate-900 border-slate-800 text-slate-400' : 'bg-white border-slate-200 text-slate-500'
         }`}>
-          No testimonials registered yet. Click "Add Endorsement" to add one.
+          No testimonials registered yet. Click &quot;Add Testimonial&quot; to add one.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {testimonials.map((item) => (
             <div
               key={item.id}
               className={`p-5 rounded-2xl border flex flex-col justify-between transition-all ${
-                isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-2xs'
+                isDark ? 'bg-slate-900/90 border-slate-800 hover:border-slate-700' : 'bg-white border-slate-200 hover:border-slate-300 shadow-2xs'
               }`}
             >
               <div>
+                {/* Header Info: Status & Verification */}
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div className="flex items-center gap-2">
-                    <span className={`px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded ${
+                    <span className={`px-2 py-0.5 text-[11px] font-bold rounded ${
                       item.status === 'published'
                         ? (isDark ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-800' : 'bg-emerald-50 text-emerald-800 border border-emerald-200')
                         : (isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600')
                     }`}>
-                      {item.status}
+                      {item.status === 'published' ? 'Published' : 'Draft'}
                     </span>
                     {item.is_placeholder ? (
-                      <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-amber-500/10 text-amber-600 border border-amber-500/30">
-                        Sample / Draft
+                      <span className="px-2 py-0.5 text-[11px] font-medium rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                        Draft / Sample
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-blue-500/10 text-blue-600 border border-blue-500/30">
-                        Verified Endorsement
+                      <span className="px-2 py-0.5 text-[11px] font-medium rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+                        Verified
                       </span>
                     )}
                   </div>
-                  <span className="text-xs font-mono text-slate-400">Order: {item.display_order}</span>
+                  <span className="text-xs text-slate-400 font-mono">#{item.display_order}</span>
                 </div>
 
-                <p className={`text-sm italic leading-relaxed mb-4 line-clamp-4 ${
+                {/* Quotation */}
+                <p className={`text-sm italic leading-relaxed mb-4 line-clamp-3 ${
                   isDark ? 'text-slate-300' : 'text-slate-700'
                 }`}>
-                  "{item.quote}"
+                  &ldquo;{item.quote}&rdquo;
                 </p>
 
+                {/* Author & Organisation Info */}
                 <div className="flex items-center gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-                  <div className="w-10 h-10 rounded-full bg-emerald-800 text-white font-black text-xs flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-emerald-800 text-white font-bold text-xs flex items-center justify-center shrink-0">
                     {item.author_initials || item.author_name.substring(0, 2).toUpperCase()}
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
                       {item.author_name}
                     </p>
-                    <p className="text-xs text-emerald-700 dark:text-emerald-400 truncate">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 truncate">
                       {item.author_title}
+                      {item.author_company ? ` • ${item.author_company}` : ''}
                     </p>
-                    {item.author_company && (
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                        {item.author_company}
-                      </p>
-                    )}
                   </div>
                 </div>
               </div>
 
+              {/* Action Buttons */}
               <div className="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <button
                   onClick={() => openEdit(item)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg border flex items-center gap-1.5 transition-colors ${
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg border flex items-center gap-1.5 transition-colors cursor-pointer ${
                     isDark ? 'border-slate-700 hover:bg-slate-800 text-slate-300' : 'border-slate-300 hover:bg-slate-50 text-slate-700'
                   }`}
                 >
@@ -229,7 +207,7 @@ const AdminTestimonials: React.FC<AdminTestimonialsProps> = ({
                 </button>
                 <button
                   onClick={() => handleDelete(item.id, item.author_name)}
-                  className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center gap-1.5 transition-colors"
+                  className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <IconTrash className="w-3.5 h-3.5" />
                   <span>Delete</span>

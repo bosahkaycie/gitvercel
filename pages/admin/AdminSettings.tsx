@@ -238,25 +238,19 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
 
   return (
     <div className="space-y-6 font-sans">
-      {/* Header */}
-      <div className={`border-b pb-6 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+      {/* Sub-Tab Navigation Bar (No Duplicate Header) */}
+      <div className={`border-b pb-4 ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              Corporate Profile & System Settings
-            </h1>
-            <p className={`text-xs mt-1 font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              Manage corporate contact channels, departmental emails, physical HQ addresses, hero metrics, SMTP mail server, and database connection.
-            </p>
-          </div>
+          <p className={`text-xs sm:text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+            Configure corporate channels, update screen intercept, and mail server delivery.
+          </p>
 
-          {/* Sub-Tab Navigation Bar */}
           <div className={`inline-flex p-1 rounded-xl border self-start ${
             isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-100 border-slate-200'
           }`}>
             <button
               onClick={() => setActiveTab('profile')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'profile'
                   ? isDark ? 'bg-emerald-600 text-white shadow' : 'bg-white text-emerald-950 shadow-sm'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
@@ -266,7 +260,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
             </button>
             <button
               onClick={() => setActiveTab('smtp')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'smtp'
                   ? isDark ? 'bg-emerald-600 text-white shadow' : 'bg-white text-emerald-950 shadow-sm'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
@@ -276,7 +270,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
             </button>
             <button
               onClick={() => setActiveTab('database')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'database'
                   ? isDark ? 'bg-emerald-600 text-white shadow' : 'bg-white text-emerald-950 shadow-sm'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'

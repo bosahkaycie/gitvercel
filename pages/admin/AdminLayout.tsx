@@ -437,7 +437,9 @@ const AdminLayout: React.FC = () => {
           />
         );
       case 'navigation':
-        return <AdminNavigation theme={theme} />;
+        return <AdminNavigation theme={theme} initialTab="header" />;
+      case 'seo':
+        return <AdminNavigation theme={theme} initialTab="pages" />;
       case 'profile':
         return (
           <AdminProfile
@@ -490,104 +492,109 @@ const AdminLayout: React.FC = () => {
 
   const tabMeta: Record<string, { group: string; title: string; description: string }> = {
     dashboard: {
-      group: 'Overview',
-      title: 'Dashboard Overview',
-      description: 'System health, recent activities, inquiry metrics, and core operational statistics.'
-    },
-    navigation: {
-      group: 'Website Management',
-      title: 'Navigation & Pages',
-      description: 'Configure header navigation structure, dropdown menus, footer link columns, and search engine metadata.'
+      group: 'Dashboard',
+      title: 'Overview',
+      description: 'System health, recent inquiries, pending applications, and operational metrics.'
     },
     sliders: {
-      group: 'Website Management',
-      title: 'Homepage Banners',
-      description: 'Manage high-resolution hero banners, background video loops, headlines, and call-to-action buttons.'
+      group: 'Website Content',
+      title: 'Homepage',
+      description: 'Manage hero carousel banners, headlines, and call-to-action buttons.'
+    },
+    navigation: {
+      group: 'Website Content',
+      title: 'Pages & Navigation',
+      description: 'Configure header navigation, dropdown menus, and footer link columns.'
     },
     services: {
-      group: 'Website Management',
-      title: 'Services & Capabilities',
-      description: 'Manage engineering divisions, technical capabilities, equipment specifications, and core deliverables.'
+      group: 'Website Content',
+      title: 'Services',
+      description: 'Manage engineering divisions, technical capabilities, and core deliverables.'
     },
     projects: {
-      group: 'Website Management',
-      title: 'Projects & Case Studies',
-      description: 'Document executed field operations, client references, technical scopes, and project milestones.'
-    },
-    videos: {
-      group: 'Website Management',
-      title: 'Video Showcase Hub',
-      description: 'Curate corporate video reels, offshore operations footage, and technical demonstration media.'
-    },
-    partners: {
-      group: 'Website Management',
-      title: 'Technology Partners',
-      description: 'Manage international technology alliances, equipment manufacturer partnerships, and verified logos.'
-    },
-    testimonials: {
-      group: 'Website Management',
-      title: 'Client Endorsements & Testimonials',
-      description: 'Manage verified client commendations, stakeholder statements, and clearly marked sample draft testimonials.'
-    },
-    blog: {
-      group: 'Website Management',
-      title: 'Publications & News',
-      description: 'Publish technical articles, corporate announcements, whitepapers, and industry insights.'
-    },
-    media: {
-      group: 'Website Management',
-      title: 'Media Library',
-      description: 'Centralised repository for high-resolution photography, diagrams, PDFs, and corporate collateral.'
-    },
-    inquiries: {
-      group: 'Business Operations',
-      title: 'Inquiries & RFPs',
-      description: 'Track, review, assign, and respond to incoming technical inquiries, RFPs, and consultation requests.'
-    },
-    vendors: {
-      group: 'Business Operations',
-      title: 'Vendor Onboarding Desk',
-      description: 'Review contractor pre-qualification submissions, statutory compliance documentation, and verification status.'
-    },
-    careers: {
-      group: 'Business Operations',
-      title: 'Careers & CV Inbox',
-      description: 'Post career opportunities, manage openings, and review submitted candidate applications and CVs.'
-    },
-    campaigns: {
-      group: 'Marketing',
-      title: 'Campaigns & Newsletters',
-      description: 'Draft, schedule, and broadcast email campaigns and newsletters to client and stakeholder lists.'
-    },
-    followups: {
-      group: 'Marketing',
-      title: 'Follow Up & Broadcast',
-      description: 'Direct communication desk for sending follow-up messages and targeted operational updates.'
+      group: 'Website Content',
+      title: 'Projects',
+      description: 'Document executed field operations, client references, and project milestones.'
     },
     team: {
-      group: 'Organisation',
-      title: 'Management Team',
-      description: 'Maintain executive leadership profiles, qualifications, operational roles, and governance information.'
+      group: 'Website Content',
+      title: 'Teams',
+      description: 'Manage executive leadership profiles, technical specialists, and operational roles.'
     },
-    'corporate-profile': {
-      group: 'Organisation',
-      title: 'Corporate Profile & Company Information',
-      description: 'Maintain verified corporate details, RC number, headquarters address, telephone contacts, and download profile PDF.'
+    partners: {
+      group: 'Website Content',
+      title: 'Our Network',
+      description: 'Manage technology alliances, OEM representations, and partner profiles.'
+    },
+    blog: {
+      group: 'Website Content',
+      title: 'Blog & Publications',
+      description: 'Publish engineering insights, case studies, and corporate announcements.'
+    },
+    media: {
+      group: 'Website Content',
+      title: 'Media Library',
+      description: 'Browse and copy direct URLs for website imagery and document assets.'
+    },
+    videos: {
+      group: 'Website Content',
+      title: 'Video Showcase',
+      description: 'Curate corporate video reels and technical demonstration media.'
+    },
+    inquiries: {
+      group: 'Enquiries',
+      title: 'Inquiries & RFPs',
+      description: 'Review and manage incoming technical consultation requests and inquiries.'
+    },
+    careers: {
+      group: 'Enquiries',
+      title: 'Careers',
+      description: 'Manage job postings and review submitted candidate applications and CVs.'
+    },
+    vendors: {
+      group: 'Enquiries',
+      title: 'Vendor Onboarding',
+      description: 'Review contractor pre-qualification submissions and vendor registrations.'
+    },
+    testimonials: {
+      group: 'Marketing & Communications',
+      title: 'Client Testimonials',
+      description: 'Manage verified client commendations and industry feedback.'
+    },
+    campaigns: {
+      group: 'Marketing & Communications',
+      title: 'Newsletter and subscriptions',
+      description: 'Manage email newsletters, subscriber lists, and follow-up communications.'
+    },
+    followups: {
+      group: 'Marketing & Communications',
+      title: 'Follow Up & Broadcast',
+      description: 'Send direct messages and targeted operational updates to contacts.'
     },
     settings: {
-      group: 'Administration',
-      title: 'Corporate & System Settings',
-      description: 'Configure corporate contact channels, SMTP email server delivery, and database infrastructure.'
+      group: 'Settings',
+      title: 'Website Settings',
+      description: 'Configure corporate contact channels, emergency hotlines, maintenance mode, and email servers.'
+    },
+    'corporate-profile': {
+      group: 'Settings',
+      title: 'Website Settings',
+      description: 'Maintain corporate details, headquarters address, telephone contacts, and company profile.'
+    },
+    seo: {
+      group: 'Settings',
+      title: 'SEO Settings',
+      description: 'Manage search engine metadata, titles, and descriptions across all public website pages.'
     },
     users: {
-      group: 'Administration',
-      title: 'Admin Team & Roles',
-      description: 'Manage administrative team accounts, role-based access control permissions, and account status.'
+      group: 'Settings',
+      title: 'User Management',
+      description: 'Manage administrative team accounts, roles, and access permissions.'
     },
     profile: {
-      group: 'Administration',
-      title: 'Admin Profile & Security',
-      description: 'Update your administrator name, avatar, contact email, and secure sign-in password.'
+      group: 'Settings',
+      title: 'Admin Profile',
+      description: 'Update your administrator name, avatar, and account password.'
     }
   };
 

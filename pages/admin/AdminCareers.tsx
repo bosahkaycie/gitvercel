@@ -168,31 +168,49 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
 
   return (
     <div className={`space-y-6 font-sans ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
-      {/* Top Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 ${
-        isDark ? 'border-slate-800' : 'border-slate-200'
-      }`}>
-        <div>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-              Careers & Talent Acquisition Desk
-            </h1>
-            <span className={`px-2.5 py-1 rounded-lg text-xs font-bold font-mono border ${
-              isDark ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800/50' : 'bg-emerald-100 text-emerald-900 border-emerald-300/60'
+      {/* Tab Switcher & Actions (No Duplicate Title) */}
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setActiveTab('applications')}
+            className={`px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center space-x-2 cursor-pointer ${
+              activeTab === 'applications'
+                ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+                : isDark ? 'border-transparent text-slate-400 hover:text-white' : 'border-transparent text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <IconFileText className="w-4 h-4" />
+            <span>Candidate Applications</span>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-mono font-bold ${
+              isDark ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/50' : 'bg-emerald-100 text-emerald-900'
             }`}>
-              {applications.length} Applications
+              {applications.length}
             </span>
-          </div>
-          <p className={`text-xs sm:text-sm mt-1 leading-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Review candidate resumes submitted via /careers and manage open engineering vacancies.
-          </p>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('openings')}
+            className={`px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center space-x-2 cursor-pointer ${
+              activeTab === 'openings'
+                ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+                : isDark ? 'border-transparent text-slate-400 hover:text-white' : 'border-transparent text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <IconCareers className="w-4 h-4" />
+            <span>Job Openings</span>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-mono font-bold ${
+              isDark ? 'bg-slate-800 text-slate-300 border border-slate-700' : 'bg-slate-100 text-slate-700'
+            }`}>
+              {jobs.length}
+            </span>
+          </button>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 pb-3 sm:pb-0">
           {activeTab === 'applications' ? (
             <button
               onClick={exportApplicationsToCSV}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 border shadow-xs ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 border shadow-xs cursor-pointer ${
                 isDark ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
               }`}
             >
@@ -202,50 +220,13 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
           ) : (
             <button
               onClick={openCreateJobModal}
-              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2"
+              className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 cursor-pointer"
             >
               <IconPlus className="w-4 h-4" />
               <span>Post New Vacancy</span>
             </button>
           )}
         </div>
-      </div>
-
-      {/* Tabs */}
-      <div className={`flex items-center space-x-2 border-b ${isDark ? 'border-slate-800' : 'border-slate-200'}`}>
-        <button
-          onClick={() => setActiveTab('applications')}
-          className={`px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center space-x-2 ${
-            activeTab === 'applications'
-              ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
-              : isDark ? 'border-transparent text-slate-400 hover:text-white' : 'border-transparent text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <IconFileText className="w-4 h-4" />
-          <span>Candidate Applications (CVs)</span>
-          <span className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-bold ${
-            isDark ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/50' : 'bg-emerald-100 text-emerald-900'
-          }`}>
-            {applications.length}
-          </span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('openings')}
-          className={`px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center space-x-2 ${
-            activeTab === 'openings'
-              ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
-              : isDark ? 'border-transparent text-slate-400 hover:text-white' : 'border-transparent text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <IconCareers className="w-4 h-4" />
-          <span>Active Vacancies & Roles</span>
-          <span className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-bold ${
-            isDark ? 'bg-slate-800 text-slate-300 border border-slate-700' : 'bg-slate-100 text-slate-700'
-          }`}>
-            {jobs.length}
-          </span>
-        </button>
       </div>
 
       {/* Applications View */}

@@ -100,36 +100,7 @@ const AdminInquiries: React.FC<AdminInquiriesProps> = ({
 
   return (
     <div className={`space-y-6 font-sans ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
-      {/* Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-5 ${
-        isDark ? 'border-slate-800' : 'border-slate-200'
-      }`}>
-        <div>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-              Client Consultations & RFPs Desk
-            </h1>
-            <span className={`px-3 py-1 rounded-lg text-xs font-mono font-bold border ${
-              isDark ? 'bg-slate-800 text-slate-200 border-slate-700' : 'bg-slate-100 text-slate-800 border-slate-200'
-            }`}>
-              {inquiries.filter(i => i.status === 'new').length} Pending
-            </span>
-          </div>
-          <p className={`text-xs sm:text-sm mt-1 leading-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Review incoming project scoping requests, update commercial response status, and record private notes.
-          </p>
-        </div>
-
-        <button
-          onClick={exportCSV}
-          className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center space-x-2 shadow-xs self-start sm:self-auto"
-        >
-          <IconDownload className="w-4 h-4" />
-          <span>Export CSV</span>
-        </button>
-      </div>
-
-      {/* Filter & Search Toolbar */}
+      {/* Filter & Search Toolbar (No Duplicate Header) */}
       <div className={`p-4 rounded-2xl border shadow-xs flex flex-col md:flex-row gap-4 items-center justify-between transition-colors ${
         isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
       }`}>
@@ -146,26 +117,30 @@ const AdminInquiries: React.FC<AdminInquiriesProps> = ({
           />
         </div>
 
-        <div className="flex items-center space-x-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-          {[
-            { id: 'all', label: 'All Inquiries' },
-            { id: 'new', label: 'Pending' },
-            { id: 'in_review', label: 'In Review' },
-            { id: 'responded', label: 'Responded' },
-            { id: 'archived', label: 'Archived' }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setStatusFilter(tab.id)}
-              className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
-                statusFilter === tab.id
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
+          <div className="flex items-center space-x-1.5 overflow-x-auto">
+            {['all', 'new', 'in_review', 'responded', 'archived'].map((status) => (
+              <button
+                key={status}
+                onClick={() => setStatusFilter(status)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+                  statusFilter === status
+                    ? 'bg-emerald-700 text-white shadow-xs'
+                    : isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                {status === 'all' ? 'All' : status === 'new' ? 'Pending' : status === 'in_review' ? 'In Review' : status === 'responded' ? 'Responded' : 'Archived'}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={exportCSV}
+            className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center space-x-2 shadow-xs cursor-pointer"
+          >
+            <IconDownload className="w-4 h-4" />
+            <span>Export CSV</span>
+          </button>
         </div>
       </div>
 

@@ -188,32 +188,20 @@ const AdminVideos: React.FC<AdminVideosProps> = ({
 
   return (
     <div className="space-y-6 font-sans">
-      {/* Header */}
-      <div className={`flex flex-col md:flex-row md:items-center justify-between pb-6 border-b gap-4 ${
+      {/* Action Bar (No Duplicate Header) */}
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
         isDark ? 'border-slate-800' : 'border-slate-200'
       }`}>
-        <div>
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20">
-              <IconVideo className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className={`text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Video Showcase & Corporate Reels
-              </h1>
-              <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Manage YouTube operational documentaries, in-situ CPT tests, 3D laser reality capture, and offshore field footage.
-              </p>
-            </div>
-          </div>
-        </div>
+        <p className={`text-xs sm:text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+          Manage corporate documentary videos and field operations demonstration footage.
+        </p>
 
         <button
           onClick={openAddModal}
-          className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-900/20 transition-all hover:scale-[1.02] active:scale-95 shrink-0"
+          className="inline-flex items-center space-x-2 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all shrink-0 cursor-pointer self-start sm:self-auto"
         >
           <IconPlus className="w-4 h-4" />
-          <span>Add New Video</span>
+          <span>Add Video</span>
         </button>
       </div>
 

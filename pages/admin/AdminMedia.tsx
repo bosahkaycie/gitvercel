@@ -83,22 +83,8 @@ const AdminMedia: React.FC<AdminMediaProps> = ({ theme = 'light' }) => {
   };
 
   return (
-    <div className={`space-y-8 font-sans ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
-      {/* Header */}
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 ${
-        isDark ? 'border-slate-800' : 'border-slate-200'
-      }`}>
-        <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-            Media & Storage Buckets
-          </h1>
-          <p className={`text-xs sm:text-sm mt-1 leading-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Upload, browse, and copy direct storage URLs for services, blog articles, and homepage sliders.
-          </p>
-        </div>
-      </div>
-
-      {/* Bucket Selector Tabs */}
+    <div className={`space-y-6 font-sans ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
+      {/* Bucket Selector Tabs (No Duplicate Header) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {BUCKETS.map((b) => (
           <button

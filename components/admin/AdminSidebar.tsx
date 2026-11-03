@@ -100,30 +100,29 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   const navGroups: NavGroup[] = [
     {
-      id: 'overview',
-      title: 'Overview',
+      id: 'dashboard',
+      title: 'Dashboard',
       items: [
-        { id: 'dashboard', label: 'Dashboard Overview', Icon: IconDashboard }
+        { id: 'dashboard', label: 'Overview', Icon: IconDashboard }
       ]
     },
     {
       id: 'website',
-      title: 'Website Management',
+      title: 'Website Content',
       items: [
-        { id: 'navigation', label: 'Navigation & Pages', Icon: IconGlobe },
-        { id: 'sliders', label: 'Homepage Banners', Icon: IconSliders },
-        { id: 'services', label: 'Services & Capabilities', Icon: IconServices },
-        { id: 'projects', label: 'Projects & Case Studies', Icon: IconProjects },
-        { id: 'videos', label: 'Video Showcase Hub', Icon: IconVideo },
-        { id: 'partners', label: 'Technology Partners', Icon: IconPartners },
-        { id: 'testimonials', label: 'Client Endorsements', Icon: IconPartners },
-        { id: 'blog', label: 'Publications & News', Icon: IconBlog },
+        { id: 'sliders', label: 'Homepage', Icon: IconSliders },
+        { id: 'navigation', label: 'Pages & Navigation', Icon: IconGlobe },
+        { id: 'services', label: 'Services', Icon: IconServices },
+        { id: 'projects', label: 'Projects', Icon: IconProjects },
+        { id: 'team', label: 'Teams', Icon: IconUsers },
+        { id: 'partners', label: 'Our Network', Icon: IconPartners },
+        { id: 'blog', label: 'Blog & Publications', Icon: IconBlog },
         { id: 'media', label: 'Media Library', Icon: IconMedia }
       ]
     },
     {
-      id: 'operations',
-      title: 'Business Operations',
+      id: 'enquiries',
+      title: 'Enquiries',
       items: [
         {
           id: 'inquiries',
@@ -131,38 +130,30 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           Icon: IconInquiries,
           badge: unreadInquiriesCount > 0 ? unreadInquiriesCount : undefined
         },
+        { id: 'careers', label: 'Careers', Icon: IconCareers },
         {
           id: 'vendors',
-          label: 'Vendor Onboarding Desk',
+          label: 'Vendor Onboarding',
           Icon: IconVendor,
           badge: pendingVendorsCount > 0 ? pendingVendorsCount : undefined
-        },
-        { id: 'careers', label: 'Careers & CV Inbox', Icon: IconCareers }
+        }
       ]
     },
     {
       id: 'marketing',
-      title: 'Marketing',
+      title: 'Marketing & Communications',
       items: [
-        { id: 'campaigns', label: 'Campaigns & Newsletters', Icon: IconCampaign },
-        { id: 'followups', label: 'Follow Up & Broadcast', Icon: IconMail }
+        { id: 'testimonials', label: 'Client Testimonials', Icon: IconPartners },
+        { id: 'campaigns', label: 'Newsletter and subscriptions', Icon: IconCampaign }
       ]
     },
     {
-      id: 'organisation',
-      title: 'Organisation',
+      id: 'settings',
+      title: 'Settings',
       items: [
-        { id: 'team', label: 'Management Team', Icon: IconUsers },
-        { id: 'corporate-profile', label: 'Corporate Profile', Icon: IconBuilding }
-      ]
-    },
-    {
-      id: 'administration',
-      title: 'Administration',
-      items: [
-        { id: 'settings', label: 'Corporate & System Settings', Icon: IconSettings },
-        { id: 'users', label: 'Admin Team & Roles', Icon: IconShield },
-        { id: 'profile', label: 'Admin Profile & Security', Icon: IconUserCircle }
+        { id: 'settings', label: 'Website Settings', Icon: IconSettings },
+        { id: 'seo', label: 'SEO Settings', Icon: IconGlobe },
+        { id: 'users', label: 'User Management', Icon: IconShield }
       ]
     }
   ];
