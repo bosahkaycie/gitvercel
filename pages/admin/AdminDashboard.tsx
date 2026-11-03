@@ -383,7 +383,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <span className={`font-bold ${
               newInquiries > 0 
                 ? isDark ? 'text-emerald-400' : 'text-emerald-800' 
-                : isDark ? 'text-slate-400' : 'text-slate-500'
+                : isDark ? 'text-slate-400' : 'text-slate-600'
             }`}>
               {newInquiries > 0 ? `${newInquiries} unread leads` : 'All resolved'}
             </span>
@@ -549,7 +549,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className={`p-3.5 rounded-xl border ${
             isDark ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-200'
           }`}>
-            <span className={`text-[11px] font-bold uppercase tracking-wider block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <span className={`text-[11px] font-bold uppercase tracking-wider block ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
               Total Period Visitors
             </span>
             <span className={`text-xl font-black font-mono mt-0.5 block ${isDark ? 'text-emerald-400' : 'text-emerald-800'}`}>
@@ -563,13 +563,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className={`p-3.5 rounded-xl border ${
             isDark ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-200'
           }`}>
-            <span className={`text-[11px] font-bold uppercase tracking-wider block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <span className={`text-[11px] font-bold uppercase tracking-wider block ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
               Total Page Impressions
             </span>
             <span className={`text-xl font-black font-mono mt-0.5 block ${isDark ? 'text-white' : 'text-slate-900'}`}>
               {totalPageViews.toLocaleString()}
             </span>
-            <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <span className={`text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
               ~3.2 pages / session
             </span>
           </div>
@@ -577,7 +577,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className={`p-3.5 rounded-xl border ${
             isDark ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-200'
           }`}>
-            <span className={`text-[11px] font-bold uppercase tracking-wider block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <span className={`text-[11px] font-bold uppercase tracking-wider block ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
               Avg. Session Duration
             </span>
             <span className={`text-xl font-black font-mono mt-0.5 block ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -591,13 +591,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className={`p-3.5 rounded-xl border ${
             isDark ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-200'
           }`}>
-            <span className={`text-[11px] font-bold uppercase tracking-wider block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <span className={`text-[11px] font-bold uppercase tracking-wider block ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
               Peak Visiting Traffic
             </span>
             <span className={`text-sm sm:text-base font-bold font-mono mt-1 block truncate ${isDark ? 'text-amber-300' : 'text-amber-800'}`}>
               11:00 AM - 3:30 PM
             </span>
-            <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <span className={`text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
               WAT (West Africa Time)
             </span>
           </div>
@@ -780,7 +780,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
 
           {recentPosts.length === 0 ? (
-            <div className={`p-8 text-center text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <div className={`p-8 text-center text-xs ${isDark ? 'text-slate-400' : 'text-slate-600 font-medium'}`}>
               <p>No articles published yet.</p>
               <button
                 onClick={() => onNavigate('blog')}
@@ -813,7 +813,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           {post.category}
                         </span>
                       )}
-                      <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      <span className={`text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                         {formatPostDate(post.published_at || post.created_at)}
                       </span>
                     </div>
@@ -908,7 +908,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
 
           {inquiries.length === 0 ? (
-            <p className={`text-xs py-8 text-center ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <p className={`text-xs py-8 text-center ${isDark ? 'text-slate-400' : 'text-slate-600 font-medium'}`}>
               No inquiries logged yet.
             </p>
           ) : (

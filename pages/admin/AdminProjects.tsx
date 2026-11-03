@@ -99,7 +99,7 @@ const AdminProjects: React.FC<AdminProjectsProps> = ({
         isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
       }`}>
         <div className="relative w-full sm:w-84">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500 dark:text-slate-400">
             <IconSearch className="w-4 h-4" />
           </span>
           <input
@@ -108,7 +108,7 @@ const AdminProjects: React.FC<AdminProjectsProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all ${
-              isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400'
+              isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-500'
             }`}
           />
         </div>
@@ -150,7 +150,7 @@ const AdminProjects: React.FC<AdminProjectsProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
               <thead className={`border-b text-xs font-bold uppercase tracking-wider ${
-                isDark ? 'bg-slate-800/60 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
+                isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
               }`}>
                 <tr>
                   <th className="py-3.5 px-4 sm:px-5">Project & Location</th>
@@ -177,7 +177,7 @@ const AdminProjects: React.FC<AdminProjectsProps> = ({
                         </div>
                         <div className="max-w-md">
                           <p className={`font-bold line-clamp-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>{project.title}</p>
-                          <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{project.location || 'Nigeria'}</p>
+                          <p className={`text-xs mt-0.5 font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{project.location || 'Nigeria'}</p>
                         </div>
                       </div>
                     </td>
@@ -194,7 +194,7 @@ const AdminProjects: React.FC<AdminProjectsProps> = ({
                       </span>
                     </td>
 
-                    <td className={`py-4 px-4 sm:px-5 font-mono text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    <td className={`py-4 px-4 sm:px-5 font-mono text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-700'}`}>
                       {project.year || '2024'}
                     </td>
 
@@ -220,7 +220,7 @@ const AdminProjects: React.FC<AdminProjectsProps> = ({
                         href={`/projects?id=${project.id}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center space-x-1 px-3 py-1.5 text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-xs font-bold transition-colors"
+                        className="inline-flex items-center space-x-1 px-3 py-1.5 text-slate-600 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-xs font-bold transition-colors"
                       >
                         <IconExternal className="w-3.5 h-3.5" />
                         <span>View</span>
@@ -242,7 +242,7 @@ const AdminProjects: React.FC<AdminProjectsProps> = ({
                             onDelete(project.id);
                           }
                         }}
-                        className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-rose-500 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg text-xs font-bold transition-colors"
+                        className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-rose-600 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg text-xs font-bold transition-colors border border-rose-200 dark:border-rose-900/40"
                       >
                         <IconTrash className="w-3.5 h-3.5" />
                         <span>Delete</span>

@@ -286,8 +286,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                     hasActiveItem
                       ? 'text-emerald-800 dark:text-emerald-400'
                       : isDark
-                      ? 'text-slate-400'
-                      : 'text-slate-500'
+                      ? 'text-slate-300'
+                      : 'text-slate-700'
                   }`}
                 >
                   <span className="truncate">{group.title}</span>
@@ -330,8 +330,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                                 ? 'bg-emerald-950/40 text-emerald-300 font-bold border border-emerald-800/80 shadow-2xs'
                                 : 'bg-emerald-50 text-emerald-950 font-bold border border-emerald-300/90 shadow-2xs'
                               : isDark
-                              ? 'text-slate-400 hover:text-slate-100 hover:bg-slate-900/60 border border-transparent'
-                              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/90 border border-transparent'
+                              ? 'text-slate-300 hover:text-white hover:bg-slate-900/60 border border-transparent'
+                              : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100/90 border border-transparent'
                           }`}
                         >
                           <div
@@ -347,7 +347,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                                     : 'text-emerald-700'
                                   : isDark
                                   ? 'text-slate-400 group-hover/tooltip:text-slate-200'
-                                  : 'text-slate-500 group-hover/tooltip:text-slate-800'
+                                  : 'text-slate-600 group-hover/tooltip:text-slate-900'
                               }`}
                             />
                             {!isCollapsed && (
@@ -472,14 +472,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
             <div className="overflow-hidden min-w-0 flex-1">
               <p
                 className={`text-xs font-bold truncate leading-tight ${
-                  isDark ? 'text-slate-200' : 'text-slate-900'
+                  isDark ? 'text-slate-100' : 'text-slate-900'
                 }`}
               >
                 {effectiveName}
               </p>
               <p
-                className={`text-[11px] font-mono truncate leading-tight mt-0.5 ${
-                  isDark ? 'text-slate-500' : 'text-slate-500'
+                className={`text-[11px] font-mono truncate leading-tight mt-0.5 font-medium ${
+                  isDark ? 'text-slate-400' : 'text-slate-600'
                 }`}
               >
                 {user?.role || 'Administrator'}

@@ -218,7 +218,7 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
           className={`px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center space-x-2 ${
             activeTab === 'applications'
               ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
-              : isDark ? 'border-transparent text-slate-400 hover:text-white' : 'border-transparent text-slate-500 hover:text-slate-900'
+              : isDark ? 'border-transparent text-slate-400 hover:text-white' : 'border-transparent text-slate-600 hover:text-slate-900'
           }`}
         >
           <IconFileText className="w-4 h-4" />
@@ -235,7 +235,7 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
           className={`px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center space-x-2 ${
             activeTab === 'openings'
               ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
-              : isDark ? 'border-transparent text-slate-400 hover:text-white' : 'border-transparent text-slate-500 hover:text-slate-900'
+              : isDark ? 'border-transparent text-slate-400 hover:text-white' : 'border-transparent text-slate-600 hover:text-slate-900'
           }`}
         >
           <IconCareers className="w-4 h-4" />
@@ -256,7 +256,7 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
             isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
           }`}>
             <div className="relative w-full sm:w-84">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500 dark:text-slate-400">
                 <IconSearch className="w-4 h-4" />
               </span>
               <input
@@ -265,7 +265,7 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={`w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all ${
-                  isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400'
+                  isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-500'
                 }`}
               />
             </div>
@@ -307,7 +307,7 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs sm:text-sm">
                   <thead className={`border-b text-xs font-bold uppercase tracking-wider ${
-                    isDark ? 'bg-slate-800/60 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
+                    isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
                   }`}>
                     <tr>
                       <th className="py-3.5 px-4 sm:px-5">Candidate</th>
@@ -326,7 +326,7 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                             <div className={`font-bold text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
                               {app.applicant_name}
                             </div>
-                            <div className={`text-xs font-mono flex items-center space-x-2 mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                            <div className={`text-xs font-mono flex items-center space-x-2 mt-0.5 font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                               <span>{app.applicant_email}</span>
                               <span>•</span>
                               <span>{app.applicant_phone}</span>
@@ -338,7 +338,7 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                           {app.job_title || 'General Engineering Application'}
                         </td>
 
-                        <td className={`py-4 px-4 sm:px-5 whitespace-nowrap font-mono text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                        <td className={`py-4 px-4 sm:px-5 whitespace-nowrap font-mono text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                           {new Date(app.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </td>
 
@@ -389,7 +389,7 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                 handleDeleteApplication(app.id);
                               }
                             }}
-                            className="px-2.5 py-1.5 text-xs font-bold text-rose-500 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg transition-colors"
+                            className="px-2.5 py-1.5 text-xs font-bold text-rose-600 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg transition-colors border border-rose-200 dark:border-rose-900/40"
                           >
                             Delete
                           </button>
@@ -416,7 +416,7 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
                     {job.department}
                   </span>
                   <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase border ${
@@ -432,11 +432,11 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                   {job.title}
                 </h3>
 
-                <p className={`text-xs sm:text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                <p className={`text-xs sm:text-sm font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                   📍 {job.location} • 💼 {job.type} • ⏳ {job.experience_level}
                 </p>
 
-                <p className={`text-xs sm:text-sm line-clamp-3 leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                <p className={`text-xs sm:text-sm line-clamp-3 leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   {job.description}
                 </p>
               </div>

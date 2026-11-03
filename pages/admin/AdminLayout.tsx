@@ -598,7 +598,7 @@ const AdminLayout: React.FC = () => {
   };
 
   return (
-    <div className={`h-screen max-h-screen overflow-hidden flex flex-col md:flex-row font-sans transition-colors duration-200 ${
+    <div className={`pigl-cms h-screen max-h-screen overflow-hidden flex flex-col md:flex-row font-sans transition-colors duration-200 ${
       theme === 'dark' ? 'bg-slate-950 text-slate-100' : 'bg-slate-100 text-slate-900'
     }`}>
       {/* Sidebar with Desktop Collapse & Mobile Slide Drawer */}
@@ -639,12 +639,12 @@ const AdminLayout: React.FC = () => {
                 <IconMenu className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               </button>
 
-              <nav aria-label="Breadcrumb" className="flex items-center space-x-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 truncate">
-                <span className="text-slate-400 dark:text-slate-500 hidden sm:inline">PIGL CMS</span>
-                <span className="text-slate-300 dark:text-slate-600 hidden sm:inline">/</span>
-                <span className="text-slate-500 dark:text-slate-400 hidden sm:inline">{currentMeta.group}</span>
-                <span className="text-slate-300 dark:text-slate-600 hidden sm:inline">/</span>
-                <span className="font-bold text-slate-900 dark:text-slate-200 truncate">{currentMeta.title}</span>
+              <nav aria-label="Breadcrumb" className="flex items-center space-x-1.5 text-xs font-medium truncate">
+                <span className="text-slate-600 dark:text-slate-400 font-semibold hidden sm:inline">PIGL CMS</span>
+                <span className="text-slate-400 dark:text-slate-600 hidden sm:inline">/</span>
+                <span className="text-slate-700 dark:text-slate-300 font-semibold hidden sm:inline">{currentMeta.group}</span>
+                <span className="text-slate-400 dark:text-slate-600 hidden sm:inline">/</span>
+                <span className="font-bold text-slate-900 dark:text-white truncate">{currentMeta.title}</span>
               </nav>
             </div>
 
@@ -783,7 +783,7 @@ const AdminLayout: React.FC = () => {
               <h1 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white">
                 {currentMeta.title}
               </h1>
-              <p className="text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 mt-0.5 leading-normal max-w-3xl">
+              <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 mt-0.5 leading-normal max-w-3xl font-medium">
                 {currentMeta.description}
               </p>
             </div>

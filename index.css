@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 html, 
 /* ==========================================================================
    Global Minimal Micro-Radius Design System (Engineering Precision Aesthetic)
@@ -456,4 +458,114 @@ body {
     animation: none !important;
   }
 }
+
+/* ==============================================================================
+   PIGL CMS SEMANTIC THEME SYSTEM (WCAG 2.1 AA COMPLIANT)
+   ============================================================================== */
+:root {
+  /* CMS Semantic Color Tokens (Light Mode) */
+  --cms-text-primary: #0f172a;       /* slate-900: Deep charcoal / slate (18.7:1) */
+  --cms-text-secondary: #334155;     /* slate-700: Medium slate (9.6:1) */
+  --cms-text-tertiary: #475569;      /* slate-600: Muted readable slate (7.0:1) */
+  --cms-text-muted: #475569;         /* slate-600: Subdued metadata (7.0:1) */
+  --cms-text-placeholder: #64748b;   /* slate-500: Accessible input placeholder (4.6:1) */
+
+  --cms-bg-canvas: #f1f5f9;          /* slate-100: Main dashboard background */
+  --cms-bg-surface: #ffffff;         /* Pure white: Cards, header, sidebar */
+  --cms-bg-nested: #f8fafc;          /* slate-50: Nested cards & panels */
+  --cms-bg-nested-hover: #f1f5f9;    /* slate-100: Hover state for nested rows */
+  --cms-bg-header-bar: #f1f5f9;      /* slate-100: Card header bar */
+
+  --cms-border-subtle: #e2e8f0;      /* slate-200 */
+  --cms-border-card: #cbd5e1;        /* slate-300: Defined card border */
+  --cms-border-strong: #94a3b8;      /* slate-400: Prominent boundary */
+
+  --cms-accent-green: #047857;       /* emerald-700: PIGL active / primary green */
+  --cms-accent-green-hover: #065f46; /* emerald-800 */
+  --cms-accent-green-bg: #ecfdf5;    /* emerald-50 */
+  --cms-accent-green-border: #a7f3d0;/* emerald-200 */
+
+  --cms-accent-red: #dc2626;         /* red-600: Destructive actions */
+  --cms-accent-red-hover: #b91c1c;   /* red-700 */
+  --cms-accent-red-bg: #fef2f2;      /* red-50 */
+  --cms-accent-red-border: #fecaca;  /* red-200 */
+}
+
+.dark {
+  /* CMS Semantic Color Tokens (Dark Mode) */
+  --cms-text-primary: #f8fafc;       /* slate-50: Crisp readable white */
+  --cms-text-secondary: #cbd5e1;     /* slate-300: Medium light text */
+  --cms-text-tertiary: #94a3b8;      /* slate-400: Muted light text (6.5:1 on dark) */
+  --cms-text-muted: #94a3b8;         /* slate-400 */
+  --cms-text-placeholder: #64748b;   /* slate-500 */
+
+  --cms-bg-canvas: #020617;          /* slate-950: Deep navy background */
+  --cms-bg-surface: #0f172a;         /* slate-900: Dark navy cards & surfaces */
+  --cms-bg-nested: #090f1e;          /* Deeper navy for nested elements */
+  --cms-bg-nested-hover: #1e293b;    /* slate-800 */
+  --cms-bg-header-bar: #0d1527;      /* Deeper navy header bar */
+
+  --cms-border-subtle: #1e293b;      /* slate-800 */
+  --cms-border-card: #1e293b;        /* slate-800 */
+  --cms-border-strong: #334155;      /* slate-700 */
+
+  --cms-accent-green: #10b981;       /* emerald-500: PIGL active / primary green */
+  --cms-accent-green-hover: #059669; /* emerald-600 */
+  --cms-accent-green-bg: rgba(6, 78, 59, 0.4); /* emerald-950/40 */
+  --cms-accent-green-border: #065f46;/* emerald-800 */
+
+  --cms-accent-red: #f87171;         /* red-400: Destructive actions */
+  --cms-accent-red-hover: #ef4444;   /* red-500 */
+  --cms-accent-red-bg: rgba(127, 29, 29, 0.3); /* red-950/30 */
+  --cms-accent-red-border: #991b1b;  /* red-800 */
+}
+
+/* Light Theme Contrast & Legibility Overrides across the CMS */
+html:not(.dark) .pigl-cms {
+  color: var(--cms-text-primary);
+}
+
+/* Ensure secondary and tertiary text meets 4.5:1+ contrast on light backgrounds */
+html:not(.dark) .pigl-cms .text-slate-400:not([class*="dark:"]) {
+  color: #475569; /* slate-600 */
+}
+html:not(.dark) .pigl-cms .text-slate-500:not([class*="dark:"]) {
+  color: #334155; /* slate-700 */
+}
+html:not(.dark) .pigl-cms .text-slate-300:not([class*="dark:"]) {
+  color: #475569; /* slate-600 */
+}
+
+/* Form labels and placeholders in light mode */
+html:not(.dark) .pigl-cms label {
+  color: #1e293b; /* slate-800: high legibility */
+}
+html:not(.dark) .pigl-cms input::placeholder,
+html:not(.dark) .pigl-cms textarea::placeholder {
+  color: #64748b; /* slate-500: readable placeholder */
+  opacity: 1;
+}
+
+/* Form inputs text color */
+html:not(.dark) .pigl-cms input:not([type="checkbox"]):not([type="radio"]),
+html:not(.dark) .pigl-cms select,
+html:not(.dark) .pigl-cms textarea {
+  color: #0f172a; /* slate-900 */
+  background-color: #ffffff;
+}
+
+/* Table headers & metadata */
+html:not(.dark) .pigl-cms th {
+  color: #1e293b; /* slate-800 */
+}
+html:not(.dark) .pigl-cms td {
+  color: #0f172a; /* slate-900 */
+}
+
+/* Inactive tabs */
+html:not(.dark) .pigl-cms button[role="tab"]:not([aria-selected="true"]):not([class*="border-emerald"]),
+html:not(.dark) .pigl-cms .border-transparent.text-slate-500 {
+  color: #334155; /* slate-700 */
+}
+
 

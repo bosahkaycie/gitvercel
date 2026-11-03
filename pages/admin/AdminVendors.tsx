@@ -184,7 +184,7 @@ const AdminVendors: React.FC<AdminVendorsProps> = ({
         isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
       }`}>
         <div className="relative w-full sm:w-84">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500 dark:text-slate-400">
             <IconSearch className="w-4 h-4" />
           </span>
           <input
@@ -193,7 +193,7 @@ const AdminVendors: React.FC<AdminVendorsProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all ${
-              isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400'
+              isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-500'
             }`}
           />
         </div>
@@ -242,7 +242,7 @@ const AdminVendors: React.FC<AdminVendorsProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
               <thead className={`border-b text-xs font-bold uppercase tracking-wider ${
-                isDark ? 'bg-slate-800/60 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
+                isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
               }`}>
                 <tr>
                   <th className="py-3.5 px-4 sm:px-5">Ref Code & Legal Entity</th>
@@ -262,7 +262,7 @@ const AdminVendors: React.FC<AdminVendorsProps> = ({
                           {v.reference_number}
                         </span>
                         <p className={`font-bold line-clamp-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>{v.vendor_legal_name}</p>
-                        <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                        <p className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                           {new Date(v.submission_date || v.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </p>
                       </div>
@@ -270,12 +270,12 @@ const AdminVendors: React.FC<AdminVendorsProps> = ({
 
                     <td className="py-4 px-4 sm:px-5">
                       <p className={`font-mono font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>{v.rc_bn_number}</p>
-                      <p className={`text-xs truncate max-w-[150px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{v.business_type}</p>
+                      <p className={`text-xs truncate max-w-[150px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{v.business_type}</p>
                     </td>
 
                     <td className="py-4 px-4 sm:px-5">
                       <p className={`font-mono font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>TIN: {v.tin_number}</p>
-                      <p className={`text-xs font-bold uppercase ${v.vat_status === 'VAT-Registered' ? (isDark ? 'text-emerald-400' : 'text-emerald-800') : isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      <p className={`text-xs font-bold uppercase ${v.vat_status === 'VAT-Registered' ? (isDark ? 'text-emerald-400' : 'text-emerald-800') : isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                         {v.vat_status}
                       </p>
                     </td>

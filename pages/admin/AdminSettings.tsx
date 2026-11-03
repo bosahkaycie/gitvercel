@@ -485,7 +485,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-medium">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   Display Phone Number
                 </label>
                 <input
@@ -500,7 +500,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   Dialer Raw Phone (tel: link)
                 </label>
                 <input
@@ -515,7 +515,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   24/7 Operations / Emergency Line
                 </label>
                 <input
@@ -530,7 +530,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   WhatsApp Display Number
                 </label>
                 <input
@@ -545,7 +545,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   WhatsApp Direct URL (wa.me link)
                 </label>
                 <input
@@ -581,7 +581,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-medium">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   General Info Email
                 </label>
                 <input
@@ -596,7 +596,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   Client Support & Portal Email
                 </label>
                 <input
@@ -611,7 +611,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   Inquiries & RFPs Desk Email
                 </label>
                 <input
@@ -626,7 +626,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   Vendor & Procurement Email
                 </label>
                 <input
@@ -641,7 +641,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   Careers & HR Talent Email
                 </label>
                 <input
@@ -677,7 +677,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-medium">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   Full Legal Headquarters Address
                 </label>
                 <textarea
@@ -691,7 +691,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   Short Location Format (for Footer & Badges)
                 </label>
                 <textarea
@@ -726,7 +726,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-medium">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   LinkedIn Corporate Page URL
                 </label>
                 <input
@@ -741,7 +741,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   Corporate YouTube Embed / Channel URL
                 </label>
                 <input
@@ -777,7 +777,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-medium">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   Years of Experience
                 </label>
                 <input
@@ -792,7 +792,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   Safe Man-Hours (Zero LTI)
                 </label>
                 <input
@@ -807,7 +807,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   Completed Projects
                 </label>
                 <input
@@ -822,7 +822,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   Client Satisfaction
                 </label>
                 <input
@@ -837,7 +837,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">
                   Hero Slide Interval (Seconds)
                 </label>
                 <input
@@ -851,7 +851,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
                     isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                   }`}
                 />
-                <p className="text-[10px] text-slate-500 mt-1">Default: 10s auto-transition between hero slides.</p>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium mt-1">Default: 10s auto-transition between hero slides.</p>
               </div>
             </div>
           </div>

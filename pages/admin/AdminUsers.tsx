@@ -215,7 +215,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
         isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
       }`}>
         <div className="relative w-full sm:w-84">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500 dark:text-slate-400">
             <IconSearch className="w-4 h-4" />
           </span>
           <input
@@ -224,7 +224,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all ${
-              isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400'
+              isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-500'
             }`}
           />
         </div>
@@ -266,7 +266,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
               <thead className={`border-b text-xs font-bold uppercase tracking-wider ${
-                isDark ? 'bg-slate-800/60 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
+                isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
               }`}>
                 <tr>
                   <th className="py-3.5 px-4 sm:px-5">Administrator</th>
@@ -301,7 +301,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
                             <div className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
                               {user.full_name}
                             </div>
-                            <div className={`text-xs font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                            <div className={`text-xs font-mono mt-0.5 font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                               {user.email}
                             </div>
                           </div>
@@ -329,14 +329,15 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
                         </button>
                       </td>
 
-                      <td className={`py-4 px-4 sm:px-5 font-mono text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      <td className={`py-4 px-4 sm:px-5 font-mono text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                         {user.last_login_at
                           ? new Date(user.last_login_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
                           : 'Recent'}
                       </td>
 
-                      <td className={`py-4 px-4 sm:px-5 font-mono text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                        {new Date(user.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      <td className={`py-4 px-4 sm:px-5 font-mono text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                        {new Date(user.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                        }
                       </td>
 
                       <td className="py-4 px-4 sm:px-5 text-right">
@@ -356,7 +357,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
                                 onDelete(user.id);
                               }
                             }}
-                            className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs font-bold text-rose-500 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg transition-colors"
+                            className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs font-bold text-rose-600 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg transition-colors border border-rose-200 dark:border-rose-900/40"
                           >
                             <IconTrash className="w-3.5 h-3.5" />
                             <span>Remove</span>

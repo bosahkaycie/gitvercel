@@ -134,14 +134,14 @@ const AdminInquiries: React.FC<AdminInquiriesProps> = ({
         isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
       }`}>
         <div className="relative w-full md:w-84">
-          <IconSearch className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <IconSearch className="w-4 h-4 text-slate-500 dark:text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search inquiries by client, company, service..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all ${
-              isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400'
+              isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-500'
             }`}
           />
         </div>
@@ -185,7 +185,7 @@ const AdminInquiries: React.FC<AdminInquiriesProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
               <thead className={`border-b text-xs font-bold uppercase tracking-wider ${
-                isDark ? 'bg-slate-800/60 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
+                isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
               }`}>
                 <tr>
                   <th className="py-3.5 px-4 sm:px-5">Client / Organization</th>
@@ -209,7 +209,7 @@ const AdminInquiries: React.FC<AdminInquiriesProps> = ({
                       <div className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                         {inq.name}
                       </div>
-                      <div className={`text-xs font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      <div className={`text-xs font-mono font-medium mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                         {inq.company ? `${inq.company} • ` : ''}{inq.email}
                       </div>
                     </td>
@@ -227,12 +227,12 @@ const AdminInquiries: React.FC<AdminInquiriesProps> = ({
                     </td>
 
                     <td className="py-4 px-4 sm:px-5 max-w-xs">
-                      <p className={`truncate text-xs sm:text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                      <p className={`truncate text-xs sm:text-sm font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                         {inq.message}
                       </p>
                     </td>
 
-                    <td className={`py-4 px-4 sm:px-5 font-mono text-xs whitespace-nowrap ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <td className={`py-4 px-4 sm:px-5 font-mono text-xs whitespace-nowrap font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                       {new Date(inq.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </td>
 
@@ -252,7 +252,7 @@ const AdminInquiries: React.FC<AdminInquiriesProps> = ({
                               onDelete(inq.id);
                             }
                           }}
-                          className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors"
+                          className="p-1.5 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors"
                           title="Delete inquiry"
                         >
                           <IconTrash className="w-4 h-4" />
@@ -296,11 +296,11 @@ const AdminInquiries: React.FC<AdminInquiriesProps> = ({
                 isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
               }`}>
                 <div>
-                  <span className={`text-xs uppercase font-bold tracking-wider block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Service Scope</span>
+                  <span className={`text-xs uppercase font-bold tracking-wider block ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Service Scope</span>
                   <div className={`text-sm font-extrabold mt-1 ${isDark ? 'text-emerald-400' : 'text-emerald-800'}`}>{selectedInquiry.service_interest}</div>
                 </div>
                 <div>
-                  <span className={`text-xs uppercase font-bold tracking-wider block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Timestamp</span>
+                  <span className={`text-xs uppercase font-bold tracking-wider block ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Timestamp</span>
                   <div className={`text-xs font-mono font-bold mt-1 ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
                     {new Date(selectedInquiry.created_at).toLocaleString()}
                   </div>
@@ -308,7 +308,7 @@ const AdminInquiries: React.FC<AdminInquiriesProps> = ({
               </div>
 
               <div>
-                <span className={`text-xs font-bold uppercase tracking-wider block mb-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                <span className={`text-xs font-bold uppercase tracking-wider block mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   Client Message
                 </span>
                 <div className={`p-4 border rounded-xl text-xs sm:text-sm leading-relaxed whitespace-pre-wrap font-sans ${
@@ -319,7 +319,7 @@ const AdminInquiries: React.FC<AdminInquiriesProps> = ({
               </div>
 
               <div>
-                <span className={`text-xs font-bold uppercase tracking-wider block mb-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                <span className={`text-xs font-bold uppercase tracking-wider block mb-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   Update Lead Status
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -345,10 +345,10 @@ const AdminInquiries: React.FC<AdminInquiriesProps> = ({
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                     Internal Engineering & Commercial Notes
                   </span>
-                  <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Internal only</span>
+                  <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Internal only</span>
                 </div>
                 <textarea
                   rows={3}
@@ -356,7 +356,7 @@ const AdminInquiries: React.FC<AdminInquiriesProps> = ({
                   value={internalNotes}
                   onChange={(e) => setInternalNotes(e.target.value)}
                   className={`w-full p-3.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all ${
-                    isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400 focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-950 placeholder:text-slate-400 focus:border-emerald-600 shadow-2xs'
+                    isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400 focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-950 placeholder:text-slate-500 focus:border-emerald-600 shadow-2xs'
                   }`}
                 />
               </div>
@@ -380,7 +380,7 @@ const AdminInquiries: React.FC<AdminInquiriesProps> = ({
                     type="button"
                     onClick={() => setSelectedInquiry(null)}
                     className={`px-4 py-2.5 text-xs font-bold rounded-xl transition-colors ${
-                      isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
+                      isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-700 hover:bg-slate-100'
                     }`}
                   >
                     Close

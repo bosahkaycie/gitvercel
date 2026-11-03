@@ -221,14 +221,14 @@ const AdminServices: React.FC<AdminServicesProps> = ({
         isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
       }`}>
         <div className="relative w-full md:w-84">
-          <IconSearch className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <IconSearch className="w-4 h-4 text-slate-500 dark:text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search services or deliverables..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all ${
-              isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400'
+              isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-500'
             }`}
           />
         </div>
@@ -308,13 +308,13 @@ const AdminServices: React.FC<AdminServicesProps> = ({
                       <h4 className="text-emerald-700 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider">
                         Core Deliverables & Focal Points:
                       </h4>
-                      <span className="text-[11px] font-mono text-slate-400">
+                      <span className="text-[11px] font-mono text-slate-600 dark:text-slate-400 font-medium">
                         {srv.capabilities?.length || 0} items
                       </span>
                     </div>
 
                     {(!srv.capabilities || srv.capabilities.length === 0) ? (
-                      <p className="text-xs text-slate-400 italic">No deliverables assigned yet. Click "Manage" to add.</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 italic">No deliverables assigned yet. Click "Manage" to add.</p>
                     ) : (
                       <ul className="space-y-2">
                         {srv.capabilities.map((cap, i) => (
@@ -328,7 +328,7 @@ const AdminServices: React.FC<AdminServicesProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 font-mono">
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 font-mono font-medium">
                   <span>/services/{srv.slug}</span>
                   <a
                     href={`/services/${srv.slug}`}
@@ -352,18 +352,18 @@ const AdminServices: React.FC<AdminServicesProps> = ({
           isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
         }`}>
           {loading ? (
-            <div className="p-12 text-center text-slate-400 text-sm font-medium">
+            <div className="p-12 text-center text-slate-500 dark:text-slate-400 text-sm font-medium">
               Loading services catalog...
             </div>
           ) : filtered.length === 0 ? (
-            <div className="p-12 text-center text-slate-400 text-sm font-medium">
+            <div className="p-12 text-center text-slate-500 dark:text-slate-400 text-sm font-medium">
               No services found matching your filter criteria.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs sm:text-sm">
                 <thead className={`border-b text-xs font-bold uppercase tracking-wider ${
-                  isDark ? 'bg-slate-800/60 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
+                  isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
                 }`}>
                   <tr>
                     <th className="py-3.5 px-4 w-16 text-center">Seq</th>
@@ -377,7 +377,7 @@ const AdminServices: React.FC<AdminServicesProps> = ({
                 <tbody className={`divide-y ${isDark ? 'divide-slate-800 text-slate-200' : 'divide-slate-100 text-slate-800'}`}>
                   {filtered.map((srv) => (
                     <tr key={srv.id} className={`transition-colors ${isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/80'}`}>
-                      <td className="py-4 px-4 text-center font-mono font-bold text-slate-400">
+                      <td className="py-4 px-4 text-center font-mono font-bold text-slate-600 dark:text-slate-400">
                         {srv.display_order}
                       </td>
                       <td className="py-4 px-4 sm:px-5">
@@ -394,7 +394,7 @@ const AdminServices: React.FC<AdminServicesProps> = ({
                           <div>
                             <p className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{srv.title}</p>
                             <div className="flex items-center space-x-2 mt-0.5">
-                              <span className={`text-xs font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>/services/{srv.slug}</span>
+                              <span className={`text-xs font-mono font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>/services/{srv.slug}</span>
                               {srv.video_url && (
                                 <>
                                   <span className="text-slate-400">•</span>
@@ -444,7 +444,7 @@ const AdminServices: React.FC<AdminServicesProps> = ({
                             type="button"
                             onClick={() => handleOpenDeliverablesModal(srv)}
                             title="Manage Core Deliverables & Focal Points"
-                            className="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 rounded-lg transition-colors"
+                            className="p-1.5 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 rounded-lg transition-colors font-bold"
                           >
                             <span className="text-xs font-bold font-mono px-1">Focal Points</span>
                           </button>
@@ -453,7 +453,7 @@ const AdminServices: React.FC<AdminServicesProps> = ({
                             target="_blank"
                             rel="noopener noreferrer"
                             title="Preview Public Page"
-                            className="p-1.5 text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                            className="p-1.5 text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                           >
                             <IconExternal className="w-4 h-4" />
                           </a>
@@ -473,7 +473,7 @@ const AdminServices: React.FC<AdminServicesProps> = ({
                               }
                             }}
                             title="Delete Service"
-                            className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors"
+                            className="p-1.5 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors"
                           >
                             <IconTrash className="w-4 h-4" />
                           </button>
@@ -502,7 +502,7 @@ const AdminServices: React.FC<AdminServicesProps> = ({
                 <h2 className="text-xl font-black tracking-tight">
                   Manage Core Deliverables & Focal Points
                 </h2>
-                <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                   For: <span className="font-bold">{managingDeliverablesService.title}</span> (<span className="font-mono text-emerald-600">/services/{managingDeliverablesService.slug}</span>)
                 </p>
               </div>
@@ -510,7 +510,7 @@ const AdminServices: React.FC<AdminServicesProps> = ({
               <button
                 type="button"
                 onClick={() => setManagingDeliverablesService(null)}
-                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
+                className="p-1.5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 <IconClose className="w-5 h-5" />
               </button>
@@ -519,15 +519,15 @@ const AdminServices: React.FC<AdminServicesProps> = ({
             {/* List of Deliverables */}
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                   Current Deliverables ({modalDeliverablesList.length})
                 </label>
-                <span className="text-[11px] text-slate-400 italic">Drag/use arrows to reorder</span>
+                <span className="text-[11px] text-slate-600 dark:text-slate-400 italic">Drag/use arrows to reorder</span>
               </div>
 
               {modalDeliverablesList.length === 0 ? (
                 <div className={`p-6 border-2 border-dashed rounded-xl text-center text-xs ${
-                  isDark ? 'border-slate-800 text-slate-400' : 'border-slate-200 text-slate-500'
+                  isDark ? 'border-slate-800 text-slate-400' : 'border-slate-300 text-slate-600'
                 }`}>
                   No deliverables defined yet. Add the first deliverable below.
                 </div>
@@ -557,7 +557,7 @@ const AdminServices: React.FC<AdminServicesProps> = ({
                           type="button"
                           disabled={idx === 0}
                           onClick={() => handleMoveModalDeliverable(idx, 'up')}
-                          className="p-1 rounded text-slate-400 hover:text-emerald-500 disabled:opacity-30"
+                          className="p-1 rounded text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 disabled:opacity-30"
                           title="Move Up"
                         >
                           ▲
@@ -566,7 +566,7 @@ const AdminServices: React.FC<AdminServicesProps> = ({
                           type="button"
                           disabled={idx === modalDeliverablesList.length - 1}
                           onClick={() => handleMoveModalDeliverable(idx, 'down')}
-                          className="p-1 rounded text-slate-400 hover:text-emerald-500 disabled:opacity-30"
+                          className="p-1 rounded text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 disabled:opacity-30"
                           title="Move Down"
                         >
                           ▼
@@ -574,7 +574,7 @@ const AdminServices: React.FC<AdminServicesProps> = ({
                         <button
                           type="button"
                           onClick={() => handleRemoveModalDeliverable(idx)}
-                          className="p-1 rounded text-rose-400 hover:text-rose-600"
+                          className="p-1 rounded text-rose-500 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300"
                           title="Delete"
                         >
                           <IconTrash className="w-3.5 h-3.5" />
@@ -638,11 +638,11 @@ const AdminServices: React.FC<AdminServicesProps> = ({
             </div>
 
             {/* Modal Actions */}
-            <div className="flex items-center justify-end space-x-3 pt-4 border-t border-slate-800">
+            <div className="flex items-center justify-end space-x-3 pt-4 border-t border-slate-200 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setManagingDeliverablesService(null)}
-                className="px-4 py-2 text-xs font-bold uppercase rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800"
+                className="px-4 py-2 text-xs font-bold uppercase rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 Cancel
               </button>

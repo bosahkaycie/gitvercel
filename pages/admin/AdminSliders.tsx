@@ -292,19 +292,19 @@ const AdminSliders: React.FC<AdminSlidersProps> = ({
               {/* Content Details */}
               <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                 <div className="space-y-1.5">
-                  <p className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                  <p className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
                     {slide.subtitle || 'Homepage Slide'}
                   </p>
                   <h3 className={`font-bold text-base leading-snug line-clamp-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {slide.title}
                   </h3>
-                  <p className={`text-xs sm:text-sm line-clamp-2 leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                  <p className={`text-xs sm:text-sm line-clamp-2 leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                     {slide.description}
                   </p>
 
                   {slide.video_url && (
                     <div className={`mt-2 p-2 rounded-lg border text-[11px] font-mono truncate flex items-center space-x-1.5 ${
-                      isDark ? 'bg-slate-950/80 border-slate-800 text-emerald-400' : 'bg-slate-50 border-slate-200 text-emerald-700'
+                      isDark ? 'bg-slate-950/80 border-slate-800 text-emerald-400' : 'bg-slate-50 border-slate-200 text-emerald-800 font-medium'
                     }`}>
                       <span className="shrink-0 font-sans font-bold">🎬 Video:</span>
                       <span className="truncate">{slide.video_url}</span>
@@ -316,7 +316,7 @@ const AdminSliders: React.FC<AdminSlidersProps> = ({
                   <button
                     onClick={() => handleToggleActive(slide)}
                     className={`text-xs font-bold ${
-                      slide.is_active ? 'text-amber-600 dark:text-amber-400 hover:underline' : 'text-emerald-600 dark:text-emerald-400 hover:underline'
+                      slide.is_active ? 'text-amber-700 dark:text-amber-400 hover:underline' : 'text-emerald-700 dark:text-emerald-400 hover:underline'
                     }`}
                   >
                     {slide.is_active ? 'Deactivate' : 'Activate'}
@@ -336,7 +336,7 @@ const AdminSliders: React.FC<AdminSlidersProps> = ({
                     </button>
                     <button
                       onClick={() => handleDelete(slide)}
-                      className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-rose-500 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg text-xs font-bold transition-colors"
+                      className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-rose-600 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg text-xs font-bold transition-colors border border-rose-200 dark:border-rose-900/40"
                     >
                       <IconTrash className="w-3.5 h-3.5" />
                       <span>Delete</span>

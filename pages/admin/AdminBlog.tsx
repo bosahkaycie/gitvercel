@@ -139,7 +139,7 @@ const AdminBlog: React.FC<AdminBlogProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs sm:text-sm">
               <thead className={`border-b text-xs font-bold uppercase tracking-wider ${
-                isDark ? 'bg-slate-800/60 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
+                isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
               }`}>
                 <tr>
                   <th className="py-3.5 px-4 sm:px-5">Article</th>
@@ -166,7 +166,7 @@ const AdminBlog: React.FC<AdminBlogProps> = ({
                         </div>
                         <div className="max-w-md">
                           <p className={`font-bold line-clamp-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>{post.title}</p>
-                          <p className={`text-xs font-mono mt-0.5 truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>/blog/{post.slug}</p>
+                          <p className={`text-xs font-mono mt-0.5 truncate font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>/blog/{post.slug}</p>
                         </div>
                       </div>
                     </td>
@@ -180,7 +180,7 @@ const AdminBlog: React.FC<AdminBlogProps> = ({
                     <td className={`py-4 px-4 sm:px-5 font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                       {post.author}
                     </td>
-                    <td className={`py-4 px-4 sm:px-5 whitespace-nowrap text-xs font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <td className={`py-4 px-4 sm:px-5 whitespace-nowrap text-xs font-mono font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                       {new Date(post.published_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </td>
                     <td className="py-4 px-4 sm:px-5">
@@ -206,7 +206,7 @@ const AdminBlog: React.FC<AdminBlogProps> = ({
                         href={`/blog/${post.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center space-x-1 px-3 py-1.5 text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-xs font-bold transition-colors"
+                        className="inline-flex items-center space-x-1 px-3 py-1.5 text-slate-600 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-xs font-bold transition-colors"
                       >
                         <IconExternal className="w-3.5 h-3.5" />
                         <span>Preview</span>
@@ -228,7 +228,7 @@ const AdminBlog: React.FC<AdminBlogProps> = ({
                             onDelete(post.id);
                           }
                         }}
-                        className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-rose-500 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg text-xs font-bold transition-colors"
+                        className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-rose-600 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg text-xs font-bold transition-colors border border-rose-200 dark:border-rose-900/40"
                       >
                         <IconTrash className="w-3.5 h-3.5" />
                         <span>Delete</span>

@@ -131,7 +131,7 @@ const AdminPartners: React.FC<AdminPartnersProps> = ({
                   <p className={`text-xs font-bold mt-1 ${isDark ? 'text-emerald-400' : 'text-emerald-800'}`}>
                     {partner.role}
                   </p>
-                  <p className={`text-xs sm:text-sm mt-2 line-clamp-3 leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                  <p className={`text-xs sm:text-sm mt-2 line-clamp-3 leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                     {partner.description}
                   </p>
                 </div>
@@ -140,7 +140,7 @@ const AdminPartners: React.FC<AdminPartnersProps> = ({
                   <div className="pt-2 flex flex-wrap gap-1.5">
                     {partner.capabilities.slice(0, 3).map((cap, i) => (
                       <span key={i} className={`text-xs px-2.5 py-1 rounded-md font-semibold border ${
-                        isDark ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
+                        isDark ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-800'
                       }`}>
                         {cap}
                       </span>
@@ -157,13 +157,13 @@ const AdminPartners: React.FC<AdminPartnersProps> = ({
                     href={partner.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center space-x-1.5 text-xs text-slate-400 hover:text-emerald-500 font-bold transition-colors"
+                    className="inline-flex items-center space-x-1.5 text-xs text-slate-600 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-400 font-bold transition-colors"
                   >
                     <span>Website</span>
                     <IconExternal className="w-3.5 h-3.5" />
                   </a>
                 ) : (
-                  <span className={`text-xs font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Order: #{partner.display_order}</span>
+                  <span className={`text-xs font-mono font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Order: #{partner.display_order}</span>
                 )}
 
                 <div className="flex items-center space-x-2">
@@ -184,7 +184,7 @@ const AdminPartners: React.FC<AdminPartnersProps> = ({
                         onDelete(partner.id);
                       }
                     }}
-                    className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-rose-500 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg text-xs font-bold transition-colors"
+                    className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-rose-600 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg text-xs font-bold transition-colors border border-rose-200 dark:border-rose-900/40"
                   >
                     <IconTrash className="w-3.5 h-3.5" />
                     <span>Delete</span>
