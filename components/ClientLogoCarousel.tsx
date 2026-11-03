@@ -233,3 +233,4 @@ export const ClientLogoCarousel: React.FC<ClientLogoCarouselProps> = ({
 };
 
 export default ClientLogoCarousel;
+
