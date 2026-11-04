@@ -21,6 +21,8 @@ import InfraSketchImg from '../assets/infrastructure_sketch.jpg';
 import DigitalScannerImg from '../assets/digital_intel_scanner.jpg';
 import MarineOperationsImg from '../assets/field_operations_marine.jpg';
 import AssetIntegrityNdtImg from '../assets/asset_integrity_ndt.jpg';
+import Iso9001Img from '../assets/Q-Mark (ISO 9001).png';
+import Iso45001Img from '../assets/Q-Mark (ISO 45001).png';
 
 // Authentic Field Operations & Maritime Photography
 import OpLogisticsBaseImg from '../assets/operations/pigl_logistics_base_aerial.jpg';
@@ -852,12 +854,29 @@ const Home: React.FC = () => {
 
               {/* Corporate Credentials Panel filling the remaining height */}
               <div className="p-6 bg-slate-50 border border-slate-200 shadow-xs flex-1 flex flex-col justify-center">
-                <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-4 gap-2">
                   <div className="flex items-center space-x-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700">Corporate Credentials</span>
                   </div>
-                  <span className="text-[11px] font-mono font-bold text-emerald-700">ISO 9001:2015 | ISO 45001:2018</span>
+                  <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+                    <img
+                      src={Iso9001Img}
+                      alt="ISO 9001:2015 Q-Mark"
+                      className="h-7 sm:h-8 w-auto object-contain"
+                      width="32"
+                      height="32"
+                      loading="lazy"
+                    />
+                    <img
+                      src={Iso45001Img}
+                      alt="ISO 45001:2018 Q-Mark"
+                      className="h-7 sm:h-8 w-auto object-contain"
+                      width="32"
+                      height="32"
+                      loading="lazy"
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
