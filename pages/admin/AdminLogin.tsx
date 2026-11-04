@@ -208,21 +208,13 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
               </button>
             </form>
 
-            {/* Quick Demo Credentials Helper */}
-            <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px]">
-              <span className="text-slate-400">
-                Default: <strong className="text-slate-200">admin@polarisigl.com</strong>
+            {/* Security Notice */}
+            <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+              <span className="flex items-center space-x-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <span>Restricted Portal • Authorized Personnel Only</span>
               </span>
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail('admin@polarisigl.com');
-                  setPassword('adminpassword123');
-                }}
-                className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors"
-              >
-                Auto-fill
-              </button>
+              <span className="font-mono text-slate-500">PIGL-SEC-2026</span>
             </div>
           </div>
 

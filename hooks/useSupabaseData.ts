@@ -1700,69 +1700,75 @@ export const useAdminAuth = () => {
   }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanPassword = (password || '').trim();
+
+    if (!cleanEmail || !cleanPassword) {
+      return { success: false, error: 'Please enter both corporate email and password.' };
+    }
+
     const client = getSupabaseClient();
     let authUser: any = null;
+    let authFailed = false;
     let dbUser: any = null;
 
     if (client) {
       try {
-        const { data, error } = await client.auth.signInWithPassword({ email: cleanEmail, password });
-        if (!error && data.user) {
+        const { data, error } = await client.auth.signInWithPassword({
+          email: cleanEmail,
+          password: cleanPassword
+        });
+
+        if (error) {
+          authFailed = true;
+          console.warn('Supabase auth sign-in rejected:', error.message);
+        } else if (data?.user) {
           authUser = data.user;
         }
       } catch (err: any) {
-        console.warn('Supabase auth sign-in notice:', err);
+        console.warn('Supabase auth network notice:', err);
       }
 
-      try {
-        const { data: dbData } = await client.from('admin_users').select('*').eq('email', cleanEmail).maybeSingle();
-        if (dbData) dbUser = dbData;
-      } catch (dbErr) {
-        console.warn('Supabase admin_users fetch notice:', dbErr);
+      if (authUser) {
+        try {
+          const { data: dbData } = await client.from('admin_users').select('*').eq('email', cleanEmail).maybeSingle();
+          if (dbData) dbUser = dbData;
+        } catch (dbErr) {
+          console.warn('Supabase admin_users fetch notice:', dbErr);
+        }
       }
     }
 
-    // Built-in Corporate Admin authentication for PIGL administrators
-    const isCorporateLogin = 
-      Boolean(authUser) ||
-      cleanEmail.includes('admin') ||
-      cleanEmail.includes('polaris') ||
-      cleanEmail.includes('dimgba') ||
-      cleanEmail.includes('bosah') ||
-      cleanEmail === 'admin@polarisigl.com' ||
-      cleanEmail === 'chigozie.dimgba@polarisigl.com' ||
-      password === 'adminpassword123' ||
-      password.length >= 6;
+    // 1. If Supabase Auth explicitly rejected the credentials, strictly deny access!
+    if (authFailed) {
+      return { success: false, error: 'Invalid corporate email or password. Access denied.' };
+    }
 
-    if (isCorporateLogin) {
-      const persisted = getPersistedAdminProfile(cleanEmail);
-      const storedUsers = getStoredAdminUsers();
-      const localMatched = storedUsers.find(u => u.email.toLowerCase() === cleanEmail);
-
-      const defaultName = (cleanEmail.includes('dimgba') || cleanEmail.includes('bosah')) ? 'Dr. Chigozie Dimgba' : 'PIGL Administrator';
-      const fullName = persisted?.full_name || dbUser?.full_name || authUser?.user_metadata?.name || localMatched?.full_name || defaultName;
-      const avatarUrl = persisted?.avatar_url || dbUser?.avatar_url || authUser?.user_metadata?.avatar_url || localMatched?.avatar_url;
-      const jobTitle = persisted?.job_title || authUser?.user_metadata?.job_title || localMatched?.job_title || 'Managing Director / Principal Engineer';
-      const phone = persisted?.phone || authUser?.user_metadata?.phone || localMatched?.phone || '+234 803 708 1904';
-      const bio = persisted?.bio || authUser?.user_metadata?.bio || localMatched?.bio || 'Leading technical integrity, geotechnical characterisation, 3D reality capture and subsea engineering across Sub-Saharan Africa.';
-      const role = (dbUser?.role || authUser?.user_metadata?.role || persisted?.role || localMatched?.role || 'Super Admin') as AdminRole;
-
-      if (dbUser?.status === 'suspended' || localMatched?.status === 'suspended') {
+    // 2. Successful Supabase Auth session
+    if (authUser) {
+      if (dbUser?.status === 'suspended') {
         return { success: false, error: 'Your administrator account has been suspended. Please contact the system administrator.' };
       }
 
+      const role = (dbUser?.role || authUser?.user_metadata?.role || 'Super Admin') as AdminRole;
+      const defaultName = (cleanEmail.includes('dimgba') || cleanEmail.includes('bosah')) ? 'Dr. Chigozie Dimgba' : 'PIGL Administrator';
+      const fullName = dbUser?.full_name || authUser?.user_metadata?.name || authUser?.user_metadata?.full_name || defaultName;
+      const avatarUrl = dbUser?.avatar_url || authUser?.user_metadata?.avatar_url;
+      const jobTitle = dbUser?.job_title || authUser?.user_metadata?.job_title || 'Managing Director / Principal Engineer';
+      const phone = dbUser?.phone || authUser?.user_metadata?.phone || '+234 803 708 1904';
+      const bio = dbUser?.bio || authUser?.user_metadata?.bio || 'Leading technical integrity, geotechnical characterisation, 3D reality capture and subsea engineering across Sub-Saharan Africa.';
+
       const adminUser: AdminUser = {
-        id: authUser?.id || dbUser?.id || persisted?.id || localMatched?.id || 'admin-auth-1',
-        email: cleanEmail || 'admin@polarisigl.com',
+        id: authUser.id,
+        email: cleanEmail,
         role,
         full_name: fullName,
         avatar_url: avatarUrl,
         job_title: jobTitle,
         phone,
         bio,
-        status: dbUser?.status || persisted?.status || 'active',
-        created_at: dbUser?.created_at || persisted?.created_at || '2026-01-10T08:00:00Z',
+        status: dbUser?.status || 'active',
+        created_at: dbUser?.created_at || new Date().toISOString(),
         last_login_at: new Date().toISOString()
       };
 
@@ -1770,7 +1776,7 @@ export const useAdminAuth = () => {
       localStorage.setItem(LOCAL_STORAGE_KEY_AUTH, JSON.stringify(adminUser));
       setPersistedAdminProfile(cleanEmail, adminUser);
 
-      // Async touch of last_login_at in database if reachable
+      // Async touch of last_login_at in database
       if (client) {
         client.from('admin_users').update({ last_login_at: new Date().toISOString() }).eq('email', cleanEmail).then(() => {}, () => {});
       }
@@ -1778,7 +1784,50 @@ export const useAdminAuth = () => {
       return { success: true };
     }
 
-    return { success: false, error: 'Invalid administrator credentials. Default password is: adminpassword123' };
+    // 3. Fallback ONLY when Supabase client is completely offline / unreachable
+    // Even offline, ONLY whitelisted corporate emails with exact password 'adminpassword123' are accepted!
+    const AUTHORIZED_OFFLINE_ADMINS = [
+      'admin@polarisigl.com',
+      'chigozie.dimgba@polarisigl.com',
+      'communications@polarisigl.com',
+      'jumboelitelimited@gmail.com'
+    ];
+
+    const storedUsers = getStoredAdminUsers();
+    const localMatched = storedUsers.find(u => u.email.toLowerCase() === cleanEmail);
+
+    const isAuthorized = AUTHORIZED_OFFLINE_ADMINS.includes(cleanEmail) || Boolean(localMatched);
+
+    if (!client && isAuthorized && cleanPassword === 'adminpassword123') {
+      if (localMatched?.status === 'suspended') {
+        return { success: false, error: 'Your administrator account has been suspended. Please contact the system administrator.' };
+      }
+
+      const defaultName = (cleanEmail.includes('dimgba') || cleanEmail.includes('bosah')) ? 'Dr. Chigozie Dimgba' : 'PIGL Administrator';
+      const fullName = localMatched?.full_name || defaultName;
+      const role = (localMatched?.role || 'Super Admin') as AdminRole;
+
+      const adminUser: AdminUser = {
+        id: localMatched?.id || 'admin-auth-1',
+        email: cleanEmail,
+        role,
+        full_name: fullName,
+        avatar_url: localMatched?.avatar_url,
+        job_title: localMatched?.job_title || 'Managing Director / Principal Engineer',
+        phone: localMatched?.phone || '+234 803 708 1904',
+        bio: localMatched?.bio || 'Authorized PIGL portal administrator.',
+        status: 'active',
+        created_at: localMatched?.created_at || '2026-01-10T08:00:00Z',
+        last_login_at: new Date().toISOString()
+      };
+
+      setUser(adminUser);
+      localStorage.setItem(LOCAL_STORAGE_KEY_AUTH, JSON.stringify(adminUser));
+      setPersistedAdminProfile(cleanEmail, adminUser);
+      return { success: true };
+    }
+
+    return { success: false, error: 'Invalid corporate email or password. Access denied.' };
   };
 
   const updateProfile = async (profileData: Partial<AdminUser>): Promise<{ success: boolean; error?: string }> => {
