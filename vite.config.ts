@@ -152,6 +152,76 @@ function apiDevServerPlugin() {
           return;
         }
 
+        if (url.startsWith('/api/admin-users')) {
+          let bodyStr = '';
+          req.on('data', (chunk: any) => {
+            bodyStr += chunk;
+          });
+          req.on('end', async () => {
+            const wrappedRes: any = res;
+            wrappedRes.status = (statusCode: number) => {
+              res.statusCode = statusCode;
+              return wrappedRes;
+            };
+            wrappedRes.json = (data: any) => {
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify(data));
+              return wrappedRes;
+            };
+
+            const wrappedReq: any = req;
+            try {
+              wrappedReq.body = bodyStr ? JSON.parse(bodyStr) : {};
+            } catch {
+              wrappedReq.body = {};
+            }
+
+            try {
+              const handler = (await import('./api/admin-users')).default;
+              await handler(wrappedReq, wrappedRes);
+            } catch (err: any) {
+              console.error('API /api/admin-users dev middleware error:', err);
+              wrappedRes.status(500).json({ success: false, error: err.message });
+            }
+          });
+          return;
+        }
+
+        if (url.startsWith('/api/settings')) {
+          let bodyStr = '';
+          req.on('data', (chunk: any) => {
+            bodyStr += chunk;
+          });
+          req.on('end', async () => {
+            const wrappedRes: any = res;
+            wrappedRes.status = (statusCode: number) => {
+              res.statusCode = statusCode;
+              return wrappedRes;
+            };
+            wrappedRes.json = (data: any) => {
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify(data));
+              return wrappedRes;
+            };
+
+            const wrappedReq: any = req;
+            try {
+              wrappedReq.body = bodyStr ? JSON.parse(bodyStr) : {};
+            } catch {
+              wrappedReq.body = {};
+            }
+
+            try {
+              const handler = (await import('./api/settings')).default;
+              await handler(wrappedReq, wrappedRes);
+            } catch (err: any) {
+              console.error('API /api/settings dev middleware error:', err);
+              wrappedRes.status(500).json({ success: false, error: err.message });
+            }
+          });
+          return;
+        }
+
         next();
       });
     }

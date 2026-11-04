@@ -68,6 +68,19 @@ const AdminLayout: React.FC = () => {
       }
     } catch {}
   };
+
+  useEffect(() => {
+    const handleUrlChange = () => {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab');
+        if (tab && tab !== currentTab) setCurrentTab(tab);
+      } catch {}
+    };
+    handleUrlChange();
+    window.addEventListener('popstate', handleUrlChange);
+    return () => window.removeEventListener('popstate', handleUrlChange);
+  }, []);
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     try {
       const saved = localStorage.getItem('pigl_admin_theme');

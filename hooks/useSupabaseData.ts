@@ -1746,7 +1746,11 @@ export const useAdminAuth = () => {
       const jobTitle = persisted?.job_title || authUser?.user_metadata?.job_title || localMatched?.job_title || 'Managing Director / Principal Engineer';
       const phone = persisted?.phone || authUser?.user_metadata?.phone || localMatched?.phone || '+234 803 708 1904';
       const bio = persisted?.bio || authUser?.user_metadata?.bio || localMatched?.bio || 'Leading technical integrity, geotechnical characterisation, 3D reality capture and subsea engineering across Sub-Saharan Africa.';
-      const role = (dbUser?.role || persisted?.role || localMatched?.role || 'Super Admin') as AdminRole;
+      const role = (dbUser?.role || authUser?.user_metadata?.role || persisted?.role || localMatched?.role || 'Super Admin') as AdminRole;
+
+      if (dbUser?.status === 'suspended' || localMatched?.status === 'suspended') {
+        return { success: false, error: 'Your administrator account has been suspended. Please contact the system administrator.' };
+      }
 
       const adminUser: AdminUser = {
         id: authUser?.id || dbUser?.id || persisted?.id || localMatched?.id || 'admin-auth-1',
@@ -1931,9 +1935,33 @@ export const useAdminUsers = () => {
     fetchUsers();
   }, [fetchUsers]);
 
-  const saveUser = async (userData: Partial<AdminUser> & { email: string; full_name: string; role: AdminRole }) => {
-    const client = getSupabaseClient();
-    const updated: AdminUser = {
+  const saveUser = async (userData: Partial<AdminUser> & { email: string; full_name: string; role: AdminRole; password?: string }) => {
+    let savedRecord: AdminUser | null = null;
+
+    // Try secure serverless API first (handles Supabase Auth + admin_users table)
+    try {
+      const isCreate = !userData.id;
+      const res = await fetch('/api/admin-users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: isCreate ? 'create' : 'update',
+          userData,
+          password: userData.password
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.user) {
+          savedRecord = data.user;
+        }
+      }
+    } catch (apiErr) {
+      console.warn('API /api/admin-users call notice:', apiErr);
+    }
+
+    const updated: AdminUser = savedRecord || {
       id: (userData.id && isValidUUID(userData.id)) ? userData.id : generateUUID(),
       email: userData.email,
       full_name: userData.full_name,
@@ -1944,11 +1972,14 @@ export const useAdminUsers = () => {
       last_login_at: userData.last_login_at || new Date().toISOString()
     };
 
-    if (client) {
-      try {
-        await client.from('admin_users').upsert(updated);
-      } catch (err) {
-        console.warn('Could not save admin user to Supabase table:', err);
+    if (!savedRecord) {
+      const client = getSupabaseClient();
+      if (client) {
+        try {
+          await client.from('admin_users').upsert(updated);
+        } catch (err) {
+          console.warn('Could not save admin user to Supabase table:', err);
+        }
       }
     }
 
@@ -1965,6 +1996,19 @@ export const useAdminUsers = () => {
   };
 
   const deleteUser = async (id: string) => {
+    const all = getStoredAdminUsers();
+    const target = all.find(u => u.id === id);
+
+    try {
+      await fetch('/api/admin-users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', id, email: target?.email })
+      });
+    } catch (err) {
+      console.warn('API /api/admin-users delete notice:', err);
+    }
+
     const client = getSupabaseClient();
     if (client) {
       try {
@@ -1973,8 +2017,8 @@ export const useAdminUsers = () => {
         console.warn('Could not delete admin user in Supabase:', err);
       }
     }
-    const all = getStoredAdminUsers().filter(u => u.id !== id);
-    saveStoredAdminUsers(all);
+    const remaining = all.filter(u => u.id !== id);
+    saveStoredAdminUsers(remaining);
     await fetchUsers();
   };
 
@@ -1982,6 +2026,15 @@ export const useAdminUsers = () => {
     const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
     const userToUpdate = users.find(u => u.id === id);
     if (userToUpdate) {
+      try {
+        await fetch('/api/admin-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'toggle-status', id, email: userToUpdate.email, status: newStatus })
+        });
+      } catch (err) {
+        console.warn('API /api/admin-users toggle-status notice:', err);
+      }
       await saveUser({ ...userToUpdate, status: newStatus });
     }
   };

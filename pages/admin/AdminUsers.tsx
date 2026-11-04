@@ -8,33 +8,41 @@ import {
   IconShield,
   IconEdit,
   IconTrash,
-  IconClose
+  IconClose,
+  IconLock,
+  IconEye,
+  IconCopy,
+  IconAlert
 } from '../../components/admin/AdminIcons';
 
 interface AdminUsersProps {
   users: AdminUser[];
   loading: boolean;
-  onSave: (user: Partial<AdminUser> & { email: string; full_name: string; role: AdminRole }) => Promise<any>;
+  onSave: (user: Partial<AdminUser> & { email: string; full_name: string; role: AdminRole; password?: string }) => Promise<any>;
   onDelete: (id: string) => Promise<any>;
   onToggleStatus: (id: string, currentStatus: 'active' | 'suspended') => Promise<any>;
   currentUserRole?: string;
   theme?: 'light' | 'dark';
 }
 
-const ROLE_PERMISSIONS: Record<AdminRole, { description: string; badges: string[] }> = {
+const ROLE_PERMISSIONS: Record<AdminRole, { title: string; description: string; badges: string[] }> = {
   'Super Admin': {
+    title: 'Administrator (Super Admin)',
     description: 'Full unrestricted system authority across all PIGL database tables, user management, and cloud storage.',
     badges: ['Manage Admins', 'Services CMS', 'Blog CMS', 'Hero Sliders', 'Inquiries Desk', 'Media Storage', 'System Settings']
   },
   'Content Editor': {
+    title: 'Content Administrator (Content Editor)',
     description: 'Can manage, draft, edit, and publish Services, Technical Articles, Case Studies, Homepage Sliders, and upload Media.',
     badges: ['Services CMS', 'Blog CMS', 'Hero Sliders', 'Media Storage']
   },
   'Inquiries Manager': {
+    title: 'Manager (Inquiries Desk)',
     description: 'Dedicated commercial & business development desk for reviewing and responding to client RFPs and consultation requests.',
     badges: ['Inquiries Desk', 'Consultation Export', 'Client Notes']
   },
   'Viewer': {
+    title: 'Viewer (Read-Only)',
     description: 'Read-only access to review CMS content status, analytics overview, and inquiry logs without modification rights.',
     badges: ['Read-Only Analytics', 'Content Review']
   }
@@ -54,20 +62,68 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [role, setRole] = useState<AdminRole>('Content Editor');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('All');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [copiedNotice, setCopiedNotice] = useState<string | null>(null);
 
   const isDark = theme === 'dark';
+
+  const generateStrongPassword = () => {
+    // Generate secure, user-friendly password e.g. Pigl#Secure8429!
+    const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    let randomPart = '';
+    for (let i = 0; i < 4; i++) {
+      randomPart += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    const numPart = Math.floor(1000 + Math.random() * 9000);
+    const newPass = `Pigl.${randomPart}${numPart}!`;
+    
+    setPassword(newPass);
+    setConfirmPassword(newPass);
+    setShowPassword(true);
+
+    try {
+      navigator.clipboard.writeText(newPass);
+      setCopiedNotice('Password generated & copied to clipboard!');
+      setTimeout(() => setCopiedNotice(null), 4000);
+    } catch {
+      setCopiedNotice('Password generated!');
+      setTimeout(() => setCopiedNotice(null), 3000);
+    }
+  };
+
+  const copyCredentials = () => {
+    const text = `Polaris Integrated Management Portal Access:
+URL: ${window.location.origin}/admin
+Email: ${email}
+Password: ${password || '(existing password)'}
+Role: ${role} (${ROLE_PERMISSIONS[role].title})`;
+
+    try {
+      navigator.clipboard.writeText(text);
+      setCopiedNotice('Access credentials copied to clipboard!');
+      setTimeout(() => setCopiedNotice(null), 4000);
+    } catch {
+      // fallback
+    }
+  };
 
   const openCreateModal = () => {
     setEditingUser(null);
     setEmail('');
     setFullName('');
     setRole('Content Editor');
+    setPassword('');
+    setConfirmPassword('');
+    setShowPassword(false);
     setError(null);
+    setCopiedNotice(null);
     setIsModalOpen(true);
   };
 
@@ -76,7 +132,11 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
     setEmail(user.email);
     setFullName(user.full_name);
     setRole(user.role);
+    setPassword('');
+    setConfirmPassword('');
+    setShowPassword(false);
     setError(null);
+    setCopiedNotice(null);
     setIsModalOpen(true);
   };
 
@@ -87,19 +147,51 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
       return;
     }
 
+    // Password validation for new users: password is required
+    if (!editingUser) {
+      if (!password || password.length < 6) {
+        setError('Please set an initial access password (minimum 6 characters) so the user can log in immediately.');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError('Access passwords do not match. Please verify both password fields.');
+        return;
+      }
+    } else {
+      // Password validation for editing: optional, but if entered must match and be >= 6 chars
+      if (password) {
+        if (password.length < 6) {
+          setError('New password must be at least 6 characters long.');
+          return;
+        }
+        if (password !== confirmPassword) {
+          setError('New passwords do not match. Please verify both password fields.');
+          return;
+        }
+      }
+    }
+
     setSaving(true);
     setError(null);
 
     try {
       await onSave({
         ...(editingUser ? { id: editingUser.id, created_at: editingUser.created_at } : {}),
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         full_name: fullName.trim(),
-        role
+        role,
+        password: password.trim() || undefined
       });
-      setSuccessMsg(editingUser ? 'Administrator profile updated.' : 'New administrator added successfully.');
+
+      setSuccessMsg(
+        editingUser
+          ? password
+            ? 'Administrator profile and password updated successfully.'
+            : 'Administrator profile updated.'
+          : 'New administrator added with immediate access credentials.'
+      );
       setIsModalOpen(false);
-      setTimeout(() => setSuccessMsg(null), 4000);
+      setTimeout(() => setSuccessMsg(null), 5000);
     } catch (err: any) {
       setError(err?.message || 'Failed to save administrator.');
     } finally {
@@ -116,30 +208,35 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
 
   return (
     <div className={`space-y-6 font-sans ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
-      {/* Action Bar (No Duplicate Header) */}
+      {/* Action Bar */}
       <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b ${
         isDark ? 'border-slate-800' : 'border-slate-200'
       }`}>
-        <p className={`text-xs sm:text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-          Manage administrator accounts, roles, and platform access permissions.
-        </p>
+        <div>
+          <h2 className="text-base sm:text-lg font-bold tracking-tight">
+            Administrator Directory & Access Control
+          </h2>
+          <p className={`text-xs sm:text-sm mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+            Provision managers, administrators, and content editors with immediate login credentials.
+          </p>
+        </div>
 
         <button
           onClick={openCreateModal}
-          className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 shrink-0 cursor-pointer self-start sm:self-auto"
+          className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition-all flex items-center space-x-2 shrink-0 cursor-pointer self-start sm:self-auto"
         >
           <IconPlus className="w-4 h-4" />
-          <span>Add User</span>
+          <span>Add New Administrator</span>
         </button>
       </div>
 
       {successMsg && (
         <div className="p-4 bg-emerald-100 border border-emerald-300 text-emerald-900 dark:bg-emerald-950 dark:border-emerald-800 dark:text-emerald-300 rounded-xl text-xs font-bold flex items-center justify-between animate-fadeIn">
           <div className="flex items-center space-x-2">
-            <IconCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <IconCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>{successMsg}</span>
           </div>
-          <button onClick={() => setSuccessMsg(null)} className="text-emerald-700 dark:text-emerald-300 font-bold">
+          <button onClick={() => setSuccessMsg(null)} className="text-emerald-700 dark:text-emerald-300 font-bold p-1">
             <IconClose className="w-4 h-4" />
           </button>
         </div>
@@ -324,20 +421,19 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
                       </td>
 
                       <td className={`py-4 px-4 sm:px-5 font-mono text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                        {new Date(user.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-                        }
+                        {new Date(user.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
 
                       <td className="py-4 px-4 sm:px-5 text-right">
                         <div className="flex items-center justify-end space-x-2">
                           <button
                             onClick={() => openEditModal(user)}
-                            className={`inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${
+                            className={`inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                               isDark ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700' : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
                             }`}
                           >
                             <IconEdit className="w-3.5 h-3.5" />
-                            <span>Edit Role</span>
+                            <span>Edit / Reset</span>
                           </button>
                           <button
                             onClick={() => {
@@ -345,7 +441,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
                                 onDelete(user.id);
                               }
                             }}
-                            className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs font-bold text-rose-600 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg transition-colors border border-rose-200 dark:border-rose-900/40"
+                            className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs font-bold text-rose-600 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg transition-colors border border-rose-200 dark:border-rose-900/40 cursor-pointer"
                           >
                             <IconTrash className="w-3.5 h-3.5" />
                             <span>Remove</span>
@@ -361,68 +457,94 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
         )}
       </div>
 
-      {/* Add / Edit Admin Modal */}
+      {/* Add / Edit Admin Modal with Immediate Password Management */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className={`rounded-2xl shadow-2xl border w-full max-w-lg overflow-hidden animate-scaleIn ${
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className={`rounded-2xl shadow-2xl border w-full max-w-xl overflow-hidden my-auto animate-scaleIn ${
             isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
           }`}>
-            <div className="p-6 bg-slate-950 text-white flex items-center justify-between border-b border-slate-800">
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 bg-slate-950 text-white flex items-center justify-between border-b border-slate-800">
               <div>
-                <h3 className="text-lg font-bold tracking-tight">
-                  {editingUser ? 'Edit Administrator Privileges' : 'Add New Administrator'}
+                <h3 className="text-base sm:text-lg font-bold tracking-tight flex items-center space-x-2">
+                  <IconShield className="w-5 h-5 text-emerald-400" />
+                  <span>{editingUser ? 'Edit Administrator Privileges & Password' : 'Add New Administrator & Set Password'}</span>
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Grant role privileges and administrative access to the PIGL management portal.
+                  Establish immediate management access credentials without email confirmation wait times.
                 </p>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-white p-1"
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <IconClose className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs sm:text-sm">
+            {/* Direct Access Notification Banner */}
+            <div className="px-5 sm:px-6 py-3 bg-emerald-950/50 border-b border-emerald-800/40 text-emerald-300 text-xs flex items-start space-x-2.5">
+              <span className="flex-shrink-0 mt-0.5 px-2 py-0.5 bg-emerald-800/80 text-emerald-100 rounded-md font-bold uppercase tracking-wider text-[10px]">
+                Direct Access
+              </span>
+              <span className="leading-relaxed">
+                {editingUser
+                  ? 'Update roles or enter a new password below to reset their access credentials immediately.'
+                  : 'Enter the user’s corporate email and assign an access password below. The account is created immediately with active status and can sign in right away.'}
+              </span>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4 text-xs sm:text-sm">
               {error && (
-                <div className="p-3 bg-rose-100 border border-rose-300 text-rose-900 dark:bg-rose-950/80 dark:text-rose-300 dark:border-rose-700/50 text-xs font-bold rounded-xl">
-                  {error}
+                <div className="p-3.5 bg-rose-100 border border-rose-300 text-rose-900 dark:bg-rose-950/80 dark:text-rose-300 dark:border-rose-700/50 text-xs font-bold rounded-xl flex items-center space-x-2">
+                  <IconAlert className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
+                  <span>{error}</span>
                 </div>
               )}
 
-              <div>
-                <label className={`block text-xs font-bold uppercase mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
-                  Full Name <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Dr. Chigozie Dimgba"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className={`w-full px-3.5 py-2.5 border rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all ${
-                    isDark ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-400 focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-950 placeholder:text-slate-400 focus:border-emerald-600 shadow-2xs'
-                  }`}
-                />
+              {copiedNotice && (
+                <div className="p-3 bg-emerald-100 border border-emerald-300 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-800 text-xs font-bold rounded-xl flex items-center space-x-2">
+                  <IconCheck className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <span>{copiedNotice}</span>
+                </div>
+              )}
+
+              {/* Full Name & Corporate Email */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className={`block text-xs font-bold uppercase mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
+                    Full Name <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Engr. Olabisi Craig"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className={`w-full px-3.5 py-2.5 border rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all ${
+                      isDark ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-950 placeholder:text-slate-400 focus:border-emerald-600 shadow-2xs'
+                    }`}
+                  />
+                </div>
+
+                <div>
+                  <label className={`block text-xs font-bold uppercase mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
+                    Corporate Email Address <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="name@polarisigl.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={`w-full px-3.5 py-2.5 border rounded-xl font-mono font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all ${
+                      isDark ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-950 placeholder:text-slate-400 focus:border-emerald-600 shadow-2xs'
+                    }`}
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className={`block text-xs font-bold uppercase mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
-                  Corporate Email Address <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  required
-                  placeholder="name@polarisigl.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={`w-full px-3.5 py-2.5 border rounded-xl font-mono font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all ${
-                    isDark ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-400 focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-950 placeholder:text-slate-400 focus:border-emerald-600 shadow-2xs'
-                  }`}
-                />
-              </div>
-
+              {/* Assigned Role */}
               <div>
                 <label className={`block text-xs font-bold uppercase mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
                   Assigned Administrative Role <span className="text-rose-500">*</span>
@@ -434,27 +556,27 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
                     isDark ? 'bg-slate-800 border-slate-700 text-white focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-950 focus:border-emerald-600 shadow-2xs'
                   }`}
                 >
-                  <option value="Super Admin">Super Admin (Full System & Database Authority)</option>
-                  <option value="Content Editor">Content Editor (Services, Blog, Sliders, Media)</option>
-                  <option value="Inquiries Manager">Inquiries Manager (Consultations & RFPs Desk)</option>
+                  <option value="Super Admin">Administrator (Super Admin - Full System & Database Authority)</option>
+                  <option value="Content Editor">Content Administrator (Content Editor - Services, Blog, Sliders & Media)</option>
+                  <option value="Inquiries Manager">Manager (Inquiries Desk - Client RFPs & Consultations Desk)</option>
                   <option value="Viewer">Viewer (Read-Only Metrics & Content Review)</option>
                 </select>
               </div>
 
               {/* Role description preview */}
-              <div className={`p-4 rounded-xl border space-y-2 ${
+              <div className={`p-3.5 rounded-xl border space-y-1.5 ${
                 isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
               }`}>
                 <div className={`text-xs font-bold flex items-center space-x-2 ${isDark ? 'text-emerald-400' : 'text-emerald-800'}`}>
                   <IconShield className="w-4 h-4" />
-                  <span>Role Authority: {role}</span>
+                  <span>{ROLE_PERMISSIONS[role].title}</span>
                 </div>
-                <p className={`text-xs sm:text-sm leading-relaxed font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
+                <p className={`text-xs leading-relaxed font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   {ROLE_PERMISSIONS[role].description}
                 </p>
-                <div className="flex flex-wrap gap-1.5 pt-1">
+                <div className="flex flex-wrap gap-1 pt-0.5">
                   {ROLE_PERMISSIONS[role].badges.map(b => (
-                    <span key={b} className={`text-xs font-bold px-2.5 py-0.5 rounded-md border ${
+                    <span key={b} className={`text-[11px] font-bold px-2 py-0.5 rounded-md border ${
                       isDark ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-emerald-50 border-emerald-300 text-emerald-800'
                     }`}>
                       {b}
@@ -463,11 +585,113 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
                 </div>
               </div>
 
+              {/* Immediate Password Section */}
+              <div className={`p-4 rounded-xl border space-y-3 ${
+                isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <IconLock className="w-4 h-4 text-emerald-500" />
+                    <label className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                      {editingUser ? 'Reset Access Password (Optional)' : 'Set Immediate Access Password *'}
+                    </label>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={generateStrongPassword}
+                    className="text-xs font-bold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 inline-flex items-center space-x-1 cursor-pointer transition-colors"
+                  >
+                    <span>⚡ Generate Secure Password</span>
+                  </button>
+                </div>
+
+                <p className={`text-[11px] leading-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  {editingUser
+                    ? 'Leave both fields blank to keep existing password, or enter a new password to immediately update user access.'
+                    : 'The user will use this password to immediately log in at /admin.'}
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {/* Password Input */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`text-[11px] font-bold uppercase ${isDark ? 'text-slate-400' : 'text-slate-700'}`}>
+                        Password {!editingUser && <span className="text-rose-500">*</span>}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-[11px] text-slate-400 hover:text-emerald-500 transition-colors"
+                      >
+                        {showPassword ? 'Hide' : 'Show'}
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        required={!editingUser}
+                        placeholder={editingUser ? 'Leave blank to keep' : 'Minimum 6 characters'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-xl font-mono text-xs sm:text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+                          isDark ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-950 placeholder:text-slate-400 focus:border-emerald-600 shadow-2xs'
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Confirm Password Input */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`text-[11px] font-bold uppercase ${isDark ? 'text-slate-400' : 'text-slate-700'}`}>
+                        Confirm Password {!editingUser && <span className="text-rose-500">*</span>}
+                      </span>
+                      {password && confirmPassword && (
+                        <span className={`text-[11px] font-bold ${password === confirmPassword ? 'text-emerald-500' : 'text-rose-500'}`}>
+                          {password === confirmPassword ? '✓ Matches' : '✗ Mismatch'}
+                        </span>
+                      )}
+                    </div>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required={!editingUser && Boolean(password)}
+                      placeholder={editingUser ? 'Repeat if changing' : 'Repeat password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-xl font-mono text-xs sm:text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+                        password && confirmPassword && password !== confirmPassword
+                          ? 'border-rose-400 dark:border-rose-600'
+                          : ''
+                      } ${
+                        isDark ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-950 placeholder:text-slate-400 focus:border-emerald-600 shadow-2xs'
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                {password && (
+                  <div className="pt-2 flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={copyCredentials}
+                      className="text-xs font-bold text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                    >
+                      <IconCopy className="w-3.5 h-3.5" />
+                      <span>Copy Credentials Dossier</span>
+                    </button>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Format: Link, Email, Password, Role
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Form Action Buttons */}
               <div className={`pt-4 flex items-center justify-end space-x-3 border-t ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className={`px-4 py-2.5 font-bold rounded-xl text-xs uppercase border transition-colors ${
+                  className={`px-4 py-2.5 font-bold rounded-xl text-xs uppercase border transition-colors cursor-pointer ${
                     isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-300 bg-white text-slate-800 hover:bg-slate-100 shadow-2xs'
                   }`}
                 >
@@ -476,12 +700,18 @@ const AdminUsers: React.FC<AdminUsersProps> = ({
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center space-x-2"
+                  className="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center space-x-2 cursor-pointer disabled:opacity-60"
                 >
                   {saving ? (
-                    <span>Saving...</span>
+                    <>
+                      <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      <span>Saving & Granting Access...</span>
+                    </>
                   ) : (
-                    <span>{editingUser ? 'Update Administrator' : 'Save & Grant Access'}</span>
+                    <span>{editingUser ? 'Update Administrator' : 'Create Account & Grant Access'}</span>
                   )}
                 </button>
               </div>
