@@ -8,6 +8,7 @@ import LayefaImg from '../../assets/management/layefa.png';
 import UjuImg from '../../assets/management/uju.png';
 import BrianImg from '../../assets/management/brian.png';
 import SteveImg from '../../assets/management/steve.png';
+import ImageUploader from '../../components/admin/ImageUploader';
 import {
   IconUsers,
   IconPlus,
@@ -20,7 +21,13 @@ import {
   IconSearch,
   IconArrowUp,
   IconArrowDown,
-  IconExternal
+  IconExternal,
+  IconEye,
+  IconCopy,
+  IconGrid,
+  IconList,
+  IconClose,
+  IconAlert
 } from '../../components/admin/AdminIcons';
 
 // Available preset leadership photo files in repository
@@ -75,6 +82,40 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
+  // Photo Management & Display State
+  const [photoSourceTab, setPhotoSourceTab] = useState<'upload' | 'preset' | 'url'>('upload');
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+  const [lightboxMember, setLightboxMember] = useState<CMSTeamMember | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+
+  const handleCopyPhotoUrl = (url: string) => {
+    if (!url) return;
+    try {
+      navigator.clipboard.writeText(url);
+      setCopiedUrl(url);
+      setTimeout(() => setCopiedUrl(null), 2500);
+    } catch (e) {
+      console.warn('Clipboard write failed:', e);
+    }
+  };
+
+  const getPhotoSourceInfo = (url?: string) => {
+    if (!url) return { label: 'No Photo', color: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700' };
+    if (url.includes('supabase.co') || url.includes('/storage/v1/object/public')) {
+      return { label: 'Cloud Storage', color: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800' };
+    }
+    if (url.startsWith('data:image')) {
+      return { label: 'Local Base64', color: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800' };
+    }
+    if (PRESET_MANAGEMENT_PHOTOS.some(p => p.src === url || p.path === url)) {
+      return { label: 'Executive Preset', color: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800' };
+    }
+    if (url.startsWith('/assets/')) {
+      return { label: 'Built-in Asset', color: 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800' };
+    }
+    return { label: 'External URL', color: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800' };
+  };
+
   // Form State for Single Member Edit/Create
   const [formName, setFormName] = useState('');
   const [formRole, setFormRole] = useState('');
@@ -120,7 +161,15 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
     setFormName(member.name);
     setFormRole(member.role);
     setFormDept(member.department || 'Executive Management');
-    setFormImage(member.image || ChigozieImg);
+    const img = member.image || ChigozieImg;
+    setFormImage(img);
+    if (PRESET_MANAGEMENT_PHOTOS.some(p => p.src === img || p.path === img)) {
+      setPhotoSourceTab('preset');
+    } else if (img.startsWith('http')) {
+      setPhotoSourceTab('url');
+    } else {
+      setPhotoSourceTab('upload');
+    }
     setFormLinkedin(member.linkedin || '');
     setFormEmail(member.email || '');
     setFormBio(member.bio || '');
@@ -137,6 +186,7 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
     setFormRole('');
     setFormDept('Executive Management');
     setFormImage(ChigozieImg);
+    setPhotoSourceTab('preset');
     setFormLinkedin('https://www.linkedin.com/company/polarisigl/');
     setFormEmail('');
     setFormBio('');
@@ -485,10 +535,42 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
             <option value="active">Active Only</option>
             <option value="inactive">Inactive Only</option>
           </select>
+
+          {/* View Mode Toggle */}
+          <div className={`flex items-center p-0.5 rounded-xl border ${
+            isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
+          }`}>
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              title="Grid / Cards View"
+              className={`p-1.5 rounded-lg transition-colors flex items-center gap-1.5 text-xs font-semibold ${
+                viewMode === 'grid'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <IconGrid className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Grid</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('table')}
+              title="Table / List View"
+              className={`p-1.5 rounded-lg transition-colors flex items-center gap-1.5 text-xs font-semibold ${
+                viewMode === 'table'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <IconList className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Table</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Grid of Team Members */}
+      {/* Grid or Table of Team Members */}
       {loading ? (
         <div className="p-12 text-center text-slate-400 text-sm font-medium">
           <svg className="animate-spin h-6 w-6 text-emerald-500 mx-auto mb-2" viewBox="0 0 24 24">
@@ -503,6 +585,147 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
         }`}>
           No management team members match your current filters. Click "Add Member" or "Import from File" to add someone.
         </div>
+      ) : viewMode === 'table' ? (
+        <div className={`rounded-2xl border overflow-hidden ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-xs'}`}>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className={`border-b text-[11px] font-bold uppercase tracking-wider ${isDark ? 'bg-slate-950/60 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+                <tr>
+                  <th className="py-3 px-4">Executive Photo</th>
+                  <th className="py-3 px-4">Name & Title</th>
+                  <th className="py-3 px-4">Department</th>
+                  <th className="py-3 px-4">Photo Source</th>
+                  <th className="py-3 px-4 text-center">Status</th>
+                  <th className="py-3 px-4 text-center">Order</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                {filteredMembers.map((member, index) => {
+                  const srcInfo = getPhotoSourceInfo(member.image);
+                  return (
+                    <tr key={member.id} className={`hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                      <td className="py-3 px-4">
+                        <div 
+                          className="w-12 h-14 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 relative group cursor-pointer shrink-0"
+                          onClick={() => setLightboxMember(member)}
+                          title="Click to view full photo"
+                        >
+                          <img
+                            src={member.image}
+                            alt={member.name}
+                            className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-300"
+                            onError={(e) => { (e.target as HTMLImageElement).src = ChigozieImg; }}
+                          />
+                          <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <IconEye className="w-3.5 h-3.5 text-white" />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="font-bold text-slate-900 dark:text-white text-sm">{member.name}</div>
+                        <div className="text-slate-500 text-xs">{member.role}</div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">{member.department || 'Executive'}</span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded border ${srcInfo.color}`}>
+                          {srcInfo.label}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <button
+                          onClick={() => handleToggleStatus(member)}
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase transition-colors ${
+                            member.status === 'active'
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                              : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-400'
+                          }`}
+                        >
+                          {member.status}
+                        </button>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <div className="inline-flex items-center space-x-1">
+                          <span className="font-mono font-bold text-xs text-slate-500 mr-1">#{member.display_order}</span>
+                          <button
+                            onClick={() => handleReorder(member, 'up')}
+                            disabled={index === 0}
+                            title="Move Up"
+                            className="p-1 hover:text-emerald-600 disabled:opacity-20 transition-colors"
+                          >
+                            <IconArrowUp className="w-3 h-3" />
+                          </button>
+                          <button
+                            onClick={() => handleReorder(member, 'down')}
+                            disabled={index === filteredMembers.length - 1}
+                            title="Move Down"
+                            className="p-1 hover:text-emerald-600 disabled:opacity-20 transition-colors"
+                          >
+                            <IconArrowDown className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end space-x-1.5">
+                          <button
+                            onClick={() => setLightboxMember(member)}
+                            title="Inspect Full Photo"
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                          >
+                            <IconEye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleCopyPhotoUrl(member.image)}
+                            title={copiedUrl === member.image ? 'Copied!' : 'Copy Photo URL'}
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                          >
+                            {copiedUrl === member.image ? <IconCheck className="w-4 h-4 text-emerald-500" /> : <IconCopy className="w-4 h-4" />}
+                          </button>
+                          <button
+                            onClick={() => handleOpenEdit(member)}
+                            title="Edit Member"
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                          >
+                            <IconEdit className="w-4 h-4" />
+                          </button>
+                          {deleteConfirmId === member.id ? (
+                            <div className="flex items-center space-x-1">
+                              <button
+                                onClick={async () => {
+                                  await onDelete(member.id);
+                                  setDeleteConfirmId(null);
+                                }}
+                                className="px-2 py-1 bg-red-600 text-white rounded text-[10px] font-bold"
+                              >
+                                Confirm
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirmId(null)}
+                                className="px-1.5 py-1 text-slate-400 hover:text-slate-600 text-[10px]"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setDeleteConfirmId(member.id)}
+                              title="Delete Member"
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                            >
+                              <IconTrash className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredMembers.map((member, index) => (
@@ -514,8 +737,12 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
                   : 'bg-white border-slate-200 hover:border-emerald-300 shadow-xs'
               }`}
             >
-              {/* Photo Area */}
-              <div className="relative aspect-[4/4.5] bg-slate-100 overflow-hidden group">
+              {/* Photo Area with Click-to-Preview Lightbox and Quick Image Actions */}
+              <div 
+                className="relative aspect-[4/4.5] bg-slate-100 overflow-hidden group cursor-pointer"
+                onClick={() => setLightboxMember(member)}
+                title="Click to inspect photo in high resolution"
+              >
                 <img
                   src={member.image}
                   alt={member.name}
@@ -525,10 +752,10 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
                     (e.target as HTMLImageElement).src = ChigozieImg;
                   }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent pointer-events-none" />
 
                 {/* Status Badge */}
-                <div className="absolute top-3 left-3 flex items-center space-x-1.5">
+                <div className="absolute top-3 left-3 flex items-center space-x-1.5 z-10">
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                     member.status === 'active'
                       ? 'bg-emerald-500 text-slate-950 font-black'
@@ -541,28 +768,54 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
                   </span>
                 </div>
 
-                {/* Reordering Controls */}
-                <div className="absolute top-3 right-3 flex items-center space-x-1 bg-slate-950/70 backdrop-blur-sm rounded-lg p-0.5 border border-slate-700">
-                  <button
-                    onClick={() => handleReorder(member, 'up')}
-                    disabled={index === 0}
-                    title="Move higher in hierarchy"
-                    className="p-1 text-slate-300 hover:text-white disabled:opacity-30 disabled:hover:text-slate-300 transition-colors"
-                  >
-                    <IconArrowUp className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => handleReorder(member, 'down')}
-                    disabled={index === filteredMembers.length - 1}
-                    title="Move lower in hierarchy"
-                    className="p-1 text-slate-300 hover:text-white disabled:opacity-30 disabled:hover:text-slate-300 transition-colors"
-                  >
-                    <IconArrowDown className="w-3.5 h-3.5" />
-                  </button>
+                {/* Top Right Actions: Photo Actions on Hover & Order Controls */}
+                <div className="absolute top-3 right-3 flex items-center space-x-1 z-10" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center space-x-1 bg-slate-950/80 backdrop-blur-sm rounded-lg p-0.5 border border-slate-700">
+                    <button
+                      type="button"
+                      onClick={() => setLightboxMember(member)}
+                      title="Inspect Photo in Full Size"
+                      className="p-1 text-slate-300 hover:text-emerald-400 transition-colors"
+                    >
+                      <IconEye className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyPhotoUrl(member.image)}
+                      title={copiedUrl === member.image ? 'Copied!' : 'Copy Photo URL'}
+                      className="p-1 text-slate-300 hover:text-emerald-400 transition-colors"
+                    >
+                      {copiedUrl === member.image ? <IconCheck className="w-3.5 h-3.5 text-emerald-400" /> : <IconCopy className="w-3.5 h-3.5" />}
+                    </button>
+                    <button
+                      onClick={() => handleReorder(member, 'up')}
+                      disabled={index === 0}
+                      title="Move higher in hierarchy"
+                      className="p-1 text-slate-300 hover:text-white disabled:opacity-30 disabled:hover:text-slate-300 transition-colors border-l border-slate-800"
+                    >
+                      <IconArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleReorder(member, 'down')}
+                      disabled={index === filteredMembers.length - 1}
+                      title="Move lower in hierarchy"
+                      className="p-1 text-slate-300 hover:text-white disabled:opacity-30 disabled:hover:text-slate-300 transition-colors"
+                    >
+                      <IconArrowDown className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
-                {/* Bottom Overlay Info */}
-                <div className="absolute bottom-3 left-3 right-3 text-white">
+                {/* Bottom Overlay Info with Photo Source Chip */}
+                <div className="absolute bottom-3 left-3 right-3 text-white pointer-events-none">
+                  <div className="flex items-center justify-between gap-1 mb-1">
+                    <span className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded border ${getPhotoSourceInfo(member.image).color}`}>
+                      {getPhotoSourceInfo(member.image).label}
+                    </span>
+                    <span className="text-[10px] text-emerald-400 font-semibold group-hover:underline flex items-center gap-0.5">
+                      <IconEye className="w-3 h-3" /> View Photo
+                    </span>
+                  </div>
                   <h3 className="text-base font-bold tracking-tight truncate leading-tight drop-shadow-sm">
                     {member.name}
                   </h3>
@@ -780,90 +1033,235 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
                 </div>
               </div>
 
-              {/* Photo Selector (From Existing Files in Repository OR Local Upload) */}
-              <div className="space-y-2.5">
+              {/* ========================================================================= */}
+              {/* Comprehensive Executive Photo Management */}
+              {/* ========================================================================= */}
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold uppercase tracking-wider">
-                    Executive Photo
+                  <label className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <span>Executive Photo Management</span>
+                    <span className="text-[10px] font-normal text-emerald-600 dark:text-emerald-400 font-mono">
+                      (4:5 Portrait Recommended)
+                    </span>
                   </label>
-                  <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    Choose from existing files or upload a new photo
+                  <span className={`text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Cloud Storage, Presets or Direct URL
                   </span>
                 </div>
 
-                <div className={`p-4 rounded-xl border space-y-4 ${
-                  isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+                {/* Active Photo Details Card */}
+                <div className={`p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                  isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-slate-50 border-slate-200'
                 }`}>
-                  {/* Current Selected Photo Preview */}
-                  <div className="flex items-center space-x-4">
-                    <div className="w-16 h-20 rounded-xl overflow-hidden bg-slate-200 border border-slate-300 shrink-0">
+                  <div className="flex items-center space-x-3.5">
+                    <div 
+                      className="w-16 h-20 rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-800 border-2 border-emerald-500/30 shrink-0 relative group cursor-pointer shadow-sm"
+                      onClick={() => {
+                        if (formImage) {
+                          setLightboxMember({
+                            id: editingMember?.id || 'preview',
+                            name: formName || 'Preview Executive',
+                            role: formRole || 'Leadership Role',
+                            image: formImage,
+                            department: formDept,
+                            bio: formBio,
+                            linkedin: formLinkedin,
+                            email: formEmail,
+                            display_order: formOrder,
+                            status: formStatus
+                          });
+                        }
+                      }}
+                      title="Click to preview full size photo"
+                    >
                       <img
-                        src={formImage}
+                        src={formImage || ChigozieImg}
                         alt="Preview"
-                        className="w-full h-full object-cover object-top"
+                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform"
                       />
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <p className="text-xs font-bold">Selected Image</p>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <button
-                          type="button"
-                          onClick={() => photoInputRef.current?.click()}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors flex items-center space-x-1.5 ${
-                            isDark
-                              ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700'
-                              : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100 shadow-xs'
-                          }`}
-                        >
-                          <IconUpload className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Attach Photo File</span>
-                        </button>
-                        <input
-                          ref={photoInputRef}
-                          type="file"
-                          accept="image/*"
-                          onChange={handlePhotoFileUpload}
-                          className="hidden"
-                        />
+                      <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <IconEye className="w-4 h-4 text-white" />
                       </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs font-bold text-slate-900 dark:text-white">Active Photo</p>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${getPhotoSourceInfo(formImage).color}`}>
+                          {getPhotoSourceInfo(formImage).label}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono truncate max-w-[240px] sm:max-w-[320px]">
+                        {formImage}
+                      </p>
                     </div>
                   </div>
 
-                  {/* Existing Photo Files Picker */}
-                  <div className="space-y-2">
-                    <p className={`text-[11px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                      Or Pick From Existing Leadership Files:
-                    </p>
-                    <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
-                      {PRESET_MANAGEMENT_PHOTOS.map((photo) => {
-                        const isSelected = formImage === photo.src || formImage === photo.path;
-                        return (
-                          <button
-                            key={photo.id}
-                            type="button"
-                            onClick={() => setFormImage(photo.src)}
-                            title={photo.label}
-                            className={`group relative rounded-lg overflow-hidden aspect-[4/5] border-2 transition-all ${
-                              isSelected
-                                ? 'border-emerald-500 ring-2 ring-emerald-500/40 scale-95'
-                                : 'border-transparent hover:border-slate-400 opacity-80 hover:opacity-100'
-                            }`}
-                          >
-                            <img
-                              src={photo.src}
-                              alt={photo.label}
-                              className="w-full h-full object-cover object-top"
-                            />
-                            {isSelected && (
-                              <div className="absolute inset-0 bg-emerald-600/30 flex items-center justify-center">
-                                <IconCheck className="w-4 h-4 text-white drop-shadow" />
-                              </div>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
+                  {/* Actions for active photo */}
+                  <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <button
+                      type="button"
+                      onClick={() => handleCopyPhotoUrl(formImage)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors flex items-center space-x-1.5 ${
+                        copiedUrl === formImage
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-700 dark:bg-emerald-950 dark:border-emerald-700 dark:text-emerald-300'
+                          : isDark ? 'bg-slate-900 border-slate-700 text-slate-300 hover:bg-slate-800' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      {copiedUrl === formImage ? <IconCheck className="w-3.5 h-3.5 text-emerald-600" /> : <IconCopy className="w-3.5 h-3.5" />}
+                      <span>{copiedUrl === formImage ? 'Copied' : 'Copy URL'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormImage(ChigozieImg);
+                        setPhotoSourceTab('preset');
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors flex items-center space-x-1 text-slate-500 hover:text-red-600 ${
+                        isDark ? 'border-slate-800 hover:bg-red-950/20' : 'border-slate-200 hover:bg-red-50'
+                      }`}
+                      title="Reset to default executive preset"
+                    >
+                      <IconTrash className="w-3.5 h-3.5" />
+                      <span>Reset</span>
+                    </button>
                   </div>
+                </div>
+
+                {/* Photo Source Tabs */}
+                <div className={`p-4 rounded-xl border space-y-4 ${
+                  isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <div className="flex items-center space-x-1.5 border-b pb-3 border-slate-200 dark:border-slate-800 flex-wrap gap-y-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setPhotoSourceTab('upload')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
+                        photoSourceTab === 'upload'
+                          ? 'bg-emerald-600 text-white shadow-xs'
+                          : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <IconUpload className="w-3.5 h-3.5" />
+                      <span>Cloud Storage Upload</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setPhotoSourceTab('preset')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
+                        photoSourceTab === 'preset'
+                          ? 'bg-emerald-600 text-white shadow-xs'
+                          : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <IconUsers className="w-3.5 h-3.5" />
+                      <span>Leadership Presets ({PRESET_MANAGEMENT_PHOTOS.length})</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setPhotoSourceTab('url')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
+                        photoSourceTab === 'url'
+                          ? 'bg-emerald-600 text-white shadow-xs'
+                          : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <IconExternal className="w-3.5 h-3.5" />
+                      <span>Direct Image URL</span>
+                    </button>
+                  </div>
+
+                  {/* Tab 1: Cloud Storage Uploader */}
+                  {photoSourceTab === 'upload' && (
+                    <div className="space-y-3">
+                      <ImageUploader
+                        currentUrl={formImage}
+                        onUploadComplete={(url) => {
+                          setFormImage(url);
+                        }}
+                        bucket="media"
+                        label="Upload Photo to Cloud Storage (Supabase)"
+                        helperText="PNG, JPG, WEBP (Max 10MB). Automatically optimised and hosted on high-availability CDN."
+                        theme={theme}
+                      />
+                    </div>
+                  )}
+
+                  {/* Tab 2: Leadership Presets */}
+                  {photoSourceTab === 'preset' && (
+                    <div className="space-y-2">
+                      <p className={`text-[11px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                        Click to Assign Preset Photo:
+                      </p>
+                      <div className="grid grid-cols-4 sm:grid-cols-8 gap-2.5">
+                        {PRESET_MANAGEMENT_PHOTOS.map((photo) => {
+                          const isSelected = formImage === photo.src || formImage === photo.path;
+                          return (
+                            <button
+                              key={photo.id}
+                              type="button"
+                              onClick={() => setFormImage(photo.src)}
+                              title={photo.label}
+                              className={`group relative rounded-xl overflow-hidden aspect-[4/5] border-2 transition-all ${
+                                isSelected
+                                  ? 'border-emerald-500 ring-2 ring-emerald-500/40 scale-95 shadow-sm'
+                                  : 'border-transparent hover:border-slate-400 opacity-80 hover:opacity-100'
+                              }`}
+                            >
+                              <img
+                                src={photo.src}
+                                alt={photo.label}
+                                className="w-full h-full object-cover object-top"
+                              />
+                              {isSelected && (
+                                <div className="absolute inset-0 bg-emerald-600/35 flex items-center justify-center">
+                                  <IconCheck className="w-5 h-5 text-white drop-shadow" />
+                                </div>
+                              )}
+                              <div className="absolute bottom-0 inset-x-0 p-1 bg-gradient-to-t from-slate-950/80 to-transparent text-[9px] text-white truncate text-center font-bold">
+                                {photo.label.split(' ')[0]}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tab 3: Direct URL Input */}
+                  {photoSourceTab === 'url' && (
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-wider">
+                        Image Public URL
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="url"
+                          placeholder="https://example.com/photo.jpg or /assets/management/..."
+                          value={formImage}
+                          onChange={(e) => setFormImage(e.target.value)}
+                          className={`w-full px-3.5 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-mono ${
+                            isDark ? 'bg-slate-950 border-slate-800 text-white focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-950 focus:border-emerald-600 shadow-2xs'
+                          }`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setFormImage('')}
+                          className={`px-3 py-2.5 rounded-xl text-xs font-bold border transition-colors text-slate-500 hover:text-red-600 ${
+                            isDark ? 'border-slate-800 hover:bg-slate-900' : 'border-slate-300 hover:bg-slate-100'
+                          }`}
+                        >
+                          Clear
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-slate-500">
+                        Paste a direct URL to an image hosted on any CDN or internal storage bucket.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1156,6 +1554,133 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
                 <IconUpload className="w-3.5 h-3.5" />
                 <span>{isImporting ? 'Importing...' : `Confirm & Import (${parsedImportRows.length})`}</span>
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* High-Resolution Photo Lightbox & Management Modal */}
+      {/* ========================================================================= */}
+      {lightboxMember && (
+        <div 
+          className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setLightboxMember(null)}
+        >
+          <div 
+            className={`w-full max-w-xl rounded-2xl border shadow-2xl overflow-hidden flex flex-col ${
+              isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className={`p-4 border-b flex items-center justify-between ${
+              isDark ? 'border-slate-800 bg-slate-950/50' : 'border-slate-100 bg-slate-50'
+            }`}>
+              <div className="flex items-center space-x-2">
+                <IconEye className="w-4 h-4 text-emerald-600" />
+                <h3 className="font-bold text-sm">Executive Photo Viewer</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLightboxMember(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              >
+                <IconClose className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Photo Preview Container */}
+            <div className="p-6 flex flex-col items-center bg-slate-950/40 relative">
+              <div className="w-64 h-80 rounded-2xl overflow-hidden shadow-2xl border-4 border-white/10 bg-slate-900 shrink-0">
+                <img
+                  src={lightboxMember.image}
+                  alt={lightboxMember.name}
+                  className="w-full h-full object-cover object-top"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = ChigozieImg;
+                  }}
+                />
+              </div>
+
+              {/* Member Summary */}
+              <div className="mt-4 text-center">
+                <h4 className="text-lg font-bold">{lightboxMember.name}</h4>
+                <p className="text-xs text-slate-400 font-medium">{lightboxMember.role}</p>
+                <div className="mt-2 flex items-center justify-center gap-2">
+                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${getPhotoSourceInfo(lightboxMember.image).color}`}>
+                    {getPhotoSourceInfo(lightboxMember.image).label}
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    Order #{lightboxMember.display_order}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Photo URL & Actions Bar */}
+            <div className={`p-4 border-t space-y-3 ${isDark ? 'border-slate-800 bg-slate-950/60' : 'border-slate-100 bg-slate-50'}`}>
+              <div className="space-y-1">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  Image Resource URL
+                </p>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={lightboxMember.image}
+                    className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-mono border ${
+                      isDark ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleCopyPhotoUrl(lightboxMember.image)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors flex items-center space-x-1 shrink-0 ${
+                      copiedUrl === lightboxMember.image
+                        ? 'bg-emerald-600 text-white border-emerald-600'
+                        : isDark ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    {copiedUrl === lightboxMember.image ? <IconCheck className="w-3.5 h-3.5" /> : <IconCopy className="w-3.5 h-3.5" />}
+                    <span>{copiedUrl === lightboxMember.image ? 'Copied' : 'Copy'}</span>
+                  </button>
+                  <a
+                    href={lightboxMember.image}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-500 border border-slate-700 hover:border-emerald-500 transition-colors shrink-0"
+                    title="Open original image in new tab"
+                  >
+                    <IconExternal className="w-4 h-4" />
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const mem = lightboxMember;
+                    setLightboxMember(null);
+                    handleOpenEdit(mem);
+                  }}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5"
+                >
+                  <IconEdit className="w-3.5 h-3.5" />
+                  <span>Edit Team Member & Photo</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setLightboxMember(null)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold border transition-colors ${
+                    isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-300 text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
