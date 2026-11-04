@@ -179,6 +179,8 @@ const HeroSlideVideo: React.FC<{
       {hasBeenActive && !prefersReducedMotion && (
         <video
           ref={videoRef}
+          key={src}
+          src={src}
           loop
           muted
           playsInline
@@ -308,8 +310,17 @@ const Home: React.FC = () => {
     }
   ]).map((s, idx) => {
     let resolvedVideoUrl = s.video_url;
-    // Map videos to local ultra-compressed, faststart video loops for instant playback
-    if (resolvedVideoUrl) {
+    // Map videos to local ultra-compressed, faststart video loops for instant playback ONLY if not a remote user-uploaded video
+    const isRemoteVideo = resolvedVideoUrl && (
+      resolvedVideoUrl.startsWith('http://') ||
+      resolvedVideoUrl.startsWith('https://') ||
+      resolvedVideoUrl.includes('supabase.co') ||
+      resolvedVideoUrl.includes('storage/v1/object') ||
+      resolvedVideoUrl.includes('youtube.com') ||
+      resolvedVideoUrl.includes('youtu.be')
+    );
+
+    if (resolvedVideoUrl && !isRemoteVideo) {
       if (resolvedVideoUrl.includes('X0d8DmasSiQ') || resolvedVideoUrl.includes('FRANKSTAR LOOP')) {
         resolvedVideoUrl = FrankstarLoopVideo;
       } else if (resolvedVideoUrl.includes('OFFSHORE INTELLIGENCE')) {

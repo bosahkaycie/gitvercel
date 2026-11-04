@@ -284,12 +284,12 @@ export const FALLBACK_SLIDERS: CMSSlider[] = [
 const LOCAL_STORAGE_KEY_SERVICES = 'pigl_cms_services';
 const LOCAL_STORAGE_KEY_BLOGS = 'pigl_cms_blogs';
 const LOCAL_STORAGE_KEY_SLIDERS = 'pigl_cms_sliders';
-export const CURRENT_SLIDERS_VERSION = "v5_perf_local_webp_assets";
+export const CURRENT_SLIDERS_VERSION = "v6_persistent_uploaded_videos";
 export const LOCAL_STORAGE_KEY_SLIDERS_VERSION = "pigl_cms_sliders_version";
 
 /**
- * Strips unreachable remote IP URLs (such as 191.215.41.50) that cause 21-second connection stalls,
- * mapping them directly to locally bundled, pre-compressed WebP and faststart video assets.
+ * Strips unreachable remote IP URLs (such as 191.215.41.50) that cause connection stalls,
+ * while strictly preserving all user-uploaded cloud video URLs (Supabase storage, YouTube, HTTPS).
  */
 export const sanitizeSliderAsset = (slider: CMSSlider, index: number): CMSSlider => {
   let desktop = slider.desktop_image !== undefined && slider.desktop_image !== null ? slider.desktop_image.trim() : '';
@@ -303,15 +303,29 @@ export const sanitizeSliderAsset = (slider: CMSSlider, index: number): CMSSlider
     mobile = '';
   }
 
-  let video = slider.video_url;
-  if (video && (video.includes('X0d8DmasSiQ') || video.includes('FRANKSTAR LOOP'))) {
-    video = '/assets/FRANKSTAR LOOP.mp4';
-  } else if (video && video.includes('OFFSHORE INTELLIGENCE')) {
-    video = '/assets/OFFSHORE INTELLIGENCE.mp4';
-  } else if (video && video.includes('DIGITAL INTELLINGENCE')) {
-    video = '/assets/DIGITAL INTELLINGENCE.mp4';
-  } else if (video && (video.includes('Pipeline_construction') || video.includes('PIPELINE_CONSTRUCTION'))) {
-    video = '/assets/PIPELINE_CONSTRUCTION.mp4';
+  let video = slider.video_url ? slider.video_url.trim() : null;
+
+  // CRITICAL FIX: If video is a remote cloud URL (Supabase Storage, YouTube, https://, http://),
+  // NEVER overwrite it with local bundled video paths!
+  const isRemoteVideo = video && (
+    video.startsWith('http://') ||
+    video.startsWith('https://') ||
+    video.includes('supabase.co') ||
+    video.includes('storage/v1/object') ||
+    video.includes('youtube.com') ||
+    video.includes('youtu.be')
+  );
+
+  if (!isRemoteVideo && video) {
+    if (video.includes('X0d8DmasSiQ') || video.includes('FRANKSTAR LOOP')) {
+      video = '/assets/FRANKSTAR LOOP.mp4';
+    } else if (video.includes('OFFSHORE INTELLIGENCE')) {
+      video = '/assets/OFFSHORE INTELLIGENCE.mp4';
+    } else if (video.includes('DIGITAL INTELLINGENCE')) {
+      video = '/assets/DIGITAL INTELLINGENCE.mp4';
+    } else if (video.includes('Pipeline_construction') || video.includes('PIPELINE_CONSTRUCTION')) {
+      video = '/assets/PIPELINE_CONSTRUCTION.mp4';
+    }
   }
 
   return {
@@ -1351,7 +1365,59 @@ export const useSliders = (adminMode = false) => {
     setLoading(true);
     setError(null);
     const deletedIds = getDeletedSliderIds();
-    // 1. Load through versioned getStoredSliders() so codebase updates synchronize cleanly
+
+    // 1. Try querying cloud source of truth (Supabase database or secure /api/sliders endpoint)
+    let cloudSliders: CMSSlider[] | null = null;
+    const client = getSupabaseClient();
+    if (client) {
+      try {
+        let query = client.from('sliders').select('*').order('display_order', { ascending: true });
+        if (!adminMode) {
+          query = query.eq('is_active', true);
+        }
+        const { data, error: sbError } = await query;
+        if (!sbError && data && data.length > 0) {
+          cloudSliders = data as CMSSlider[];
+        }
+      } catch (err: any) {
+        console.warn('Direct Supabase slider query notice:', err);
+      }
+    }
+
+    // Secondary cloud fallback via serverless API if direct client query was blocked or returned empty
+    if (!cloudSliders || cloudSliders.length === 0) {
+      try {
+        const res = await fetch('/api/sliders');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.sliders) && json.sliders.length > 0) {
+            cloudSliders = json.sliders as CMSSlider[];
+          }
+        }
+      } catch (apiErr) {
+        // Offline or serverless endpoint not reachable
+      }
+    }
+
+    if (cloudSliders && cloudSliders.length > 0) {
+      const seenIds = new Set<string>();
+      const unique = cloudSliders.filter(s => {
+        if (!s || !s.id || deletedIds.has(s.id)) return false;
+        if (seenIds.has(s.id)) return false;
+        seenIds.add(s.id);
+        return true;
+      });
+
+      const normalized = unique.map((s, idx) => sanitizeSliderAsset(s, idx));
+      normalized.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+      saveStoredSliders(normalized);
+      const filtered = adminMode ? normalized : normalized.filter(s => s.is_active);
+      setSliders(filtered);
+      setLoading(false);
+      return;
+    }
+
+    // 2. Fallback to Local Storage if offline or no remote slides yet
     const stored = getStoredSliders();
     if (stored && stored.length > 0) {
       const seen = new Set<string>();
@@ -1370,40 +1436,7 @@ export const useSliders = (adminMode = false) => {
       return;
     }
 
-    // 2. If no local storage (fresh visitor or deployed instance):
-    // Check if Supabase has updated modern slides (e.g. matching or newer than FALLBACK_SLIDERS)
-    const client = getSupabaseClient();
-    if (client) {
-      try {
-        let query = client.from('sliders').select('*').order('display_order', { ascending: true });
-        if (!adminMode) {
-          query = query.eq('is_active', true);
-        }
-        const { data, error: sbError } = await query;
-        if (!sbError && data && data.length > 0) {
-          const seenIds = new Set<string>();
-          const unique = (data as CMSSlider[]).filter(s => {
-            if (deletedIds.has(s.id)) return false;
-            if (seenIds.has(s.id)) return false;
-            seenIds.add(s.id);
-            return true;
-          });
-
-          const normalized = unique.map((s, idx) => sanitizeSliderAsset(s, idx));
-
-          normalized.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-          saveStoredSliders(normalized);
-          const filtered = adminMode ? normalized : normalized.filter(s => s.is_active);
-          setSliders(filtered);
-          setLoading(false);
-          return;
-        }
-      } catch (err: any) {
-        console.warn('Initial Supabase slider seed notice:', err);
-      }
-    }
-
-    // 3. Fallback default seeds (the authoritative 5 slides)
+    // 3. Fallback default seeds (the authoritative slides)
     const validFallback = FALLBACK_SLIDERS.filter(s => !deletedIds.has(s.id));
     saveStoredSliders(validFallback);
     const filtered = adminMode ? validFallback : validFallback.filter(s => s.is_active);
@@ -1493,6 +1526,16 @@ export const useSliders = (adminMode = false) => {
         } catch (apiErr) {
           console.warn('Network notice syncing slider to Supabase (persisted to local store):', apiErr);
         }
+      }
+    } else {
+      try {
+        await fetch('/api/sliders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'save', slider: updated })
+        }).catch(() => {});
+      } catch (apiErr) {
+        console.warn('Network notice syncing slider via API endpoint:', apiErr);
       }
     }
 
