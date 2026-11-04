@@ -287,7 +287,12 @@ export const LEGACY_SERVICE_MAP: Record<string, string> = {
   'marine-environmental-services': 'metocean-marine-solutions',
   'marine-advisory-operational-support': 'metocean-marine-solutions',
   'environmental-survey': 'metocean-marine-solutions',
+  'environmental-studies': 'metocean-marine-solutions',
+  'environmental-studies-nigeria': 'metocean-marine-solutions',
   'search-and-salvage': 'metocean-marine-solutions',
+  'underwater-subsea-investigation': 'metocean-marine-solutions',
+  'underwater-subsea-investigation-nigeria': 'metocean-marine-solutions',
+  'subsea-investigation': 'metocean-marine-solutions',
 
   // Division 03: Integrated Construction Services (ICS) mappings
   'integrated-construction-services': 'integrated-construction-services',

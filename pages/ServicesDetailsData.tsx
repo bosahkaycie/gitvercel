@@ -312,6 +312,7 @@ export const SERVICE_DETAILS_MAP: Record<string, ServiceDetail> = {
       'Dredging Channels & Marine Approach Corridors'
     ],
     gallery: SERVICE_GALLERY_PRESETS['metocean-marine-solutions'],
+    video_url: '/assets/offshore-intelligence.mp4',
     subServices: MMS_SERVICE_FAMILIES,
     methodology: [
       'Directional wave buoy deployment, taut-line mooring & satellite telemetry integration',
@@ -372,6 +373,7 @@ export const SERVICE_DETAILS_MAP: Record<string, ServiceDetail> = {
       'PIGL Port Harcourt Logistics Base & Fabrication Staging Yards'
     ],
     gallery: SERVICE_GALLERY_PRESETS['integrated-construction-services'],
+    video_url: '/assets/PIPELINE_CONSTRUCTION.mp4',
     subServices: ICS_SERVICE_FAMILIES,
     methodology: [
       'Right-of-way (ROW) clearance, swamp-cat excavation, trenching & pipe stringing',
@@ -494,7 +496,12 @@ SERVICE_DETAILS_MAP['continuous-marine-intelligence'] = SERVICE_DETAILS_MAP['met
 SERVICE_DETAILS_MAP['climate-environmental-metocean'] = SERVICE_DETAILS_MAP['metocean-marine-solutions'];
 SERVICE_DETAILS_MAP['metocean'] = SERVICE_DETAILS_MAP['metocean-marine-solutions'];
 SERVICE_DETAILS_MAP['environmental-survey'] = SERVICE_DETAILS_MAP['metocean-marine-solutions'];
+SERVICE_DETAILS_MAP['environmental-studies'] = SERVICE_DETAILS_MAP['metocean-marine-solutions'];
+SERVICE_DETAILS_MAP['environmental-studies-nigeria'] = SERVICE_DETAILS_MAP['metocean-marine-solutions'];
 SERVICE_DETAILS_MAP['search-and-salvage'] = SERVICE_DETAILS_MAP['metocean-marine-solutions'];
+SERVICE_DETAILS_MAP['underwater-subsea-investigation'] = SERVICE_DETAILS_MAP['metocean-marine-solutions'];
+SERVICE_DETAILS_MAP['underwater-subsea-investigation-nigeria'] = SERVICE_DETAILS_MAP['metocean-marine-solutions'];
+SERVICE_DETAILS_MAP['subsea-investigation'] = SERVICE_DETAILS_MAP['metocean-marine-solutions'];
 
 // Backward compatibility: Construction & Asset Integrity -> ICS
 SERVICE_DETAILS_MAP['integrated-engineering-construction'] = SERVICE_DETAILS_MAP['integrated-construction-services'];

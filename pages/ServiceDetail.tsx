@@ -515,13 +515,27 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
             {/* Right: Operational Video & Integrated Commercial Value */}
             <div className="lg:col-span-5 space-y-8">
               {/* Operational Video if configured */}
-              {rawVideoUrl && (
+              {rawVideoUrl ? (
                 <NativeVideoPlayer
                   src={rawVideoUrl}
                   poster={service.hero_image || service.card_image}
                   title={`${service.title} Operational Video`}
                   className="hover-lift"
                 />
+              ) : (
+                <div className="relative rounded-lg overflow-hidden border border-slate-200/80 shadow-sm aspect-video bg-slate-950 group hover-lift">
+                  <img
+                    src={service.card_image || service.hero_image || '/assets/water_treatment_skid.jpg'}
+                    alt={`${service.title} Operational Technology`}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-5">
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 bg-slate-900/80 backdrop-blur-sm px-2.5 py-1 rounded border border-emerald-500/30">
+                      Engineering Deployment Spread
+                    </span>
+                  </div>
+                </div>
               )}
 
               {/* Integrated Commercial Value & Operator Assurance */}
@@ -587,8 +601,14 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
               </p>
             </div>
 
-            {/* 4 in a row layout */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Balanced Capabilities Grid: 3 columns for 6 items, 4 columns for 4 items */}
+            <div className={`grid gap-6 ${
+              subServicesList.length === 6 
+                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+                : (subServicesList.length === 4 
+                    ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' 
+                    : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3')
+            }`}>
               {subServicesList.map((sub, idx) => (
                 <div
                   key={sub.id || idx}
@@ -835,41 +855,123 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
           </div>
 
           <div className="space-y-4 reveal">
-            {((service.slug === 'geosolutions-engineering-services' || id === 'geosolutions-engineering-services' || id === 'ground-intelligence') ? [
-              {
-                q: "Where does PIGL deliver geotechnical engineering services in Nigeria?",
-                a: "Polaris Integrated & GeoSolutions Limited (PIGL) operates throughout Nigeria with active mobilisation bases in Port Harcourt, Lagos, Warri, and Bonny Island. We mobilise 20-tonne hydraulic Cone Penetration Testing (CPT) equipment, deep borehole drilling rigs, and comprehensive soil mechanics testing laboratories across swamp, coastal, land, and offshore environments."
-              },
-              {
-                q: "What capabilities distinguish PIGL's geophysical survey operations?",
-                a: "PIGL combines indigenous operational experience with specialised marine and terrestrial geophysical survey instruments. Our spreads include high-resolution sub-bottom profilers, dual-frequency side-scan sonars, multibeam echo sounders, marine magnetometers, and electrical resistivity tomography (ERT) for pipeline route surveys, hazard detection, and seabed integrity."
-              },
-              {
-                q: "What is 3D reality capture and what accuracy can PIGL deliver?",
-                a: "3D reality capture digitises physical assets into millimetre-accurate point clouds and 3D digital twins. Utilizing industrial-grade Leica RTC360 terrestrial laser scanners, PIGL delivers high-precision registered point clouds, as-built 3D CAD/BIM models, clash detection reports, and digital twins for brownfield facilities, offshore platforms, and infrastructure."
-              },
-              {
-                q: "What geotechnical laboratory tests and certifications do you provide?",
-                a: "Our geotechnical testing laboratories in Port Harcourt and Lagos perform full soil and rock mechanics testing: Atterberg limits, sieve analysis, triaxial shear testing (UU, CU, CD), unconfined compression, direct shear, oedometer consolidation, permeability, and chemical aggressivity analysis in strict compliance with ASTM, BS 1377, and BS 5930."
-              },
-              {
-                q: "What is the typical mobilisation timeline for geotechnical or geophysical surveys?",
-                a: "For onshore, swamp, and coastal survey operations in Nigeria, PIGL standard mobilisation timelines range from 24 to 72 hours following notice to proceed and site access clearance. For offshore spreads requiring specialised vessels, mobilisation schedules are coordinated to optimise operational weather windows."
+            {(() => {
+              const currentSlug = service.slug || id;
+              if (currentSlug === 'geosolutions-engineering-services' || currentSlug === 'ges' || currentSlug === 'ground-intelligence') {
+                return [
+                  {
+                    q: "Where does PIGL deliver geotechnical engineering services in Nigeria?",
+                    a: "Polaris Integrated & GeoSolutions Limited (PIGL) operates throughout Nigeria with active mobilisation bases in Port Harcourt, Lagos, Warri, and Bonny Island. We mobilise 20-tonne hydraulic Cone Penetration Testing (CPT) equipment, deep borehole drilling rigs, and comprehensive soil mechanics testing laboratories across swamp, coastal, land, and offshore environments."
+                  },
+                  {
+                    q: "What capabilities distinguish PIGL's geophysical survey operations?",
+                    a: "PIGL combines indigenous operational experience with specialised marine and terrestrial geophysical survey instruments. Our spreads include high-resolution sub-bottom profilers, dual-frequency side-scan sonars, multibeam echo sounders, marine magnetometers, and electrical resistivity tomography (ERT) for pipeline route surveys, hazard detection, and seabed integrity."
+                  },
+                  {
+                    q: "What is 3D reality capture and what accuracy can PIGL deliver?",
+                    a: "3D reality capture digitises physical assets into millimetre-accurate point clouds and 3D digital twins. Utilizing industrial-grade Leica RTC360 terrestrial laser scanners, PIGL delivers high-precision registered point clouds, as-built 3D CAD/BIM models, clash detection reports, and digital twins for brownfield facilities, offshore platforms, and infrastructure."
+                  },
+                  {
+                    q: "What geotechnical laboratory tests and certifications do you provide?",
+                    a: "Our geotechnical testing laboratories in Port Harcourt and Lagos perform full soil and rock mechanics testing: Atterberg limits, sieve analysis, triaxial shear testing (UU, CU, CD), unconfined compression, direct shear, oedometer consolidation, permeability, and chemical aggressivity analysis in strict compliance with ASTM, BS 1377, and BS 5930."
+                  },
+                  {
+                    q: "What is the typical mobilisation timeline for geotechnical or geophysical surveys?",
+                    a: "For onshore, swamp, and coastal survey operations in Nigeria, PIGL standard mobilisation timelines range from 24 to 72 hours following notice to proceed and site access clearance. For offshore spreads requiring specialised vessels, mobilisation schedules are coordinated to optimise operational weather windows."
+                  }
+                ];
               }
-            ] : [
-              {
-                q: `What compliance and quality standards govern ${service.title}?`,
-                a: `All operations under ${service.title} are executed in strict alignment with ISO 9001:2015 Quality Management, ISO 45001:2018 Safety Standards, NUPRC statutory regulations, and relevant international engineering codes (API, ASME, BS, DNV).`
-              },
-              {
-                q: `Where does PIGL deliver ${service.title} operations?`,
-                a: "PIGL provides engineering services across all key Nigerian operating theatres: onshore swamp fields in Rivers, Delta, and Bayelsa States, industrial complexes in Lagos and Ogun, and offshore deepwater concessions across the Gulf of Guinea."
-              },
-              {
-                q: "How can our project team request a detailed engineering proposal?",
-                a: "You can submit your project coordinates, scope requirements, or tender documentation via our consultation form above, or contact our engineering desks in Port Harcourt and Lagos directly at hello@polarisigl.com."
+
+              if (currentSlug === 'metocean-marine-solutions' || currentSlug === 'mms') {
+                return [
+                  {
+                    q: "What oceanographic telemetry buoys and current sensors does PIGL deploy?",
+                    a: "Through our technical partnership with Frankstar Technology, PIGL deploys calibrated oceanographic wave and current buoys, Teledyne RDI Acoustic Doppler Current Profilers (ADCP - 300kHz & 600kHz), acoustic wave and tide gauges, and satellite modems providing real-time metocean telemetry feeds across the Gulf of Guinea."
+                  },
+                  {
+                    q: "How does PIGL deliver marine weather-window forecasting for offshore operations?",
+                    a: "We integrate satellite observational data, high-resolution hydrodynamic numerical models, and local atmospheric station telemetry to provide calibrated 7-day to 14-day operational forecasts and squall early warnings for offshore drilling, rig moves, pipelay barges, and heavy-lift campaigns."
+                  },
+                  {
+                    q: "What statutory marine environmental baseline surveys does PIGL conduct?",
+                    a: "We execute offshore and estuarine environmental baseline and seabed monitoring surveys conforming strictly with NUPRC EGASPIN and FMEnv standards, utilizing Niskin water column samplers, multi-parameter CTD profilers, and Van Veen benthic sediment grabs."
+                  },
+                  {
+                    q: "What extreme metocean design criteria can PIGL calculate for offshore structures?",
+                    a: "We perform extreme value analyses and joint-probability modelling to derive 10-year, 50-year, and 100-year return period design criteria for wave heights, crest elevations, current profiles, wind velocities, and storm surges in accordance with ISO 19901-1."
+                  },
+                  {
+                    q: "Where are PIGL's marine support bases and vessels mobilized from?",
+                    a: "PIGL mobilizes dedicated marine survey craft, deck winches, and instrumented survey containers directly from Onne Port, Port Harcourt, and Lagos, providing rapid coastal and deepwater dispatch across Nigerian maritime waters."
+                  }
+                ];
               }
-            ]).map((faq, i) => (
+
+              if (currentSlug === 'integrated-construction-services' || currentSlug === 'ics') {
+                return [
+                  {
+                    q: "What pipeline construction and swamp pipelay capabilities does PIGL deliver?",
+                    a: "PIGL provides turnkey pipeline installation across challenging swamp and wetland terrain in Nigeria. Our spreads include amphibious swamp excavators ('swamp cats'), sideboom pipelayers, field pipe bending, trenching, API 1104 multi-process welding, joint coating, and lowering-in."
+                  },
+                  {
+                    q: "Which codes govern PIGL's welding, fabrication, and NDT inspections?",
+                    a: "All pipeline welding and fabrication adhere to API 1104, ASME B31.4, ASME B31.8, and NUPRC guidelines. Weld integrity is verified through ASNT Level II certified Non-Destructive Examination (NDE) including radiographic (RT), ultrasonic (UT), magnetic particle (MPI), and dye penetrant testing (DPT)."
+                  },
+                  {
+                    q: "What hydrostatic pressure testing and pre-commissioning procedures are applied?",
+                    a: "We conduct high-pressure hydrostatic testing using calibrated electronic deadweight testers and dual-pen chart recorders, pipeline caliper pigging for geometry verification, dewatering, and nitrogen purging for safe statutory handover."
+                  },
+                  {
+                    q: "What civil and foundation infrastructure works are handled under ICS?",
+                    a: "We deliver heavy civil earthworks, structural concrete foundation piling caps, compressor station bund walls, facility drainage, and soil-stabilized industrial access roads across swamp and land oilfield locations."
+                  },
+                  {
+                    q: "Where is PIGL's primary fabrication staging and logistics base located?",
+                    a: "PIGL operates a fully integrated logistics and mechanical fabrication staging facility in Port Harcourt, Rivers State, equipped for spool fabrication, equipment maintenance, and rapid pipeline spread dispatch."
+                  }
+                ];
+              }
+
+              if (currentSlug === 'industrial-solutions' || currentSlug === 'is') {
+                return [
+                  {
+                    q: "What produced water treatment technologies does PIGL deploy with CoaleXpert?",
+                    a: "In strategic alliance with CoaleXpert, PIGL supplies modular coalescing oil-water separation skids, hydrocyclones, and nutshell filtration units capable of reducing oil-in-water (OIW) concentrations down to <10-29 ppm for compliant offshore discharge or formation reinjection."
+                  },
+                  {
+                    q: "How does PIGL guarantee compliance with NUPRC EGASPIN and FMEnv standards?",
+                    a: "We combine engineered separation hardware with our accredited analytical laboratory. We perform continuous effluent characterisation, heavy metal spectroscopy, BOD/COD testing, and provide certified statutory compliance dossiers for regulatory audit."
+                  },
+                  {
+                    q: "What industrial reverse osmosis (RO) and water treatment solutions are provided?",
+                    a: "PIGL engineers turnkey brackish and seawater reverse osmosis (RO) desalination plants, multimedia and activated carbon filtration skids, and automated chemical dosing systems supplying ultra-pure process water and potable camp supplies."
+                  },
+                  {
+                    q: "What capabilities are available in PIGL's environmental and water testing laboratory?",
+                    a: "Our laboratory in Port Harcourt conducts atomic absorption spectroscopy (AAS), gas chromatography, oil-in-water infrared spectrophotometry, and full microbiological testing for industrial water, produced water, and soil samples."
+                  },
+                  {
+                    q: "What are the footprint advantages of PIGL's modular water treatment packages?",
+                    a: "Our skid-mounted produced water and effluent systems are pre-assembled and factory acceptance tested (FAT), allowing rapid integration into existing upstream flowstations and offshore platforms without costly brownfield structural modifications."
+                  }
+                ];
+              }
+
+              return [
+                {
+                  q: `What compliance and quality standards govern ${service.title}?`,
+                  a: `All operations under ${service.title} are executed in strict alignment with ISO 9001:2015 Quality Management, ISO 45001:2018 Safety Standards, NUPRC statutory regulations, and relevant international engineering codes (API, ASME, BS, DNV).`
+                },
+                {
+                  q: `Where does PIGL deliver ${service.title} operations?`,
+                  a: "PIGL provides engineering services across all key Nigerian operating theatres: onshore swamp fields in Rivers, Delta, and Bayelsa States, industrial complexes in Lagos and Ogun, and offshore deepwater concessions across the Gulf of Guinea."
+                },
+                {
+                  q: "How can our project team request a detailed engineering proposal?",
+                  a: "You can submit your project coordinates, scope requirements, or tender documentation via our consultation form above, or contact our engineering desks in Port Harcourt and Lagos directly at hello@polarisigl.com."
+                }
+              ];
+            })().map((faq, i) => (
               <details
                 key={i}
                 className="group bg-white border border-slate-200/90 rounded-lg p-5 transition-all duration-200 open:shadow-md open:border-emerald-600/60"
