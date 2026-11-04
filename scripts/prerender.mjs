@@ -21,8 +21,8 @@ const routes = [
     title: 'Polaris Integrated & GeoSolutions (PIGL) | Geoscience, Marine, Construction & Industrial Solutions',
     description: 'Polaris Integrated & GeoSolutions Limited provides geoscience and survey services, marine observation, infrastructure construction and industrial water treatment for energy, infrastructure and industrial clients in Nigeria.',
     badge: 'ISO 9001:2015 & ISO 45001:2018 Certified Management Systems',
-    h1: 'About PIGL',
-    intro: 'Polaris Integrated & GeoSolutions Limited provides geoscience and survey services, marine observation, infrastructure construction and industrial water treatment for energy, infrastructure and industrial clients.',
+    h1: 'Engineering Intelligence & Subsurface Assurance',
+    intro: 'Polaris Integrated & GeoSolutions Limited delivers multidisciplinary engineering services across four operating divisions: GeoSolutions & Engineering (GES), Metocean & Marine (MMS), Integrated Construction (ICS), and Industrial Solutions (IS).',
     sectionsHtml: `
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
         <article style="padding: 1.5rem; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;">
@@ -448,12 +448,13 @@ function generateHtmlForRoute(config) {
             PIGL <span style="color: #cbd5e1; font-weight: 500;">| Polaris Integrated &amp; GeoSolutions Limited</span>
           </a>
           <nav style="display: flex; gap: 1.25rem; flex-wrap: wrap; font-size: 0.9rem;">
+            <a href="/" style="color: #94a3b8; text-decoration: none;">Home</a>
+            <a href="/about" style="color: #94a3b8; text-decoration: none;">About Us</a>
             <a href="/services" style="color: #94a3b8; text-decoration: none;">Services</a>
-            <a href="/services/geosolutions-engineering-services" style="color: #94a3b8; text-decoration: none;">GeoSolutions (GES)</a>
-            <a href="/services/metocean-marine-solutions" style="color: #94a3b8; text-decoration: none;">Metocean (MMS)</a>
-            <a href="/services/integrated-construction-services" style="color: #94a3b8; text-decoration: none;">Construction (ICS)</a>
-            <a href="/services/industrial-solutions" style="color: #94a3b8; text-decoration: none;">Industrial (IS)</a>
-            <a href="/about" style="color: #94a3b8; text-decoration: none;">About</a>
+            <a href="/teams" style="color: #94a3b8; text-decoration: none;">Team</a>
+            <a href="/careers" style="color: #94a3b8; text-decoration: none;">Careers</a>
+            <a href="/network" style="color: #94a3b8; text-decoration: none;">Our Network</a>
+            <a href="/blog" style="color: #94a3b8; text-decoration: none;">Blog</a>
             <a href="/contact" style="color: #94a3b8; text-decoration: none;">Contact</a>
           </nav>
         </div>

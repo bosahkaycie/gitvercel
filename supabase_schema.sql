@@ -582,45 +582,68 @@ ON CONFLICT (slug) DO UPDATE SET
 
 -- Homepage Sliders Seed Data
 INSERT INTO sliders (
-    title, subtitle, description, desktop_image, mobile_image, video_url, cta_text, cta_url, display_order, is_active
+    id, title, subtitle, description, desktop_image, mobile_image, video_url, cta_text, cta_url, display_order, is_active
 ) VALUES
 (
-    'Pioneering Sub-Surface & Digital Geosolutions',
-    'Indigenous Engineering Excellence Across Sub-Saharan Africa',
-    'Delivering high-precision 3D reality capture, marine geophysics, geotechnical soil mechanics, and asset assurance for energy leaders.',
-    '/assets/DJI_0003.jpg',
+    '3bd59604-1015-41e0-bcb1-c087fa769342',
+    'Metocean & Marine Solutions',
+    'LIFECYCLE PHASE 01 // METOCEAN & MARINE SOLUTIONS',
+    'Real-time ocean observation, metocean forecasting, marine environmental monitoring, and operational advisory across maritime domains.',
+    '/assets/new_ocean.webp',
     '/assets/DJI_0003.jpg',
     '/assets/FRANKSTAR LOOP.mp4',
-    'Explore Our Capabilities',
-    '/services',
+    'Explore Division Capabilities',
+    '/services/metocean-marine-solutions',
     1,
     true
 ),
 (
-    'Subsea Marine Intelligence & Metocean Systems',
-    'In Partnership with Frankstar Technology',
-    'Deploying oceanographic buoys, multi-beam acoustic bathymetry, and sub-bottom profiling to safeguard offshore marine assets.',
-    '/assets/marine_intel_metocean.jpg',
-    '/assets/marine_intel_metocean.jpg',
-    NULL,
-    'Discover Marine Intelligence',
-    '/services/marine-intelligence',
+    'c72b6c96-00ff-48d7-9589-1f2ef3a24aee',
+    'GeoSolutions & Engineering Services',
+    'LIFECYCLE PHASE 02 // GEOSOLUTIONS & ENGINEERING',
+    'Accurate data. Deeper insight. Smarter engineering. High-resolution seismic, geophysical & hydrographic survey, geotechnical investigation, reality capture, and laboratory testing.',
+    '/assets/seismic_survey.webp',
+    '/assets/DJI_0003.jpg',
+    '/assets/OFFSHORE INTELLIGENCE.mp4',
+    'Explore Division Capabilities',
+    '/services/geosolutions-engineering-services',
     2,
     true
 ),
 (
-    'Asset Integrity & Advanced NDT Technologies',
-    'In Partnership with CoaleXpert',
-    'Certified non-destructive testing, acoustic emission structural monitoring, and life-extension assurance for industrial facilities.',
-    '/assets/IMG_6170.jpg',
-    '/assets/IMG_6170.jpg',
-    NULL,
-    'View Asset Integrity Solutions',
-    '/services/asset-integrity-management',
+    '52f9111a-7fc9-4668-9f04-3fdbb37ef77d',
+    'Integrated Construction Services',
+    'LIFECYCLE PHASE 03 // INTEGRATED CONSTRUCTION SERVICES',
+    'From engineering preparation to successful project delivery. Integrated pipeline construction, civil infrastructure, structural steel fabrication, and commissioning support.',
+    '/assets/newpipeline.webp',
+    '/assets/DJI_0003.jpg',
+    'https://jbldpfvceacfonkzzhig.supabase.co/storage/v1/object/public/media/1793801194760_Pipeline_construction.mp4',
+    'Explore Division Capabilities',
+    '/services/integrated-construction-services',
     3,
     true
+),
+(
+    '9f5faf33-0d6b-4373-b86b-c989b330ba60',
+    'Industrial Solutions',
+    'LIFECYCLE PHASE 04 // INDUSTRIAL SOLUTIONS',
+    'Cleaner water. Healthier communities. Sustainable industries. Produced water treatment, industrial & domestic water solutions, water laboratory analysis, and wastewater recovery.',
+    '/assets/water_treatment_skid.jpg',
+    '/assets/DJI_0003.jpg',
+    '/assets/DIGITAL INTELLINGENCE.mp4',
+    'Explore Division Capabilities',
+    '/services/industrial-solutions',
+    4,
+    true
 )
-ON CONFLICT DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+    title = EXCLUDED.title,
+    subtitle = EXCLUDED.subtitle,
+    description = EXCLUDED.description,
+    video_url = EXCLUDED.video_url,
+    cta_url = EXCLUDED.cta_url,
+    display_order = EXCLUDED.display_order,
+    is_active = EXCLUDED.is_active;
 
 -- ==============================================================================
 -- 10. ADMIN USERS & PRIVILEGES TABLE
