@@ -602,14 +602,18 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsTestEmailModalOpen(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800"
+                    className={`h-10 px-4 rounded-xl text-xs font-bold border transition-all ${
+                      isDark
+                        ? 'border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800'
+                        : 'border-slate-300 text-slate-700 hover:bg-slate-100 hover:text-slate-900 shadow-xs'
+                    }`}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSendingTest}
-                    className="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white shadow-lg flex items-center space-x-2"
+                    className="h-10 px-5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white shadow-sm flex items-center space-x-2"
                   >
                     {isSendingTest ? (
                       <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -628,56 +632,82 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
         )}
 
         {/* Editor Page Header */}
-        <div className={`p-6 sm:p-8 rounded-2xl border transition-all ${
-          isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+        <div className={`p-5 sm:p-6 rounded-2xl border transition-all ${
+          isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200/90 text-slate-900 shadow-xs'
         }`}>
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div className="flex items-center space-x-3 sm:space-x-4">
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
-                title="Back to Campaigns"
+                className={`h-10 px-3.5 rounded-xl border text-xs font-bold flex items-center space-x-1.5 transition-all shadow-xs ${
+                  isDark
+                    ? 'border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white'
+                    : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+                title="Return to Campaigns & Subscribers List"
               >
-                &larr; Back
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span>Back</span>
               </button>
+
               <div>
-                <div className="flex items-center space-x-3 mb-1">
-                  <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
+                <div className="flex items-center space-x-2.5 mb-1">
+                  <h1 className={`text-xl sm:text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     {editingCampaignId ? 'Edit Campaign' : 'Compose Email Campaign'}
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono border ${
+                    isDark
+                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                      : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  }`}>
                     Full Studio Mode
                   </span>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-400">
+                <p className={`text-xs sm:text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   Author rich corporate newsletters, paste raw HTML templates, and preview real-time client rendering.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
+            {/* Top Action Buttons: Vertically Aligned & Uniform Heights */}
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
               <button
                 type="button"
                 onClick={() => handleSaveAndSend(true)}
-                className="px-4 py-2.5 rounded-xl text-xs font-bold border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 transition-all"
+                className={`h-10 px-4 rounded-xl text-xs font-bold border transition-all flex items-center space-x-1.5 shadow-xs ${
+                  isDark
+                    ? 'border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white'
+                    : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                }`}
               >
-                Save as Draft
+                <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                </svg>
+                <span>Save as Draft</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => setIsTestEmailModalOpen(true)}
-                className="px-4 py-2.5 rounded-xl text-xs font-bold border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-all flex items-center space-x-1.5"
+                className={`h-10 px-4 rounded-xl text-xs font-bold border transition-all flex items-center space-x-1.5 shadow-xs ${
+                  isDark
+                    ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
+                    : 'border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+                }`}
                 title="Send a live preview email to test deliverability"
               >
-                <IconMail className="w-3.5 h-3.5" />
+                <IconMail className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Send Test</span>
               </button>
+
               <button
                 type="button"
                 disabled={isDispatchingLive}
                 onClick={() => handleSaveAndSend(false)}
-                className="px-6 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white shadow-lg hover:shadow-emerald-600/30 transition-all flex items-center space-x-2"
+                className="h-10 px-5 rounded-xl text-xs font-bold uppercase tracking-wider bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white shadow-sm hover:shadow-emerald-600/30 transition-all flex items-center space-x-2"
               >
                 {isDispatchingLive ? (
                   <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -693,57 +723,91 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
           </div>
         </div>
 
-        {/* Template Selector Bar */}
-        <div className={`p-4 rounded-xl border flex flex-wrap items-center gap-2 ${
-          isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-100 border-slate-200'
+        {/* Template & Preset Selector Bar */}
+        <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+          isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90 shadow-xs'
         }`}>
-          <span className={`text-xs font-bold uppercase tracking-wider mr-2 ${isDark ? 'text-slate-400' : 'text-slate-700'}`}>
-            Design Options:
-          </span>
-          <button
-            type="button"
-            onClick={handleOpenNewCampaign}
-            className={`px-3 py-1.5 border rounded-lg text-xs font-bold transition-all ${
-              (!campTitle && !campSubject && !campBody && !rawHtmlCode)
-                ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                : isDark
-                  ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
-                  : 'bg-white hover:bg-slate-200 border-slate-300 text-slate-700 shadow-sm'
-            }`}
-          >
-            ✨ Blank Custom Canvas
-          </button>
-          <span className="text-slate-500 text-xs mx-1">|</span>
-          <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            Optional Presets:
-          </span>
-          {EMAIL_TEMPLATES.map((tpl) => (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3.5 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                Campaign Presets & Templates
+              </span>
+              <span className={`hidden sm:inline text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                • Choose a pre-built template or start from a blank canvas
+              </span>
+            </div>
+
             <button
-              key={tpl.id}
               type="button"
-              onClick={() => handleApplyTemplate(tpl.id)}
-              className={`px-3 py-1.5 border rounded-lg text-xs transition-all ${
-                isDark 
-                  ? 'bg-slate-800/80 hover:bg-emerald-600 hover:text-white border-slate-700 text-slate-300' 
-                  : 'bg-white hover:bg-emerald-600 hover:text-white hover:border-emerald-600 border-slate-300 text-slate-800 font-bold shadow-sm'
+              onClick={handleOpenNewCampaign}
+              className={`h-9 px-3.5 rounded-xl text-xs font-bold border transition-all flex items-center space-x-1.5 self-start sm:self-auto ${
+                (!campTitle && !campSubject && !campBody && !rawHtmlCode)
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                  : isDark
+                    ? 'border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700'
+                    : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
-              {tpl.name}
+              <span>✨ Blank Custom Canvas</span>
             </button>
-          ))}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {EMAIL_TEMPLATES.map((tpl) => {
+              const isSelected = campTitle === tpl.name || campSubject === tpl.subject;
+              return (
+                <button
+                  key={tpl.id}
+                  type="button"
+                  onClick={() => handleApplyTemplate(tpl.id)}
+                  className={`p-3.5 rounded-xl border text-left transition-all flex flex-col justify-between group relative ${
+                    isSelected
+                      ? 'border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 shadow-xs ring-1 ring-emerald-500'
+                      : isDark
+                        ? 'border-slate-800 bg-slate-950/50 text-slate-300 hover:border-slate-700 hover:bg-slate-800/60'
+                        : 'border-slate-200 bg-slate-50/80 text-slate-700 hover:border-slate-300 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className={`text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded ${
+                      isSelected
+                        ? 'bg-emerald-200/70 text-emerald-800 dark:bg-emerald-900/80 dark:text-emerald-300'
+                        : isDark
+                          ? 'bg-slate-800 text-slate-400'
+                          : 'bg-slate-200 text-slate-600'
+                    }`}>
+                      {tpl.category.replace('_', ' ')}
+                    </span>
+                    {isSelected && (
+                      <span className="text-emerald-600 dark:text-emerald-400 flex items-center text-[10px] font-bold">
+                        <IconCheck className="w-3.5 h-3.5 mr-0.5" />
+                        Selected
+                      </span>
+                    )}
+                  </div>
+                  <h4 className="text-xs font-bold leading-snug line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                    {tpl.name}
+                  </h4>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Main 2-Column Split: Form on Left, Live HTML Viewer on Right */}
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 sm:gap-8">
           
           {/* Left Column: Form & Code/Visual Editor (7 cols) */}
           <div className="xl:col-span-7 space-y-6">
-            <div className={`p-6 sm:p-8 rounded-2xl border transition-all ${
-              isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+            <div className={`p-6 sm:p-7 rounded-2xl border transition-all ${
+              isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200/90 text-slate-900 shadow-xs'
             }`}>
               <div className="space-y-4 text-xs">
                 <div>
-                  <label className="block font-bold text-slate-400 uppercase mb-1">Campaign Internal Title *</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                    Campaign Internal Title *
+                  </label>
                   <input
                     type="text"
                     required
@@ -753,21 +817,23 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
                     className={`w-full px-3.5 py-2.5 rounded-xl text-sm border focus:outline-none transition-colors ${
                       isDark 
                         ? 'bg-slate-950 border-slate-800 text-white focus:border-emerald-500' 
-                        : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                        : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-600 focus:bg-white'
                     }`}
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-bold text-slate-400 uppercase mb-1">Target Audience Segment</label>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                      Target Audience Segment
+                    </label>
                     <select
                       value={campAudience}
                       onChange={(e) => setCampAudience(e.target.value as any)}
                       className={`w-full px-3.5 py-2.5 rounded-xl text-sm border focus:outline-none transition-colors ${
                         isDark 
                           ? 'bg-slate-950 border-slate-800 text-white focus:border-emerald-500' 
-                          : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                          : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-600 focus:bg-white'
                       }`}
                     >
                       <option value="all_subscribers">All Subscribers & Leads ({subscribers.length + inquiries.length + vendors.length})</option>
@@ -778,14 +844,16 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-400 uppercase mb-1">Campaign Category</label>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                      Campaign Category
+                    </label>
                     <select
                       value={campCategory}
                       onChange={(e) => setCampCategory(e.target.value as any)}
                       className={`w-full px-3.5 py-2.5 rounded-xl text-sm border focus:outline-none transition-colors ${
                         isDark 
                           ? 'bg-slate-950 border-slate-800 text-white focus:border-emerald-500' 
-                          : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                          : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-600 focus:bg-white'
                       }`}
                     >
                       <option value="service_promotion">Service Promotion</option>
@@ -797,7 +865,9 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-400 uppercase mb-1">Email Subject Line *</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                    Email Subject Line *
+                  </label>
                   <input
                     type="text"
                     required
@@ -807,13 +877,15 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
                     className={`w-full px-3.5 py-2.5 rounded-xl text-sm border focus:outline-none transition-colors ${
                       isDark 
                         ? 'bg-slate-950 border-slate-800 text-white focus:border-emerald-500' 
-                        : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                        : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-600 focus:bg-white'
                     }`}
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-400 uppercase mb-1">Inbox Preview Text (Preheader)</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                    Inbox Preview Text (Preheader)
+                  </label>
                   <input
                     type="text"
                     value={campPreheader}
@@ -822,25 +894,25 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
                     className={`w-full px-3.5 py-2.5 rounded-xl text-sm border focus:outline-none transition-colors ${
                       isDark 
                         ? 'bg-slate-950 border-slate-800 text-white focus:border-emerald-500' 
-                        : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                        : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-600 focus:bg-white'
                     }`}
                   />
                 </div>
 
                 {/* BCC Recipients for Campaign Broadcast */}
                 <div className={`p-4 rounded-xl border ${
-                  isDark ? 'bg-slate-950/40 border-slate-800/80' : 'bg-slate-50/80 border-slate-200'
+                  isDark ? 'bg-slate-950/40 border-slate-800/80' : 'bg-slate-50 border-slate-200'
                 }`}>
-                  <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
-                      <label className="block font-bold text-slate-400 uppercase">
+                      <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                         BCC Recipients (Blind Carbon Copy)
                       </label>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                         Internal Archive
                       </span>
                     </div>
-                    <span className="text-[11px] text-slate-500 font-mono">Optional</span>
+                    <span className="text-[11px] text-slate-400 font-mono">Optional</span>
                   </div>
                   <input
                     type="text"
@@ -850,20 +922,26 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
                     className={`w-full px-3.5 py-2 rounded-xl text-xs border focus:outline-none transition-colors ${
                       isDark 
                         ? 'bg-slate-950 border-slate-800 text-white focus:border-amber-500' 
-                        : 'bg-white border-slate-300 text-slate-900 focus:border-amber-500'
+                        : 'bg-white border-slate-200 text-slate-900 focus:border-amber-500'
                     }`}
                   />
                 </div>
 
                 {/* Editor Mode Header */}
                 <div className="pt-2">
-                  <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate-800">
-                    <div className="flex items-center space-x-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800">
+                  <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className={`p-1 rounded-xl border flex items-center space-x-1 ${
+                      isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
+                    }`}>
                       <button
                         type="button"
                         onClick={() => setEditorMode('visual')}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                          editorMode === 'visual' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                          editorMode === 'visual'
+                            ? 'bg-emerald-600 text-white shadow-xs'
+                            : isDark
+                              ? 'text-slate-400 hover:text-white'
+                              : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
                         Visual Formatter
@@ -877,22 +955,32 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
                           setEditorMode('html');
                         }}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                          editorMode === 'html' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                          editorMode === 'html'
+                            ? 'bg-emerald-600 text-white shadow-xs'
+                            : isDark
+                              ? 'text-slate-400 hover:text-white'
+                              : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
                         Paste Raw HTML
                       </button>
                     </div>
 
-                    <span className="text-[11px] text-slate-500 font-mono">
+                    <span className={`text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg border ${
+                      isDark
+                        ? 'bg-slate-800/80 border-slate-700 text-slate-400'
+                        : 'bg-slate-50 border-slate-200 text-slate-600'
+                    }`}>
                       {editorMode === 'visual' ? 'Rich Text Mode' : 'HTML Source Mode'}
                     </span>
                   </div>
 
                   {editorMode === 'visual' ? (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <div>
-                        <label className="block font-bold text-slate-400 uppercase mb-1">Banner Headline</label>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                          Banner Headline
+                        </label>
                         <input
                           type="text"
                           value={campHeadline}
@@ -901,13 +989,15 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
                           className={`w-full px-3.5 py-2.5 rounded-xl text-sm border focus:outline-none transition-colors ${
                             isDark 
                               ? 'bg-slate-950 border-slate-800 text-white focus:border-emerald-500' 
-                              : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                              : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-600 focus:bg-white'
                           }`}
                         />
                       </div>
 
                       <div>
-                        <label className="block font-bold text-slate-400 uppercase mb-1">Main Content Body</label>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                          Main Content Body
+                        </label>
                         <textarea
                           rows={8}
                           value={campBody}
@@ -916,14 +1006,16 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
                           className={`w-full px-3.5 py-2.5 rounded-xl text-sm border focus:outline-none transition-colors leading-relaxed ${
                             isDark 
                               ? 'bg-slate-950 border-slate-800 text-white focus:border-emerald-500' 
-                              : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                              : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-600 focus:bg-white'
                           }`}
                         />
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block font-bold text-slate-400 uppercase mb-1">CTA Button Text</label>
+                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                            CTA Button Text
+                          </label>
                           <input
                             type="text"
                             value={campCtaText}
@@ -932,13 +1024,15 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
                             className={`w-full px-3.5 py-2.5 rounded-xl text-sm border focus:outline-none transition-colors ${
                               isDark 
                                 ? 'bg-slate-950 border-slate-800 text-white focus:border-emerald-500' 
-                                : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                                : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-600 focus:bg-white'
                             }`}
                           />
                         </div>
 
                         <div>
-                          <label className="block font-bold text-slate-400 uppercase mb-1">CTA Destination Link</label>
+                          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                            CTA Destination Link
+                          </label>
                           <input
                             type="url"
                             value={campCtaUrl}
@@ -947,7 +1041,7 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
                             className={`w-full px-3.5 py-2.5 rounded-xl text-sm border focus:outline-none transition-colors ${
                               isDark 
                                 ? 'bg-slate-950 border-slate-800 text-white focus:border-emerald-500' 
-                                : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                                : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-600 focus:bg-white'
                             }`}
                           />
                         </div>
@@ -983,23 +1077,29 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
 
           {/* Right Column: Live HTML Viewer Studio (5 cols) */}
           <div className="xl:col-span-5 space-y-4">
-            <div className={`p-6 rounded-2xl border transition-all ${
-              isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+            <div className={`p-5 sm:p-6 rounded-2xl border transition-all ${
+              isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200/90 text-slate-900 shadow-xs'
             }`}>
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center space-x-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <h3 className={`text-xs font-bold uppercase tracking-wider ${
+                    isDark ? 'text-slate-200' : 'text-slate-800'
+                  }`}>
                     Live Client Email Simulator
                   </h3>
                 </div>
 
-                <div className="flex items-center space-x-1 bg-slate-950 p-1 rounded-lg border border-slate-800">
+                <div className={`p-1 rounded-xl border flex items-center space-x-1 ${
+                  isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
+                }`}>
                   <button
                     type="button"
                     onClick={() => setPreviewDevice('desktop')}
-                    className={`px-2.5 py-1 text-[11px] font-bold rounded ${
-                      previewDevice === 'desktop' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
+                    className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${
+                      previewDevice === 'desktop'
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     Desktop
@@ -1007,8 +1107,10 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
                   <button
                     type="button"
                     onClick={() => setPreviewDevice('mobile')}
-                    className={`px-2.5 py-1 text-[11px] font-bold rounded ${
-                      previewDevice === 'mobile' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
+                    className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${
+                      previewDevice === 'mobile'
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     Mobile (375px)
@@ -1016,32 +1118,57 @@ const AdminCampaigns: React.FC<AdminCampaignsProps> = ({
                 </div>
               </div>
 
-              {/* Rendering Canvas (Rendered directly as it appears without envelope shell) */}
-              <div className={`bg-slate-200 dark:bg-slate-950 rounded-xl border border-slate-300 dark:border-slate-800/80 p-4 min-h-[440px] max-h-[600px] overflow-y-auto no-scrollbar flex flex-col justify-center shadow-inner ${
-                previewDevice === 'mobile' ? 'px-2' : ''
+              {/* Realistic Email Client Frame */}
+              <div className={`rounded-xl border overflow-hidden ${
+                isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
               }`}>
-                {(editorMode === 'html' ? rawHtmlCode.trim().length > 0 : (campHeadline.trim().length > 0 || campSubject.trim().length > 0 || campBody.trim().length > 0)) ? (
-                  <div className="flex justify-center w-full">
-                    <div 
-                      className={`bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ${
-                        previewDevice === 'mobile' ? 'max-w-[375px] w-full text-xs' : 'w-full'
-                      }`}
-                      dangerouslySetInnerHTML={{ __html: renderedHtml }}
-                    />
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-center p-8 space-y-3 my-auto">
-                    <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                      <IconCampaign className="w-7 h-7" />
+                {/* Email Client Simulated Header Bar */}
+                <div className={`px-4 py-2.5 border-b text-[11px] font-mono flex flex-col gap-1 ${
+                  isDark ? 'bg-slate-900/90 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-400/80 inline-block" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80 inline-block" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/80 inline-block" />
                     </div>
-                    <div>
-                      <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">Blank Custom Canvas</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mt-1">
-                        Compose your custom campaign on the left or paste raw HTML. Your email design will render live here in real-time.
-                      </p>
-                    </div>
+                    <span className="text-[10px] text-slate-400">client_preview.html</span>
                   </div>
-                )}
+                  <div className="truncate">
+                    <strong className={isDark ? 'text-slate-300' : 'text-slate-700'}>Subject:</strong> {campSubject || 'No subject entered'}
+                  </div>
+                  <div className="truncate text-[10px] text-slate-400">
+                    <strong>From:</strong> Polaris Integrated & GeoSolutions &lt;newsletter@polarisigl.com&gt;
+                  </div>
+                </div>
+
+                {/* Rendering Canvas */}
+                <div className={`p-4 min-h-[460px] max-h-[620px] overflow-y-auto no-scrollbar flex flex-col justify-start ${
+                  previewDevice === 'mobile' ? 'px-2' : ''
+                }`}>
+                  {(editorMode === 'html' ? rawHtmlCode.trim().length > 0 : (campHeadline.trim().length > 0 || campSubject.trim().length > 0 || campBody.trim().length > 0)) ? (
+                    <div className="flex justify-center w-full">
+                      <div 
+                        className={`bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden transition-all duration-300 ${
+                          previewDevice === 'mobile' ? 'max-w-[375px] w-full text-xs' : 'w-full'
+                        }`}
+                        dangerouslySetInnerHTML={{ __html: renderedHtml }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-center p-8 space-y-3 my-auto">
+                      <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                        <IconCampaign className="w-7 h-7" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">Blank Custom Canvas</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mt-1">
+                          Compose your custom campaign on the left or choose a preset above. Your email design will render live here in real-time.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
