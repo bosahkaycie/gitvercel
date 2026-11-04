@@ -14,7 +14,7 @@ import {
   EmailCampaign,
   EmailSubscriber
 } from '../../types';
-import { useSiteSettings } from '../../hooks/useSupabaseData';
+import { useSiteSettings, useWebsiteAnalytics } from '../../hooks/useSupabaseData';
 import {
   IconServices,
   IconProjects,
@@ -61,47 +61,61 @@ interface VisitationPoint {
   pageViews: number;
 }
 
-const getDynamicVisitationData7D = (): VisitationPoint[] => {
+const getRealTelemetryData7D = (logs: any[]): VisitationPoint[] => {
   const points: VisitationPoint[] = [];
-  const baseVisitors = [340, 485, 520, 290, 310, 640, 580];
-  const baseViews = [1120, 1640, 1890, 860, 940, 2210, 1980];
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const now = new Date();
 
   for (let i = 6; i >= 0; i--) {
-    const targetDate = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+    const targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i, 0, 0, 0, 0);
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i, 23, 59, 59, 999);
     const dayLabel = dayNames[targetDate.getDay()];
     const dateFormatted = targetDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    const idx = 6 - i;
+
+    const dayLogs = logs.filter(l => {
+      const t = new Date(l.visited_at).getTime();
+      return t >= targetDate.getTime() && t <= endOfDay.getTime();
+    });
+
+    const uniqueVisitors = new Set(dayLogs.map(l => l.visitor_id || l.id)).size;
+    const views = dayLogs.length;
+
     points.push({
       date: dateFormatted,
       dayLabel: i === 0 ? 'Today' : dayLabel,
       timeSlot: i === 0 ? 'Today (Live)' : `All day (${dayLabel})`,
-      visitors: baseVisitors[idx],
-      pageViews: baseViews[idx]
+      visitors: uniqueVisitors,
+      pageViews: views
     });
   }
   return points;
 };
 
-const getDynamicVisitationData30D = (): VisitationPoint[] => {
+const getRealTelemetryData30D = (logs: any[]): VisitationPoint[] => {
   const points: VisitationPoint[] = [];
-  const baseVisitors = [2420, 2890, 3410, 3980, 1220];
-  const baseViews = [8100, 9650, 11400, 13200, 4190];
   const now = new Date();
 
   for (let w = 4; w >= 0; w--) {
-    const endDate = new Date(now.getTime() - w * 7 * 24 * 60 * 60 * 1000);
-    const startDate = new Date(endDate.getTime() - 6 * 24 * 60 * 60 * 1000);
-    const endStr = endDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-    const startStr = startDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    const endWeek = new Date(now.getTime() - w * 7 * 24 * 60 * 60 * 1000);
+    const startWeek = new Date(endWeek.getTime() - 6 * 24 * 60 * 60 * 1000);
+    const endStr = endWeek.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    const startStr = startWeek.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
     const idx = 4 - w;
+
+    const weekLogs = logs.filter(l => {
+      const t = new Date(l.visited_at).getTime();
+      return t >= startWeek.getTime() && t <= endWeek.getTime();
+    });
+
+    const uniqueVisitors = new Set(weekLogs.map(l => l.visitor_id || l.id)).size;
+    const views = weekLogs.length;
+
     points.push({
       date: w === 0 ? `Current (${startStr}-${endStr})` : `Week ${idx + 1} (${startStr}-${endStr})`,
       dayLabel: w === 0 ? 'Live' : `W${idx + 1}`,
       timeSlot: w === 0 ? 'Active Running' : 'Weekly Aggregated',
-      visitors: baseVisitors[idx],
-      pageViews: baseViews[idx]
+      visitors: uniqueVisitors,
+      pageViews: views
     });
   }
   return points;
@@ -133,6 +147,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const isDark = theme === 'dark';
   const adminName = currentUser?.full_name?.trim() || currentUser?.email?.split('@')[0] || 'Administrator';
   const { settings } = useSiteSettings();
+  const { telemetryLogs } = useWebsiteAnalytics();
 
   useEffect(() => {
     const updateTimeAndGreeting = () => {
@@ -169,11 +184,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const pendingVendors = vendors.filter(v => v.status === 'pending').length;
   const totalSubscribersReach = subscribers.length + inquiries.length + vendors.length;
 
-  // Active visitation series
-  const activeSeries = visitationRange === '7d' ? getDynamicVisitationData7D() : getDynamicVisitationData30D();
+  // Active visitation series from live database telemetry
+  const activeSeries = visitationRange === '7d' 
+    ? getRealTelemetryData7D(telemetryLogs) 
+    : getRealTelemetryData30D(telemetryLogs);
   const totalVisitors = activeSeries.reduce((acc, p) => acc + p.visitors, 0);
   const totalPageViews = activeSeries.reduce((acc, p) => acc + p.pageViews, 0);
-  const maxVisitorVal = Math.max(...activeSeries.map(p => p.visitors), 700);
+  const maxVisitorVal = Math.max(...activeSeries.map(p => p.visitors), 10);
 
   // SVG Line Chart coordinates calculation
   const svgWidth = 700;
@@ -499,7 +516,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </h2>
             </div>
             <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              Unique visitors, page engagement, and visitation timestamps across polarisigl.com
+              Real-time visitor sessions and page engagement recorded via database telemetry across polarisigl.com
             </p>
           </div>
 

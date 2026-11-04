@@ -1112,7 +1112,7 @@ export const useServices = (adminMode = false) => {
     const slug = service.slug || service.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     const preset = (SERVICE_GALLERY_PRESETS && (SERVICE_GALLERY_PRESETS[slug] || SERVICE_GALLERY_PRESETS[service.id || ''])) || [];
     const updated: CMSService = {
-      id: service.id || `srv-${Date.now()}`,
+      id: (service.id && isValidUUID(service.id)) ? service.id : generateUUID(),
       slug,
       title: service.title,
       abbreviation: service.abbreviation,
@@ -1124,7 +1124,7 @@ export const useServices = (adminMode = false) => {
       hero_heading: service.hero_heading || service.title,
       short_description: service.short_description || '',
       overview_heading: service.overview_heading || 'Engineering Scope & Problem Resolution',
-      full_description: service.full_description || '',
+      full_description: service.full_description || service.short_description || service.title || 'Specialist Engineering Solution',
       engineering_problem_addressed: service.engineering_problem_addressed !== undefined ? service.engineering_problem_addressed : '',
       business_value: service.business_value || '',
       hero_image: service.hero_image || '/assets/DJI_0003.jpg',
@@ -1274,7 +1274,7 @@ export const useBlogPosts = (category?: string, adminMode = false) => {
     const client = getSupabaseClient();
     const slug = post.slug || post.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     const updated: CMSBlogPost = {
-      id: post.id || `blog-${Date.now()}`,
+      id: (post.id && isValidUUID(post.id)) ? post.id : generateUUID(),
       slug,
       title: post.title,
       excerpt: post.excerpt || post.content.substring(0, 150) + '...',
@@ -1421,7 +1421,7 @@ export const useSliders = (adminMode = false) => {
 
   const saveSlider = async (slider: Partial<CMSSlider> & { title: string; desktop_image?: string }) => {
     const client = getSupabaseClient();
-    const id = (slider.id && isValidUUID(slider.id)) ? slider.id : (slider.id || generateUUID());
+    const id = (slider.id && isValidUUID(slider.id)) ? slider.id : generateUUID();
     const cleanVideo = slider.video_url ? slider.video_url.trim() : null;
     const fallbackImg = cleanVideo ? '' : '/assets/DJI_0003.jpg';
 
@@ -1866,7 +1866,7 @@ export const useAdminUsers = () => {
   const saveUser = async (userData: Partial<AdminUser> & { email: string; full_name: string; role: AdminRole }) => {
     const client = getSupabaseClient();
     const updated: AdminUser = {
-      id: userData.id || `admin-${Date.now()}`,
+      id: (userData.id && isValidUUID(userData.id)) ? userData.id : generateUUID(),
       email: userData.email,
       full_name: userData.full_name,
       role: userData.role || 'Content Editor',
@@ -2223,7 +2223,7 @@ export const useProjects = (adminMode = false) => {
     }
 
     try {
-      let query = client.from('projects').select('*').order('display_order', { ascending: true });
+      let query = client.from('projects').select('*').order('created_at', { ascending: false });
       if (!adminMode) {
         query = query.eq('status', 'published');
       }
@@ -2281,11 +2281,22 @@ export const useProjects = (adminMode = false) => {
 
     if (client) {
       try {
+        const SUPABASE_PROJECT_COLUMNS = new Set([
+          'id', 'title', 'client', 'category', 'year', 'location',
+          'description', 'challenge', 'solution', 'scope', 'results',
+          'equipment', 'image', 'featured', 'status', 'created_at', 'updated_at'
+        ]);
+        const dbPayload: Record<string, any> = {};
+        for (const [k, v] of Object.entries(payload)) {
+          if (SUPABASE_PROJECT_COLUMNS.has(k)) {
+            dbPayload[k] = v;
+          }
+        }
         if (isNew) {
-          const { error } = await client.from('projects').insert([payload]);
+          const { error } = await client.from('projects').insert([dbPayload]);
           if (error) throw error;
         } else {
-          const { error } = await client.from('projects').update(payload).eq('id', payload.id);
+          const { error } = await client.from('projects').update(dbPayload).eq('id', payload.id);
           if (error) throw error;
         }
       } catch (err: any) {
@@ -2748,7 +2759,7 @@ export const useTestimonials = (adminMode = false) => {
       id: testimonial.id || `test-${Date.now()}`,
       quote: testimonial.quote,
       author_name: testimonial.author_name,
-      author_title: testimonial.author_title || '',
+      author_title: testimonial.author_title || 'Client Representative',
       author_company: testimonial.author_company || '',
       author_initials: testimonial.author_initials || testimonial.author_name.slice(0, 2).toUpperCase(),
       is_placeholder: testimonial.is_placeholder ?? false,
@@ -4867,12 +4878,12 @@ export const useNavigation = (adminMode = false) => {
       try {
         const { data, error } = await client
           .from('site_settings')
-          .select('id, navigation_config')
+          .select('*')
           .limit(1)
-          .single();
+          .maybeSingle();
 
-        if (!error && data && data.navigation_config) {
-          const remote = data.navigation_config as NavigationConfig;
+        if (!error && data && (data as any).navigation_config) {
+          const remote = (data as any).navigation_config as NavigationConfig;
           if (Array.isArray(remote.header) && remote.footer) {
             setNavConfig(remote);
             saveStoredNavigation(remote);
