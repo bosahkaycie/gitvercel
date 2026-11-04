@@ -1,23 +1,44 @@
 import React, { useState, useEffect, useRef } from 'react';
 import LogoLightImg from '../assets/logo_light.png';
-import LogoDarkImg from '../assets/LOGO.png';
 import { SiteSettings } from '../types';
 
 interface MaintenanceUpdateScreenProps {
   settings?: SiteSettings;
 }
 
-const PRESET_VIDEOS = [
+export const PRESET_VIDEOS = [
   { id: 'frankstar', title: 'Offshore Vessel & MetOcean', url: '/assets/FRANKSTAR LOOP.mp4' },
   { id: 'digital', title: '3D Reality Capture & Scanning', url: '/assets/DIGITAL INTELLINGENCE.mp4' },
   { id: 'offshore', title: 'Offshore Telemetry', url: '/assets/OFFSHORE INTELLIGENCE.mp4' },
   { id: 'ground', title: 'Ground Truth & Geotechnical', url: '/assets/videos/ground_intelligence.mp4' }
 ];
 
+export const PRESET_MAINTENANCE_IMAGES = [
+  { id: 'partner', title: 'International Engineering Spread', url: '/assets/pigl_international_partner.jpg', category: 'Marine' },
+  { id: 'conference', title: 'Executive Operations Command', url: '/assets/pigl_conference_keynote.jpg', category: 'Corporate' },
+  { id: 'pipeline', title: 'Pipeline ROW & Surveying Spread', url: '/assets/pigl_pipeline_clearing_aerial.jpg', category: 'Pipeline' },
+  { id: 'swamp', title: 'Swamp Geotechnical Field Crew', url: '/assets/pigl_field_team_swamp.jpg', category: 'Field' },
+  { id: 'geomatics', title: '3D Geomatics Survey Quay', url: '/assets/geomatics_survey.webp', category: 'Survey' },
+  { id: 'drilling', title: 'Deep Geotechnical Drilling Rig', url: '/assets/drilling.jpg', category: 'Drilling' }
+];
+
 const MaintenanceUpdateScreen: React.FC<MaintenanceUpdateScreenProps> = ({ settings }) => {
+  // Determine initial backdrop mode (video loop or static high-res photo)
+  const [bgType, setBgType] = useState<'video' | 'image'>(() => {
+    return settings?.maintenance_bg_type || (settings?.maintenance_image_url ? 'image' : 'video');
+  });
+
   const [activeVideoIdx, setActiveVideoIdx] = useState<number>(() => {
     if (settings?.maintenance_video_url) {
       const foundIdx = PRESET_VIDEOS.findIndex(v => v.url === settings.maintenance_video_url);
+      if (foundIdx >= 0) return foundIdx;
+    }
+    return 0;
+  });
+
+  const [activeImageIdx, setActiveImageIdx] = useState<number>(() => {
+    if (settings?.maintenance_image_url) {
+      const foundIdx = PRESET_MAINTENANCE_IMAGES.findIndex(img => img.url === settings.maintenance_image_url);
       if (foundIdx >= 0) return foundIdx;
     }
     return 0;
@@ -38,15 +59,17 @@ const MaintenanceUpdateScreen: React.FC<MaintenanceUpdateScreenProps> = ({ setti
     return () => clearInterval(interval);
   }, []);
 
-  // Auto-cycle background videos every 22 seconds
+  // Auto-cycle background videos every 22 seconds if in video mode
   useEffect(() => {
+    if (bgType !== 'video') return;
     const cycleTimer = setInterval(() => {
       setActiveVideoIdx(prev => (prev + 1) % PRESET_VIDEOS.length);
     }, 22000);
     return () => clearInterval(cycleTimer);
-  }, []);
+  }, [bgType]);
 
   const currentVideo = PRESET_VIDEOS[activeVideoIdx];
+  const activeImageUrl = settings?.maintenance_image_url || PRESET_MAINTENANCE_IMAGES[activeImageIdx]?.url || '/assets/pigl_international_partner.jpg';
 
   const headline = settings?.maintenance_title?.trim() || 'Website Undergoing Scheduled Systems Update';
   const message = settings?.maintenance_message?.trim() ||
@@ -57,27 +80,43 @@ const MaintenanceUpdateScreen: React.FC<MaintenanceUpdateScreenProps> = ({ setti
   const phoneRaw = settings?.phone_raw || '+2348097081333';
   const email = settings?.email_info || 'info@polarisigl.com';
 
+  const isPreviewMode = typeof window !== 'undefined' && (
+    window.location.search.includes('preview_maintenance=true') ||
+    window.location.search.includes('maintenance_preview=true') ||
+    window.location.pathname === '/maintenance'
+  );
+
   return (
     <div className="relative min-h-screen w-full flex flex-col justify-between bg-slate-950 text-slate-100 overflow-hidden font-sans select-none">
       
-      {/* Background Video Player */}
+      {/* Background Backdrop Layer: High-Res Image or Streamlined Video */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <video
-          ref={videoRef}
-          key={currentVideo.url}
-          src={currentVideo.url}
-          autoPlay
-          loop
-          muted={isMuted}
-          playsInline
-          className="w-full h-full object-cover scale-105 filter brightness-[0.45] contrast-[1.1] transition-all duration-1000"
-        />
+        {bgType === 'image' ? (
+          <img
+            key={activeImageUrl}
+            src={activeImageUrl}
+            alt="Polaris Operations Backdrop"
+            className="w-full h-full object-cover scale-105 filter brightness-[0.45] contrast-[1.15] transition-all duration-1000 animate-kenburns"
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            key={currentVideo.url}
+            src={currentVideo.url}
+            poster={activeImageUrl}
+            autoPlay
+            loop
+            muted={isMuted}
+            playsInline
+            className="w-full h-full object-cover scale-105 filter brightness-[0.45] contrast-[1.1] transition-all duration-1000"
+          />
+        )}
 
         {/* Ambient Engineering Gradient Overlays */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/60" />
         <div className="absolute inset-0 bg-radial-gradient from-transparent via-slate-950/60 to-slate-950/95" />
         
-        {/* Subtle Engineering Grid */}
+        {/* Subtle Engineering Grid Overlay */}
         <div 
           className="absolute inset-0 opacity-[0.07] pointer-events-none"
           style={{
@@ -88,7 +127,7 @@ const MaintenanceUpdateScreen: React.FC<MaintenanceUpdateScreenProps> = ({ setti
       </div>
 
       {/* Top Header */}
-      <header className="relative z-20 px-4 py-4 sm:px-10 sm:py-6 flex items-center justify-between border-b border-white/10 backdrop-blur-md bg-slate-950/40">
+      <header className="relative z-20 px-4 py-4 sm:px-10 sm:py-6 flex items-center justify-between border-b border-white/10 backdrop-blur-md bg-slate-950/50">
         <div className="flex items-center space-x-3">
           <img
             src={LogoLightImg}
@@ -99,29 +138,58 @@ const MaintenanceUpdateScreen: React.FC<MaintenanceUpdateScreenProps> = ({ setti
           <span className="hidden sm:inline-block text-[11px] font-mono tracking-widest text-emerald-400 font-bold uppercase">
             POLARIS PORTAL
           </span>
+          {isPreviewMode && (
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+              Admin Preview
+            </span>
+          )}
         </div>
 
         <div className="flex items-center space-x-2 sm:space-x-3">
-          {/* Audio Toggle */}
-          <button
-            onClick={() => setIsMuted(!isMuted)}
-            className="px-2.5 sm:px-3 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 backdrop-blur-md text-[11px] sm:text-xs font-mono font-medium flex items-center space-x-1.5 sm:space-x-2 transition-colors"
-            title={isMuted ? 'Unmute background operational reel' : 'Mute background reel'}
-          >
-            <span>{isMuted ? '🔇 Audio' : '🔊 Audio'}</span>
-          </button>
+          {/* Backdrop Mode Switcher */}
+          <div className="p-0.5 rounded-lg border border-white/15 bg-white/5 backdrop-blur-md flex items-center text-[11px] font-mono font-bold">
+            <button
+              onClick={() => setBgType('image')}
+              className={`px-2.5 py-1 rounded transition-colors ${
+                bgType === 'image' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+              }`}
+              title="Show Photo Backdrop"
+            >
+              Photo
+            </button>
+            <button
+              onClick={() => setBgType('video')}
+              className={`px-2.5 py-1 rounded transition-colors ${
+                bgType === 'video' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-400 hover:text-white'
+              }`}
+              title="Show Video Loop"
+            >
+              Video
+            </button>
+          </div>
 
-          {/* Admin Bypass Link */}
+          {/* Audio Toggle (When Video Mode Active) */}
+          {bgType === 'video' && (
+            <button
+              onClick={() => setIsMuted(!isMuted)}
+              className="px-2.5 sm:px-3 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 backdrop-blur-md text-[11px] sm:text-xs font-mono font-medium flex items-center space-x-1.5 transition-colors"
+              title={isMuted ? 'Unmute background operational reel' : 'Mute background reel'}
+            >
+              <span>{isMuted ? '🔇 Audio' : '🔊 Audio'}</span>
+            </button>
+          )}
+
+          {/* Admin Portal Link */}
           <a
-            href="/admin"
+            href="/admin?tab=settings"
             className="px-3 sm:px-3.5 py-1.5 rounded-lg bg-emerald-600/90 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition-all flex items-center space-x-1.5"
-            title="Sign in to Administrator Backend"
+            title="Administrator Settings & Configuration"
           >
             <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" fill="none" stroke="currentColor" strokeWidth="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="currentColor" strokeWidth="2" />
             </svg>
-            <span>Staff Portal</span>
+            <span>{isPreviewMode ? 'Exit Preview' : 'Staff Portal'}</span>
           </a>
         </div>
       </header>
@@ -211,26 +279,42 @@ const MaintenanceUpdateScreen: React.FC<MaintenanceUpdateScreenProps> = ({ setti
         </div>
       </main>
 
-      {/* Video Selector & Footer Telemetry */}
-      <footer className="relative z-20 px-6 py-4 sm:px-10 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10 backdrop-blur-md bg-slate-950/60 text-xs text-slate-400">
-        {/* Background Video Selector Pills */}
+      {/* Footer Backdrop Selector & Live Telemetry */}
+      <footer className="relative z-20 px-6 py-4 sm:px-10 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10 backdrop-blur-md bg-slate-950/70 text-xs text-slate-400">
+        {/* Backdrop Selector Pills (Images or Videos depending on active mode) */}
         <div className="flex items-center space-x-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0">
           <span className="text-[10px] uppercase font-mono font-bold text-slate-500 mr-1 hidden md:inline">
-            Reel:
+            {bgType === 'image' ? 'Backdrop Photo:' : 'Video Reel:'}
           </span>
-          {PRESET_VIDEOS.map((v, idx) => (
-            <button
-              key={v.id}
-              onClick={() => setActiveVideoIdx(idx)}
-              className={`px-2.5 py-1 rounded text-[10.5px] font-mono transition-colors whitespace-nowrap ${
-                activeVideoIdx === idx
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
-              }`}
-            >
-              {v.title}
-            </button>
-          ))}
+          {bgType === 'image' ? (
+            PRESET_MAINTENANCE_IMAGES.map((img, idx) => (
+              <button
+                key={img.id}
+                onClick={() => setActiveImageIdx(idx)}
+                className={`px-2.5 py-1 rounded text-[10.5px] font-mono transition-colors whitespace-nowrap ${
+                  activeImageIdx === idx
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
+                }`}
+              >
+                {img.title}
+              </button>
+            ))
+          ) : (
+            PRESET_VIDEOS.map((v, idx) => (
+              <button
+                key={v.id}
+                onClick={() => setActiveVideoIdx(idx)}
+                className={`px-2.5 py-1 rounded text-[10.5px] font-mono transition-colors whitespace-nowrap ${
+                  activeVideoIdx === idx
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
+                }`}
+              >
+                {v.title}
+              </button>
+            ))
+          )}
         </div>
 
         {/* Live HQ Clock & Copyright */}

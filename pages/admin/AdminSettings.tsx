@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { isSupabaseConfigured } from '../../lib/supabase';
 import { verifySmtpConnection, getSmtpStatus, SmtpStatusResponse } from '../../lib/email';
 import { useSiteSettings } from '../../hooks/useSupabaseData';
+import ImageUploader from '../../components/admin/ImageUploader';
+import MaintenanceUpdateScreen, { PRESET_VIDEOS, PRESET_MAINTENANCE_IMAGES } from '../../components/MaintenanceUpdateScreen';
 import {
   IconDatabase,
   IconShield,
@@ -13,7 +15,11 @@ import {
   IconSettings,
   IconPhone,
   IconMapPin,
-  IconExternal
+  IconExternal,
+  IconEye,
+  IconCopy,
+  IconClose,
+  IconVideo
 } from '../../components/admin/AdminIcons';
 
 interface AdminSettingsProps {
@@ -64,11 +70,25 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
   const [maintenanceTitle, setMaintenanceTitle] = useState<string>(settings.maintenance_title || 'Website Undergoing Scheduled Systems Update');
   const [maintenanceMessage, setMaintenanceMessage] = useState<string>(settings.maintenance_message || 'Our corporate digital portal is currently undergoing scheduled engineering maintenance and infrastructure updates. All field operations, offshore surveying, and client project execution continue at full capacity.');
   const [maintenanceEstimatedTime, setMaintenanceEstimatedTime] = useState<string>(settings.maintenance_estimated_time || 'Systems will resume normal public operations shortly.');
+  const [maintenanceBgType, setMaintenanceBgType] = useState<'video' | 'image'>(settings.maintenance_bg_type || 'image');
   const [maintenanceVideoUrl, setMaintenanceVideoUrl] = useState<string>(settings.maintenance_video_url || '/assets/FRANKSTAR LOOP.mp4');
+  const [maintenanceImageUrl, setMaintenanceImageUrl] = useState<string>(settings.maintenance_image_url || '/assets/pigl_international_partner.jpg');
+  const [maintenanceImageTab, setMaintenanceImageTab] = useState<'upload' | 'presets' | 'url'>('presets');
+  const [isMaintenanceSaving, setIsMaintenanceSaving] = useState(false);
+  const [copiedImageUrl, setCopiedImageUrl] = useState(false);
+  const [isSettingsPreviewModalOpen, setIsSettingsPreviewModalOpen] = useState(false);
   const [maintenanceNotice, setMaintenanceNotice] = useState<string | null>(null);
 
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSuccessNotice, setProfileSuccessNotice] = useState<string | null>(null);
+
+  const getImageSourceInfo = (url: string) => {
+    if (!url) return { label: 'None', color: 'bg-slate-700 text-slate-300' };
+    if (url.includes('supabase.co')) return { label: 'Cloud Storage', color: 'bg-emerald-950/80 text-emerald-300 border-emerald-800' };
+    if (url.startsWith('/assets/')) return { label: 'Engineering Preset', color: 'bg-cyan-950/80 text-cyan-300 border-cyan-800' };
+    if (url.startsWith('data:image')) return { label: 'Local Base64', color: 'bg-purple-950/80 text-purple-300 border-purple-800' };
+    return { label: 'External URL', color: 'bg-amber-950/80 text-amber-300 border-amber-800' };
+  };
 
   useEffect(() => {
     if (settings) {
@@ -95,44 +115,56 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
       if (settings.maintenance_title) setMaintenanceTitle(settings.maintenance_title);
       if (settings.maintenance_message) setMaintenanceMessage(settings.maintenance_message);
       if (settings.maintenance_estimated_time) setMaintenanceEstimatedTime(settings.maintenance_estimated_time);
+      if (settings.maintenance_bg_type) setMaintenanceBgType(settings.maintenance_bg_type);
       if (settings.maintenance_video_url) setMaintenanceVideoUrl(settings.maintenance_video_url);
+      if (settings.maintenance_image_url) setMaintenanceImageUrl(settings.maintenance_image_url);
     }
   }, [settings]);
 
   const handleToggleMaintenanceMode = async (newStatus: boolean) => {
     setMaintenanceMode(newStatus);
+    setIsMaintenanceSaving(true);
     try {
       await saveSettings({
         maintenance_mode: newStatus,
         maintenance_title: maintenanceTitle,
         maintenance_message: maintenanceMessage,
         maintenance_estimated_time: maintenanceEstimatedTime,
-        maintenance_video_url: maintenanceVideoUrl
+        maintenance_bg_type: maintenanceBgType,
+        maintenance_video_url: maintenanceVideoUrl,
+        maintenance_image_url: maintenanceImageUrl
       });
       setMaintenanceNotice(
         newStatus
-          ? "⚠️ Update Mode Activated: Public visitors will now see the 'Website Undergoing Update' screen with video background."
+          ? "⚠️ Update Mode Activated: Public visitors will now see the 'Website Undergoing Update' screen."
           : "✅ Normal Mode Restored: Public website is now live for all visitors worldwide!"
       );
       setTimeout(() => setMaintenanceNotice(null), 5000);
     } catch (err: any) {
       alert(`Error toggling update mode: ${err.message || 'Unknown error'}`);
+    } finally {
+      setIsMaintenanceSaving(false);
     }
   };
 
   const handleSaveMaintenanceNotice = async () => {
+    setIsMaintenanceSaving(true);
     try {
       await saveSettings({
         maintenance_mode: maintenanceMode,
         maintenance_title: maintenanceTitle,
         maintenance_message: maintenanceMessage,
         maintenance_estimated_time: maintenanceEstimatedTime,
-        maintenance_video_url: maintenanceVideoUrl
+        maintenance_bg_type: maintenanceBgType,
+        maintenance_video_url: maintenanceVideoUrl,
+        maintenance_image_url: maintenanceImageUrl
       });
-      setMaintenanceNotice("✅ Update screen notice text & video configuration saved!");
+      setMaintenanceNotice("✅ Update screen configuration & background backdrop saved successfully!");
       setTimeout(() => setMaintenanceNotice(null), 4000);
     } catch (err: any) {
       alert(`Error saving notice settings: ${err.message || 'Unknown error'}`);
+    } finally {
+      setIsMaintenanceSaving(false);
     }
   };
 
@@ -335,18 +367,33 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
             </div>
           </div>
 
-          <div className="flex items-center space-x-3 shrink-0 self-end md:self-center">
-            {/* Direct Link to Preview Screen */}
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0 self-end md:self-center">
+            {/* Quick In-Admin Modal Preview */}
+            <button
+              type="button"
+              onClick={() => setIsSettingsPreviewModalOpen(true)}
+              className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center space-x-1.5 cursor-pointer shadow-xs ${
+                isDark 
+                  ? 'border-cyan-500/40 bg-cyan-950/40 text-cyan-300 hover:bg-cyan-900/50 hover:border-cyan-400' 
+                  : 'border-cyan-300 bg-cyan-50 text-cyan-800 hover:bg-cyan-100 hover:border-cyan-400'
+              }`}
+              title="Open instant modal preview with current settings"
+            >
+              <IconEye className="w-3.5 h-3.5" />
+              <span>Instant Preview</span>
+            </button>
+
+            {/* Direct Link to Preview Screen in New Tab */}
             <a
-              href="/?preview=true"
+              href="/?preview_maintenance=true"
               target="_blank"
               rel="noopener noreferrer"
               className={`px-3 py-2 rounded-xl text-xs font-bold border transition-colors flex items-center space-x-1.5 ${
                 isDark ? 'border-slate-700 bg-slate-800 text-slate-300 hover:text-white' : 'border-slate-300 bg-slate-100 text-slate-700 hover:text-slate-900'
               }`}
-              title="Preview how visitors see the update screen"
+              title="Preview how visitors see the update screen in a new browser tab"
             >
-              <span>Preview Screen</span>
+              <span>Preview Tab</span>
               <IconExternal className="w-3.5 h-3.5" />
             </a>
 
@@ -372,7 +419,283 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
 
         {/* Configurable Notice Details (visible when in update mode or expandable) */}
         {maintenanceMode && (
-          <div className="mt-5 pt-4 border-t border-amber-500/20 text-xs font-medium space-y-4 animate-fadeIn">
+          <div className="mt-5 pt-4 border-t border-amber-500/20 text-xs font-medium space-y-5 animate-fadeIn">
+            {/* Display Media Mode Switcher (Video vs Image) */}
+            <div className={`p-4 rounded-xl border ${isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-white border-slate-200'}`}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-amber-500 dark:text-amber-400">
+                    Construction / Maintenance Backdrop Type
+                  </label>
+                  <p className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Choose whether public visitors experience an ambient looping video or a high-definition engineering still.
+                  </p>
+                </div>
+                <div className="inline-flex rounded-xl p-1 bg-slate-800/80 border border-slate-700/60 shrink-0 self-start sm:self-auto">
+                  <button
+                    type="button"
+                    onClick={() => setMaintenanceBgType('image')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
+                      maintenanceBgType === 'image'
+                        ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                        : 'text-slate-300 hover:text-white'
+                    }`}
+                  >
+                    <span>🖼️ High-Res Image</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMaintenanceBgType('video')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
+                      maintenanceBgType === 'video'
+                        ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                        : 'text-slate-300 hover:text-white'
+                    }`}
+                  >
+                    <IconVideo className="w-3.5 h-3.5" />
+                    <span>Looping Video</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* IMAGE MODE CONFIGURATION */}
+              {maintenanceBgType === 'image' && (
+                <div className="space-y-4">
+                  {/* Active Background Visual Card */}
+                  <div className={`p-3.5 rounded-xl border flex flex-col md:flex-row items-center gap-4 ${
+                    isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-slate-50 border-slate-200'
+                  }`}>
+                    <div className="relative w-full md:w-56 h-32 rounded-lg overflow-hidden shrink-0 border border-slate-700 bg-slate-950 shadow-inner group">
+                      <img
+                        src={maintenanceImageUrl || '/assets/pigl_international_partner.jpg'}
+                        alt="Current Maintenance Backdrop"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2">
+                        <span className="text-[10px] font-mono text-white/90 truncate font-semibold">
+                          Active Backdrop
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 min-w-0 w-full space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider border ${getImageSourceInfo(maintenanceImageUrl).color}`}>
+                          {getImageSourceInfo(maintenanceImageUrl).label}
+                        </span>
+                        <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                          Applied to live visitor update screen
+                        </span>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="text"
+                          readOnly
+                          value={maintenanceImageUrl}
+                          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-mono border focus:outline-none ${
+                            isDark ? 'bg-slate-950 border-slate-800 text-slate-300' : 'bg-white border-slate-300 text-slate-700'
+                          }`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(maintenanceImageUrl);
+                            setCopiedImageUrl(true);
+                            setTimeout(() => setCopiedImageUrl(false), 2000);
+                          }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors flex items-center space-x-1 shrink-0 ${
+                            isDark ? 'border-slate-700 bg-slate-800 text-slate-300 hover:text-white' : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+                          }`}
+                          title="Copy Image URL to Clipboard"
+                        >
+                          <IconCopy className="w-3.5 h-3.5" />
+                          <span>{copiedImageUrl ? 'Copied!' : 'Copy'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setMaintenanceImageUrl('/assets/pigl_international_partner.jpg')}
+                          className={`px-2.5 py-1.5 rounded-lg text-xs font-bold border transition-colors text-amber-500 hover:text-amber-400 shrink-0 ${
+                            isDark ? 'border-amber-500/30 bg-amber-950/20' : 'border-amber-300 bg-amber-50'
+                          }`}
+                          title="Reset to default engineering backdrop"
+                        >
+                          Reset
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Image Selector Tabs */}
+                  <div className="border-b border-slate-800 flex space-x-4">
+                    <button
+                      type="button"
+                      onClick={() => setMaintenanceImageTab('presets')}
+                      className={`pb-2 text-xs font-bold transition-colors cursor-pointer border-b-2 ${
+                        maintenanceImageTab === 'presets'
+                          ? 'border-amber-500 text-amber-400'
+                          : 'border-transparent text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      Engineering Presets ({PRESET_MAINTENANCE_IMAGES.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMaintenanceImageTab('upload')}
+                      className={`pb-2 text-xs font-bold transition-colors cursor-pointer border-b-2 ${
+                        maintenanceImageTab === 'upload'
+                          ? 'border-amber-500 text-amber-400'
+                          : 'border-transparent text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      Cloud Storage Upload
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMaintenanceImageTab('url')}
+                      className={`pb-2 text-xs font-bold transition-colors cursor-pointer border-b-2 ${
+                        maintenanceImageTab === 'url'
+                          ? 'border-amber-500 text-amber-400'
+                          : 'border-transparent text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      Direct Image URL
+                    </button>
+                  </div>
+
+                  {/* TAB: Presets Grid */}
+                  {maintenanceImageTab === 'presets' && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 pt-1">
+                      {PRESET_MAINTENANCE_IMAGES.map((preset) => {
+                        const isSelected = maintenanceImageUrl === preset.url;
+                        return (
+                          <div
+                            key={preset.id}
+                            onClick={() => setMaintenanceImageUrl(preset.url)}
+                            className={`group relative rounded-xl overflow-hidden border cursor-pointer transition-all ${
+                              isSelected
+                                ? 'border-amber-500 ring-2 ring-amber-500/50 shadow-md shadow-amber-950/30 scale-[1.01]'
+                                : isDark
+                                ? 'border-slate-800 bg-slate-900/60 hover:border-slate-700'
+                                : 'border-slate-200 bg-white hover:border-slate-300'
+                            }`}
+                          >
+                            <div className="aspect-video w-full overflow-hidden bg-slate-950 relative">
+                              <img
+                                src={preset.url}
+                                alt={preset.title}
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                              <div className="absolute top-2 left-2">
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider bg-black/60 text-amber-300 border border-amber-500/30 backdrop-blur-xs">
+                                  {preset.category}
+                                </span>
+                              </div>
+                              {isSelected && (
+                                <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shadow-md">
+                                  <IconCheck className="w-3 h-3 stroke-[3]" />
+                                </div>
+                              )}
+                              <div className="absolute bottom-2 left-2 right-2">
+                                <p className="text-[11px] font-bold text-white leading-tight truncate">
+                                  {preset.title}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* TAB: Cloud Storage Uploader */}
+                  {maintenanceImageTab === 'upload' && (
+                    <div className={`p-4 rounded-xl border ${isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                      <ImageUploader
+                        folder="settings/maintenance"
+                        currentImageUrl={maintenanceImageUrl}
+                        onImageUploaded={(url) => {
+                          setMaintenanceImageUrl(url);
+                          setMaintenanceNotice('✅ Background image uploaded to Supabase Storage!');
+                          setTimeout(() => setMaintenanceNotice(null), 4000);
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {/* TAB: Direct URL Input */}
+                  {maintenanceImageTab === 'url' && (
+                    <div className="space-y-2">
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Paste Public CDN / HTTPS Image URL
+                      </label>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="url"
+                          value={maintenanceImageUrl}
+                          onChange={(e) => setMaintenanceImageUrl(e.target.value)}
+                          placeholder="https://images.unsplash.com/... or /assets/..."
+                          className={`flex-1 px-3 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-amber-500/40 text-xs ${
+                            isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                          }`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setMaintenanceImageUrl('')}
+                          className="px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 text-slate-300 hover:text-white text-xs font-bold"
+                        >
+                          Clear
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* VIDEO MODE CONFIGURATION */}
+              {maintenanceBgType === 'video' && (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 text-slate-400">
+                        Select Corporate Video Reel
+                      </label>
+                      <select
+                        value={maintenanceVideoUrl}
+                        onChange={(e) => setMaintenanceVideoUrl(e.target.value)}
+                        className={`w-full px-3 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-amber-500/40 text-xs ${
+                          isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                        }`}
+                      >
+                        {PRESET_VIDEOS.map((v) => (
+                          <option key={v.url} value={v.url}>
+                            {v.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 text-slate-400">
+                        Custom Video File / Stream Path
+                      </label>
+                      <input
+                        type="text"
+                        value={maintenanceVideoUrl}
+                        onChange={(e) => setMaintenanceVideoUrl(e.target.value)}
+                        placeholder="/assets/FRANKSTAR LOOP.mp4"
+                        className={`w-full px-3 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-amber-500/40 text-xs ${
+                          isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Notice Text Content & Estimated Time */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 text-amber-500 dark:text-amber-400">
@@ -383,40 +706,6 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
                   value={maintenanceTitle}
                   onChange={(e) => setMaintenanceTitle(e.target.value)}
                   placeholder="Website Undergoing Scheduled Systems Update"
-                  className={`w-full px-3 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-amber-500/40 ${
-                    isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
-                  }`}
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 text-amber-500 dark:text-amber-400">
-                  Background Slider Video
-                </label>
-                <select
-                  value={maintenanceVideoUrl}
-                  onChange={(e) => setMaintenanceVideoUrl(e.target.value)}
-                  className={`w-full px-3 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-amber-500/40 ${
-                    isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
-                  }`}
-                >
-                  <option value="/assets/FRANKSTAR LOOP.mp4">Offshore Vessel & MetOcean Loop</option>
-                  <option value="/assets/DIGITAL INTELLINGENCE.mp4">Digital Intelligence 3D Laser Scan</option>
-                  <option value="/assets/OFFSHORE INTELLIGENCE.mp4">Offshore Intelligence Vessel</option>
-                  <option value="/assets/videos/ground_intelligence.mp4">Ground Intelligence & Geotechnical Operations</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 text-amber-500 dark:text-amber-400">
-                  Public Reassurance Statement
-                </label>
-                <textarea
-                  rows={2}
-                  value={maintenanceMessage}
-                  onChange={(e) => setMaintenanceMessage(e.target.value)}
                   className={`w-full px-3 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-amber-500/40 ${
                     isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
                   }`}
@@ -436,14 +725,47 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
                     isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
                   }`}
                 />
-                <button
-                  type="button"
-                  onClick={handleSaveMaintenanceNotice}
-                  className="mt-3 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs shadow-md transition-all"
-                >
-                  Save Notice Details
-                </button>
               </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 text-amber-500 dark:text-amber-400">
+                Public Reassurance Statement
+              </label>
+              <textarea
+                rows={2}
+                value={maintenanceMessage}
+                onChange={(e) => setMaintenanceMessage(e.target.value)}
+                className={`w-full px-3 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-amber-500/40 ${
+                  isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                }`}
+              />
+            </div>
+
+            <div className="flex items-center justify-between pt-2">
+              <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Changes are instantly synced to production settings and active upon save.
+              </span>
+              <button
+                type="button"
+                disabled={isMaintenanceSaving}
+                onClick={handleSaveMaintenanceNotice}
+                className={`px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md transition-all flex items-center space-x-2 cursor-pointer ${
+                  isMaintenanceSaving ? 'opacity-70 cursor-not-allowed' : ''
+                }`}
+              >
+                {isMaintenanceSaving ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                    <span>Saving Settings...</span>
+                  </>
+                ) : (
+                  <>
+                    <IconCheck className="w-4 h-4 stroke-[2.5]" />
+                    <span>Save Update Screen Settings</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         )}
@@ -1141,6 +1463,39 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               <li>Copy the contents of <code className="text-emerald-400 font-mono bg-slate-800 px-1 py-0.5 rounded">supabase_schema.sql</code> and click <strong>Run</strong>.</li>
               <li>Verify your <strong>Project URL</strong> and <strong>anon/public key</strong> from Project Settings → API in your <code className="text-emerald-400 font-mono bg-slate-800 px-1 py-0.5 rounded">.env</code> file.</li>
             </ol>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Quick Preview Modal */}
+      {isSettingsPreviewModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md animate-fadeIn">
+          <div className="absolute top-4 right-4 z-50 flex items-center space-x-3">
+            <span className="px-3 py-1.5 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+              Interactive Live Preview
+            </span>
+            <button
+              onClick={() => setIsSettingsPreviewModalOpen(false)}
+              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white transition-all shadow-lg flex items-center space-x-1 cursor-pointer"
+              title="Close Preview"
+            >
+              <IconClose className="w-5 h-5" />
+              <span className="text-xs font-bold mr-1">Close Preview</span>
+            </button>
+          </div>
+          <div className="w-full h-full overflow-hidden">
+            <MaintenanceUpdateScreen
+              settings={{
+                ...settings,
+                maintenance_mode: true,
+                maintenance_title: maintenanceTitle,
+                maintenance_message: maintenanceMessage,
+                maintenance_estimated_time: maintenanceEstimatedTime,
+                maintenance_bg_type: maintenanceBgType,
+                maintenance_video_url: maintenanceVideoUrl,
+                maintenance_image_url: maintenanceImageUrl
+              }}
+            />
           </div>
         </div>
       )}

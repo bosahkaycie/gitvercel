@@ -527,7 +527,9 @@ const FALLBACK_SETTINGS: SiteSettings = {
   maintenance_title: 'Website Undergoing Scheduled Systems Update',
   maintenance_message: 'Our corporate digital portal is currently undergoing scheduled engineering maintenance and infrastructure updates. All field operations, offshore surveying, and client project execution continue at full capacity.',
   maintenance_estimated_time: 'Systems will resume normal public operations shortly.',
+  maintenance_bg_type: 'image',
   maintenance_video_url: '/assets/FRANKSTAR LOOP.mp4',
+  maintenance_image_url: '/assets/pigl_international_partner.jpg',
   updated_at: new Date().toISOString()
 };
 
@@ -3134,25 +3136,55 @@ export const useSiteSettings = () => {
 
   const fetchSettings = useCallback(async () => {
     const client = getSupabaseClient();
-    if (!client) {
-      setSettings(getStoredSettings());
-      setLoading(false);
-      return;
+
+    // 1. Fetch cloud settings config from /api/settings or direct storage
+    let cloudConfig: Partial<SiteSettings> = {};
+    try {
+      const resp = await fetch('/api/settings');
+      if (resp.ok) {
+        const json = await resp.json();
+        if (json.success && json.settings) {
+          cloudConfig = json.settings;
+        }
+      }
+    } catch {
+      if (client) {
+        try {
+          const { data: stData } = await client.storage.from('media').download('config/site_settings.json');
+          if (stData) {
+            cloudConfig = JSON.parse(await stData.text());
+          }
+        } catch {}
+      }
     }
 
-    try {
-      const { data, error } = await client.from('site_settings').select('*').limit(1).single();
-      if (error) throw error;
-      if (data) {
-        setSettings({ ...FALLBACK_SETTINGS, ...(data as SiteSettings) });
-      } else {
-        setSettings(getStoredSettings());
-      }
-    } catch (err) {
-      setSettings(getStoredSettings());
-    } finally {
-      setLoading(false);
+    // 2. Fetch standard database row from site_settings table
+    let dbRow: any = null;
+    if (client) {
+      try {
+        const { data } = await client.from('site_settings').select('*').limit(1).single();
+        if (data) dbRow = data;
+      } catch {}
     }
+
+    const local = getStoredSettings();
+    const merged: SiteSettings = {
+      ...FALLBACK_SETTINGS,
+      ...local,
+      ...(dbRow ? {
+        company_name: dbRow.company_name,
+        email_info: dbRow.primary_email || local.email_info,
+        phone: dbRow.primary_phone || local.phone,
+        address_hq: dbRow.address_port_harcourt || local.address_hq,
+        linkedin_url: dbRow.social_linkedin || local.linkedin_url,
+        youtube_url: dbRow.social_twitter || local.youtube_url
+      } : {}),
+      ...cloudConfig
+    };
+
+    saveStoredSettings(merged);
+    setSettings(merged);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -3167,14 +3199,47 @@ export const useSiteSettings = () => {
       updated_at: new Date().toISOString()
     };
 
+    // 1. Upsert allowed fields to Supabase site_settings table (prevents PGRST204 column error)
     if (client) {
       try {
-        await client.from('site_settings').upsert({ id: 'site-config', ...updated });
+        const dbPayload: any = { id: 'site-config', updated_at: updated.updated_at };
+        if (updated.company_name) dbPayload.company_name = updated.company_name;
+        if (updated.email_info) dbPayload.primary_email = updated.email_info;
+        if (updated.phone) dbPayload.primary_phone = updated.phone;
+        if (updated.address_hq) dbPayload.address_port_harcourt = updated.address_hq;
+        if (updated.linkedin_url) dbPayload.social_linkedin = updated.linkedin_url;
+        if (updated.youtube_url) dbPayload.social_twitter = updated.youtube_url;
+        await client.from('site_settings').upsert(dbPayload);
       } catch (err) {
-        console.warn('Supabase site settings save error:', err);
+        console.warn('Supabase site_settings table upsert error:', err);
       }
     }
 
+    // 2. Persist full settings (including maintenance_mode, background image/video) via /api/settings
+    try {
+      const resp = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings: updated })
+      });
+      if (!resp.ok && client) {
+        await client.storage.from('media').upload('config/site_settings.json', JSON.stringify(updated), {
+          contentType: 'application/json',
+          upsert: true
+        });
+      }
+    } catch {
+      if (client) {
+        try {
+          await client.storage.from('media').upload('config/site_settings.json', JSON.stringify(updated), {
+            contentType: 'application/json',
+            upsert: true
+          });
+        } catch {}
+      }
+    }
+
+    // 3. Save to local storage for instant responsiveness
     saveStoredSettings(updated);
     setSettings(updated);
     return updated;

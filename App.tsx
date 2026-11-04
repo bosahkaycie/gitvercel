@@ -465,13 +465,21 @@ const App: React.FC = () => {
   }
 
   // Handle Administrative Maintenance / Update Mode Switch
-  // Admins can bypass by appending ?bypass=true or ?preview=true
-  const isBypassActive = typeof window !== 'undefined' && (
-    window.location.search.includes('bypass=true') ||
-    window.location.search.includes('preview=true')
+  // Dedicated preview trigger for administrators (from Admin Settings "Preview Screen" button or /maintenance route)
+  const isMaintenancePreview = typeof window !== 'undefined' && (
+    window.location.search.includes('preview_maintenance=true') ||
+    window.location.search.includes('maintenance_preview=true') ||
+    window.location.search.includes('preview=maintenance') ||
+    currentPath === '/maintenance'
   );
 
-  if (settings?.maintenance_mode && !isBypassActive) {
+  // Admin bypass to view live public site while maintenance mode is ON
+  const isBypassActive = typeof window !== 'undefined' && (
+    window.location.search.includes('bypass=true') ||
+    window.location.search.includes('admin_bypass=true')
+  );
+
+  if ((settings?.maintenance_mode && !isBypassActive) || isMaintenancePreview) {
     return (
       <Suspense fallback={<PageFallback />}>
         <MaintenanceUpdateScreen settings={settings} />

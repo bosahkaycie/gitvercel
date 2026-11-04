@@ -294,7 +294,9 @@ export interface SiteSettings {
   maintenance_title?: string;
   maintenance_message?: string;
   maintenance_estimated_time?: string;
+  maintenance_bg_type?: 'video' | 'image';
   maintenance_video_url?: string;
+  maintenance_image_url?: string;
   updated_at?: string;
 }
 
