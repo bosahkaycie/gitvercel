@@ -233,6 +233,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
       }
     },
     { name: 'Team', href: '/teams', type: 'standard' },
+    { name: 'Careers', href: '/careers', type: 'standard' },
     { name: 'Our Network', href: '/network', type: 'standard' },
     { name: 'Blog', href: '/blog', type: 'standard' },
     { name: 'Contact', href: '/contact', type: 'standard' },

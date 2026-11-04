@@ -331,7 +331,7 @@ const LOCAL_STORAGE_KEY_JOBS = 'pigl_cms_job_openings_v1';
 const LOCAL_STORAGE_KEY_APPLICATIONS = 'pigl_cms_job_applications_v1';
 const LOCAL_STORAGE_KEY_SETTINGS = 'pigl_cms_site_settings_v1';
 const LOCAL_STORAGE_KEY_TEAM = 'pigl_cms_team_members_v1';
-const LOCAL_STORAGE_KEY_NAVIGATION = 'pigl_cms_navigation_config_v2';
+const LOCAL_STORAGE_KEY_NAVIGATION = 'pigl_cms_navigation_config_v3';
 const LOCAL_STORAGE_KEY_TESTIMONIALS = 'pigl_cms_testimonials_v1';
 
 const FALLBACK_PROJECTS: CMSProject[] = PROJECTS.map((p, idx) => ({
@@ -4653,12 +4653,20 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
       order: 4
     },
     {
+      id: 'nav-careers',
+      name: 'Careers',
+      href: '/careers',
+      type: 'standard',
+      is_active: true,
+      order: 5
+    },
+    {
       id: 'nav-network',
       name: 'Our Network',
       href: '/network',
       type: 'standard',
       is_active: true,
-      order: 5
+      order: 6
     },
     {
       id: 'nav-blog',
@@ -4666,7 +4674,7 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
       href: '/blog',
       type: 'standard',
       is_active: true,
-      order: 6
+      order: 7
     },
     {
       id: 'nav-contact',
@@ -4674,7 +4682,7 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
       href: '/contact',
       type: 'standard',
       is_active: true,
-      order: 7
+      order: 8
     }
   ],
   footer: {
