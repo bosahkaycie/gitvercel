@@ -267,7 +267,6 @@ const App: React.FC = () => {
       '/': 'Polaris Integrated & GeoSolutions Limited provides geoscience and survey services, marine observation, infrastructure construction and industrial water treatment for energy, infrastructure and industrial clients in Nigeria.',
       '/about': 'Polaris Integrated & GeoSolutions Limited (PIGL) is a Nigerian engineering and technical solutions company serving the energy, infrastructure and industrial sectors.',
       '/services': 'Explore PIGL\'s four operating divisions: GeoSolutions & Engineering Services (GES), Metocean & Marine Solutions (MMS), Integrated Construction Services (ICS), and Industrial Solutions (IS).',
-      '/projects': 'Review completed engineering, reality capture, geotechnical survey, and pipeline construction projects delivered for energy and infrastructure clients across Nigeria.',
       '/teams': 'Meet the executive leadership and multidisciplinary engineering teams guiding PIGL operations across West Africa.',
       '/network': 'PIGL Strategic Alliances, Authorised Representations & Global Technology Partnerships with Frankstar Technology, CoaleXpert, and NPK Automation.',
       '/our-network': 'PIGL Strategic Alliances, Authorised Representations & Global Technology Partnerships with Frankstar Technology, CoaleXpert, and NPK Automation.',
@@ -291,7 +290,6 @@ const App: React.FC = () => {
       '/': 'Polaris Integrated & GeoSolutions (PIGL) | Geoscience, Marine, Construction & Industrial Solutions',
       '/about': 'About PIGL | ISO Certified Engineering Contractor',
       '/services': 'Specialist Engineering Divisions | PIGL Nigeria',
-      '/projects': 'Executed Engineering Projects & Case Studies | PIGL',
       '/teams': 'Leadership & Engineering Teams | PIGL Nigeria',
       '/network': 'Our Professional Network & Technology Alliances | PIGL',
       '/our-network': 'Our Professional Network & Technology Alliances | PIGL',
@@ -408,18 +406,6 @@ const App: React.FC = () => {
           "name": s.title
         }))
       };
-    } else if (currentPath === '/projects') {
-      schemaData = {
-        "@context": "https://schema.org",
-        "@type": "ItemList",
-        "name": "PIGL Engineering Project Showcase",
-        "itemListElement": PROJECTS.map((p, index) => ({
-          "@type": "ListItem",
-          "position": index + 1,
-          "url": `https://polarisigl.com/projects?id=${p.id}`,
-          "name": p.title
-        }))
-      };
     } else if (currentPath === '/network' || currentPath === '/our-network' || currentPath === '/partners') {
       schemaData = {
         "@context": "https://schema.org",
@@ -518,7 +504,10 @@ const App: React.FC = () => {
       case '/partners':
         return <Network />;
       case '/projects':
-        return <Projects />;
+        if (typeof window !== 'undefined') {
+          window.history.replaceState(null, '', '/services');
+        }
+        return <Services />;
       case '/careers':
         return <Careers />;
       case '/news':

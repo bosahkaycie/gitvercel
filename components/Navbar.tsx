@@ -90,6 +90,9 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
     'Our Philosophy': 'Our vision, mission and strategic objectives',
     'Core Values': 'Professionalism, innovation, integrity and safety',
     'Management Team': 'Experienced leaders driving project excellence',
+    'About PIGL': 'Indigenous engineering capability & track record',
+    'Careers': 'Professional development, talent recruitment & field careers',
+    'Careers at PIGL': 'Professional development, talent recruitment & field careers',
     
     // About us - Commitment
     'HSSE & Quality Policy': 'Commitment to zero injuries & high-quality assurance',
@@ -150,7 +153,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
     .map(item => {
       let layout: 'links' | 'services' | 'projects' = item.layout || (item.name === 'Services' ? 'services' : 'links');
       let featured = item.featured;
-      if (!featured && (item.name === 'About us' || item.name === 'About')) {
+      if (!featured && (item.name === 'About us' || item.name === 'About' || item.name === 'About Us')) {
         featured = {
           category: 'Corporate Overview',
           title: 'Precision & Integrity',
@@ -188,7 +191,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
   const navLinks = dynamicNavLinks.length > 0 ? dynamicNavLinks : [
     { name: 'Home', href: '/', type: 'standard' },
     {
-      name: 'About',
+      name: 'About Us',
       href: '/about',
       type: 'mega',
       layout: 'links',
@@ -204,7 +207,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
           title: 'Company Leadership',
           links: [
             { label: 'About PIGL', href: '/about' },
-            { label: 'Teams', href: '/teams' },
+            { label: 'Careers', href: '/careers' },
           ]
         },
         {
@@ -229,7 +232,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
         link: `/services/${SERVICES[0].id}`
       }
     },
-    { name: 'Projects', href: '/projects', type: 'standard' },
+    { name: 'Team', href: '/teams', type: 'standard' },
     { name: 'Our Network', href: '/network', type: 'standard' },
     { name: 'Blog', href: '/blog', type: 'standard' },
     { name: 'Contact', href: '/contact', type: 'standard' },

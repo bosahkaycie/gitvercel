@@ -140,7 +140,6 @@ const Footer: React.FC = () => {
                   links: [
                     { id: '7', label: 'About PIGL', href: '/about', is_active: true },
                     { id: '8', label: 'Teams', href: '/teams', is_active: true },
-                    { id: '9', label: 'Executed Projects', href: '/projects', is_active: true },
                     { id: '10', label: 'Our Network', href: '/network', is_active: true },
                     { id: '11', label: 'Technical Blog', href: '/blog', is_active: true },
                     { id: '12', label: 'HSSE & Quality Policy', href: '/hsse', is_active: true },

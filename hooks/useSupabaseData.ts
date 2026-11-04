@@ -331,7 +331,7 @@ const LOCAL_STORAGE_KEY_JOBS = 'pigl_cms_job_openings_v1';
 const LOCAL_STORAGE_KEY_APPLICATIONS = 'pigl_cms_job_applications_v1';
 const LOCAL_STORAGE_KEY_SETTINGS = 'pigl_cms_site_settings_v1';
 const LOCAL_STORAGE_KEY_TEAM = 'pigl_cms_team_members_v1';
-const LOCAL_STORAGE_KEY_NAVIGATION = 'pigl_cms_navigation_config_v1';
+const LOCAL_STORAGE_KEY_NAVIGATION = 'pigl_cms_navigation_config_v2';
 const LOCAL_STORAGE_KEY_TESTIMONIALS = 'pigl_cms_testimonials_v1';
 
 const FALLBACK_PROJECTS: CMSProject[] = PROJECTS.map((p, idx) => ({
@@ -4603,7 +4603,7 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
     },
     {
       id: 'nav-about',
-      name: 'About us',
+      name: 'About Us',
       href: '/about',
       type: 'mega',
       layout: 'links',
@@ -4622,7 +4622,7 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
           title: 'Company',
           links: [
             { id: 'sub-about', label: 'About PIGL', href: '/about', description: 'Indigenous engineering capability & track record' },
-            { id: 'sub-teams', label: 'Teams', href: '/teams', description: 'Executive leadership and specialist engineering disciplines' }
+            { id: 'sub-careers', label: 'Careers', href: '/careers', description: 'Engineering careers, field talent & opportunities' }
           ]
         },
         {
@@ -4645,9 +4645,9 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
       order: 3
     },
     {
-      id: 'nav-projects',
-      name: 'Projects',
-      href: '/projects',
+      id: 'nav-team',
+      name: 'Team',
+      href: '/teams',
       type: 'standard',
       is_active: true,
       order: 4
@@ -4700,12 +4700,11 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
         links: [
           { id: 'flink-about', label: 'About PIGL', href: '/about', is_active: true, order: 1 },
           { id: 'flink-teams', label: 'Teams', href: '/teams', is_active: true, order: 2 },
-          { id: 'flink-projects', label: 'Executed Projects', href: '/projects', is_active: true, order: 3 },
+          { id: 'flink-careers', label: 'Careers at PIGL', href: '/careers', is_active: true, order: 3 },
           { id: 'flink-network', label: 'Our Network', href: '/network', is_active: true, order: 4 },
           { id: 'flink-qhse', label: 'QHSE Standards', href: '/hsse', is_active: true, order: 5 },
           { id: 'flink-blog', label: 'Technical Blog', href: '/blog', is_active: true, order: 6 },
-          { id: 'flink-careers', label: 'Careers at PIGL', href: '/careers', is_active: true, order: 7 },
-          { id: 'flink-vendors', label: 'Vendor Onboarding', href: '/vendors', is_active: true, order: 8 }
+          { id: 'flink-vendors', label: 'Vendor Onboarding', href: '/vendors', is_active: true, order: 7 }
         ]
       }
     ],
@@ -4747,7 +4746,7 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
       meta_title: 'Leadership & Engineering Teams | PIGL Nigeria',
       meta_description: 'Meet the executive leadership and multidisciplinary engineering teams guiding PIGL operations across West Africa.',
       is_published: true,
-      show_in_header: false,
+      show_in_header: true,
       show_in_footer: true
     },
     {
@@ -4757,17 +4756,6 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
       description: 'Comprehensive directory of engineering, surveying, reality capture, and geosolutions divisions.',
       meta_title: 'Engineering & Geosolutions Services | PIGL',
       meta_description: 'Explore our multi-disciplinary engineering capabilities from 3D laser scanning to offshore geotechnics and asset integrity.',
-      is_published: true,
-      show_in_header: true,
-      show_in_footer: true
-    },
-    {
-      id: 'pg-projects',
-      title: 'Executed Projects & Case Studies',
-      slug: '/projects',
-      description: 'Filterable portfolio of delivered engineering projects with scopes and metrics.',
-      meta_title: 'Executed Projects & Case Studies | PIGL',
-      meta_description: 'Case studies of mission-critical engineering deliveries for Chevron, TotalEnergies, Aradel, and major African energy operators.',
       is_published: true,
       show_in_header: true,
       show_in_footer: true
