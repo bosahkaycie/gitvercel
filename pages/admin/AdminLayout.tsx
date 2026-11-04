@@ -45,7 +45,29 @@ import AdminNotificationCenter from '../../components/admin/AdminNotificationCen
 
 const AdminLayout: React.FC = () => {
   const { user, loading: authLoading, isAuthenticated, login, logout, updateProfile, updatePassword } = useAdminAuth();
-  const [currentTab, setCurrentTab] = useState<string>('dashboard');
+  const [currentTab, setCurrentTab] = useState<string>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab');
+        if (tab) return tab;
+        const hash = window.location.hash.replace('#', '');
+        if (hash) return hash;
+      }
+    } catch {}
+    return 'dashboard';
+  });
+
+  const handleTabChange = (tab: string) => {
+    setCurrentTab(tab);
+    try {
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', tab);
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch {}
+  };
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     try {
       const saved = localStorage.getItem('pigl_admin_theme');
@@ -611,7 +633,7 @@ const AdminLayout: React.FC = () => {
       {/* Sidebar with Desktop Collapse & Mobile Slide Drawer */}
       <AdminSidebar
         currentTab={currentTab}
-        onTabChange={setCurrentTab}
+        onTabChange={handleTabChange}
         onLogout={logout}
         user={user}
         adminEmail={user?.email}

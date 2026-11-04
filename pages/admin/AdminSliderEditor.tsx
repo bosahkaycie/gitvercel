@@ -49,11 +49,9 @@ const AdminSliderEditor: React.FC<AdminSliderEditorProps> = ({
     setError(null);
     setSaving(true);
 
-    const ytId = getYouTubeId(videoUrl);
-    const ytThumbnail = ytId ? (getYouTubeThumbnail(videoUrl) || `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`) : null;
     const cleanVideoUrl = videoUrl ? videoUrl.trim() : null;
-    const cleanDesktopImage = desktopImage.trim() || ytThumbnail || '';
-    const cleanMobileImage = mobileImage.trim() || cleanDesktopImage || '';
+    const cleanDesktopImage = desktopImage ? desktopImage.trim() : '';
+    const cleanMobileImage = mobileImage ? mobileImage.trim() : '';
 
     const payload = {
       ...(initialData?.id ? { id: initialData.id } : {}),
@@ -434,18 +432,25 @@ const AdminSliderEditor: React.FC<AdminSliderEditorProps> = ({
             </div>
           </div>
 
-          {/* Desktop Background Image */}
+          {/* Fallback Image Section (Genuinely Optional) */}
           <div className={`border rounded-xl p-6 shadow-sm space-y-4 ${
             isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
           }`}>
             <div className={`flex items-center justify-between border-b pb-2 ${
               isDark ? 'border-slate-800' : 'border-slate-100'
             }`}>
-              <h3 className={`text-sm font-bold uppercase tracking-wider ${
-                isDark ? 'text-white' : 'text-slate-900'
-              }`}>
-                Background Image (Optional)
-              </h3>
+              <div>
+                <h3 className={`text-sm font-bold uppercase tracking-wider ${
+                  isDark ? 'text-white' : 'text-slate-900'
+                }`}>
+                  Fallback Image (Optional)
+                </h3>
+                <p className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  {videoUrl 
+                    ? 'Optional poster image. When omitted, video plays directly over dark canvas.' 
+                    : 'Static background visual for this slide.'}
+                </p>
+              </div>
               {desktopImage && (
                 <button
                   type="button"
@@ -453,44 +458,73 @@ const AdminSliderEditor: React.FC<AdminSliderEditorProps> = ({
                     setDesktopImage('');
                     setMobileImage('');
                   }}
-                  className="text-xs text-rose-600 hover:text-rose-800 font-bold flex items-center space-x-1"
+                  className="px-2.5 py-1 text-xs bg-rose-950/60 hover:bg-rose-900/80 border border-rose-800/80 text-rose-300 font-bold rounded-lg transition-colors flex items-center space-x-1.5"
                 >
-                  <IconTrash className="w-3 h-3" />
+                  <IconTrash className="w-3.5 h-3.5 text-rose-400" />
                   <span>Remove Image</span>
                 </button>
               )}
             </div>
 
             {desktopImage ? (
-              <ImageUploader
-                label="High-Res Desktop Visual"
-                currentUrl={desktopImage}
-                onUploadComplete={(url) => {
-                  setDesktopImage(url);
-                  if (!mobileImage) setMobileImage(url);
-                }}
-                bucket="sliders"
-                helperText="1920x1080 high-resolution background"
-                theme={theme}
-              />
+              <div className="space-y-3">
+                <div className="relative rounded-lg overflow-hidden border border-slate-700 max-h-48 group">
+                  <img
+                    src={desktopImage}
+                    alt="Current Fallback"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-2 right-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDesktopImage('');
+                        setMobileImage('');
+                      }}
+                      className="px-2 py-1 bg-black/80 hover:bg-rose-950/90 text-rose-300 border border-rose-700/60 rounded text-[11px] font-bold transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+                <ImageUploader
+                  label="Replace Fallback Image"
+                  currentUrl={desktopImage}
+                  onUploadComplete={(url) => {
+                    setDesktopImage(url);
+                    if (!mobileImage) setMobileImage(url);
+                  }}
+                  bucket="sliders"
+                  helperText="1920x1080 high-resolution background"
+                  theme={theme}
+                />
+              </div>
             ) : (
               <div className="space-y-3">
-                <div className={`p-4 border border-dashed rounded-xl text-center space-y-2 ${
-                  isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-300'
+                <div className={`p-4 border border-dashed rounded-xl text-center space-y-1.5 ${
+                  isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-slate-50 border-slate-300'
                 }`}>
-                  <p className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    No image set. {videoUrl ? 'Using background video.' : 'A sleek corporate dark gradient will be rendered.'}
+                  <div className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700">
+                    <span>No Fallback Image Set</span>
+                  </div>
+                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    {videoUrl 
+                      ? 'The background video will play directly with zero fallback image.' 
+                      : 'A corporate dark gradient canvas will be displayed for this slide.'}
+                  </p>
+                  <p className="text-[11px] text-emerald-500 font-mono">
+                    ✓ Saving now will save with genuinely empty image (no auto-replacement).
                   </p>
                 </div>
                 <ImageUploader
-                  label="Add Image Background"
+                  label="Upload Optional Fallback Image"
                   currentUrl=""
                   onUploadComplete={(url) => {
                     setDesktopImage(url);
                     if (!mobileImage) setMobileImage(url);
                   }}
                   bucket="sliders"
-                  helperText="Optional 1920x1080 background"
+                  helperText="Optional 1920x1080 background image"
                   theme={theme}
                 />
               </div>

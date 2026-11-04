@@ -103,7 +103,8 @@ const HeroSlideVideo: React.FC<{
 }> = ({ src, isActive, isHeroVisible, prefersReducedMotion = false, poster, title, isFirst = false }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [hasBeenActive, setHasBeenActive] = useState(false);
+  const [hasBeenActive, setHasBeenActive] = useState(isFirst);
+  const hasPoster = Boolean(poster && poster.trim());
 
   // Lazy load video stream only when slide becomes active and user does not prefer reduced motion
   useEffect(() => {
@@ -160,8 +161,8 @@ const HeroSlideVideo: React.FC<{
   }, [isActive, isHeroVisible, hasBeenActive, prefersReducedMotion, src]);
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
-      {poster && (
+    <div className="relative w-full h-full overflow-hidden bg-slate-950">
+      {hasPoster && (
         <img
           src={poster}
           alt={title || 'Slide background poster'}
@@ -181,14 +182,16 @@ const HeroSlideVideo: React.FC<{
           loop
           muted
           playsInline
+          autoPlay
           disablePictureInPicture
           disableRemotePlayback
-          preload={isActive ? 'auto' : 'none'}
+          preload={isActive || isFirst ? 'auto' : 'none'}
           aria-label={title || 'Slide background video'}
           className={`w-full h-full object-cover pointer-events-none transition-opacity duration-700 ease-out ${
-            isVideoLoaded && isActive ? 'opacity-100' : 'opacity-0'
+            !hasPoster || (isVideoLoaded && isActive) ? 'opacity-100' : 'opacity-0'
           }`}
           onPlaying={() => setIsVideoLoaded(true)}
+          onLoadedData={() => setIsVideoLoaded(true)}
         >
           <source src={src} type="video/mp4" />
         </video>
@@ -318,14 +321,14 @@ const Home: React.FC = () => {
       }
     }
 
-    let desktopImg = s.desktop_image;
-    if (!desktopImg || desktopImg.includes('191.215.41.50') || desktopImg.includes('sslip.io')) {
-      desktopImg = localSliderPosters[idx % localSliderPosters.length];
+    let desktopImg = s.desktop_image !== undefined && s.desktop_image !== null ? s.desktop_image.trim() : '';
+    if (desktopImg && (desktopImg.includes('191.215.41.50') || desktopImg.includes('sslip.io'))) {
+      desktopImg = '';
     }
 
-    let mobileImg = s.mobile_image;
-    if (!mobileImg || mobileImg.includes('191.215.41.50') || mobileImg.includes('sslip.io')) {
-      mobileImg = '/assets/DJI_0003.jpg';
+    let mobileImg = s.mobile_image !== undefined && s.mobile_image !== null ? s.mobile_image.trim() : '';
+    if (mobileImg && (mobileImg.includes('191.215.41.50') || mobileImg.includes('sslip.io'))) {
+      mobileImg = '';
     }
 
     let targetCtaUrl = s.cta_url || '/services';
@@ -532,9 +535,7 @@ const Home: React.FC = () => {
             const isActive = currentSlide === idx;
             const youtubeId = getYouTubeId(slide.video_url);
             const isDirectVideo = Boolean(slide.video_url && !youtubeId);
-            const fallbackPoster = youtubeId 
-              ? (getYouTubeThumbnail(slide.video_url) || `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`)
-              : (slide.desktop_image || '/assets/DJI_0003.jpg');
+            const hasCustomImage = Boolean(slide.desktop_image && slide.desktop_image.trim());
 
             return (
               <div
@@ -544,13 +545,14 @@ const Home: React.FC = () => {
                 }`}
               >
                 {youtubeId ? (
-                  <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-                    {/* Persistent poster image prevents black flash during YouTube stream initialization */}
-                    <img
-                      src={fallbackPoster}
-                      alt={slide.title}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
+                  <div className="relative w-full h-full flex items-center justify-center overflow-hidden bg-slate-950">
+                    {hasCustomImage && (
+                      <img
+                        src={slide.desktop_image}
+                        alt={slide.title}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    )}
                     {isActive && (
                       <iframe
                         src={getYouTubeEmbedUrl(slide.video_url, { autoplay: true, mute: true, loop: true, controls: false }) || ''}
@@ -573,13 +575,13 @@ const Home: React.FC = () => {
                     isActive={isActive}
                     isHeroVisible={isHeroVisible}
                     prefersReducedMotion={prefersReducedMotion}
-                    poster={slide.desktop_image || fallbackPoster}
+                    poster={hasCustomImage ? slide.desktop_image : undefined}
                     title={slide.title}
                     isFirst={idx === 0}
                   />
-                ) : (
+                ) : hasCustomImage ? (
                   <img
-                    src={slide.desktop_image || fallbackPoster}
+                    src={slide.desktop_image}
                     alt={slide.title}
                     loading={idx === 0 ? "eager" : "lazy"}
                     {...(idx === 0 ? { fetchPriority: "high" } : {})}
@@ -588,6 +590,8 @@ const Home: React.FC = () => {
                       isActive ? 'scale-105' : 'scale-100'
                     }`}
                   />
+                ) : (
+                  <div className="w-full h-full bg-slate-950" />
                 )}
               </div>
             );

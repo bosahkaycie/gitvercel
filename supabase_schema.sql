@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS sliders (
     title VARCHAR(200) NOT NULL,
     subtitle VARCHAR(250),
     description TEXT,
-    desktop_image TEXT NOT NULL,
+    desktop_image TEXT,
     mobile_image TEXT,
     video_url TEXT,
     cta_text VARCHAR(100) DEFAULT 'Explore Capabilities',
@@ -125,6 +125,9 @@ CREATE TABLE IF NOT EXISTS sliders (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Ensure desktop_image and mobile_image are nullable for optional fallback image support
+ALTER TABLE sliders ALTER COLUMN desktop_image DROP NOT NULL;
 
 -- Indexes for Sliders
 CREATE INDEX IF NOT EXISTS idx_sliders_is_active ON sliders(is_active);

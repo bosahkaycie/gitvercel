@@ -280,9 +280,20 @@ const AdminSliders: React.FC<AdminSlidersProps> = ({
                   </span>
                 </div>
                 {slide.video_url && (
-                  <div className="absolute bottom-3 left-3 bg-red-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold uppercase flex items-center space-x-1.5 shadow-md">
-                    <IconVideo className="w-3.5 h-3.5" />
-                    <span>{getYouTubeId(slide.video_url) ? 'YouTube Video' : 'MP4/WebM Video'}</span>
+                  <div className="absolute bottom-3 left-3 flex items-center space-x-2">
+                    <div className="bg-red-600 text-white px-2.5 py-1 rounded-lg text-xs font-bold uppercase flex items-center space-x-1.5 shadow-md">
+                      <IconVideo className="w-3.5 h-3.5" />
+                      <span>{getYouTubeId(slide.video_url) ? 'YouTube Video' : 'MP4/WebM Video'}</span>
+                    </div>
+                    {slide.desktop_image ? (
+                      <span className="bg-slate-900/90 text-slate-300 border border-slate-700 px-2 py-0.5 rounded text-[10px] font-bold">
+                        Has Fallback Image
+                      </span>
+                    ) : (
+                      <span className="bg-emerald-950/90 text-emerald-300 border border-emerald-700/80 px-2 py-0.5 rounded text-[10px] font-bold">
+                        Pure Video (No Image)
+                      </span>
+                    )}
                   </div>
                 )}
               </div>

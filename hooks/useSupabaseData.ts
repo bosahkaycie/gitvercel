@@ -292,20 +292,15 @@ export const LOCAL_STORAGE_KEY_SLIDERS_VERSION = "pigl_cms_sliders_version";
  * mapping them directly to locally bundled, pre-compressed WebP and faststart video assets.
  */
 export const sanitizeSliderAsset = (slider: CMSSlider, index: number): CMSSlider => {
-  const localPosters = [
-    '/assets/new_ocean.webp',
-    '/assets/seismic_survey.webp',
-    '/assets/newpipeline.webp',
-    '/assets/water_treatment_skid.jpg'
-  ];
-  let desktop = slider.desktop_image;
-  let mobile = slider.mobile_image;
+  let desktop = slider.desktop_image !== undefined && slider.desktop_image !== null ? slider.desktop_image.trim() : '';
+  let mobile = slider.mobile_image !== undefined && slider.mobile_image !== null ? slider.mobile_image.trim() : '';
 
-  if (!desktop || desktop.includes('191.215.41.50') || desktop.includes('sslip.io')) {
-    desktop = localPosters[index % localPosters.length];
+  // Clean obsolete unreachable IP test endpoints if present, but NEVER inject automatic fallbacks
+  if (desktop && (desktop.includes('191.215.41.50') || desktop.includes('sslip.io'))) {
+    desktop = '';
   }
-  if (!mobile || mobile.includes('191.215.41.50') || mobile.includes('sslip.io')) {
-    mobile = '/assets/DJI_0003.jpg';
+  if (mobile && (mobile.includes('191.215.41.50') || mobile.includes('sslip.io'))) {
+    mobile = '';
   }
 
   let video = slider.video_url;
@@ -875,13 +870,13 @@ export const saveStoredSliders = (sliders: CMSSlider[]) => {
       if (video_url && video_url.startsWith('data:') && video_url.length > 50000) {
         video_url = null;
       }
-      let desktop_image = s.desktop_image || '';
+      let desktop_image = s.desktop_image ? s.desktop_image.trim() : '';
       if (desktop_image && desktop_image.startsWith('data:') && desktop_image.length > 600000) {
-        desktop_image = '/assets/DJI_0003.jpg';
+        desktop_image = '';
       }
-      let mobile_image = s.mobile_image || desktop_image;
+      let mobile_image = s.mobile_image ? s.mobile_image.trim() : '';
       if (mobile_image && mobile_image.startsWith('data:') && mobile_image.length > 600000) {
-        mobile_image = desktop_image;
+        mobile_image = '';
       }
       return { ...s, video_url, desktop_image, mobile_image };
     });
@@ -1383,8 +1378,7 @@ export const useSliders = (adminMode = false) => {
           query = query.eq('is_active', true);
         }
         const { data, error: sbError } = await query;
-        const hasPipelineOrModern = data?.some(s => s.title?.includes('Pipeline') || s.id === '52f9111a-7fc9-4668-9f04-3fdbb37ef77d');
-        if (!sbError && data && data.length > 0 && hasPipelineOrModern) {
+        if (!sbError && data && data.length > 0) {
           const seenIds = new Set<string>();
           const unique = (data as CMSSlider[]).filter(s => {
             if (deletedIds.has(s.id)) return false;
@@ -1423,7 +1417,8 @@ export const useSliders = (adminMode = false) => {
     const client = getSupabaseClient();
     const id = (slider.id && isValidUUID(slider.id)) ? slider.id : generateUUID();
     const cleanVideo = slider.video_url ? slider.video_url.trim() : null;
-    const fallbackImg = cleanVideo ? '' : '/assets/DJI_0003.jpg';
+    const cleanDesktopImage = slider.desktop_image !== undefined && slider.desktop_image !== null ? slider.desktop_image.trim() : '';
+    const cleanMobileImage = slider.mobile_image !== undefined && slider.mobile_image !== null ? slider.mobile_image.trim() : '';
 
     // If previously marked deleted, unmark it
     unmarkSliderAsDeleted(id);
@@ -1433,8 +1428,8 @@ export const useSliders = (adminMode = false) => {
       title: slider.title.trim(),
       subtitle: (slider.subtitle || '').trim(),
       description: (slider.description || '').trim(),
-      desktop_image: slider.desktop_image?.trim() || slider.mobile_image?.trim() || fallbackImg,
-      mobile_image: slider.mobile_image?.trim() || slider.desktop_image?.trim() || fallbackImg,
+      desktop_image: cleanDesktopImage,
+      mobile_image: cleanMobileImage,
       video_url: cleanVideo,
       cta_text: slider.cta_text || 'Explore Capabilities',
       cta_url: slider.cta_url || '/services',
@@ -1474,15 +1469,28 @@ export const useSliders = (adminMode = false) => {
     // 2. Immediately update state so UI renders the saved slide with zero latency
     setSliders(adminMode ? updatedList : updatedList.filter(s => s.is_active));
 
-    // 3. Attempt cloud synchronization to Supabase in the background
+    // 3. Attempt cloud synchronization to Supabase
     if (client) {
       try {
         const { error: saveErr } = await client.from('sliders').upsert(updated);
         if (saveErr) {
-          console.warn('Supabase cloud save notice (persisted to local store):', saveErr.message);
+          // If RLS blocks direct anon write, route through secure serverless API
+          await fetch('/api/sliders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'save', slider: updated })
+          }).catch(() => {});
         }
       } catch (err) {
-        console.warn('Network error syncing slider to Supabase (persisted to local store):', err);
+        try {
+          await fetch('/api/sliders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'save', slider: updated })
+          }).catch(() => {});
+        } catch (apiErr) {
+          console.warn('Network notice syncing slider to Supabase (persisted to local store):', apiErr);
+        }
       }
     }
 
@@ -1501,13 +1509,28 @@ export const useSliders = (adminMode = false) => {
     // 3. Immediately update state
     setSliders(adminMode ? updatedList : updatedList.filter(s => s.is_active));
 
-    // 4. Attempt remote delete on Supabase in the background
+    // 4. Attempt remote delete on Supabase
     const client = getSupabaseClient();
     if (client) {
       try {
-        await client.from('sliders').delete().eq('id', id);
+        const { error: delErr } = await client.from('sliders').delete().eq('id', id);
+        if (delErr) {
+          await fetch('/api/sliders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'delete', id })
+          }).catch(() => {});
+        }
       } catch (err) {
-        console.warn('Supabase deleteSlider notice (deleted locally):', err);
+        try {
+          await fetch('/api/sliders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'delete', id })
+          }).catch(() => {});
+        } catch (apiErr) {
+          console.warn('Network notice deleting slider from Supabase (deleted locally):', apiErr);
+        }
       }
     }
   };
