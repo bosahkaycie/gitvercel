@@ -220,13 +220,6 @@ export const ClientLogoCarousel: React.FC<ClientLogoCarouselProps> = ({
             </div>
           </div>
         </div>
-
-        {/* Verification and Editorial Note */}
-        <div className="mt-8 text-center">
-          <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
-            Logos represent historical or ongoing project engagements, contracting participation, or technical service delivery.
-          </p>
-        </div>
       </div>
     </section>
   );
