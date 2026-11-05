@@ -6,6 +6,7 @@ import AdminDirectFollowUp from './AdminDirectFollowUp';
 import AdminServices from './AdminServices';
 import AdminProjects from './AdminProjects';
 import AdminPartners from './AdminPartners';
+import AdminClientLogos from './AdminClientLogos';
 import AdminTestimonials from './AdminTestimonials';
 import AdminTeam from './AdminTeam';
 import AdminVendors from './AdminVendors';
@@ -385,6 +386,8 @@ const AdminLayout: React.FC = () => {
             theme={theme}
           />
         );
+      case 'clients':
+        return <AdminClientLogos theme={theme} />;
       case 'testimonials':
         return (
           <AdminTestimonials
@@ -560,6 +563,11 @@ const AdminLayout: React.FC = () => {
       group: 'Website Content',
       title: 'Our Network',
       description: 'Manage technology alliances, OEM representations, and partner profiles.'
+    },
+    clients: {
+      group: 'Website Content',
+      title: 'Client Organisations',
+      description: 'Manage corporate client and stakeholder logos displayed in the homepage carousel ticker.'
     },
     blog: {
       group: 'Website Content',

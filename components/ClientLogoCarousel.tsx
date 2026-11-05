@@ -1,82 +1,10 @@
 import React, { useRef, useState } from 'react';
-import { usePartners } from '../hooks/useSupabaseData';
+import { useClientLogos } from '../hooks/useSupabaseData';
+import { ClientRelationshipItem, DEFAULT_CLIENT_RELATIONSHIPS } from '../types';
 import { IconChevronLeft, IconChevronRight } from './admin/AdminIcons';
 
-export interface ClientRelationshipItem {
-  id: string;
-  name: string;
-  category: 'Direct Client' | 'Project & Delivery Partner' | 'Industry Stakeholder';
-  logo_url: string;
-  display_order: number;
-  status: 'published' | 'draft';
-  role?: string;
-}
-
-export const INITIAL_CLIENT_RELATIONSHIPS: ClientRelationshipItem[] = [
-  {
-    id: 'client-shell',
-    name: 'Shell',
-    category: 'Direct Client',
-    role: 'Operating Engagement',
-    logo_url: '/assets/clients/shell.svg',
-    display_order: 1,
-    status: 'published'
-  },
-  {
-    id: 'client-nnpc',
-    name: 'NNPC Limited',
-    category: 'Industry Stakeholder',
-    role: 'National Energy Infrastructure',
-    logo_url: '/assets/clients/nnpc.svg',
-    display_order: 2,
-    status: 'published'
-  },
-  {
-    id: 'client-totalenergies',
-    name: 'TotalEnergies',
-    category: 'Direct Client',
-    role: 'Offshore & Energy Operations',
-    logo_url: '/assets/clients/totalenergies.svg',
-    display_order: 3,
-    status: 'published'
-  },
-  {
-    id: 'client-renaissance',
-    name: 'Renaissance Africa Energy Company Limited',
-    category: 'Industry Stakeholder',
-    role: 'Upstream Asset Operations',
-    logo_url: '/assets/clients/renaissance.svg',
-    display_order: 4,
-    status: 'published'
-  },
-  {
-    id: 'client-newcross',
-    name: 'Newcross Exploration & Production',
-    category: 'Project & Delivery Partner',
-    role: 'Field Development Support',
-    logo_url: '/assets/clients/newcross.svg',
-    display_order: 5,
-    status: 'published'
-  },
-  {
-    id: 'client-panocean',
-    name: 'Pan Ocean Oil Corporation (Nigeria) Limited',
-    category: 'Project & Delivery Partner',
-    role: 'Pipeline & Facility Support',
-    logo_url: '/assets/clients/panocean.svg',
-    display_order: 6,
-    status: 'published'
-  },
-  {
-    id: 'client-matrix',
-    name: 'Matrix Energy',
-    category: 'Direct Client',
-    role: 'Downstream & Terminal Engineering',
-    logo_url: '/assets/clients/matrix.svg',
-    display_order: 7,
-    status: 'published'
-  }
-];
+export { DEFAULT_CLIENT_RELATIONSHIPS as INITIAL_CLIENT_RELATIONSHIPS };
+export type { ClientRelationshipItem };
 
 interface ClientLogoCarouselProps {
   className?: string;
@@ -91,25 +19,12 @@ export const ClientLogoCarousel: React.FC<ClientLogoCarouselProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Retrieve dynamic partners/clients from CMS if populated, otherwise use approved baseline
-  const { partners } = usePartners();
+  // Retrieve dynamic client organisations managed by the administrator from CMS backend
+  const { clients } = useClientLogos(false);
   
-  // Find published client relationships from CMS or fallback to INITIAL_CLIENT_RELATIONSHIPS
-  const dynamicClients: ClientRelationshipItem[] = (partners || [])
-    .filter(p => (p as any).category === 'client_relationship' && p.status === 'published')
-    .map(p => ({
-      id: p.id,
-      name: p.name,
-      category: ((p as any).relationship_type || 'Direct Client') as any,
-      role: p.role,
-      logo_url: p.logo_url || '/assets/clients/shell.svg',
-      display_order: p.display_order,
-      status: p.status as any
-    }));
-
-  const activeClients = dynamicClients.length > 0
-    ? dynamicClients.sort((a, b) => a.display_order - b.display_order)
-    : INITIAL_CLIENT_RELATIONSHIPS.filter(c => c.status === 'published');
+  const activeClients = (clients && clients.length > 0)
+    ? clients.filter(c => c.status === 'published').sort((a, b) => a.display_order - b.display_order)
+    : DEFAULT_CLIENT_RELATIONSHIPS.filter(c => c.status === 'published');
 
   // Duplicate list to achieve continuous seamless ticker loop
   const displayLogos = [...activeClients, ...activeClients];

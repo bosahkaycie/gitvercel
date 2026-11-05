@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { CMSPartner } from '../../types';
 import AdminPartnerEditor from './AdminPartnerEditor';
+import AdminClientLogos from './AdminClientLogos';
 import {
   IconPartners,
+  IconBuilding,
   IconPlus,
   IconEdit,
   IconTrash,
@@ -26,6 +28,7 @@ const AdminPartners: React.FC<AdminPartnersProps> = ({
 }) => {
   const [editingPartner, setEditingPartner] = useState<CMSPartner | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [activeNetworkTab, setActiveNetworkTab] = useState<'alliances' | 'clients'>('alliances');
 
   const isDark = theme === 'dark';
 
@@ -34,6 +37,32 @@ const AdminPartners: React.FC<AdminPartnersProps> = ({
     setEditingPartner(null);
     setIsCreating(false);
   };
+
+  if (activeNetworkTab === 'clients') {
+    return (
+      <div className="space-y-6">
+        <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-6 pb-2">
+          <button
+            type="button"
+            onClick={() => setActiveNetworkTab('alliances')}
+            className={`pb-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border-b-2 ${
+              isDark ? 'border-transparent text-slate-400 hover:text-white' : 'border-transparent text-slate-500 hover:text-slate-900'
+            }`}
+          >
+            Technical Representation Alliances
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveNetworkTab('clients')}
+            className="pb-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border-b-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 font-bold"
+          >
+            Landing Page Client Organisations
+          </button>
+        </div>
+        <AdminClientLogos theme={theme} />
+      </div>
+    );
+  }
 
   if (isCreating || editingPartner) {
     return (
@@ -51,6 +80,26 @@ const AdminPartners: React.FC<AdminPartnersProps> = ({
 
   return (
     <div className={`space-y-6 font-sans ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
+      {/* Subtab navigation */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-6 pb-2">
+        <button
+          type="button"
+          onClick={() => setActiveNetworkTab('alliances')}
+          className="pb-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border-b-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 font-bold"
+        >
+          Technical Representation Alliances
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveNetworkTab('clients')}
+          className={`pb-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border-b-2 ${
+            isDark ? 'border-transparent text-slate-400 hover:text-white' : 'border-transparent text-slate-500 hover:text-slate-900'
+          }`}
+        >
+          Landing Page Client Organisations
+        </button>
+      </div>
+
       {/* Action Bar (No Duplicate Title) */}
       <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b ${
         isDark ? 'border-slate-800' : 'border-slate-200'

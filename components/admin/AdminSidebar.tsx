@@ -116,6 +116,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         { id: 'projects', label: 'Projects', Icon: IconProjects },
         { id: 'team', label: 'Teams', Icon: IconUsers },
         { id: 'partners', label: 'Our Network', Icon: IconPartners },
+        { id: 'clients', label: 'Client Organisations', Icon: IconBuilding },
         { id: 'blog', label: 'Blog & Publications', Icon: IconBlog },
         { id: 'media', label: 'Media Library', Icon: IconMedia }
       ]

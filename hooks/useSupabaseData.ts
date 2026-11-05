@@ -26,7 +26,9 @@ import {
   SitePageInfo,
   NavigationConfig,
   CMSVideoItem,
-  CMSTestimonial
+  CMSTestimonial,
+  ClientRelationshipItem,
+  DEFAULT_CLIENT_RELATIONSHIPS
 } from '../types';
 import CptThumbImg from '../assets/cpt.png';
 import DigitalThumbImg from '../assets/digital_intel_scanner.jpg';
@@ -2630,6 +2632,201 @@ export const usePartners = (adminMode = false) => {
   };
 
   return { partners, loading, error, reload: fetchPartners, savePartner, deletePartner };
+};
+
+// ==============================================================================
+// 9.4. CLIENT ORGANISATIONS & STAKEHOLDER LOGOS HOOK
+// ==============================================================================
+export const LOCAL_STORAGE_KEY_CLIENT_LOGOS = 'pigl_client_logos';
+
+export const getStoredClientLogos = (): ClientRelationshipItem[] => {
+  try {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY_CLIENT_LOGOS);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) {
+    console.warn('Failed to load local client logos', e);
+  }
+  return DEFAULT_CLIENT_RELATIONSHIPS;
+};
+
+export const saveStoredClientLogos = (logos: ClientRelationshipItem[]) => {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY_CLIENT_LOGOS, JSON.stringify(logos));
+  } catch (e) {
+    console.warn('Failed to save local client logos', e);
+  }
+};
+
+export const useClientLogos = (adminMode = false) => {
+  const [clients, setClients] = useState<ClientRelationshipItem[]>(getStoredClientLogos());
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchClients = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    let fetched: ClientRelationshipItem[] | null = null;
+
+    // 1. Fetch from /api/client-logos
+    try {
+      const res = await fetch('/api/client-logos');
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success && Array.isArray(data.clients) && data.clients.length > 0) {
+          fetched = data.clients;
+        }
+      }
+    } catch (e) {
+      console.warn('Fetch from /api/client-logos failed, trying Supabase storage fallback:', e);
+    }
+
+    // 2. Direct Supabase Storage fallback if api fetch failed
+    if (!fetched) {
+      const client = getSupabaseClient();
+      if (client) {
+        try {
+          const { data, error: stErr } = await client.storage.from('media').download('config/client_logos.json');
+          if (!stErr && data) {
+            const parsed = JSON.parse(await data.text());
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              fetched = parsed;
+            }
+          }
+        } catch (stErr) {
+          console.warn('Supabase storage fallback for client logos failed:', stErr);
+        }
+      }
+    }
+
+    // 3. Fallback to localStorage or default
+    const finalItems = fetched || getStoredClientLogos();
+    saveStoredClientLogos(finalItems);
+
+    const filtered = adminMode ? finalItems : finalItems.filter(c => c.status === 'published');
+    setClients([...filtered].sort((a, b) => a.display_order - b.display_order));
+    setLoading(false);
+  }, [adminMode]);
+
+  useEffect(() => {
+    fetchClients();
+  }, [fetchClients]);
+
+  const saveClient = async (item: Partial<ClientRelationshipItem> & { name: string }) => {
+    const isNew = !item.id;
+    const targetId = item.id || `client-${Date.now()}`;
+    const payload: ClientRelationshipItem = {
+      id: targetId,
+      name: item.name.trim(),
+      category: item.category || 'Direct Client',
+      role: item.role ? item.role.trim() : 'Operating Engagement',
+      logo_url: item.logo_url || '/assets/clients/shell.svg',
+      website: item.website ? item.website.trim() : '',
+      display_order: Number(item.display_order) || (clients.length + 1),
+      status: item.status || 'published'
+    };
+
+    // Optimistic update
+    const current = getStoredClientLogos();
+    const existingIdx = current.findIndex(c => c.id === targetId);
+    let updated: ClientRelationshipItem[];
+    if (existingIdx >= 0) {
+      updated = [...current];
+      updated[existingIdx] = payload;
+    } else {
+      updated = [...current, payload];
+    }
+    updated.sort((a, b) => a.display_order - b.display_order);
+    saveStoredClientLogos(updated);
+    setClients(adminMode ? updated : updated.filter(c => c.status === 'published'));
+
+    // Cloud persistence
+    try {
+      await fetch('/api/client-logos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'save', client: payload })
+      });
+    } catch (e) {
+      console.warn('Failed to save client logo to server:', e);
+    }
+
+    return payload;
+  };
+
+  const deleteClient = async (id: string) => {
+    const current = getStoredClientLogos();
+    const updated = current.filter(c => c.id !== id);
+    saveStoredClientLogos(updated);
+    setClients(adminMode ? updated : updated.filter(c => c.status === 'published'));
+
+    try {
+      await fetch('/api/client-logos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', id })
+      });
+    } catch (e) {
+      console.warn('Failed to delete client logo from server:', e);
+    }
+  };
+
+  const reorderClients = async (newOrderList: ClientRelationshipItem[]) => {
+    const updated = newOrderList.map((item, idx) => ({
+      ...item,
+      display_order: idx + 1
+    }));
+    saveStoredClientLogos(updated);
+    setClients(adminMode ? updated : updated.filter(c => c.status === 'published'));
+
+    try {
+      await fetch('/api/client-logos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'save_all', clients: updated })
+      });
+    } catch (e) {
+      console.warn('Failed to reorder client logos on server:', e);
+    }
+  };
+
+  const toggleStatus = async (id: string) => {
+    const current = getStoredClientLogos();
+    const item = current.find(c => c.id === id);
+    if (!item) return;
+    const nextStatus = item.status === 'published' ? 'draft' : 'published';
+    await saveClient({ ...item, status: nextStatus });
+  };
+
+  const resetToDefault = async () => {
+    saveStoredClientLogos(DEFAULT_CLIENT_RELATIONSHIPS);
+    setClients(adminMode ? DEFAULT_CLIENT_RELATIONSHIPS : DEFAULT_CLIENT_RELATIONSHIPS.filter(c => c.status === 'published'));
+
+    try {
+      await fetch('/api/client-logos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reset' })
+      });
+    } catch (e) {
+      console.warn('Failed to reset client logos on server:', e);
+    }
+  };
+
+  return {
+    clients,
+    loading,
+    error,
+    reload: fetchClients,
+    saveClient,
+    deleteClient,
+    reorderClients,
+    toggleStatus,
+    resetToDefault
+  };
 };
 
 // ==============================================================================
