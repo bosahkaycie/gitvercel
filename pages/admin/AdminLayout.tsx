@@ -16,6 +16,7 @@ import AdminSliders from './AdminSliders';
 import AdminVideos from './AdminVideos';
 import AdminNavigation from './AdminNavigation';
 import AdminPageHeaders from './AdminPageHeaders';
+import AdminCompanyProfile from './AdminCompanyProfile';
 import AdminMedia from './AdminMedia';
 import AdminSettings from './AdminSettings';
 import AdminInquiries from './AdminInquiries';
@@ -504,6 +505,8 @@ const AdminLayout: React.FC = () => {
         );
       case 'media':
         return <AdminMedia theme={theme} />;
+      case 'company-profile':
+        return <AdminCompanyProfile theme={theme} adminEmail={user?.email} />;
       case 'corporate-profile':
         return <AdminSettings theme={theme} initialTab="profile" />;
       case 'settings':

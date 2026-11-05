@@ -31,7 +31,8 @@ import {
   DEFAULT_CLIENT_RELATIONSHIPS,
   PageHeaderConfig,
   HeaderBackgroundSettings,
-  SiteHeadersData
+  SiteHeadersData,
+  CompanyProfileDocument
 } from '../types';
 import { DEFAULT_PAGE_HEADERS, DEFAULT_TOP_HEADER } from '../api/page-headers';
 import CptThumbImg from '../assets/cpt.png';
@@ -5910,5 +5911,355 @@ export const usePageHeaders = (adminMode = false) => {
     removeTopHeader,
     resetAllHeaders,
     reload: fetchHeaders
+  };
+};
+
+// ==============================================================================
+// COMPANY PROFILE DOCUMENT CMS HOOK
+// ==============================================================================
+
+export const DEFAULT_COMPANY_PROFILE: CompanyProfileDocument = {
+  id: 'official-company-profile',
+  title: 'Polaris Integrated & GeoSolutions Limited - Official Corporate Profile',
+  filename: 'PIGL_Company_Profile.pdf',
+  file_url: 'https://jbldpfvceacfonkzzhig.supabase.co/storage/v1/object/public/documents/company-profile/PIGL_Company_Profile.pdf',
+  storage_path: 'company-profile/PIGL_Company_Profile.pdf',
+  storage_bucket: 'documents',
+  file_type: 'application/pdf',
+  file_size: 11488310,
+  formatted_size: '10.95 MB',
+  is_published: true,
+  version: '2026.1',
+  description: 'Comprehensive corporate overview of PIGL engineering divisions, offshore assets, QA/QC certifications, and track record across Nigeria & West Africa.',
+  cover_image_url: '/assets/PIGL COMPANY PROFILE.jpg',
+  upload_date: '2026-11-05T14:45:00.000Z',
+  updated_at: '2026-11-05T14:45:00.000Z',
+  updated_by: 'admin@polarisigl.com'
+};
+
+const LOCAL_STORAGE_KEY_COMPANY_PROFILE = 'pigl_cms_company_profile_doc';
+
+export const getStoredCompanyProfile = (): CompanyProfileDocument => {
+  try {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY_COMPANY_PROFILE);
+      if (saved) return JSON.parse(saved);
+    }
+  } catch {}
+  return DEFAULT_COMPANY_PROFILE;
+};
+
+export const saveStoredCompanyProfile = (doc: CompanyProfileDocument) => {
+  try {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(LOCAL_STORAGE_KEY_COMPANY_PROFILE, JSON.stringify(doc));
+      window.dispatchEvent(new CustomEvent('pigl_company_profile_updated', { detail: doc }));
+    }
+  } catch {}
+};
+
+export const useCompanyProfile = () => {
+  const [profileDoc, setProfileDoc] = useState<CompanyProfileDocument>(getStoredCompanyProfile());
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchProfile = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    let remoteData: CompanyProfileDocument | null = null;
+
+    // 1. Fetch from /api/company-profile
+    try {
+      const res = await fetch('/api/company-profile');
+      if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+        const json = await res.json();
+        if (json.success && json.document) {
+          remoteData = json.document;
+        }
+      }
+    } catch (e) {
+      console.warn('API /api/company-profile notice, falling back to direct storage:', e);
+    }
+
+    // 2. Direct Supabase Storage fallback
+    if (!remoteData) {
+      const client = getSupabaseClient();
+      if (client) {
+        try {
+          const { data, error: stErr } = await client.storage.from('media').download('config/company_profile.json');
+          if (!stErr && data) {
+            const parsed = JSON.parse(await data.text());
+            if (parsed && typeof parsed === 'object') {
+              remoteData = parsed;
+            }
+          }
+        } catch (stErr) {
+          console.warn('Supabase storage fallback for company profile notice:', stErr);
+        }
+      }
+    }
+
+    const finalDoc = remoteData || getStoredCompanyProfile() || DEFAULT_COMPANY_PROFILE;
+    saveStoredCompanyProfile(finalDoc);
+    setProfileDoc(finalDoc);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchProfile();
+
+    const handleSync = () => {
+      setProfileDoc(getStoredCompanyProfile());
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('pigl_company_profile_updated', handleSync);
+      window.addEventListener('storage', handleSync);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('pigl_company_profile_updated', handleSync);
+        window.removeEventListener('storage', handleSync);
+      }
+    };
+  }, [fetchProfile]);
+
+  // Upload or replace PDF file
+  const uploadProfileDocument = async (file: File, metadata?: { title?: string; version?: string; description?: string; publishNow?: boolean }, adminEmail?: string) => {
+    if (!file) throw new Error('Please select a file to upload.');
+    if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
+      throw new Error('Invalid file format. Only PDF documents (.pdf) are supported.');
+    }
+    if (file.size > 50 * 1024 * 1024) {
+      throw new Error('File size exceeds the 50MB limit. Please upload an optimized PDF.');
+    }
+
+    setLoading(true);
+    setError(null);
+
+    // Convert file to base64
+    const base64: string = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    let uploadedDoc: CompanyProfileDocument | null = null;
+
+    // 1. Try /api/company-profile upload
+    try {
+      const res = await fetch('/api/company-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'upload',
+          fileBase64: base64,
+          filename: file.name,
+          title: metadata?.title || profileDoc.title,
+          version: metadata?.version || profileDoc.version,
+          description: metadata?.description || profileDoc.description,
+          publishNow: metadata?.publishNow ?? true,
+          adminEmail: adminEmail || 'admin@polarisigl.com'
+        })
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.document) {
+          uploadedDoc = json.document;
+        }
+      }
+    } catch (apiErr) {
+      console.warn('API upload encountered issue, attempting direct Supabase storage upload:', apiErr);
+    }
+
+    // 2. Direct Supabase Storage fallback
+    if (!uploadedDoc) {
+      const client = getSupabaseClient();
+      if (!client) throw new Error('Supabase client not initialized.');
+
+      const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const storagePath = `company-profile/${Date.now()}_${cleanName}`;
+
+      const { error: upErr } = await client.storage
+        .from('documents')
+        .upload(storagePath, file, {
+          contentType: 'application/pdf',
+          upsert: true
+        });
+
+      if (upErr) throw new Error(`Supabase Storage Upload Error: ${upErr.message}`);
+
+      const { data: pubData } = client.storage.from('documents').getPublicUrl(storagePath);
+      const formattedSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+
+      uploadedDoc = {
+        ...profileDoc,
+        id: 'official-company-profile',
+        title: metadata?.title || profileDoc.title,
+        filename: cleanName,
+        file_url: pubData.publicUrl,
+        storage_path: storagePath,
+        storage_bucket: 'documents',
+        file_type: 'application/pdf',
+        file_size: file.size,
+        formatted_size: formattedSize,
+        is_published: metadata?.publishNow ?? true,
+        version: metadata?.version || profileDoc.version || '2026.1',
+        description: metadata?.description || profileDoc.description,
+        upload_date: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        updated_by: adminEmail || 'admin@polarisigl.com'
+      };
+
+      try {
+        await client.storage.from('media').upload('config/company_profile.json', JSON.stringify(uploadedDoc), {
+          contentType: 'application/json',
+          upsert: true
+        });
+      } catch {}
+    }
+
+    if (uploadedDoc) {
+      saveStoredCompanyProfile(uploadedDoc);
+      setProfileDoc(uploadedDoc);
+      setLoading(false);
+      return uploadedDoc;
+    }
+
+    setLoading(false);
+    throw new Error('Failed to upload and save Company Profile document.');
+  };
+
+  // Toggle publish / unpublish
+  const togglePublish = async (publish: boolean, adminEmail?: string) => {
+    setLoading(true);
+    const updated = {
+      ...profileDoc,
+      is_published: publish,
+      updated_at: new Date().toISOString(),
+      updated_by: adminEmail || 'admin@polarisigl.com'
+    };
+
+    saveStoredCompanyProfile(updated);
+    setProfileDoc(updated);
+
+    try {
+      await fetch('/api/company-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: publish ? 'publish' : 'unpublish',
+          adminEmail: adminEmail || 'admin@polarisigl.com'
+        })
+      });
+    } catch {}
+
+    const client = getSupabaseClient();
+    if (client) {
+      try {
+        await client.storage.from('media').upload('config/company_profile.json', JSON.stringify(updated), {
+          contentType: 'application/json',
+          upsert: true
+        });
+      } catch {}
+    }
+
+    setLoading(false);
+    return updated;
+  };
+
+  // Remove / unpublish document
+  const removeProfileDocument = async (adminEmail?: string) => {
+    setLoading(true);
+    const updated: CompanyProfileDocument = {
+      ...profileDoc,
+      is_published: false,
+      file_url: '',
+      filename: '',
+      file_size: 0,
+      formatted_size: '0 MB',
+      updated_at: new Date().toISOString(),
+      updated_by: adminEmail || 'admin@polarisigl.com'
+    };
+
+    saveStoredCompanyProfile(updated);
+    setProfileDoc(updated);
+
+    try {
+      await fetch('/api/company-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'remove',
+          adminEmail: adminEmail || 'admin@polarisigl.com'
+        })
+      });
+    } catch {}
+
+    const client = getSupabaseClient();
+    if (client) {
+      try {
+        await client.storage.from('media').upload('config/company_profile.json', JSON.stringify(updated), {
+          contentType: 'application/json',
+          upsert: true
+        });
+      } catch {}
+    }
+
+    setLoading(false);
+    return updated;
+  };
+
+  // Save metadata
+  const saveProfileMetadata = async (metadata: Partial<CompanyProfileDocument>, adminEmail?: string) => {
+    setLoading(true);
+    const updated: CompanyProfileDocument = {
+      ...profileDoc,
+      ...metadata,
+      updated_at: new Date().toISOString(),
+      updated_by: adminEmail || 'admin@polarisigl.com'
+    };
+
+    saveStoredCompanyProfile(updated);
+    setProfileDoc(updated);
+
+    try {
+      await fetch('/api/company-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save',
+          document: updated,
+          adminEmail: adminEmail || 'admin@polarisigl.com'
+        })
+      });
+    } catch {}
+
+    const client = getSupabaseClient();
+    if (client) {
+      try {
+        await client.storage.from('media').upload('config/company_profile.json', JSON.stringify(updated), {
+          contentType: 'application/json',
+          upsert: true
+        });
+      } catch {}
+    }
+
+    setLoading(false);
+    return updated;
+  };
+
+  return {
+    document: profileDoc,
+    loading,
+    error,
+    uploadProfileDocument,
+    togglePublish,
+    removeProfileDocument,
+    saveProfileMetadata,
+    reload: fetchProfile
   };
 };

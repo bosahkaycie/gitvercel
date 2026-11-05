@@ -6,7 +6,7 @@ import { SERVICES, PROJECTS, CONTACT_CONFIG } from '../site_data';
 import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
 import ProfileCoverImg from '../assets/PIGL COMPANY PROFILE.jpg';
 import { Service, Project } from '../types';
-import { useNavigation, usePageHeaders } from '../hooks/useSupabaseData';
+import { useNavigation, usePageHeaders, useCompanyProfile } from '../hooks/useSupabaseData';
 
 interface NavbarProps {
   currentPath?: string;
@@ -83,6 +83,10 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
   const [hoveredService, setHoveredService] = useState<Service>(SERVICES[0]);
   const [hoveredProject, setHoveredProject] = useState<Project>(PROJECTS[0]);
   const { navConfig } = useNavigation();
+  const { document: companyProfileDoc } = useCompanyProfile();
+  const isProfilePublished = Boolean(companyProfileDoc?.is_published && companyProfileDoc?.file_url);
+  const profileDownloadUrl = companyProfileDoc?.file_url || ProfilePDF;
+  const profileDownloadFilename = companyProfileDoc?.filename || 'PIGL-Company-Profile.pdf';
   const { topHeader } = usePageHeaders();
 
   const menuDescriptions: Record<string, string> = {
@@ -331,14 +335,16 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                   <svg className="w-[17px] h-[17px] xl:w-[18px] xl:h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </button>
                 {/* Download Profile Icon */}
-                <button 
-                  onClick={() => setIsDownloadModalOpen(true)}
-                  title="Download Profile"
-                  aria-label="Download Profile"
-                  className={`p-1.5 transition-colors flex items-center justify-center ${useDarkText ? 'text-slate-800 hover:text-emerald-700' : 'text-white hover:text-white/80'}`}
-                >
-                  <svg className="w-[17px] h-[17px] xl:w-[18px] xl:h-[18px]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                </button>
+                {isProfilePublished && (
+                  <button 
+                    onClick={() => setIsDownloadModalOpen(true)}
+                    title="Download Company Profile"
+                    aria-label="Download Company Profile"
+                    className={`p-1.5 transition-colors flex items-center justify-center ${useDarkText ? 'text-slate-800 hover:text-emerald-700' : 'text-white hover:text-white/80'}`}
+                  >
+                    <svg className="w-[17px] h-[17px] xl:w-[18px] xl:h-[18px]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                  </button>
+                )}
               </div>
 
               <a
@@ -742,15 +748,17 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                 <span className="font-bold text-xs uppercase tracking-wider">Profile</span>
               </button>
             </div>
-             <button
-              onClick={() => {
-                setIsOpen(false);
-                setIsDownloadModalOpen(true);
-              }}
-              className="w-full text-center py-3.5 bg-emerald-700 text-white font-black text-sm uppercase tracking-widest hover:bg-emerald-800 transition-all block mb-3"
-            >
-              Company Profile
-            </button>
+            {isProfilePublished && (
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsDownloadModalOpen(true);
+                }}
+                className="w-full text-center py-3.5 bg-emerald-700 text-white font-black text-sm uppercase tracking-widest hover:bg-emerald-800 transition-all block mb-3"
+              >
+                Company Profile
+              </button>
+            )}
 
             <a
               href="/contact"
@@ -788,16 +796,25 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
             {/* Content & Action Buttons */}
             <div className="w-full sm:w-7/12 p-5 sm:p-8 flex flex-col justify-between">
               <div className="space-y-3 sm:space-y-4">
-                <h3 className="text-lg sm:text-xl font-black text-slate-950 tracking-tight leading-snug">Company Profile</h3>
+                <h3 className="text-lg sm:text-xl font-black text-slate-950 tracking-tight leading-snug">
+                  {companyProfileDoc?.title || 'Company Profile'}
+                </h3>
                 <p className="text-xs sm:text-sm font-normal text-slate-500 leading-relaxed">
-                  Would you like to download our comprehensive corporate profile presentation?
+                  {companyProfileDoc?.description || 'Would you like to download our comprehensive corporate profile presentation?'}
                 </p>
+                {companyProfileDoc?.formatted_size && (
+                  <span className="inline-block text-[11px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200">
+                    PDF Document • {companyProfileDoc.formatted_size} {companyProfileDoc.version ? `• v${companyProfileDoc.version}` : ''}
+                  </span>
+                )}
               </div>
               
               <div className="mt-6 sm:mt-8 space-y-2.5 sm:space-y-3">
                 <a
-                  href={ProfilePDF}
-                  download="PIGL_Company_Profile.pdf"
+                  href={profileDownloadUrl}
+                  download={profileDownloadFilename}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={() => setIsDownloadModalOpen(false)}
                   className="w-full inline-flex items-center justify-center py-3 sm:py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs uppercase tracking-widest transition-colors duration-300 rounded-md"
                 >

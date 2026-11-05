@@ -91,6 +91,10 @@ Options -Indexes
   RewriteCond %{DOCUMENT_ROOT}/api/send-email.php -f
   RewriteRule ^api/send-email/?$ /api/send-email.php [L,QSA]
 
+  RewriteCond %{REQUEST_URI} ^/api/company-profile/?$ [NC]
+  RewriteCond %{DOCUMENT_ROOT}/api/company-profile.php -f
+  RewriteRule ^api/company-profile/?$ /api/company-profile.php [L,QSA]
+
   # 7C. If requested resource is a physical file or directory, serve it directly
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d

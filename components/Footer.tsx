@@ -5,7 +5,7 @@ import { CONTACT_CONFIG } from '../site_data';
 import Iso9001Img from '../assets/Q-Mark (ISO 9001).png';
 import Iso45001Img from '../assets/Q-Mark (ISO 45001).png';
 import InfraSketchImg from '../assets/infrastructure_sketch.jpg';
-import { useEmailSubscribers, useNavigation, useSiteSettings } from '../hooks/useSupabaseData';
+import { useEmailSubscribers, useNavigation, useSiteSettings, useCompanyProfile } from '../hooks/useSupabaseData';
 
 const Footer: React.FC = () => {
   const [email, setEmail] = React.useState('');
@@ -13,6 +13,10 @@ const Footer: React.FC = () => {
   const { addSubscriber } = useEmailSubscribers();
   const { navConfig } = useNavigation();
   const { settings } = useSiteSettings();
+  const { document: companyProfileDoc } = useCompanyProfile();
+  const isProfilePublished = Boolean(companyProfileDoc?.is_published && companyProfileDoc?.file_url);
+  const profileDownloadUrl = companyProfileDoc?.file_url || ProfilePDF;
+  const profileDownloadFilename = companyProfileDoc?.filename || 'PIGL-Company-Profile.pdf';
 
   const handleSubscribeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,18 +196,22 @@ const Footer: React.FC = () => {
                   </a>
                 </p>
               </div>
-              <div className="pt-2">
-                <a
-                  href={ProfilePDF}
-                  download="PIGL_Company_Profile.pdf"
-                  className="inline-flex items-center justify-center w-full px-4 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  <span>Download Company Profile</span>
-                </a>
-              </div>
+              {isProfilePublished && (
+                <div className="pt-2">
+                  <a
+                    href={profileDownloadUrl}
+                    download={profileDownloadFilename}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center w-full px-4 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <span>Download Company Profile</span>
+                  </a>
+                </div>
+              )}
             </address>
           </div>
         </div>

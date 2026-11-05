@@ -269,6 +269,25 @@ export interface JobApplication {
   created_at: string;
 }
 
+export interface CompanyProfileDocument {
+  id: string;
+  title: string;
+  filename: string;
+  file_url: string;
+  storage_path?: string;
+  storage_bucket?: string;
+  file_type: string;
+  file_size: number;
+  formatted_size?: string;
+  is_published: boolean;
+  version?: string;
+  description?: string;
+  cover_image_url?: string;
+  upload_date: string;
+  updated_at: string;
+  updated_by?: string;
+}
+
 export interface SiteSettings {
   id?: string;
   phone: string;

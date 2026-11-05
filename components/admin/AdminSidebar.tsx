@@ -27,7 +27,8 @@ import {
   IconGlobe,
   IconVideo,
   IconBuilding,
-  IconShield
+  IconShield,
+  IconFileCheck
 } from './AdminIcons';
 
 interface AdminSidebarProps {
@@ -118,6 +119,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         { id: 'team', label: 'Teams', Icon: IconUsers },
         { id: 'partners', label: 'Our Network', Icon: IconPartners },
         { id: 'clients', label: 'Client Organisations', Icon: IconBuilding },
+        { id: 'company-profile', label: 'Company Profile Doc', Icon: IconFileCheck },
         { id: 'blog', label: 'Blog & Publications', Icon: IconBlog },
         { id: 'media', label: 'Media Library', Icon: IconMedia }
       ]

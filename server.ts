@@ -22,6 +22,7 @@ import adminUsersHandler from './api/admin-users';
 import settingsHandler from './api/settings';
 import slidersHandler from './api/sliders';
 import mediaHandler from './api/media';
+import companyProfileHandler from './api/company-profile';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -137,6 +138,9 @@ const server = http.createServer(async (req, res) => {
       }
       if (pathname.startsWith('/api/media')) {
         return await mediaHandler(wrappedReq, wrappedRes);
+      }
+      if (pathname.startsWith('/api/company-profile')) {
+        return await companyProfileHandler(wrappedReq, wrappedRes);
       }
 
       return wrappedRes.status(404).json({ success: false, error: 'API endpoint not found' });
