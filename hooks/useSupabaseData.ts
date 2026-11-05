@@ -1787,7 +1787,7 @@ export const useAdminAuth = () => {
     }
 
     // 3. Fallback ONLY when Supabase client is completely offline / unreachable
-    // Even offline, ONLY whitelisted corporate emails with exact password 'adminpassword123' are accepted!
+    // Even offline, ONLY whitelisted corporate emails with exact password 'password123' or 'adminpassword123' are accepted!
     const AUTHORIZED_OFFLINE_ADMINS = [
       'admin@polarisigl.com',
       'chigozie.dimgba@polarisigl.com',
@@ -1800,7 +1800,7 @@ export const useAdminAuth = () => {
 
     const isAuthorized = AUTHORIZED_OFFLINE_ADMINS.includes(cleanEmail) || Boolean(localMatched);
 
-    if (!client && isAuthorized && cleanPassword === 'adminpassword123') {
+    if (!client && isAuthorized && (cleanPassword === 'password123' || cleanPassword === 'adminpassword123')) {
       if (localMatched?.status === 'suspended') {
         return { success: false, error: 'Your administrator account has been suspended. Please contact the system administrator.' };
       }
