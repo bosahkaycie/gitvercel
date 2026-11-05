@@ -2678,7 +2678,7 @@ export const useClientLogos = (adminMode = false) => {
     // 1. Fetch from /api/client-logos
     try {
       const res = await fetch('/api/client-logos');
-      if (res.ok) {
+      if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
         const data = await res.json();
         if (data && data.success && Array.isArray(data.clients) && data.clients.length > 0) {
           fetched = data.clients;
@@ -2748,14 +2748,32 @@ export const useClientLogos = (adminMode = false) => {
     setClients(adminMode ? updated : updated.filter(c => c.status === 'published'));
 
     // Cloud persistence
+    let apiSaved = false;
     try {
-      await fetch('/api/client-logos', {
+      const res = await fetch('/api/client-logos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'save', client: payload })
       });
+      if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+        apiSaved = true;
+      }
     } catch (e) {
-      console.warn('Failed to save client logo to server:', e);
+      console.warn('Notice: /api/client-logos API call bypassed, attempting direct storage persistence:', e);
+    }
+
+    if (!apiSaved) {
+      const client = getSupabaseClient();
+      if (client) {
+        try {
+          await client.storage.from('media').upload('config/client_logos.json', JSON.stringify(updated), {
+            upsert: true,
+            contentType: 'application/json'
+          });
+        } catch (stErr) {
+          console.warn('Direct storage client logos persistence notice:', stErr);
+        }
+      }
     }
 
     return payload;
@@ -2767,14 +2785,32 @@ export const useClientLogos = (adminMode = false) => {
     saveStoredClientLogos(updated);
     setClients(adminMode ? updated : updated.filter(c => c.status === 'published'));
 
+    let apiSaved = false;
     try {
-      await fetch('/api/client-logos', {
+      const res = await fetch('/api/client-logos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'delete', id })
       });
+      if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+        apiSaved = true;
+      }
     } catch (e) {
-      console.warn('Failed to delete client logo from server:', e);
+      console.warn('Notice: /api/client-logos delete bypassed, attempting direct storage persistence:', e);
+    }
+
+    if (!apiSaved) {
+      const client = getSupabaseClient();
+      if (client) {
+        try {
+          await client.storage.from('media').upload('config/client_logos.json', JSON.stringify(updated), {
+            upsert: true,
+            contentType: 'application/json'
+          });
+        } catch (stErr) {
+          console.warn('Direct storage delete client logo notice:', stErr);
+        }
+      }
     }
   };
 
@@ -2786,14 +2822,32 @@ export const useClientLogos = (adminMode = false) => {
     saveStoredClientLogos(updated);
     setClients(adminMode ? updated : updated.filter(c => c.status === 'published'));
 
+    let apiSaved = false;
     try {
-      await fetch('/api/client-logos', {
+      const res = await fetch('/api/client-logos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'save_all', clients: updated })
       });
+      if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+        apiSaved = true;
+      }
     } catch (e) {
-      console.warn('Failed to reorder client logos on server:', e);
+      console.warn('Notice: /api/client-logos reorder bypassed, attempting direct storage persistence:', e);
+    }
+
+    if (!apiSaved) {
+      const client = getSupabaseClient();
+      if (client) {
+        try {
+          await client.storage.from('media').upload('config/client_logos.json', JSON.stringify(updated), {
+            upsert: true,
+            contentType: 'application/json'
+          });
+        } catch (stErr) {
+          console.warn('Direct storage reorder client logo notice:', stErr);
+        }
+      }
     }
   };
 
@@ -5460,7 +5514,7 @@ export const usePageHeaders = (adminMode = false) => {
     // 1. Fetch from /api/page-headers
     try {
       const res = await fetch('/api/page-headers');
-      if (res.ok) {
+      if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
         const json = await res.json();
         if (json.success && json.headers) {
           remoteData = json.headers;
@@ -5585,6 +5639,7 @@ export const usePageHeaders = (adminMode = false) => {
     });
 
     // Cloud persistence
+    let apiSaved = false;
     try {
       const res = await fetch('/api/page-headers', {
         method: 'POST',
@@ -5596,13 +5651,31 @@ export const usePageHeaders = (adminMode = false) => {
           adminEmail: options?.adminEmail || 'admin@polarisigl.com'
         })
       });
-      const data = await res.json();
-      if (data.success && data.headers) {
-        setHeadersData(data.headers);
-        saveStoredPageHeaders(data.headers);
+      if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+        const data = await res.json();
+        if (data.success && data.headers) {
+          apiSaved = true;
+          setHeadersData(data.headers);
+          saveStoredPageHeaders(data.headers);
+        }
       }
     } catch (e) {
-      console.warn('Failed to sync page breadcrumb to server:', e);
+      console.warn('Notice: /api/page-headers sync bypassed, attempting direct storage persistence:', e);
+    }
+
+    if (!apiSaved) {
+      const client = getSupabaseClient();
+      if (client) {
+        try {
+          const latest = getStoredPageHeaders();
+          await client.storage.from('media').upload('config/page_headers.json', JSON.stringify(latest), {
+            upsert: true,
+            contentType: 'application/json'
+          });
+        } catch (stErr) {
+          console.warn('Direct storage page headers persistence notice:', stErr);
+        }
+      }
     }
 
     return updatedPage;
@@ -5636,6 +5709,7 @@ export const usePageHeaders = (adminMode = false) => {
       return nextData;
     });
 
+    let apiSaved = false;
     try {
       const res = await fetch('/api/page-headers', {
         method: 'POST',
@@ -5646,13 +5720,31 @@ export const usePageHeaders = (adminMode = false) => {
           adminEmail
         })
       });
-      const data = await res.json();
-      if (data.success && data.headers) {
-        setHeadersData(data.headers);
-        saveStoredPageHeaders(data.headers);
+      if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+        const data = await res.json();
+        if (data.success && data.headers) {
+          apiSaved = true;
+          setHeadersData(data.headers);
+          saveStoredPageHeaders(data.headers);
+        }
       }
     } catch (e) {
-      console.warn('Failed to remove page breadcrumb on server:', e);
+      console.warn('Notice: /api/page-headers remove bypassed, attempting direct storage persistence:', e);
+    }
+
+    if (!apiSaved) {
+      const client = getSupabaseClient();
+      if (client) {
+        try {
+          const latest = getStoredPageHeaders();
+          await client.storage.from('media').upload('config/page_headers.json', JSON.stringify(latest), {
+            upsert: true,
+            contentType: 'application/json'
+          });
+        } catch (stErr) {
+          console.warn('Direct storage remove page breadcrumb notice:', stErr);
+        }
+      }
     }
   };
 
@@ -5675,6 +5767,7 @@ export const usePageHeaders = (adminMode = false) => {
       return nextData;
     });
 
+    let apiSaved = false;
     try {
       const res = await fetch('/api/page-headers', {
         method: 'POST',
@@ -5685,13 +5778,31 @@ export const usePageHeaders = (adminMode = false) => {
           adminEmail: options?.adminEmail || 'admin@polarisigl.com'
         })
       });
-      const data = await res.json();
-      if (data.success && data.headers) {
-        setHeadersData(data.headers);
-        saveStoredPageHeaders(data.headers);
+      if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+        const data = await res.json();
+        if (data.success && data.headers) {
+          apiSaved = true;
+          setHeadersData(data.headers);
+          saveStoredPageHeaders(data.headers);
+        }
       }
     } catch (e) {
-      console.warn('Failed to sync top header to server:', e);
+      console.warn('Notice: /api/page-headers top header sync bypassed, attempting direct storage persistence:', e);
+    }
+
+    if (!apiSaved) {
+      const client = getSupabaseClient();
+      if (client) {
+        try {
+          const latest = getStoredPageHeaders();
+          await client.storage.from('media').upload('config/page_headers.json', JSON.stringify(latest), {
+            upsert: true,
+            contentType: 'application/json'
+          });
+        } catch (stErr) {
+          console.warn('Direct storage top header persistence notice:', stErr);
+        }
+      }
     }
 
     return updatedTop;
@@ -5716,6 +5827,7 @@ export const usePageHeaders = (adminMode = false) => {
       return nextData;
     });
 
+    let apiSaved = false;
     try {
       const res = await fetch('/api/page-headers', {
         method: 'POST',
@@ -5725,13 +5837,31 @@ export const usePageHeaders = (adminMode = false) => {
           adminEmail
         })
       });
-      const data = await res.json();
-      if (data.success && data.headers) {
-        setHeadersData(data.headers);
-        saveStoredPageHeaders(data.headers);
+      if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+        const data = await res.json();
+        if (data.success && data.headers) {
+          apiSaved = true;
+          setHeadersData(data.headers);
+          saveStoredPageHeaders(data.headers);
+        }
       }
     } catch (e) {
-      console.warn('Failed to remove top header on server:', e);
+      console.warn('Notice: /api/page-headers remove top header bypassed, attempting direct storage persistence:', e);
+    }
+
+    if (!apiSaved) {
+      const client = getSupabaseClient();
+      if (client) {
+        try {
+          const latest = getStoredPageHeaders();
+          await client.storage.from('media').upload('config/page_headers.json', JSON.stringify(latest), {
+            upsert: true,
+            contentType: 'application/json'
+          });
+        } catch (stErr) {
+          console.warn('Direct storage remove top header notice:', stErr);
+        }
+      }
     }
   };
 

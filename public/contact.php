@@ -1,3 +1,4 @@
+<?php
 // contact.php - Secure Contact Form Handler
 session_start();
 

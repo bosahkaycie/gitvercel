@@ -47,7 +47,7 @@ export interface SmtpStatusResponse {
 }
 
 /**
- * Dispatch an email via the serverless SMTP engine
+ * Dispatch an email via the serverless or PHP SMTP engine
  */
 export async function sendCorporateEmail(payload: SendEmailPayload): Promise<SendEmailResponse> {
   try {
@@ -62,12 +62,27 @@ export async function sendCorporateEmail(payload: SendEmailPayload): Promise<Sen
       }),
     });
 
-    const data = await res.json();
-    if (!res.ok || !data.success) {
+    let data: any = null;
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      data = await res.json();
+    } else {
+      const text = await res.text();
+      try {
+        data = JSON.parse(text);
+      } catch {
+        return {
+          success: false,
+          error: `Server responded with status ${res.status}. Please check mail server configuration.`,
+        };
+      }
+    }
+
+    if (!res.ok || !data?.success) {
       return {
         success: false,
-        error: data.error || `HTTP ${res.status}: Failed to send email`,
-        code: data.code,
+        error: data?.error || `HTTP ${res.status}: Failed to send email`,
+        code: data?.code,
       };
     }
 
@@ -105,13 +120,29 @@ export async function verifySmtpConnection(
       }),
     });
 
-    const data = await res.json();
-    if (!res.ok || !data.success) {
+    let data: any = null;
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      data = await res.json();
+    } else {
+      const text = await res.text();
+      try {
+        data = JSON.parse(text);
+      } catch {
+        return {
+          success: false,
+          message: `Server returned non-JSON response (${res.status})`,
+          error: text.substring(0, 150),
+        };
+      }
+    }
+
+    if (!res.ok || !data?.success) {
       return {
         success: false,
-        message: data.error || `HTTP ${res.status}: SMTP Verification Failed`,
-        error: data.error,
-        code: data.code,
+        message: data?.error || `HTTP ${res.status}: SMTP Verification Failed`,
+        error: data?.error,
+        code: data?.code,
       };
     }
 
@@ -140,7 +171,11 @@ export async function getSmtpStatus(): Promise<SmtpStatusResponse | null> {
       method: 'GET',
     });
     if (!res.ok) return null;
-    return await res.json();
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return await res.json();
+    }
+    return null;
   } catch {
     return null;
   }

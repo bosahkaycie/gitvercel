@@ -1,0 +1,1435 @@
+// server.ts
+import http from "http";
+import fs from "fs";
+import path from "path";
+import zlib from "zlib";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+
+// api/send-email.ts
+import nodemailer from "nodemailer";
+function getSmtpConfig(override) {
+  const host = override?.smtp_host || process.env.SMTP_HOST || "glacier.mxrouting.net";
+  const port = Number(override?.smtp_port || process.env.SMTP_PORT || 465);
+  const secure = override?.smtp_secure !== void 0 ? Boolean(override.smtp_secure) : process.env.SMTP_SECURE === "true" || port === 465;
+  const user = override?.smtp_user || process.env.SMTP_USER || "hello@polarisigl.com";
+  const pass = override?.smtp_pass || process.env.SMTP_PASS || "";
+  const defaultFrom = process.env.SMTP_FROM || `"Polaris Integrated & GeoSolutions" <${user}>`;
+  return { host, port, secure, user, pass, defaultFrom };
+}
+function createTransporter(config) {
+  return nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    // true for 465, false for other ports
+    auth: {
+      user: config.user,
+      pass: config.pass
+    },
+    tls: {
+      // MXrouting certificates are valid and secure
+      rejectUnauthorized: true,
+      minVersion: "TLSv1.2"
+    },
+    connectionTimeout: 1e4,
+    // 10 seconds
+    greetingTimeout: 1e4,
+    socketTimeout: 15e3
+  });
+}
+async function handler(req, res) {
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,PATCH,DELETE,POST,PUT");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+  );
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+  if (req.method === "GET") {
+    const config = getSmtpConfig();
+    return res.status(200).json({
+      status: "ready",
+      smtp_server: config.host,
+      smtp_port: config.port,
+      smtp_secure: config.secure,
+      smtp_user_configured: Boolean(config.user),
+      smtp_user_display: config.user ? `${config.user.substring(0, 3)}***@${config.user.split("@")[1] || ""}` : null,
+      service: "Polaris Integrated & GeoSolutions Serverless Mail Dispatcher",
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    });
+  }
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed. Use POST." });
+  }
+  try {
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
+    const { action = "send", to, bcc, cc, replyTo, subject, html, text, config_override, test_email } = body;
+    const config = getSmtpConfig(config_override);
+    const transporter = createTransporter(config);
+    if (action === "verify" || action === "test_connection") {
+      try {
+        await transporter.verify();
+        let testSendResult = null;
+        if (test_email) {
+          testSendResult = await transporter.sendMail({
+            from: config.defaultFrom,
+            to: test_email,
+            subject: "\u2705 PIGL Email Server Diagnostic - SMTP Verified",
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #10b981; border-radius: 8px;">
+                <div style="background-color: #022c22; padding: 16px; text-align: center; border-radius: 6px;">
+                  <h2 style="color: #ffffff; margin: 0;">Polaris Integrated & GeoSolutions</h2>
+                  <p style="color: #6ee7b7; margin: 4px 0 0 0; font-size: 12px; font-weight: bold;">SMTP Server Diagnostic Test</p>
+                </div>
+                <div style="padding: 20px 0;">
+                  <p style="color: #0f172a; font-size: 15px;"><strong>SMTP Server Connection Successful!</strong></p>
+                  <p style="color: #475569; font-size: 13px;">Your email dispatch configuration on <strong>${config.host}:${config.port}</strong> (User: ${config.user}) is fully active, authenticated, and ready to send corporate communications.</p>
+                  <div style="background-color: #f8fafc; padding: 12px; border-left: 4px solid #10b981; font-family: monospace; font-size: 12px; color: #334155;">
+                    Timestamp: ${(/* @__PURE__ */ new Date()).toISOString()}<br>
+                    Host: ${config.host}<br>
+                    Encryption: ${config.secure ? "SSL (Port 465)" : "TLS/STARTTLS"}
+                  </div>
+                </div>
+                <p style="color: #94a3b8; font-size: 11px; text-align: center; margin: 0;">\xA9 ${(/* @__PURE__ */ new Date()).getFullYear()} Polaris Integrated & GeoSolutions Limited.</p>
+              </div>
+            `,
+            text: `PIGL Email Server Diagnostic Test - Successful connection on ${config.host}:${config.port} at ${(/* @__PURE__ */ new Date()).toISOString()}`
+          });
+        }
+        return res.status(200).json({
+          success: true,
+          message: `SMTP connection to ${config.host}:${config.port} verified successfully!`,
+          test_sent_to: test_email || null,
+          messageId: testSendResult?.messageId || null
+        });
+      } catch (verifyError) {
+        console.error("SMTP Verification Error:", verifyError);
+        return res.status(500).json({
+          success: false,
+          error: `SMTP Verification Failed: ${verifyError.message || verifyError}`,
+          code: verifyError.code || "SMTP_VERIFY_ERROR"
+        });
+      }
+    }
+    if (!to && !bcc) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing recipient. "to" or "bcc" must be provided.'
+      });
+    }
+    if (!subject) {
+      return res.status(400).json({
+        success: false,
+        error: "Missing email subject."
+      });
+    }
+    if (!html && !text) {
+      return res.status(400).json({
+        success: false,
+        error: "Missing email body (HTML or plain text required)."
+      });
+    }
+    const mailOptions = {
+      from: config.defaultFrom,
+      to: to || void 0,
+      bcc: bcc || void 0,
+      cc: cc || void 0,
+      replyTo: replyTo || config.user,
+      subject,
+      html: html || void 0,
+      text: text || void 0,
+      headers: {
+        "X-Entity-Ref-ID": `PIGL-${Date.now()}`,
+        "X-Mailer": "PIGL Corporate Dispatch Engine/1.0"
+      }
+    };
+    const info = await transporter.sendMail(mailOptions);
+    return res.status(200).json({
+      success: true,
+      messageId: info.messageId,
+      accepted: info.accepted,
+      rejected: info.rejected,
+      response: info.response,
+      sent_at: (/* @__PURE__ */ new Date()).toISOString()
+    });
+  } catch (error) {
+    console.error("Error in /api/send-email:", error);
+    return res.status(500).json({
+      success: false,
+      error: error.message || "Internal Mail Server Error",
+      code: error.code || "MAIL_DISPATCH_FAILED"
+    });
+  }
+}
+
+// api/upload.ts
+import { createClient } from "@supabase/supabase-js";
+async function handler2(req, res) {
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,POST");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+  );
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+  if (req.method === "GET") {
+    return res.status(200).json({
+      status: "ready",
+      service: "Polaris Integrated & GeoSolutions Media Upload API",
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    });
+  }
+  if (req.method !== "POST") {
+    return res.status(405).json({ success: false, error: "Method Not Allowed. Use POST." });
+  }
+  try {
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
+    const { fileBase64, filename, contentType = "image/jpeg", bucket = "media" } = body;
+    if (!fileBase64) {
+      return res.status(400).json({ success: false, error: "Missing fileBase64 data in payload." });
+    }
+    let supabaseUrl = process.env.VITE_SUPABASE_URL || "";
+    if (supabaseUrl.startsWith("http://")) {
+      supabaseUrl = supabaseUrl.replace("http://", "https://");
+    }
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
+    if (!supabaseUrl || !supabaseKey) {
+      return res.status(500).json({ success: false, error: "Supabase credentials not configured on server." });
+    }
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      auth: { persistSession: false }
+    });
+    const base64Data = fileBase64.replace(/^data:[^;]+;base64,/, "");
+    const buffer = Buffer.from(base64Data, "base64");
+    const cleanName = (filename || "media_asset").replace(/[^a-zA-Z0-9.-]/g, "_");
+    const timestamp = Date.now();
+    const isVideoBucket = bucket === "videos";
+    const filePath = isVideoBucket ? `videos/${timestamp}_${cleanName}` : `${timestamp}_${cleanName}`;
+    const validBuckets = ["blog", "services", "sliders", "media", "resumes", "vendor-documents"];
+    const targetBucket = isVideoBucket ? "media" : validBuckets.includes(bucket) ? bucket : "media";
+    const { data, error } = await supabase.storage.from(targetBucket).upload(filePath, buffer, {
+      contentType,
+      cacheControl: "31536000",
+      upsert: true
+    });
+    if (error) {
+      console.error("Supabase storage upload error:", error);
+      return res.status(500).json({
+        success: false,
+        error: error.message || "Failed to upload to Supabase storage."
+      });
+    }
+    const { data: publicUrlData } = supabase.storage.from(targetBucket).getPublicUrl(filePath);
+    return res.status(200).json({
+      success: true,
+      url: publicUrlData.publicUrl,
+      path: data.path,
+      bucket: targetBucket,
+      size: buffer.length
+    });
+  } catch (err) {
+    console.error("Error in /api/upload handler:", err);
+    return res.status(500).json({
+      success: false,
+      error: err.message || "Internal server error during media upload."
+    });
+  }
+}
+
+// api/page-headers.ts
+import { createClient as createClient2 } from "@supabase/supabase-js";
+var DEFAULT_PAGE_HEADERS = {
+  home: {
+    id: "home",
+    page_slug: "/",
+    page_name: "Home",
+    breadcrumb_title: "Home",
+    fallback_image: "/assets/newoffshore.png",
+    overlay_opacity: 0.35
+  },
+  about: {
+    id: "about",
+    page_slug: "/about",
+    page_name: "About Us",
+    breadcrumb_title: "About Us",
+    fallback_image: "/assets/teaching.jpeg",
+    overlay_opacity: 0.3
+  },
+  services: {
+    id: "services",
+    page_slug: "/services",
+    page_name: "Our Services",
+    breadcrumb_title: "Services",
+    fallback_image: "/assets/road.png",
+    overlay_opacity: 0.35
+  },
+  projects: {
+    id: "projects",
+    page_slug: "/projects",
+    page_name: "Executed Projects & Case Studies",
+    breadcrumb_title: "Case studies",
+    fallback_image: "/assets/newoffshore.png",
+    overlay_opacity: 0.35
+  },
+  teams: {
+    id: "teams",
+    page_slug: "/teams",
+    page_name: "Leadership & Engineering Teams",
+    breadcrumb_title: "Management Team",
+    fallback_image: "/assets/team.jpeg",
+    overlay_opacity: 0.25
+  },
+  network: {
+    id: "network",
+    page_slug: "/network",
+    page_name: "Our Professional Network",
+    breadcrumb_title: "Our Network",
+    fallback_image: "/assets/pigl_international_partner.jpg",
+    overlay_opacity: 0.25
+  },
+  careers: {
+    id: "careers",
+    page_slug: "/careers",
+    page_name: "Careers & Vacancies",
+    breadcrumb_title: "Careers",
+    fallback_image: "/assets/1770736125265.jpeg",
+    overlay_opacity: 0.3
+  },
+  blog: {
+    id: "blog",
+    page_slug: "/blog",
+    page_name: "Publications & Blog",
+    breadcrumb_title: "Publications & Insights",
+    fallback_image: "/assets/pigl_field_team_swamp.jpg",
+    overlay_opacity: 0.35
+  },
+  contact: {
+    id: "contact",
+    page_slug: "/contact",
+    page_name: "Contact Us",
+    breadcrumb_title: "Contact Engineering Desk",
+    fallback_image: "/assets/operations/pigl_logistics_base_aerial.jpg",
+    overlay_opacity: 0.3
+  },
+  hsse: {
+    id: "hsse",
+    page_slug: "/hsse",
+    page_name: "HSSE & Quality Policy",
+    breadcrumb_title: "QHSE Policy & Standards",
+    fallback_image: "/assets/IMG_6170.jpg",
+    overlay_opacity: 0.3
+  },
+  videos: {
+    id: "videos",
+    page_slug: "/videos",
+    page_name: "Corporate Video Hub",
+    breadcrumb_title: "Corporate Video Hub",
+    fallback_image: "/assets/operations/pigl_marine_crew_vessel.jpg",
+    overlay_opacity: 0.3
+  },
+  vendors: {
+    id: "vendors",
+    page_slug: "/vendors",
+    page_name: "Vendor Onboarding Desk",
+    breadcrumb_title: "Vendor Hub",
+    fallback_image: "/assets/operations/pigl_geomatics_survey_quay.jpg",
+    overlay_opacity: 0.3
+  },
+  "vendor-registration": {
+    id: "vendor-registration",
+    page_slug: "/vendors/registration",
+    page_name: "Vendor Registration Dossier",
+    breadcrumb_title: "Vendor Registration",
+    fallback_image: "/assets/operations/pigl_geomatics_survey_quay.jpg",
+    overlay_opacity: 0.3
+  },
+  "services-ges": {
+    id: "services-ges",
+    page_slug: "/services/geosolutions-engineering-services",
+    page_name: "GeoSolutions & Engineering Services",
+    breadcrumb_title: "GeoSolutions & Engineering",
+    fallback_image: "/assets/cpt.png",
+    overlay_opacity: 0.35
+  },
+  "services-mms": {
+    id: "services-mms",
+    page_slug: "/services/metocean-marine-solutions",
+    page_name: "Metocean & Marine Solutions",
+    breadcrumb_title: "Metocean & Marine Solutions",
+    fallback_image: "/assets/marine_intel_metocean.jpg",
+    overlay_opacity: 0.35
+  },
+  "services-ics": {
+    id: "services-ics",
+    page_slug: "/services/integrated-construction-services",
+    page_name: "Integrated Construction Services",
+    breadcrumb_title: "Integrated Construction",
+    fallback_image: "/assets/newpipeline.png",
+    overlay_opacity: 0.35
+  },
+  "services-iet": {
+    id: "services-iet",
+    page_slug: "/services/industrial-solutions",
+    page_name: "Industrial & Environmental Technologies",
+    breadcrumb_title: "Industrial Technologies",
+    fallback_image: "/assets/water_treatment_skid.png",
+    overlay_opacity: 0.35
+  }
+};
+var DEFAULT_TOP_HEADER = {
+  top_header_bg_image: "",
+  top_header_overlay_opacity: 0.3,
+  top_header_active: false
+};
+var STORAGE_PATH = "config/page_headers.json";
+var memoryHeadersCache = null;
+async function handler3(req, res) {
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,POST");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+  );
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || "https://jbldpfvceacfonkzzhig.supabase.co";
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpibGRwZnZjZWFjZm9ua3p6aGlnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MzcwNDQzOSwiZXhwIjoyMTA5MjgwNDM5fQ.-QdwJyGzzER_sLPqPCNIm3nSMYeJ1hHRCkBcFIN_NPk";
+  const supabase = createClient2(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false, autoRefreshToken: false }
+  });
+  if (req.method === "GET") {
+    const forceReload = req.query?.nocache === "1";
+    if (memoryHeadersCache && !forceReload) {
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      return res.status(200).json({ success: true, headers: memoryHeadersCache });
+    }
+    try {
+      const { data, error } = await supabase.storage.from("media").download(STORAGE_PATH);
+      if (error) {
+        const initialData = {
+          pages: DEFAULT_PAGE_HEADERS,
+          top_header: DEFAULT_TOP_HEADER,
+          updated_at: (/* @__PURE__ */ new Date()).toISOString()
+        };
+        await supabase.storage.from("media").upload(STORAGE_PATH, JSON.stringify(initialData, null, 2), {
+          contentType: "application/json",
+          upsert: true
+        });
+        memoryHeadersCache = initialData;
+        return res.status(200).json({ success: true, headers: initialData });
+      }
+      const text = await data.text();
+      const parsed = JSON.parse(text);
+      const mergedPages = { ...DEFAULT_PAGE_HEADERS };
+      if (parsed.pages && typeof parsed.pages === "object") {
+        for (const [key, val] of Object.entries(parsed.pages)) {
+          mergedPages[key] = {
+            ...mergedPages[key] || {},
+            ...val
+          };
+        }
+      }
+      const mergedData = {
+        pages: mergedPages,
+        top_header: parsed.top_header || DEFAULT_TOP_HEADER,
+        updated_at: parsed.updated_at || (/* @__PURE__ */ new Date()).toISOString()
+      };
+      memoryHeadersCache = mergedData;
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      return res.status(200).json({ success: true, headers: mergedData });
+    } catch (err) {
+      console.warn("page-headers download error, fallback to baseline:", err);
+      const fallbackData = { pages: DEFAULT_PAGE_HEADERS, top_header: DEFAULT_TOP_HEADER };
+      return res.status(200).json({
+        success: true,
+        headers: fallbackData,
+        warning: err.message
+      });
+    }
+  }
+  if (req.method === "POST") {
+    try {
+      const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
+      const { action = "save_page", pageId, pageConfig, topHeader, adminEmail = "admin@polarisigl.com" } = body;
+      let currentData = memoryHeadersCache ? {
+        pages: { ...DEFAULT_PAGE_HEADERS, ...memoryHeadersCache.pages },
+        top_header: { ...DEFAULT_TOP_HEADER, ...memoryHeadersCache.top_header }
+      } : {
+        pages: { ...DEFAULT_PAGE_HEADERS },
+        top_header: { ...DEFAULT_TOP_HEADER }
+      };
+      if (!memoryHeadersCache) {
+        try {
+          const { data } = await supabase.storage.from("media").download(STORAGE_PATH);
+          if (data) {
+            const text = await data.text();
+            const parsed = JSON.parse(text);
+            if (parsed && typeof parsed.pages === "object") {
+              currentData = {
+                pages: { ...DEFAULT_PAGE_HEADERS, ...parsed.pages },
+                top_header: parsed.top_header || DEFAULT_TOP_HEADER
+              };
+            }
+          }
+        } catch (e) {
+        }
+      }
+      let auditDescription = "";
+      if (action === "save_page") {
+        if (!pageId) {
+          return res.status(400).json({ success: false, error: "pageId is required." });
+        }
+        const existing = currentData.pages[pageId] || DEFAULT_PAGE_HEADERS[pageId] || {
+          id: pageId,
+          page_slug: `/${pageId}`,
+          page_name: pageId
+        };
+        const updatedPage = {
+          ...existing,
+          ...pageConfig,
+          id: pageId,
+          updated_at: (/* @__PURE__ */ new Date()).toISOString(),
+          updated_by: adminEmail
+        };
+        currentData.pages[pageId] = updatedPage;
+        auditDescription = `Updated breadcrumb background for page "${updatedPage.page_name}" (${updatedPage.page_slug})`;
+      } else if (action === "remove_page_image") {
+        if (!pageId) {
+          return res.status(400).json({ success: false, error: "pageId is required." });
+        }
+        const existing = currentData.pages[pageId];
+        if (existing) {
+          const previousImg = existing.breadcrumb_image;
+          existing.breadcrumb_image = "";
+          existing.header_bg_image = "";
+          existing.updated_at = (/* @__PURE__ */ new Date()).toISOString();
+          existing.updated_by = adminEmail;
+          currentData.pages[pageId] = existing;
+          auditDescription = `Removed breadcrumb background for page "${existing.page_name}"`;
+          if (previousImg && previousImg.includes("/storage/v1/object/public/media/headers/")) {
+            try {
+              const storagePath = previousImg.split("/media/")[1];
+              if (storagePath) {
+                await supabase.storage.from("media").remove([storagePath]);
+              }
+            } catch {
+            }
+          }
+        }
+      } else if (action === "save_top_header") {
+        currentData.top_header = {
+          ...currentData.top_header,
+          ...topHeader,
+          updated_at: (/* @__PURE__ */ new Date()).toISOString(),
+          updated_by: adminEmail
+        };
+        auditDescription = `Updated main website top header background image`;
+      } else if (action === "remove_top_header") {
+        const previousImg = currentData.top_header?.top_header_bg_image;
+        currentData.top_header = {
+          top_header_bg_image: "",
+          top_header_overlay_opacity: 0.3,
+          top_header_active: false,
+          updated_at: (/* @__PURE__ */ new Date()).toISOString(),
+          updated_by: adminEmail
+        };
+        auditDescription = `Removed main website top header background image`;
+        if (previousImg && previousImg.includes("/storage/v1/object/public/media/headers/")) {
+          try {
+            const storagePath = previousImg.split("/media/")[1];
+            if (storagePath) {
+              await supabase.storage.from("media").remove([storagePath]);
+            }
+          } catch {
+          }
+        }
+      } else if (action === "reset") {
+        currentData = {
+          pages: { ...DEFAULT_PAGE_HEADERS },
+          top_header: { ...DEFAULT_TOP_HEADER },
+          updated_at: (/* @__PURE__ */ new Date()).toISOString()
+        };
+        auditDescription = "Reset all page breadcrumbs and top header backgrounds to baseline defaults";
+      }
+      currentData.updated_at = (/* @__PURE__ */ new Date()).toISOString();
+      const { error: uploadError } = await supabase.storage.from("media").upload(
+        STORAGE_PATH,
+        JSON.stringify(currentData, null, 2),
+        { contentType: "application/json", upsert: true }
+      );
+      if (uploadError) {
+        console.warn("Storage save warning:", uploadError.message);
+      }
+      try {
+        await supabase.from("audit_logs").insert([
+          {
+            action: auditDescription,
+            entity_type: "navigation",
+            entity_id: pageId || "top-header",
+            details: { action, pageId, adminEmail },
+            user_email: adminEmail,
+            created_at: (/* @__PURE__ */ new Date()).toISOString()
+          }
+        ]);
+      } catch (auditErr) {
+        console.warn("Audit log write notice:", auditErr);
+      }
+      memoryHeadersCache = currentData;
+      return res.status(200).json({
+        success: true,
+        message: "Page header & breadcrumb configuration updated successfully.",
+        headers: currentData
+      });
+    } catch (err) {
+      console.error("API /api/page-headers error:", err);
+      return res.status(500).json({ success: false, error: err.message || "Internal server error" });
+    }
+  }
+  return res.status(405).json({ success: false, error: "Method not allowed" });
+}
+
+// api/client-logos.ts
+import { createClient as createClient3 } from "@supabase/supabase-js";
+var DEFAULT_CLIENT_RELATIONSHIPS = [
+  {
+    id: "client-shell",
+    name: "Shell",
+    category: "Direct Client",
+    role: "Operating Engagement",
+    logo_url: "/assets/clients/shell.svg",
+    display_order: 1,
+    status: "published"
+  },
+  {
+    id: "client-nnpc",
+    name: "NNPC Limited",
+    category: "Industry Stakeholder",
+    role: "National Energy Infrastructure",
+    logo_url: "/assets/clients/nnpc.svg",
+    display_order: 2,
+    status: "published"
+  },
+  {
+    id: "client-totalenergies",
+    name: "TotalEnergies",
+    category: "Direct Client",
+    role: "Offshore & Energy Operations",
+    logo_url: "/assets/clients/totalenergies.svg",
+    display_order: 3,
+    status: "published"
+  },
+  {
+    id: "client-renaissance",
+    name: "Renaissance Africa Energy Company Limited",
+    category: "Industry Stakeholder",
+    role: "Upstream Asset Operations",
+    logo_url: "/assets/clients/renaissance.svg",
+    display_order: 4,
+    status: "published"
+  },
+  {
+    id: "client-newcross",
+    name: "Newcross Exploration & Production",
+    category: "Project & Delivery Partner",
+    role: "Field Development Support",
+    logo_url: "/assets/clients/newcross.svg",
+    display_order: 5,
+    status: "published"
+  },
+  {
+    id: "client-panocean",
+    name: "Pan Ocean Oil Corporation (Nigeria) Limited",
+    category: "Project & Delivery Partner",
+    role: "Pipeline & Facility Support",
+    logo_url: "/assets/clients/panocean.svg",
+    display_order: 6,
+    status: "published"
+  },
+  {
+    id: "client-matrix",
+    name: "Matrix Energy",
+    category: "Direct Client",
+    role: "Downstream & Terminal Engineering",
+    logo_url: "/assets/clients/matrix.svg",
+    display_order: 7,
+    status: "published"
+  }
+];
+var STORAGE_PATH2 = "config/client_logos.json";
+async function handler4(req, res) {
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,POST,DELETE");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+  );
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || "https://jbldpfvceacfonkzzhig.supabase.co";
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpibGRwZnZjZWFjZm9ua3p6aGlnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MzcwNDQzOSwiZXhwIjoyMTA5MjgwNDM5fQ.-QdwJyGzzER_sLPqPCNIm3nSMYeJ1hHRCkBcFIN_NPk";
+  const supabase = createClient3(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false, autoRefreshToken: false }
+  });
+  if (req.method === "GET") {
+    try {
+      const { data, error } = await supabase.storage.from("media").download(STORAGE_PATH2);
+      if (error) {
+        await supabase.storage.from("media").upload(STORAGE_PATH2, JSON.stringify(DEFAULT_CLIENT_RELATIONSHIPS, null, 2), {
+          contentType: "application/json",
+          upsert: true
+        });
+        return res.status(200).json({ success: true, clients: DEFAULT_CLIENT_RELATIONSHIPS });
+      }
+      const text = await data.text();
+      const clients = JSON.parse(text);
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      return res.status(200).json({ success: true, clients: Array.isArray(clients) ? clients : DEFAULT_CLIENT_RELATIONSHIPS });
+    } catch (err) {
+      console.warn("client-logos download fallback:", err);
+      return res.status(200).json({ success: true, clients: DEFAULT_CLIENT_RELATIONSHIPS, warning: err.message });
+    }
+  }
+  if (req.method === "POST") {
+    try {
+      const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
+      const { action = "save", client, clients, id } = body;
+      let currentList = [];
+      try {
+        const { data } = await supabase.storage.from("media").download(STORAGE_PATH2);
+        if (data) {
+          const text = await data.text();
+          currentList = JSON.parse(text);
+        }
+      } catch {
+        currentList = [...DEFAULT_CLIENT_RELATIONSHIPS];
+      }
+      if (!Array.isArray(currentList) || currentList.length === 0) {
+        currentList = [...DEFAULT_CLIENT_RELATIONSHIPS];
+      }
+      let updatedList = [...currentList];
+      if (action === "save") {
+        if (!client || !client.name) {
+          return res.status(400).json({ success: false, error: "Organisation name is required." });
+        }
+        const targetId = client.id || `client-${Date.now()}`;
+        const item = {
+          id: targetId,
+          name: client.name.trim(),
+          category: client.category || "Direct Client",
+          role: client.role ? client.role.trim() : "Operating Engagement",
+          logo_url: client.logo_url || "/assets/clients/shell.svg",
+          website: client.website ? client.website.trim() : "",
+          display_order: Number(client.display_order) || updatedList.length + 1,
+          status: client.status || "published"
+        };
+        const existingIdx = updatedList.findIndex((c) => c.id === targetId);
+        if (existingIdx >= 0) {
+          updatedList[existingIdx] = item;
+        } else {
+          updatedList.push(item);
+        }
+      } else if (action === "save_all" && Array.isArray(clients)) {
+        updatedList = clients;
+      } else if (action === "delete") {
+        const targetId = id || client?.id;
+        updatedList = updatedList.filter((c) => c.id !== targetId);
+      } else if (action === "reset") {
+        updatedList = [...DEFAULT_CLIENT_RELATIONSHIPS];
+      }
+      updatedList.sort((a, b) => a.display_order - b.display_order);
+      const { error: uploadErr } = await supabase.storage.from("media").upload(
+        STORAGE_PATH2,
+        JSON.stringify(updatedList, null, 2),
+        { contentType: "application/json", upsert: true }
+      );
+      if (uploadErr) {
+        console.warn("Storage save warning:", uploadErr.message);
+      }
+      return res.status(200).json({
+        success: true,
+        message: "Client organisation logos updated successfully.",
+        clients: updatedList
+      });
+    } catch (err) {
+      console.error("API /api/client-logos error:", err);
+      return res.status(500).json({ success: false, error: err.message || "Internal server error" });
+    }
+  }
+  return res.status(405).json({ success: false, error: "Method not allowed" });
+}
+
+// api/admin-users.ts
+import { createClient as createClient4 } from "@supabase/supabase-js";
+async function handler5(req, res) {
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,POST,DELETE");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+  );
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || "https://jbldpfvceacfonkzzhig.supabase.co";
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpibGRwZnZjZWFjZm9ua3p6aGlnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MzcwNDQzOSwiZXhwIjoyMTA5MjgwNDM5fQ.-QdwJyGzzER_sLPqPCNIm3nSMYeJ1hHRCkBcFIN_NPk";
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(500).json({ success: false, error: "Supabase credentials not configured on server." });
+  }
+  const supabase = createClient4(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false, autoRefreshToken: false }
+  });
+  if (req.method === "GET") {
+    try {
+      const { data, error } = await supabase.from("admin_users").select("*").order("created_at", { ascending: false });
+      if (error) {
+        return res.status(500).json({ success: false, error: error.message });
+      }
+      return res.status(200).json({ success: true, users: data });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+  if (req.method === "POST") {
+    try {
+      const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
+      const { action = "create", userData = {}, password } = body;
+      const email = (userData.email || body.email || "").trim().toLowerCase();
+      const fullName = (userData.full_name || body.full_name || "").trim();
+      const role = userData.role || body.role || "Content Editor";
+      const status = userData.status || body.status || "active";
+      const pass = password || userData.password || body.password;
+      if (!email) {
+        return res.status(400).json({ success: false, error: "Corporate email address is required." });
+      }
+      if (action === "create") {
+        if (!fullName) {
+          return res.status(400).json({ success: false, error: "Full name is required." });
+        }
+        if (!pass || pass.length < 6) {
+          return res.status(400).json({ success: false, error: "Password must be at least 6 characters long." });
+        }
+        let authUserId = null;
+        const { data: createData, error: createErr } = await supabase.auth.admin.createUser({
+          email,
+          password: pass,
+          email_confirm: true,
+          user_metadata: {
+            name: fullName,
+            full_name: fullName,
+            role
+          }
+        });
+        if (createErr) {
+          const { data: listData } = await supabase.auth.admin.listUsers();
+          const existingAuthUser = listData?.users?.find((u) => u.email?.toLowerCase() === email);
+          if (existingAuthUser) {
+            authUserId = existingAuthUser.id;
+            const { error: updateErr } = await supabase.auth.admin.updateUserById(existingAuthUser.id, {
+              password: pass,
+              email_confirm: true,
+              user_metadata: {
+                name: fullName,
+                full_name: fullName,
+                role
+              }
+            });
+            if (updateErr) {
+              return res.status(500).json({ success: false, error: `Failed to update credentials: ${updateErr.message}` });
+            }
+          } else {
+            return res.status(500).json({ success: false, error: createErr.message });
+          }
+        } else if (createData?.user) {
+          authUserId = createData.user.id;
+        }
+        const record = {
+          id: authUserId || (userData.id && userData.id.length > 20 ? userData.id : crypto.randomUUID()),
+          email,
+          full_name: fullName,
+          role,
+          status,
+          created_at: userData.created_at || (/* @__PURE__ */ new Date()).toISOString(),
+          last_login_at: (/* @__PURE__ */ new Date()).toISOString()
+        };
+        const { error: tableErr } = await supabase.from("admin_users").upsert(record, { onConflict: "email" });
+        if (tableErr) {
+          console.warn("admin_users table upsert notice:", tableErr.message);
+        }
+        return res.status(200).json({
+          success: true,
+          message: "Administrator account and password created successfully. Access granted immediately.",
+          user: record
+        });
+      }
+      if (action === "update") {
+        const id = userData.id || body.id;
+        if (pass && pass.length >= 6) {
+          let targetAuthId = id;
+          const { data: listData } = await supabase.auth.admin.listUsers();
+          const authUser = listData?.users?.find((u) => u.email?.toLowerCase() === email || u.id === id);
+          if (authUser) {
+            targetAuthId = authUser.id;
+            const { error: passErr } = await supabase.auth.admin.updateUserById(targetAuthId, {
+              password: pass,
+              email_confirm: true,
+              user_metadata: {
+                name: fullName || authUser.user_metadata?.name,
+                full_name: fullName || authUser.user_metadata?.full_name,
+                role: role || authUser.user_metadata?.role
+              }
+            });
+            if (passErr) {
+              console.warn("Supabase password reset notice:", passErr.message);
+            }
+          }
+        } else {
+          const { data: listData } = await supabase.auth.admin.listUsers();
+          const authUser = listData?.users?.find((u) => u.email?.toLowerCase() === email || u.id === id);
+          if (authUser) {
+            await supabase.auth.admin.updateUserById(authUser.id, {
+              user_metadata: {
+                name: fullName || authUser.user_metadata?.name,
+                full_name: fullName || authUser.user_metadata?.full_name,
+                role: role || authUser.user_metadata?.role
+              }
+            });
+          }
+        }
+        const updatePayload = {
+          full_name: fullName,
+          role,
+          status
+        };
+        const { error: updateTableErr } = await supabase.from("admin_users").update(updatePayload).eq("email", email);
+        if (updateTableErr) {
+          console.warn("admin_users update notice:", updateTableErr.message);
+        }
+        const updatedRecord = {
+          id: id || crypto.randomUUID(),
+          email,
+          full_name: fullName,
+          role,
+          status,
+          created_at: userData.created_at || (/* @__PURE__ */ new Date()).toISOString(),
+          last_login_at: userData.last_login_at || (/* @__PURE__ */ new Date()).toISOString()
+        };
+        return res.status(200).json({
+          success: true,
+          message: "Administrator privileges updated successfully.",
+          user: updatedRecord
+        });
+      }
+      if (action === "toggle-status") {
+        const newStatus = status;
+        await supabase.from("admin_users").update({ status: newStatus }).eq("email", email);
+        return res.status(200).json({ success: true, status: newStatus });
+      }
+      if (action === "delete") {
+        const id = userData.id || body.id;
+        if (email) {
+          await supabase.from("admin_users").delete().eq("email", email);
+        } else if (id) {
+          await supabase.from("admin_users").delete().eq("id", id);
+        }
+        try {
+          const { data: listData } = await supabase.auth.admin.listUsers();
+          const authUser = listData?.users?.find((u) => u.email?.toLowerCase() === email || u.id === id);
+          if (authUser) {
+            await supabase.auth.admin.deleteUser(authUser.id);
+          }
+        } catch (authDelErr) {
+          console.warn("Auth deletion notice:", authDelErr);
+        }
+        return res.status(200).json({ success: true, message: "Administrator removed successfully." });
+      }
+      return res.status(400).json({ success: false, error: `Unsupported action: ${action}` });
+    } catch (err) {
+      console.error("API /api/admin-users error:", err);
+      return res.status(500).json({ success: false, error: err.message || "Internal server error" });
+    }
+  }
+  return res.status(405).json({ success: false, error: "Method not allowed" });
+}
+
+// api/settings.ts
+import { createClient as createClient5 } from "@supabase/supabase-js";
+async function handler6(req, res) {
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,POST");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+  );
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || "";
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(500).json({ success: false, error: "Supabase credentials not configured on server." });
+  }
+  const supabase = createClient5(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false }
+  });
+  const STORAGE_PATH3 = "config/site_settings.json";
+  if (req.method === "GET") {
+    try {
+      const { data, error } = await supabase.storage.from("media").download(STORAGE_PATH3);
+      if (error) {
+        return res.status(200).json({ success: true, settings: null });
+      }
+      const text = await data.text();
+      const settings = JSON.parse(text);
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      return res.status(200).json({ success: true, settings });
+    } catch (err) {
+      return res.status(200).json({ success: true, settings: null, warning: err.message });
+    }
+  }
+  if (req.method === "POST") {
+    try {
+      const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
+      const newSettings = body.settings || body;
+      const payload = {
+        ...newSettings,
+        updated_at: (/* @__PURE__ */ new Date()).toISOString()
+      };
+      const { error } = await supabase.storage.from("media").upload(STORAGE_PATH3, JSON.stringify(payload), {
+        contentType: "application/json",
+        upsert: true
+      });
+      if (error) {
+        return res.status(500).json({ success: false, error: error.message });
+      }
+      return res.status(200).json({ success: true, settings: payload });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+  return res.status(405).json({ success: false, error: "Method not allowed" });
+}
+
+// api/sliders.ts
+import { createClient as createClient6 } from "@supabase/supabase-js";
+async function handler7(req, res) {
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,POST,DELETE");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+  );
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || "";
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(500).json({ success: false, error: "Supabase credentials not configured on server." });
+  }
+  const supabase = createClient6(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false }
+  });
+  if (req.method === "GET") {
+    try {
+      const { data, error } = await supabase.from("sliders").select("*").order("display_order", { ascending: true });
+      if (error) {
+        return res.status(500).json({ success: false, error: error.message });
+      }
+      return res.status(200).json({ success: true, sliders: data });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+  if (req.method === "POST") {
+    try {
+      const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
+      const { action = "save", slider, id } = body;
+      if (action === "delete") {
+        const targetId = id || slider?.id;
+        if (!targetId) {
+          return res.status(400).json({ success: false, error: "Missing slider id to delete." });
+        }
+        const { error: delErr } = await supabase.from("sliders").delete().eq("id", targetId);
+        if (delErr) {
+          return res.status(500).json({ success: false, error: delErr.message });
+        }
+        return res.status(200).json({ success: true, message: "Slider deleted successfully" });
+      }
+      if (!slider || !slider.title) {
+        return res.status(400).json({ success: false, error: "Missing slider data." });
+      }
+      const cleanSlider = {
+        ...slider,
+        desktop_image: slider.desktop_image !== void 0 && slider.desktop_image !== null ? String(slider.desktop_image).trim() : "",
+        mobile_image: slider.mobile_image !== void 0 && slider.mobile_image !== null ? String(slider.mobile_image).trim() : "",
+        video_url: slider.video_url ? String(slider.video_url).trim() : null
+      };
+      const { data: saved, error: saveErr } = await supabase.from("sliders").upsert(cleanSlider).select().single();
+      if (saveErr) {
+        return res.status(500).json({ success: false, error: saveErr.message });
+      }
+      return res.status(200).json({ success: true, slider: saved });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+  return res.status(405).json({ success: false, error: "Method Not Allowed" });
+}
+
+// api/media.ts
+import { createClient as createClient7 } from "@supabase/supabase-js";
+function formatBytes(bytes, decimals = 1) {
+  if (!bytes || bytes === 0) return "0 B";
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+}
+function cleanDisplayFileName(rawName) {
+  return rawName.replace(/^\d{10,14}_/, "");
+}
+async function handler8(req, res) {
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,POST,DELETE");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+  );
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || "";
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(500).json({ success: false, error: "Supabase credentials not configured on server." });
+  }
+  const supabase = createClient7(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false }
+  });
+  if (req.method === "GET") {
+    try {
+      const urlObj = new URL(req.url, "http://localhost");
+      const requestedBucket = urlObj.searchParams.get("bucket") || "all";
+      const bucketsToList = requestedBucket === "all" ? ["videos", "services", "blog", "sliders", "media"] : [requestedBucket];
+      const allFiles = [];
+      for (const b of bucketsToList) {
+        if (b === "videos") {
+          try {
+            const { data: vidsInSubfolder } = await supabase.storage.from("media").list("videos", {
+              limit: 100,
+              sortBy: { column: "created_at", order: "desc" }
+            });
+            if (vidsInSubfolder && Array.isArray(vidsInSubfolder)) {
+              for (const f of vidsInSubfolder) {
+                if (f.name && f.name !== ".emptyFolderPlaceholder") {
+                  const filePath = `videos/${f.name}`;
+                  const { data: pubData } = supabase.storage.from("media").getPublicUrl(filePath);
+                  allFiles.push({
+                    id: `media-videos-${f.name}`,
+                    rawName: f.name,
+                    name: cleanDisplayFileName(f.name),
+                    path: filePath,
+                    storageBucket: "media",
+                    bucket: "videos",
+                    url: pubData.publicUrl,
+                    size: formatBytes(f.metadata?.size || 0),
+                    bytes: f.metadata?.size || 0,
+                    type: f.metadata?.mimetype || "video/mp4",
+                    updated_at: f.updated_at || f.created_at || (/* @__PURE__ */ new Date()).toISOString(),
+                    isCloudStorage: true
+                  });
+                }
+              }
+            }
+          } catch (e) {
+            console.warn("Could not list media/videos:", e);
+          }
+          try {
+            const { data: rootMedia } = await supabase.storage.from("media").list("", {
+              limit: 100,
+              sortBy: { column: "created_at", order: "desc" }
+            });
+            if (rootMedia && Array.isArray(rootMedia)) {
+              for (const f of rootMedia) {
+                if (f.name && /\.(mp4|webm|ogg|mov)$/i.test(f.name)) {
+                  const { data: pubData } = supabase.storage.from("media").getPublicUrl(f.name);
+                  if (!allFiles.some((item) => item.rawName === f.name)) {
+                    allFiles.push({
+                      id: `media-root-${f.name}`,
+                      rawName: f.name,
+                      name: cleanDisplayFileName(f.name),
+                      path: f.name,
+                      storageBucket: "media",
+                      bucket: "videos",
+                      url: pubData.publicUrl,
+                      size: formatBytes(f.metadata?.size || 0),
+                      bytes: f.metadata?.size || 0,
+                      type: f.metadata?.mimetype || "video/mp4",
+                      updated_at: f.updated_at || f.created_at || (/* @__PURE__ */ new Date()).toISOString(),
+                      isCloudStorage: true
+                    });
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            console.warn("Could not list root media:", e);
+          }
+        } else {
+          try {
+            const { data: files } = await supabase.storage.from(b).list("", {
+              limit: 100,
+              sortBy: { column: "created_at", order: "desc" }
+            });
+            if (files && Array.isArray(files)) {
+              for (const f of files) {
+                if (f.name && f.name !== ".emptyFolderPlaceholder" && f.name !== "videos") {
+                  const { data: pubData } = supabase.storage.from(b).getPublicUrl(f.name);
+                  allFiles.push({
+                    id: `${b}-${f.name}`,
+                    rawName: f.name,
+                    name: cleanDisplayFileName(f.name),
+                    path: f.name,
+                    storageBucket: b,
+                    bucket: b,
+                    url: pubData.publicUrl,
+                    size: formatBytes(f.metadata?.size || 0),
+                    bytes: f.metadata?.size || 0,
+                    type: f.metadata?.mimetype || "image/jpeg",
+                    updated_at: f.updated_at || f.created_at || (/* @__PURE__ */ new Date()).toISOString(),
+                    isCloudStorage: true
+                  });
+                }
+              }
+            }
+          } catch (e) {
+            console.warn(`Could not list bucket ${b}:`, e);
+          }
+        }
+      }
+      return res.status(200).json({ success: true, files: allFiles });
+    } catch (err) {
+      console.error("Error listing media:", err);
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+  if (req.method === "POST") {
+    try {
+      const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
+      const { action = "delete", storageBucket = "media", bucket, path: path2 } = body;
+      if (action === "delete") {
+        if (!path2) {
+          return res.status(400).json({ success: false, error: "Missing path to delete" });
+        }
+        const effectiveBucket = storageBucket || (bucket === "videos" ? "media" : bucket) || "media";
+        const { error: delErr } = await supabase.storage.from(effectiveBucket).remove([path2]);
+        if (delErr) {
+          console.error("Supabase storage delete error:", delErr);
+          return res.status(500).json({ success: false, error: delErr.message });
+        }
+        return res.status(200).json({
+          success: true,
+          message: `File "${path2}" permanently deleted from ${effectiveBucket} storage.`
+        });
+      }
+      return res.status(400).json({ success: false, error: `Unsupported action: ${action}` });
+    } catch (err) {
+      console.error("Error handling media action:", err);
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+  return res.status(405).json({ success: false, error: "Method Not Allowed" });
+}
+
+// server.ts
+dotenv.config();
+var __filename = fileURLToPath(import.meta.url);
+var __dirname = path.dirname(__filename);
+var DIST_DIR = path.resolve(__dirname, "dist");
+var PORT = Number(process.env.PORT) || 3e3;
+var HOST = process.env.HOST || "0.0.0.0";
+var MIME_TYPES = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".mjs": "application/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".avif": "image/avif",
+  ".gif": "image/gif",
+  ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".ttf": "font/ttf",
+  ".mp4": "video/mp4",
+  ".webm": "video/webm",
+  ".ogg": "video/ogg",
+  ".pdf": "application/pdf",
+  ".txt": "text/plain; charset=utf-8",
+  ".xml": "application/xml; charset=utf-8"
+};
+function setSecurityHeaders(res) {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=(self)");
+}
+function parseBody(req) {
+  return new Promise((resolve) => {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk;
+      if (body.length > 10 * 1024 * 1024) {
+        req.destroy();
+        resolve({});
+      }
+    });
+    req.on("end", () => {
+      try {
+        resolve(body ? JSON.parse(body) : {});
+      } catch {
+        resolve(body || {});
+      }
+    });
+    req.on("error", () => resolve({}));
+  });
+}
+function wrapResponse(res) {
+  const wrapped = res;
+  wrapped.status = function(statusCode) {
+    res.statusCode = statusCode;
+    return wrapped;
+  };
+  wrapped.json = function(data) {
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.end(JSON.stringify(data));
+    return wrapped;
+  };
+  return wrapped;
+}
+var server = http.createServer(async (req, res) => {
+  setSecurityHeaders(res);
+  const rawUrl = req.url || "/";
+  const parsedUrl = new URL(rawUrl, `http://${req.headers.host || "localhost"}`);
+  const pathname = decodeURIComponent(parsedUrl.pathname);
+  if (pathname.startsWith("/api/")) {
+    const wrappedRes = wrapResponse(res);
+    const body = req.method !== "GET" && req.method !== "HEAD" ? await parseBody(req) : {};
+    const wrappedReq = req;
+    wrappedReq.body = body;
+    wrappedReq.query = Object.fromEntries(parsedUrl.searchParams.entries());
+    try {
+      if (pathname.startsWith("/api/send-email")) {
+        return await handler(wrappedReq, wrappedRes);
+      }
+      if (pathname.startsWith("/api/upload")) {
+        return await handler2(wrappedReq, wrappedRes);
+      }
+      if (pathname.startsWith("/api/page-headers")) {
+        return await handler3(wrappedReq, wrappedRes);
+      }
+      if (pathname.startsWith("/api/client-logos")) {
+        return await handler4(wrappedReq, wrappedRes);
+      }
+      if (pathname.startsWith("/api/admin-users")) {
+        return await handler5(wrappedReq, wrappedRes);
+      }
+      if (pathname.startsWith("/api/settings")) {
+        return await handler6(wrappedReq, wrappedRes);
+      }
+      if (pathname.startsWith("/api/sliders")) {
+        return await handler7(wrappedReq, wrappedRes);
+      }
+      if (pathname.startsWith("/api/media")) {
+        return await handler8(wrappedReq, wrappedRes);
+      }
+      return wrappedRes.status(404).json({ success: false, error: "API endpoint not found" });
+    } catch (apiErr) {
+      console.error(`Error handling ${pathname}:`, apiErr);
+      return wrappedRes.status(500).json({ success: false, error: apiErr.message || "Internal Server Error" });
+    }
+  }
+  let filePath = path.join(DIST_DIR, pathname);
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
+    filePath = path.join(filePath, "index.html");
+  }
+  if (!fs.existsSync(filePath)) {
+    const candidateHtml = path.join(DIST_DIR, `${pathname}.html`);
+    const candidateDirHtml = path.join(DIST_DIR, pathname, "index.html");
+    if (fs.existsSync(candidateHtml)) {
+      filePath = candidateHtml;
+    } else if (fs.existsSync(candidateDirHtml)) {
+      filePath = candidateDirHtml;
+    } else {
+      filePath = path.join(DIST_DIR, "index.html");
+    }
+  }
+  if (!fs.existsSync(filePath)) {
+    res.statusCode = 404;
+    res.setHeader("Content-Type", "text/plain");
+    res.end("Not Found");
+    return;
+  }
+  const ext = path.extname(filePath).toLowerCase();
+  const contentType = MIME_TYPES[ext] || "application/octet-stream";
+  res.setHeader("Content-Type", contentType);
+  if (pathname.startsWith("/assets/")) {
+    res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+  } else if (ext === ".html") {
+    res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
+  } else {
+    res.setHeader("Cache-Control", "public, max-age=86400");
+  }
+  const acceptEncoding = req.headers["accept-encoding"] || "";
+  const stat = fs.statSync(filePath);
+  const shouldCompress = stat.size > 1024 && (contentType.startsWith("text/") || contentType.startsWith("application/javascript") || contentType.startsWith("application/json") || contentType.startsWith("image/svg+xml"));
+  if (shouldCompress && acceptEncoding.includes("gzip")) {
+    res.setHeader("Content-Encoding", "gzip");
+    res.removeHeader("Content-Length");
+    fs.createReadStream(filePath).pipe(zlib.createGzip()).pipe(res);
+  } else if (shouldCompress && acceptEncoding.includes("deflate")) {
+    res.setHeader("Content-Encoding", "deflate");
+    res.removeHeader("Content-Length");
+    fs.createReadStream(filePath).pipe(zlib.createDeflate()).pipe(res);
+  } else {
+    res.setHeader("Content-Length", stat.size);
+    fs.createReadStream(filePath).pipe(res);
+  }
+});
+server.listen(PORT, HOST, () => {
+  console.log(`
+======================================================`);
+  console.log(`  Polaris Integrated & GeoSolutions (PIGL) Server`);
+  console.log(`  Hostinger / Production Server listening on http://${HOST}:${PORT}`);
+  console.log(`  Serving static assets from: ${DIST_DIR}`);
+  console.log(`======================================================
+`);
+});
