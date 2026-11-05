@@ -97,6 +97,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
     
     // About us - Commitment
     'HSSE & Quality Policy': 'Commitment to zero injuries & high-quality assurance',
+    'QHSE Standards': 'Commitment to zero injuries & high-quality assurance',
+    'CSR & Community': 'Sustainable community investment, STEM mentorship & environmental care',
     'Certifications': 'ISO 9001:2015, ISO 45001:2018 and regulatory permits',
     'Safety Performance': 'Track record of 500k+ safe man-hours & zero LTI',
 
@@ -215,6 +217,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
           title: 'Standards & Network',
           links: [
             { label: 'QHSE Standards', href: '/hsse' },
+            { label: 'CSR & Community', href: '/csr' },
             { label: 'Our Network', href: '/network' },
           ]
         }

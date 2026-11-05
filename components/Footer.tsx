@@ -144,7 +144,8 @@ const Footer: React.FC = () => {
                     { id: '11', label: 'Technical Blog', href: '/blog', is_active: true },
                     { id: '12', label: 'HSSE & Quality Policy', href: '/hsse', is_active: true },
                     { id: '13', label: 'Careers at PIGL', href: '/careers', is_active: true },
-                    { id: '14', label: 'Vendor Onboarding & Compliance', href: '/vendors', is_active: true },
+                    { id: '14', label: 'CSR & Host Communities', href: '/csr', is_active: true },
+                    { id: '15', label: 'Vendor Onboarding & Compliance', href: '/vendors', is_active: true },
                   ]
                 }
               ]

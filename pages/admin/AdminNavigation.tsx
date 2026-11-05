@@ -1074,7 +1074,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ theme = 'light
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredPages.map((page) => {
-              const metaTitleLen = (page.meta_title || `${page.title} | Polaris Integrated & GeoSolutions`).length;
+              const metaTitleLen = (page.meta_title || `${page.title} | PIGL`).length;
               const metaDescLen = (page.meta_description || '').length;
 
               return (
@@ -1141,7 +1141,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ theme = 'light
                         </div>
                       </div>
                       <p className="font-semibold text-blue-700 dark:text-blue-400 text-xs truncate">
-                        {page.meta_title || `${page.title} | Polaris Integrated & GeoSolutions`}
+                        {page.meta_title || `${page.title} | PIGL`}
                       </p>
                       <p className="text-slate-700 dark:text-slate-300 text-[11px] leading-relaxed line-clamp-2">
                         {page.meta_description || 'High-fidelity 3D reality capture, geotechnical investigations, and digital twins across Sub-Saharan Africa.'}

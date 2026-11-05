@@ -6,6 +6,8 @@ import { SERVICES, PROJECTS, LEGACY_SERVICE_MAP } from './site_data';
 import ScrollToTop from './components/ScrollToTop';
 import WhatsAppButton from './components/WhatsAppButton';
 import { trackPageView, useSiteSettings } from './hooks/useSupabaseData';
+import { applySEO } from './utils/seo';
+import { getSEOForPath } from './utils/seoConfig';
 
 // Resilient dynamic import wrapper that handles stale chunk 404s after new deployments
 function lazyWithRetry<T extends React.ComponentType<any>>(
@@ -44,6 +46,7 @@ const HSSE = lazyWithRetry(() => import('./pages/HSSE'));
 const Partners = lazyWithRetry(() => import('./pages/Partners'));
 const VendorHub = lazyWithRetry(() => import('./pages/VendorHub'));
 const Videos = lazyWithRetry(() => import('./pages/Videos'));
+const CSR = lazyWithRetry(() => import('./pages/CSR'));
 const AdminLayout = lazyWithRetry(() => import('./pages/admin/AdminLayout'));
 const SearchOverlay = lazyWithRetry(() => import('./components/SearchOverlay'));
 const MaintenanceUpdateScreen = lazyWithRetry(() => import('./components/MaintenanceUpdateScreen'));
@@ -263,196 +266,39 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const metaDescriptions: { [key: string]: string } = {
-      '/': 'Polaris Integrated & GeoSolutions Limited provides geoscience and survey services, marine observation, infrastructure construction and industrial water treatment for energy, infrastructure and industrial clients in Nigeria.',
-      '/about': 'Polaris Integrated & GeoSolutions Limited (PIGL) is a Nigerian engineering and technical solutions company serving the energy, infrastructure and industrial sectors.',
-      '/services': 'Explore PIGL\'s four operating divisions: GeoSolutions & Engineering Services (GES), Metocean & Marine Solutions (MMS), Integrated Construction Services (ICS), and Industrial Solutions (IS).',
-      '/teams': 'Meet the executive leadership and multidisciplinary engineering teams guiding PIGL operations across West Africa.',
-      '/network': 'PIGL Strategic Alliances, Authorised Representations & Global Technology Partnerships with Frankstar Technology, CoaleXpert, and NPK Automation.',
-      '/our-network': 'PIGL Strategic Alliances, Authorised Representations & Global Technology Partnerships with Frankstar Technology, CoaleXpert, and NPK Automation.',
-      '/partners': 'PIGL Strategic Alliances & Global Technology Partnerships with Frankstar Technology, CoaleXpert, and NPK Automation.',
-      '/careers': 'Join the PIGL engineering team in Port Harcourt and across Nigeria. Grow your career with an indigenous leader in geosolutions and energy infrastructure.',
-      '/news': 'Latest updates, technical milestones, and industry perspectives from Polaris Integrated and GeoSolutions Limited.',
-      '/blog': 'Technical updates, project milestones, and engineering insights from Polaris Integrated and GeoSolutions Limited.',
-      '/hsse': 'Health, Safety, Security, Environment & Quality (HSSEQ) at PIGL. Certified ISO 9001:2015 and ISO 45001:2018 with over 500,000+ safe man-hours and zero LTI.',
-      '/contact': 'Contact Polaris Integrated & GeoSolutions Limited for project consultations, technical scoping, and field mobilisation across Nigeria.',
-      '/vendors': 'Polaris Integrated & GeoSolutions Limited Vendor Onboarding & Tax Compliance Portal. Standardized registration Form PIGL/F/VOTC/AHR/037.',
-      '/vendors/register': 'Digital Vendor Onboarding & Tax Compliance Form PIGL/F/VOTC/AHR/037 Rev 00 - PIGL Procurement & Finance Onboarding Wizard.',
-      '/vendor-registration': 'Digital Vendor Onboarding & Tax Compliance Form PIGL/F/VOTC/AHR/037 Rev 00 - PIGL Procurement & Finance Onboarding Wizard.',
-      '/vendors/portal': 'PIGL Vendor Status Tracker & Compliance Dossier Lookup. Check onboarding progress and print official verification receipts.',
-      '/videos': 'Explore Polaris Integrated & GeoSolutions Limited (PIGL) official video hub, corporate documentary, 3D laser scanning field demos, 20-tonne CPT geotechnical testing, and pipeline integrity operations.',
-      '/media': 'PIGL Official Media Hub, Technical Videos & Corporate Documentary Showcase.',
-      '/watch': 'Watch PIGL Corporate Documentary and Engineering Demonstrations.',
-      '/admin': 'PIGL Content Management System - Administrative Control Center'
-    };
-
-    const pageTitles: { [key: string]: string } = {
-      '/': 'Polaris Integrated & GeoSolutions (PIGL) | Geoscience, Marine, Construction & Industrial Solutions',
-      '/about': 'About PIGL | ISO Certified Engineering Contractor',
-      '/services': 'Specialist Engineering Divisions | PIGL Nigeria',
-      '/teams': 'Leadership & Engineering Teams | PIGL Nigeria',
-      '/network': 'Our Professional Network & Technology Alliances | PIGL',
-      '/our-network': 'Our Professional Network & Technology Alliances | PIGL',
-      '/partners': 'Technology Partners & Engineering Alliances | PIGL',
-      '/careers': 'Careers at PIGL | Engineering Opportunities in Nigeria',
-      '/news': 'News & Technical Insights | PIGL Nigeria',
-      '/blog': 'Engineering News & Technical Insights | PIGL Nigeria',
-      '/hsse': 'HSSEQ Standards & ISO Certifications | PIGL Safety',
-      '/contact': 'Contact PIGL | Engineering Offices in Port Harcourt & Lagos',
-      '/vendors': 'Vendor Onboarding & Compliance Portal | PIGL Nigeria',
-      '/vendors/register': 'Vendor Registration Form PIGL/F/VOTC/AHR/037 | PIGL',
-      '/vendor-registration': 'Vendor Registration Form PIGL/F/VOTC/AHR/037 | PIGL',
-      '/vendors/portal': 'Vendor Status Tracker & Compliance Dossier | PIGL',
-      '/videos': 'Operations & Engineering Video Library | PIGL Nigeria',
-      '/media': 'Media Center & Technical Video Showcase | PIGL Nigeria',
-      '/watch': 'Watch Corporate Documentary & Field Demos | PIGL Nigeria',
-      '/admin': 'PIGL CMS Portal | Engineering Administration'
-    };
-
-    let activeTitle = pageTitles[currentPath] || 'Polaris Integrated and GeoSolutions Limited (PIGL)';
-    let activeDesc = metaDescriptions[currentPath] || metaDescriptions['/'];
+    // 1. Resolve SEO configuration for active route
+    const seoRecord = getSEOForPath(currentPath);
+    let serviceSchema: any = undefined;
 
     if (currentPath.startsWith('/services/')) {
       let id = currentPath.split('/services/')[1];
       if (LEGACY_SERVICE_MAP[id]) id = LEGACY_SERVICE_MAP[id];
       const service = SERVICES.find(s => s.id === id);
       if (service) {
-        if (id === 'geosolutions-engineering-services') {
-          activeTitle = 'GeoSolutions & Engineering Services | PIGL';
-          activeDesc = 'PIGL undertakes geophysical and hydrographic surveys, geotechnical investigations, positioning, geospatial data acquisition and reality capture to support engineering design and infrastructure development.';
-        } else if (id === 'metocean-marine-solutions') {
-          activeTitle = 'Metocean & Marine Solutions | PIGL';
-          activeDesc = 'We provide marine observation, oceanographic monitoring, forecasting and environmental survey services to support offshore planning, marine operations and environmental assessment.';
-        } else if (id === 'integrated-construction-services') {
-          activeTitle = 'Integrated Construction Services | PIGL';
-          activeDesc = 'We undertake pipeline installation, civil infrastructure, mechanical fabrication and installation, and construction support for industrial and energy projects.';
-        } else if (id === 'industrial-solutions') {
-          activeTitle = 'Industrial Solutions | PIGL';
-          activeDesc = 'We provide produced-water treatment, industrial and domestic water systems, laboratory analysis and wastewater treatment services for industrial and environmental applications.';
-        } else {
-          activeTitle = `${service.title} | PIGL Specialist Engineering`;
-          activeDesc = service.description;
-        }
-      }
-    } else if (currentPath.startsWith('/blog/')) {
-      activeTitle = 'Engineering Technical Publication | PIGL Insights';
-    }
-
-    document.title = activeTitle;
-
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', activeDesc);
-    }
-
-    // Dynamic Canonical Link Update
-    const canonicalLink = document.querySelector('link[rel="canonical"]');
-    if (canonicalLink) {
-      canonicalLink.setAttribute('href', `https://polarisigl.com${currentPath}`);
-    }
-
-    // Update Social Tags
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', activeTitle);
-
-    const twitterDesc = document.querySelector('meta[property="twitter:description"]');
-    if (twitterDesc) twitterDesc.setAttribute('content', activeDesc);
-
-    // Track Page View Telemetry
-    trackPageView(currentPath);
-
-    // Dynamic JSON-LD structured data injection
-    const existingJsonLd = document.getElementById('dynamic-jsonld');
-    if (existingJsonLd) existingJsonLd.remove();
-
-    let schemaData: any = null;
-
-    if (currentPath.startsWith('/services/')) {
-      let id = currentPath.split('/services/')[1];
-      if (LEGACY_SERVICE_MAP[id]) id = LEGACY_SERVICE_MAP[id];
-      const service = SERVICES.find(s => s.id === id);
-      if (service) {
-        schemaData = {
-          "@context": "https://schema.org",
-          "@type": "Service",
-          "name": service.title,
-          "alternateName": service.abbreviation,
-          "provider": {
-            "@type": "Organization",
-            "name": "Polaris Integrated and GeoSolutions Limited (PIGL)",
-            "url": "https://polarisigl.com/"
-          },
-          "description": service.description,
-          "areaServed": {
-            "@type": "Country",
-            "name": "Nigeria"
-          },
-          "category": service.descriptor || "Engineering & Industrial Solutions",
-          "offers": {
-            "@type": "Offer",
-            "description": "High-fidelity engineering, geoscience, metocean and industrial solutions"
-          }
+        serviceSchema = {
+          name: service.title,
+          description: service.description,
+          serviceType: service.descriptor || service.title,
+          divisionName: service.title,
+          divisionSlug: service.slug,
+          capabilities: seoRecord.capabilities || []
         };
       }
-    } else if (currentPath === '/services') {
-      schemaData = {
-        "@context": "https://schema.org",
-        "@type": "ItemList",
-        "name": "PIGL Four Operating Divisions",
-        "itemListElement": SERVICES.map((s, index) => ({
-          "@type": "ListItem",
-          "position": index + 1,
-          "url": `https://polarisigl.com/services/${s.id}`,
-          "name": s.title
-        }))
-      };
-    } else if (currentPath === '/network' || currentPath === '/our-network' || currentPath === '/partners') {
-      schemaData = {
-        "@context": "https://schema.org",
-        "@type": "AboutPage",
-        "name": "PIGL Professional Network & Technology Alliances",
-        "publisher": {
-          "@type": "Organization",
-          "name": "Polaris Integrated and GeoSolutions Limited (PIGL)",
-          "url": "https://polarisigl.com/"
-        }
-      };
-    } else if (currentPath === '/teams') {
-      schemaData = {
-        "@context": "https://schema.org",
-        "@type": "AboutPage",
-        "name": "PIGL Leadership & Engineering Teams",
-        "publisher": {
-          "@type": "Organization",
-          "name": "Polaris Integrated and GeoSolutions Limited (PIGL)",
-          "url": "https://polarisigl.com/"
-        }
-      };
-    } else if (currentPath === '/videos' || currentPath === '/media' || currentPath === '/watch') {
-      schemaData = {
-        "@context": "https://schema.org",
-        "@type": "VideoObject",
-        "name": "Polaris Integrated & GeoSolutions Limited — Corporate Documentary",
-        "description": "A comprehensive visual exploration of PIGL indigenous engineering heritage, ground characterisation, sub-centimeter reality capture, and high-assurance field execution across Nigerian energy corridors.",
-        "thumbnailUrl": "https://img.youtube.com/vi/sExrHCIGkH0/maxresdefault.jpg",
-        "uploadDate": "2026-01-01T08:00:00+01:00",
-        "contentUrl": "https://www.youtube.com/watch?v=sExrHCIGkH0",
-        "embedUrl": "https://www.youtube.com/embed/sExrHCIGkH0",
-        "publisher": {
-          "@type": "Organization",
-          "name": "Polaris Integrated and GeoSolutions Limited (PIGL)",
-          "url": "https://polarisigl.com/"
-        }
-      };
     }
 
-    if (schemaData) {
-      const script = document.createElement('script');
-      script.id = 'dynamic-jsonld';
-      script.type = 'application/ld+json';
-      script.text = JSON.stringify(schemaData);
-      document.head.appendChild(script);
-    }
+    // 2. Apply complete SEO metadata, OpenGraph, Twitter, and Schema.org Graph
+    applySEO({
+      title: seoRecord.title,
+      description: seoRecord.description,
+      canonicalUrl: `https://polarisigl.com${currentPath === '/' ? '/' : currentPath}`,
+      keywords: seoRecord.keywords,
+      breadcrumbs: seoRecord.breadcrumbs,
+      serviceSchema,
+      noIndex: currentPath.startsWith('/admin')
+    });
+
+    // 3. Track Page View Telemetry
+    trackPageView(currentPath);
   }, [currentPath]);
 
   // Handle Admin Portal View as Standalone Full App
@@ -524,6 +370,8 @@ const App: React.FC = () => {
         return <Blog />;
       case '/hsse':
         return <HSSE />;
+      case '/csr':
+        return <CSR />;
       case '/contact':
         return <Contact />;
       case '/vendors':

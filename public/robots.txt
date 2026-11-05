@@ -1,13 +1,29 @@
-# Production robots.txt for Polaris Integrated & GeoSolutions Limited (polarisigl.com)
+# Production robots.txt for Polaris Integrated & GeoSolutions Limited (PIGL)
+# Website: https://polarisigl.com/
 
 User-agent: *
 Allow: /
+Allow: /services
 Allow: /services/
-Allow: /news/
-Allow: /careers/
+Allow: /about
 Allow: /about/
-Allow: /contact/
+Allow: /csr
+Allow: /csr/
+Allow: /teams
+Allow: /teams/
+Allow: /network
+Allow: /network/
+Allow: /careers
+Allow: /careers/
+Allow: /hsse
 Allow: /hsse/
+Allow: /blog
+Allow: /blog/
+Allow: /videos
+Allow: /videos/
+Allow: /contact
+Allow: /contact/
+Allow: /vendors
 Allow: /vendors/
 
 # Disallow private administration dashboard and API endpoints

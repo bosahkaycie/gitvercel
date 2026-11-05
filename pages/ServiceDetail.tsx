@@ -316,17 +316,27 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
     if (service) {
       const isGes = service.slug === 'geosolutions-engineering-services' || id === 'geosolutions-engineering-services' || id === 'ground-intelligence';
       const isMms = service.slug === 'metocean-marine-solutions' || id === 'metocean-marine-solutions';
+      const isIcs = service.slug === 'integrated-construction-services' || id === 'integrated-construction-services';
+      const isIs = service.slug === 'industrial-solutions' || id === 'industrial-solutions';
       
       const pageTitle = isGes
-        ? 'GeoSolutions & Engineering Services | PIGL'
+        ? 'GeoSolutions & Engineering Services (GES) | PIGL'
         : isMms
-        ? 'Metocean & Marine Solutions | PIGL'
+        ? 'Metocean & Marine Solutions (MMS) | PIGL'
+        : isIcs
+        ? 'Integrated Construction Services (ICS) | PIGL'
+        : isIs
+        ? 'Industrial Solutions (IS) | PIGL'
         : (service.meta_title || `${service.title} | PIGL Specialist Engineering`);
 
       const metaDescription = isGes
-        ? 'Geotechnical investigations, 20-tonne hydraulic Cone Penetration Testing (CPT), deep borehole drilling, marine geophysical surveys, hydrography, and 3D laser scanning using Leica RTC360 equipment across Nigeria.'
+        ? 'PIGL GeoSolutions & Engineering Services (GES): 3D laser scanning, Leica RTC360 reality capture, 20-tonne hydraulic CPT geotechnical investigations, borehole drilling, hydrographic surveys, and marine geophysical surveys across Nigeria and the Gulf of Guinea.'
         : isMms
-        ? 'Oceanographic buoy deployment and real-time data collection, Acoustic Doppler Current Profiler (ADCP) measurements, metocean forecasting, and marine environmental baseline surveys across the Gulf of Guinea.'
+        ? 'PIGL Metocean & Marine Solutions (MMS): oceanographic buoy deployment, Acoustic Doppler Current Profiler (ADCP) measurements, directional wave recording, squall early warnings, metocean forecasting, and marine environmental baseline surveys across the Gulf of Guinea.'
+        : isIcs
+        ? 'PIGL Integrated Construction Services (ICS): flowline and trunkline pipeline construction, swamp pipelaying, civil infrastructure, structural steel fabrication, hydrostatic testing, pipeline caliper pigging, and industrial plant commissioning in Nigeria.'
+        : isIs
+        ? 'PIGL Industrial Solutions (IS): produced water treatment packages, industrial and domestic water solutions, certified water and environmental laboratory testing, wastewater treatment, effluent treatment plants (ETP), and integrated valve maintenance across Nigeria.'
         : (service.meta_description || service.short_description || service.description || '');
 
       document.title = pageTitle;
@@ -355,10 +365,16 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
         "@type": "Service",
         "name": service.title,
         "alternateName": service.abbreviation,
-        "serviceType": isGes ? "Geotechnical Engineering & Geophysical Survey" : service.title,
+        "serviceType": isGes ? "Geotechnical Engineering & Geophysical Survey" : isMms ? "Metocean & Marine Survey Intelligence" : isIcs ? "Pipeline Construction & Infrastructure Engineering" : "Industrial Water Treatment & Environmental Engineering",
         "provider": {
           "@type": ["EngineeringService", "LocalBusiness"],
-          "name": "Polaris Integrated & GeoSolutions Limited",
+          "name": "PIGL",
+          "legalName": "Polaris Integrated & GeoSolutions Limited",
+          "alternateName": [
+            "Polaris Integrated & GeoSolutions Limited",
+            "PIGL Nigeria",
+            "Polaris GeoSolutions"
+          ],
           "telephone": "+234-809-7081-333",
           "address": {
             "@type": "PostalAddress",
@@ -368,9 +384,9 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
             "addressCountry": "NG"
           }
         },
-        "areaServed": ["Port Harcourt", "Lagos", "Warri", "Bonny Island", "Abuja", "Nigeria", "Sub-Saharan Africa"],
+        "areaServed": ["Port Harcourt", "Rivers State", "Lagos", "Warri", "Bonny Island", "Abuja", "Nigeria", "Sub-Saharan Africa"],
         "description": metaDescription,
-        "keywords": "geotechnical company near me, geotechnical engineering, cone penetration testing, CPT testing Nigeria, geophysical company, marine geophysics, reality capture, 3D laser scanning, digital twin"
+        "keywords": "PIGL, geotechnical company near me, geotechnical engineering, cone penetration testing, CPT testing Nigeria, geophysical company, marine geophysics, reality capture, 3D laser scanning, Leica RTC360, pipeline construction, produced water treatment"
       });
     }
 

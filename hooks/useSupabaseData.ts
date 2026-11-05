@@ -5289,6 +5289,17 @@ export const DEFAULT_NAVIGATION_CONFIG: NavigationConfig = {
       show_in_footer: true
     },
     {
+      id: 'pg-csr',
+      title: 'CSR & Community Stewardship',
+      slug: '/csr',
+      description: 'Community development, STEM education sponsorship, and environmental stewardship.',
+      meta_title: 'Corporate Social Responsibility (CSR) & Community Stewardship | PIGL',
+      meta_description: 'PIGL community empowerment across Rivers State and the Niger Delta through STEM education, local content capacity building, and environmental conservation.',
+      is_published: true,
+      show_in_header: false,
+      show_in_footer: true
+    },
+    {
       id: 'pg-vendors',
       title: 'Vendor Onboarding & Compliance',
       slug: '/vendors',
