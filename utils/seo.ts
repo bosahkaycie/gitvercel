@@ -46,8 +46,8 @@ export const PIGL_COMPANY_IDENTITY = {
     'Polaris GeoSolutions'
   ],
   url: 'https://polarisigl.com/',
-  logoUrl: 'https://polarisigl.com/assets/logo_light.png',
-  defaultOgImage: 'https://polarisigl.com/assets/slider.jpeg',
+  logoUrl: 'https://polarisigl.com/icon-512.png',
+  defaultOgImage: 'https://polarisigl.com/og-image.jpg',
   headquarters: {
     streetAddress: '#3 Diamond Close, Castle & Green Estate, Off Eneka Link Road',
     addressLocality: 'Port Harcourt',

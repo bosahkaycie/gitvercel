@@ -13,11 +13,13 @@ Options -Indexes
   AddType image/svg+xml svg svgz
   AddType image/webp webp
   AddType image/avif avif
+  AddType image/x-icon ico
   AddType font/woff woff
   AddType font/woff2 woff2
   AddType application/json json
   AddType video/mp4 mp4
   AddType application/pdf pdf
+  AddType application/manifest+json webmanifest
 </IfModule>
 
 # 3. Enable Gzip & Brotli Compression for Maximum PageSpeed
@@ -94,6 +96,9 @@ Options -Indexes
   RewriteCond %{REQUEST_URI} ^/api/company-profile/?$ [NC]
   RewriteCond %{DOCUMENT_ROOT}/api/company-profile.php -f
   RewriteRule ^api/company-profile/?$ /api/company-profile.php [L,QSA]
+
+  # 7B-2. Explicit Static Bypass for Search Crawlers (Favicon, Manifest, OG Banner, Robots, Sitemap)
+  RewriteRule ^(favicon\.ico|favicon-[0-9]+x[0-9]+\.png|favicon\.png|favicon\.svg|icon-[0-9]+\.png|apple-touch-icon\.png|og-image\.(jpg|jpeg|png)|site\.webmanifest|robots\.txt|sitemap\.xml)$ - [L]
 
   # 7C. If requested resource is a physical file or directory, serve it directly
   RewriteCond %{REQUEST_FILENAME} -f [OR]

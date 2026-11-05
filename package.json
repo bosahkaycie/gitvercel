@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/generate-seo-assets.mjs",
     "build": "vite build && node scripts/prerender.mjs && npm run build:server",
     "build:server": "esbuild server.ts --bundle --platform=node --format=esm --outfile=server.mjs --external:nodemailer --external:@supabase/supabase-js --external:dotenv",
     "start": "node server.mjs",
