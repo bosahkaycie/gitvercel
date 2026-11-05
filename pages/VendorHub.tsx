@@ -4,7 +4,7 @@ import LogoDarkImg from '../assets/LOGO.png';
 import Iso9001Img from '../assets/Q-Mark (ISO 9001).png';
 import Iso45001Img from '../assets/Q-Mark (ISO 45001).png';
 import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
-import { submitVendorApplication, lookupVendorApplication } from '../hooks/useSupabaseData';
+import { submitVendorApplication, lookupVendorApplication, usePageHeaders } from '../hooks/useSupabaseData';
 import { VendorApplication, VendorBusinessType, VendorVATStatus } from '../types';
 
 interface VendorHubProps {
@@ -103,6 +103,9 @@ const SERVICE_CATEGORIES = [
 ];
 
 export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
+  const { getPageHeader } = usePageHeaders();
+  const pageHeader = getPageHeader('vendors');
+  const breadcrumbImage = pageHeader.effective_image || VendorsHeroBg;
   // Mode: 'register' | 'track'
   const [activeTab, setActiveTab] = useState<'register' | 'track'>(() => {
     if (initialTab) return initialTab;
@@ -370,9 +373,10 @@ export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
       <section className="relative bg-slate-950 pt-28 pb-14 md:pt-36 md:pb-20 overflow-hidden border-b border-slate-800 print:hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src={VendorsHeroBg} 
+            src={breadcrumbImage} 
             alt="PIGL Vendor Desk" 
-            className="w-full h-full object-cover opacity-25 grayscale-[0.2]"
+            className="w-full h-full object-cover grayscale-[0.2]"
+            style={{ opacity: 1 - (pageHeader.overlay_opacity ?? 0.30) }}
             loading="eager"
             fetchPriority="high"
           />

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useServices, submitContactInquiry } from '../hooks/useSupabaseData';
+import { useServices, submitContactInquiry, usePageHeaders } from '../hooks/useSupabaseData';
 import { SERVICE_DETAILS_MAP, SERVICE_GALLERY_PRESETS, getEmbedVideoUrl } from './ServicesDetailsData';
 import { GROUND_INTELLIGENCE_SERVICES, SERVICES, LEGACY_SERVICE_MAP } from '../site_data';
 import ServiceBg from '../assets/slider.jpeg';
@@ -144,6 +144,9 @@ const ServiceContactForm: React.FC<{ serviceTitle: string }> = ({ serviceTitle }
 
 const Services: React.FC = () => {
   const { services, loading } = useServices();
+  const { getPageHeader } = usePageHeaders();
+  const pageHeader = getPageHeader('services');
+  const breadcrumbImage = pageHeader.effective_image || ServiceBg;
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [activeLifecycleIndex, setActiveLifecycleIndex] = useState(0);
   const [activeDeliverableModal, setActiveDeliverableModal] = useState<ServiceDeliverableItem | null>(null);
@@ -571,9 +574,10 @@ const Services: React.FC = () => {
       <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-32 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src={ServiceBg} 
+            src={breadcrumbImage} 
             alt="PIGL Engineering Capabilities" 
-            className="w-full h-full object-cover opacity-35 grayscale-[0.2]"
+            className="w-full h-full object-cover grayscale-[0.2]"
+            style={{ opacity: 1 - (pageHeader.overlay_opacity ?? 0.35) }}
             loading="eager"
             fetchPriority="high"
             decoding="async"

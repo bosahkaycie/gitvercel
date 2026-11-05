@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { TEAM } from '../site_data';
-import { useTeamMembers, useSiteSettings } from '../hooks/useSupabaseData';
+import { useTeamMembers, useSiteSettings, usePageHeaders } from '../hooks/useSupabaseData';
 import AboutBg from '../assets/teaching.jpeg';
 import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
 import InfraSketchImg from '../assets/infrastructure_sketch.jpg';
@@ -14,6 +14,9 @@ import OpMarineCrewImg from '../assets/operations/pigl_marine_crew_vessel.jpg';
 const About: React.FC = () => {
   const { teamMembers } = useTeamMembers();
   const { settings } = useSiteSettings();
+  const { getPageHeader } = usePageHeaders();
+  const pageHeader = getPageHeader('about');
+  const breadcrumbImage = pageHeader.effective_image || AboutBg;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -74,9 +77,10 @@ const About: React.FC = () => {
       <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-32 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src={AboutBg} 
+            src={breadcrumbImage} 
             alt="About PIGL - Engineering and Technical Solutions" 
-            className="w-full h-full object-cover opacity-30 grayscale-[0.1]"
+            className="w-full h-full object-cover grayscale-[0.1]"
+            style={{ opacity: 1 - (pageHeader.overlay_opacity ?? 0.30) }}
             loading="eager"
             fetchPriority="high"
             decoding="async"

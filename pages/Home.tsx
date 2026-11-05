@@ -40,7 +40,7 @@ import OpPipelineSwampCatImg from '../assets/operations/pigl_pipeline_constructi
 import YouTubeFacade from '../components/YouTubeFacade';
 import ClientLogoCarousel from '../components/ClientLogoCarousel';
 
-import { useSliders, useServices, useBlogPosts, useProjects, usePartners, useSiteSettings } from '../hooks/useSupabaseData';
+import { useSliders, useServices, useBlogPosts, useProjects, usePartners, useSiteSettings, usePageHeaders } from '../hooks/useSupabaseData';
 import { getYouTubeId, getYouTubeEmbedUrl, getYouTubeThumbnail } from '../utils/video';
 
 const CountUp: React.FC<{ end: number; duration?: number; suffix?: string }> = ({ end, duration = 2000, suffix = '' }) => {
@@ -211,6 +211,7 @@ const Home: React.FC = () => {
   const { partners: dynamicPartners } = usePartners();
   const { posts: blogPosts, loading: blogLoading } = useBlogPosts();
   const { settings } = useSiteSettings();
+  const { topHeader } = usePageHeaders();
 
   const effectiveServices = dynamicServices && dynamicServices.length > 0 ? dynamicServices : SERVICES;
   const effectiveProjects = dynamicProjects && dynamicProjects.length > 0 ? dynamicProjects : PROJECTS;
@@ -544,6 +545,14 @@ const Home: React.FC = () => {
         
         {/* Dynamic Video & Image Backgrounds with Seamless Looping and Smooth Cross-Fades */}
         <div className="absolute inset-0 overflow-hidden bg-slate-950 pointer-events-none z-0 select-none">
+          {Boolean(topHeader?.top_header_bg_image) && topHeader?.top_header_active !== false && (
+            <img 
+              src={topHeader.top_header_bg_image} 
+              alt="Top Header Background" 
+              className="absolute inset-0 w-full h-full object-cover z-0" 
+              style={{ opacity: 1 - (topHeader.top_header_overlay_opacity ?? 0.75) }}
+            />
+          )}
           {heroSlides.map((slide, idx) => {
             const isActive = currentSlide === idx;
             const youtubeId = getYouTubeId(slide.video_url);

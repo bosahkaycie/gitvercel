@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { PARTNERS } from '../site_data';
-import { usePartners } from '../hooks/useSupabaseData';
+import { usePartners, usePageHeaders } from '../hooks/useSupabaseData';
 import MarineIntelImg from '../assets/marine_intel_metocean.jpg';
 import WaterTreatmentSkidImg from '../assets/water_treatment_skid.jpg';
 import ProcurementImg from '../assets/procure.jpg';
@@ -10,6 +10,9 @@ import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 const Network: React.FC = () => {
   const { partners: dynamicPartners, loading } = usePartners();
   const displayPartners = dynamicPartners && dynamicPartners.length > 0 ? dynamicPartners : PARTNERS;
+  const { getPageHeader } = usePageHeaders();
+  const pageHeader = getPageHeader('network');
+  const breadcrumbImage = pageHeader.effective_image || NetworkHeroBg;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -27,9 +30,10 @@ const Network: React.FC = () => {
       <section className="relative bg-slate-950 pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
-            src={NetworkHeroBg}
+            src={breadcrumbImage}
             alt="Our Professional Network and Technology Alliances"
-            className="w-full h-full object-cover opacity-25 grayscale-[0.2]"
+            className="w-full h-full object-cover grayscale-[0.2]"
+            style={{ opacity: 1 - (pageHeader.overlay_opacity ?? 0.25) }}
             loading="eager"
             fetchPriority="high"
             decoding="async"

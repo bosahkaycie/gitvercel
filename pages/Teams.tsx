@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { TEAM } from '../site_data';
-import { useTeamMembers } from '../hooks/useSupabaseData';
+import { useTeamMembers, usePageHeaders } from '../hooks/useSupabaseData';
 import TeamsHeroBg from '../assets/team_large.jpeg';
 import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 
@@ -21,6 +21,9 @@ interface ExtendedTeamMember {
 
 const Teams: React.FC = () => {
   const { teamMembers, loading } = useTeamMembers();
+  const { getPageHeader } = usePageHeaders();
+  const pageHeader = getPageHeader('teams');
+  const breadcrumbImage = pageHeader.effective_image || TeamsHeroBg;
   const [visibleCardIds, setVisibleCardIds] = useState<Set<string>>(new Set());
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -163,9 +166,10 @@ const Teams: React.FC = () => {
       <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-28 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
-            src={TeamsHeroBg}
+            src={breadcrumbImage}
             alt="PIGL Engineering and Management Team"
-            className="w-full h-full object-cover opacity-25 grayscale-[0.2]"
+            className="w-full h-full object-cover grayscale-[0.2]"
+            style={{ opacity: 1 - (pageHeader.overlay_opacity ?? 0.25) }}
             loading="eager"
             fetchPriority="high"
             decoding="async"

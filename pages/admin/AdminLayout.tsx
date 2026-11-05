@@ -15,6 +15,7 @@ import AdminBlog from './AdminBlog';
 import AdminSliders from './AdminSliders';
 import AdminVideos from './AdminVideos';
 import AdminNavigation from './AdminNavigation';
+import AdminPageHeaders from './AdminPageHeaders';
 import AdminMedia from './AdminMedia';
 import AdminSettings from './AdminSettings';
 import AdminInquiries from './AdminInquiries';
@@ -476,6 +477,8 @@ const AdminLayout: React.FC = () => {
         );
       case 'navigation':
         return <AdminNavigation theme={theme} initialTab="header" />;
+      case 'page-headers':
+        return <AdminPageHeaders theme={theme} />;
       case 'seo':
         return <AdminNavigation theme={theme} initialTab="pages" />;
       case 'profile':
@@ -543,6 +546,11 @@ const AdminLayout: React.FC = () => {
       group: 'Website Content',
       title: 'Pages & Navigation',
       description: 'Configure header navigation, dropdown menus, and footer link columns.'
+    },
+    'page-headers': {
+      group: 'Website Content',
+      title: 'Headers & Breadcrumbs',
+      description: 'Upload, preview, replace, or remove background images for individual page breadcrumbs and the top header.'
     },
     services: {
       group: 'Website Content',

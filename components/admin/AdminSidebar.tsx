@@ -112,6 +112,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       items: [
         { id: 'sliders', label: 'Homepage', Icon: IconSliders },
         { id: 'navigation', label: 'Pages & Navigation', Icon: IconGlobe },
+        { id: 'page-headers', label: 'Headers & Breadcrumbs', Icon: IconMedia },
         { id: 'services', label: 'Services', Icon: IconServices },
         { id: 'projects', label: 'Projects', Icon: IconProjects },
         { id: 'team', label: 'Teams', Icon: IconUsers },

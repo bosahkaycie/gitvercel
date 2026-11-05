@@ -8,7 +8,7 @@ import MarineThumbImg from '../assets/marine_intel_metocean.jpg';
 import HsseThumbImg from '../assets/IMG_6170.jpg';
 import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 import { CMSVideoItem } from '../types';
-import { useVideos } from '../hooks/useSupabaseData';
+import { useVideos, usePageHeaders } from '../hooks/useSupabaseData';
 
 const OFFICIAL_VIDEOS: CMSVideoItem[] = [
   {
@@ -118,6 +118,9 @@ const OFFICIAL_VIDEOS: CMSVideoItem[] = [
 
 const Videos: React.FC = () => {
   const { videos } = useVideos();
+  const { getPageHeader } = usePageHeaders();
+  const pageHeader = getPageHeader('videos');
+  const breadcrumbImage = pageHeader.effective_image || VideoHeroBg;
   const effectiveVideos = videos && videos.length > 0
     ? videos.filter(v => v.status !== 'draft')
     : OFFICIAL_VIDEOS;
@@ -139,9 +142,10 @@ const Videos: React.FC = () => {
       <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-24 overflow-hidden border-b border-slate-800">
         <div className="absolute inset-0 z-0">
           <img 
-            src={VideoHeroBg} 
+            src={breadcrumbImage} 
             alt="PIGL Video Hub" 
-            className="w-full h-full object-cover opacity-20 grayscale-[0.3]"
+            className="w-full h-full object-cover grayscale-[0.3]"
+            style={{ opacity: 1 - (pageHeader.overlay_opacity ?? 0.30) }}
             loading="eager"
             fetchPriority="high"
           />

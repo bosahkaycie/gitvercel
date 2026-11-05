@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useJobOpenings, submitJobApplication } from '../hooks/useSupabaseData';
+import { useJobOpenings, submitJobApplication, usePageHeaders } from '../hooks/useSupabaseData';
 import EngineerImg from '../assets/teaching.jpeg';
 import CareersBg from '../assets/inspiring_next_gen.jpeg';
 import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 
 const Careers: React.FC = () => {
   const { jobs, loading: jobsLoading } = useJobOpenings();
+  const { getPageHeader } = usePageHeaders();
+  const pageHeader = getPageHeader('careers');
+  const breadcrumbImage = pageHeader.effective_image || CareersBg;
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<{ id?: string; title?: string } | null>(null);
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', coverLetter: '' });
@@ -123,9 +126,10 @@ const Careers: React.FC = () => {
       <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-32 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src={CareersBg} 
+            src={breadcrumbImage} 
             alt="Careers at PIGL" 
-            className="w-full h-full object-cover opacity-35 grayscale-[0.2]"
+            className="w-full h-full object-cover grayscale-[0.2]"
+            style={{ opacity: 1 - (pageHeader.overlay_opacity ?? 0.35) }}
             loading="eager"
             fetchPriority="high"
             decoding="async"

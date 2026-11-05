@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import LogoDarkImg from '../assets/LOGO.png';
 import VendorsHeroBg from '../assets/slider.jpeg';
-import { submitVendorApplication } from '../hooks/useSupabaseData';
+import { submitVendorApplication, usePageHeaders } from '../hooks/useSupabaseData';
 import { VendorBusinessType, VendorVATStatus } from '../types';
 import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 
@@ -36,6 +36,11 @@ const SERVICE_NATURE_OPTIONS = [
 ];
 
 const VendorRegistration: React.FC = () => {
+  const { getPageHeader } = usePageHeaders();
+  const pageHeader = getPageHeader('vendor-registration');
+  const breadcrumbImage = pageHeader.effective_image || VendorsHeroBg;
+  const overlayOpacity = pageHeader.overlay_opacity ?? 0.25;
+
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState<string | null>(null);
@@ -370,9 +375,10 @@ const VendorRegistration: React.FC = () => {
       <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-24 overflow-hidden border-b border-slate-800">
         <div className="absolute inset-0 z-0">
           <img 
-            src={VendorsHeroBg} 
+            src={breadcrumbImage} 
             alt="PIGL Vendor Registration" 
-            className="w-full h-full object-cover opacity-25 grayscale-[0.2]"
+            className="w-full h-full object-cover grayscale-[0.2]"
+            style={{ opacity: overlayOpacity }}
             loading="eager"
             fetchPriority="high"
             decoding="async"

@@ -12,6 +12,9 @@ function apiDevServerPlugin() {
     configureServer(server: any) {
       server.middlewares.use(async (req: any, res: any, next: any) => {
         const url = req.url || '';
+        if (url.endsWith('.ts') || url.endsWith('.tsx') || url.endsWith('.js') || url.includes('.ts?') || url.includes('.tsx?') || url.includes('.js?')) {
+          return next();
+        }
         if (url.startsWith('/api/send-email')) {
           let bodyStr = '';
           req.on('data', (chunk: any) => {
@@ -251,6 +254,41 @@ function apiDevServerPlugin() {
               await handler(wrappedReq, wrappedRes);
             } catch (err: any) {
               console.error('API /api/client-logos dev middleware error:', err);
+              wrappedRes.status(500).json({ success: false, error: err.message });
+            }
+          });
+          return;
+        }
+
+        if (url.startsWith('/api/page-headers')) {
+          let bodyStr = '';
+          req.on('data', (chunk: any) => {
+            bodyStr += chunk;
+          });
+          req.on('end', async () => {
+            const wrappedRes: any = res;
+            wrappedRes.status = (statusCode: number) => {
+              res.statusCode = statusCode;
+              return wrappedRes;
+            };
+            wrappedRes.json = (data: any) => {
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify(data));
+              return wrappedRes;
+            };
+
+            const wrappedReq: any = req;
+            try {
+              wrappedReq.body = bodyStr ? JSON.parse(bodyStr) : {};
+            } catch {
+              wrappedReq.body = {};
+            }
+
+            try {
+              const handler = (await import('./api/page-headers')).default;
+              await handler(wrappedReq, wrappedRes);
+            } catch (err: any) {
+              console.error('API /api/page-headers dev middleware error:', err);
               wrappedRes.status(500).json({ success: false, error: err.message });
             }
           });

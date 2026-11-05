@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PROJECTS } from '../site_data';
-import { useProjects } from '../hooks/useSupabaseData';
+import { useProjects, usePageHeaders } from '../hooks/useSupabaseData';
 import BrianImg from '../assets/management/brian.png';
 import SteveImg from '../assets/management/steve.png';
 import ProjectsBg from '../assets/slider.jpeg';
@@ -93,6 +93,9 @@ const InteractiveProjectCard: React.FC<{
 const Projects: React.FC = () => {
   const { projects: dynamicProjects, loading } = useProjects();
   const allProjects = dynamicProjects && dynamicProjects.length > 0 ? dynamicProjects : PROJECTS;
+  const { getPageHeader } = usePageHeaders();
+  const pageHeader = getPageHeader('projects');
+  const breadcrumbImage = pageHeader.effective_image || ProjectsBg;
 
   const [filter, setFilter] = useState<'All' | 'Intelligence' | 'Solutions & Engineering' | 'Civil' | 'Pipeline'>('All');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -179,9 +182,10 @@ const Projects: React.FC = () => {
       <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-32 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src={ProjectsBg} 
+            src={breadcrumbImage} 
             alt="PIGL Executed Projects" 
-            className="w-full h-full object-cover opacity-35 grayscale-[0.2]"
+            className="w-full h-full object-cover grayscale-[0.2]"
+            style={{ opacity: 1 - (pageHeader.overlay_opacity ?? 0.35) }}
             loading="eager"
             fetchPriority="high"
             decoding="async"

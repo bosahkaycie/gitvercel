@@ -27,9 +27,11 @@ import {
   IconChevronRight
 } from '../../components/admin/AdminIcons';
 
+import AdminPageHeaders from './AdminPageHeaders';
+
 interface AdminNavigationProps {
   theme?: 'light' | 'dark';
-  initialTab?: 'header' | 'footer' | 'pages';
+  initialTab?: 'header' | 'footer' | 'pages' | 'headers';
 }
 
 export const AdminNavigation: React.FC<AdminNavigationProps> = ({ theme = 'light', initialTab }) => {
@@ -43,7 +45,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ theme = 'light
     resetToDefaults
   } = useNavigation(true);
 
-  const [activeTab, setActiveTab] = useState<'header' | 'footer' | 'pages'>(() => initialTab || 'header');
+  const [activeTab, setActiveTab] = useState<'header' | 'footer' | 'pages' | 'headers'>(() => initialTab || 'header');
 
   React.useEffect(() => {
     if (initialTab) {
@@ -510,7 +512,22 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ theme = 'light
             {navConfig.pages.length} Pages
           </span>
         </button>
+
+        <button
+          onClick={() => setActiveTab('headers')}
+          className={`pb-3 border-b-2 flex items-center space-x-2 transition-colors ${
+            activeTab === 'headers'
+              ? 'border-emerald-600 text-emerald-800 dark:text-emerald-400'
+              : 'border-transparent text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
+          }`}
+        >
+          <span>Breadcrumbs & Headers</span>
+        </button>
       </div>
+
+      {activeTab === 'headers' && (
+        <AdminPageHeaders theme={theme} />
+      )}
 
       {/* ==================================================================== */}
       {/* TAB 1: HEADER NAVIGATION                                             */}

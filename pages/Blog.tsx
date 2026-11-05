@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useBlogPosts } from '../hooks/useSupabaseData';
+import { useBlogPosts, usePageHeaders } from '../hooks/useSupabaseData';
 import ConferenceKeynoteImg from '../assets/pigl_conference_keynote.jpg';
 import InternationalPartnerImg from '../assets/pigl_international_partner.jpg';
 import FieldTeamSwampImg from '../assets/pigl_field_team_swamp.jpg';
@@ -12,6 +12,9 @@ const Blog: React.FC = () => {
   const [emailSubscribe, setEmailSubscribe] = useState<string>('');
   const [subscribed, setSubscribed] = useState<boolean>(false);
   const { posts, loading } = useBlogPosts(selectedCategory === 'All' ? undefined : selectedCategory);
+  const { getPageHeader } = usePageHeaders();
+  const pageHeader = getPageHeader('blog');
+  const breadcrumbImage = pageHeader.effective_image || ConferenceKeynoteImg;
 
   // Dynamic distinct categories extracted from published posts
   const categories = useMemo(() => {
@@ -57,9 +60,10 @@ const Blog: React.FC = () => {
       <section className="relative bg-slate-950 pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden text-white">
         <div className="absolute inset-0 z-0">
           <img 
-            src={ConferenceKeynoteImg} 
+            src={breadcrumbImage} 
             alt="PIGL Engineering Journal & Insights" 
-            className="w-full h-full object-cover opacity-25"
+            className="w-full h-full object-cover"
+            style={{ opacity: 1 - (pageHeader.overlay_opacity ?? 0.35) }}
             loading="eager"
             fetchPriority="high"
           />

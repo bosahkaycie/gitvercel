@@ -660,9 +660,38 @@ export interface SitePageInfo {
   description?: string;
   meta_title?: string;
   meta_description?: string;
+  breadcrumb_image?: string;
+  header_bg_image?: string;
   is_published: boolean;
   show_in_header: boolean;
   show_in_footer: boolean;
+  updated_at?: string;
+}
+
+export interface PageHeaderConfig {
+  id: string;            // e.g. "about", "services", "projects", "teams", "network", "careers", "blog", "contact", "hsse", "videos", "vendors"
+  page_slug: string;     // e.g. "/about", "/services"
+  page_name: string;     // e.g. "About Us", "Our Services"
+  breadcrumb_title?: string;
+  breadcrumb_image?: string; // Persistent URL of uploaded breadcrumb background
+  header_bg_image?: string;  // Persistent URL for top header background
+  overlay_opacity?: number;  // 0.1 to 0.9 (defaults to 0.35)
+  fallback_image?: string;   // Baseline default image to use when removed
+  updated_at?: string;
+  updated_by?: string;       // Email of admin who updated
+}
+
+export interface HeaderBackgroundSettings {
+  top_header_bg_image?: string; // Top header background image
+  top_header_overlay_opacity?: number;
+  top_header_active?: boolean;
+  updated_at?: string;
+  updated_by?: string;
+}
+
+export interface SiteHeadersData {
+  pages: Record<string, PageHeaderConfig>;
+  top_header: HeaderBackgroundSettings;
   updated_at?: string;
 }
 

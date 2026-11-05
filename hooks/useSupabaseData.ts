@@ -28,8 +28,12 @@ import {
   CMSVideoItem,
   CMSTestimonial,
   ClientRelationshipItem,
-  DEFAULT_CLIENT_RELATIONSHIPS
+  DEFAULT_CLIENT_RELATIONSHIPS,
+  PageHeaderConfig,
+  HeaderBackgroundSettings,
+  SiteHeadersData
 } from '../types';
+import { DEFAULT_PAGE_HEADERS, DEFAULT_TOP_HEADER } from '../api/page-headers';
 import CptThumbImg from '../assets/cpt.png';
 import DigitalThumbImg from '../assets/digital_intel_scanner.jpg';
 import PipelineThumbImg from '../assets/newpipeline.png';
@@ -5400,5 +5404,370 @@ export const useNavigation = (adminMode = false) => {
     savePages,
     resetToDefaults,
     refreshNavigation: fetchNavigation
+  };
+};
+
+// ==============================================================================
+// 19. PAGE BREADCRUMB & HEADER BACKGROUND MANAGEMENT HOOK
+// ==============================================================================
+export const LOCAL_STORAGE_KEY_PAGE_HEADERS = 'pigl_site_page_headers';
+
+export const getStoredPageHeaders = (): SiteHeadersData => {
+  try {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY_PAGE_HEADERS);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && typeof parsed.pages === 'object') {
+        return {
+          pages: { ...DEFAULT_PAGE_HEADERS, ...parsed.pages },
+          top_header: parsed.top_header || DEFAULT_TOP_HEADER,
+          updated_at: parsed.updated_at
+        };
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to load local page headers', e);
+  }
+  return {
+    pages: { ...DEFAULT_PAGE_HEADERS },
+    top_header: { ...DEFAULT_TOP_HEADER },
+    updated_at: new Date().toISOString()
+  };
+};
+
+export const saveStoredPageHeaders = (data: SiteHeadersData): void => {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY_PAGE_HEADERS, JSON.stringify(data));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('pigl_page_headers_updated'));
+    }
+  } catch (e) {
+    console.warn('Failed to save local page headers', e);
+  }
+};
+
+export const usePageHeaders = (adminMode = false) => {
+  const [headersData, setHeadersData] = useState<SiteHeadersData>(getStoredPageHeaders());
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchHeaders = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    let remoteData: SiteHeadersData | null = null;
+
+    // 1. Fetch from /api/page-headers
+    try {
+      const res = await fetch('/api/page-headers');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.headers) {
+          remoteData = json.headers;
+        }
+      }
+    } catch (e) {
+      console.warn('API /api/page-headers fetch error, checking storage fallback:', e);
+    }
+
+    // 2. Direct Supabase Storage fallback
+    if (!remoteData) {
+      const client = getSupabaseClient();
+      if (client) {
+        try {
+          const { data, error: stErr } = await client.storage.from('media').download('config/page_headers.json');
+          if (!stErr && data) {
+            const parsed = JSON.parse(await data.text());
+            if (parsed && typeof parsed.pages === 'object') {
+              remoteData = parsed;
+            }
+          }
+        } catch (stErr) {
+          console.warn('Supabase storage fallback for page headers notice:', stErr);
+        }
+      }
+    }
+
+    const currentLocal = getStoredPageHeaders();
+    const finalData: SiteHeadersData = {
+      pages: {
+        ...DEFAULT_PAGE_HEADERS,
+        ...(remoteData?.pages || currentLocal.pages)
+      },
+      top_header: remoteData?.top_header || currentLocal.top_header || DEFAULT_TOP_HEADER,
+      updated_at: remoteData?.updated_at || currentLocal.updated_at
+    };
+
+    saveStoredPageHeaders(finalData);
+    setHeadersData(finalData);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchHeaders();
+
+    const handleSync = () => {
+      setHeadersData(getStoredPageHeaders());
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('pigl_page_headers_updated', handleSync);
+      window.addEventListener('storage', handleSync);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('pigl_page_headers_updated', handleSync);
+        window.removeEventListener('storage', handleSync);
+      }
+    };
+  }, [fetchHeaders]);
+
+  const getPageHeader = useCallback((keyOrSlug: string) => {
+    const cleanKey = (keyOrSlug || '').trim().toLowerCase();
+    const pages = headersData.pages || DEFAULT_PAGE_HEADERS;
+
+    // Match by ID, slug, or normalized key
+    let found = pages[cleanKey];
+    if (!found) {
+      const slugMatch = (Object.values(pages) as PageHeaderConfig[]).find(p => 
+        p.page_slug.toLowerCase() === cleanKey || 
+        p.page_slug.toLowerCase() === `/${cleanKey.replace(/^\//, '')}` ||
+        p.id.toLowerCase() === cleanKey
+      );
+      if (slugMatch) found = slugMatch;
+    }
+
+    const fallbackImg = found?.fallback_image || DEFAULT_PAGE_HEADERS[cleanKey]?.fallback_image || '/assets/newoffshore.png';
+    const customImg = found?.breadcrumb_image ? found.breadcrumb_image.trim() : '';
+
+    return {
+      id: found?.id || cleanKey,
+      page_name: found?.page_name || cleanKey,
+      page_slug: found?.page_slug || `/${cleanKey}`,
+      breadcrumb_title: found?.breadcrumb_title || found?.page_name || cleanKey,
+      breadcrumb_image: customImg,
+      fallback_image: fallbackImg,
+      effective_image: customImg || fallbackImg,
+      has_custom_image: Boolean(customImg),
+      header_bg_image: found?.header_bg_image || '',
+      overlay_opacity: found?.overlay_opacity ?? 0.35,
+      updated_at: found?.updated_at,
+      updated_by: found?.updated_by
+    };
+  }, [headersData]);
+
+  const savePageBreadcrumb = async (pageId: string, imageUrl: string, options?: { breadcrumb_title?: string; overlay_opacity?: number; adminEmail?: string }) => {
+    const cleanId = pageId.trim();
+    const currentLocal = getStoredPageHeaders();
+    const existing = currentLocal.pages[cleanId] || headersData.pages[cleanId] || DEFAULT_PAGE_HEADERS[cleanId] || {
+      id: cleanId,
+      page_slug: `/${cleanId}`,
+      page_name: cleanId
+    };
+
+    const updatedPage: PageHeaderConfig = {
+      ...existing,
+      breadcrumb_image: imageUrl.trim(),
+      ...(options?.breadcrumb_title ? { breadcrumb_title: options.breadcrumb_title.trim() } : {}),
+      ...(typeof options?.overlay_opacity === 'number' ? { overlay_opacity: options.overlay_opacity } : {}),
+      updated_at: new Date().toISOString(),
+      updated_by: options?.adminEmail || 'admin@polarisigl.com'
+    };
+
+    setHeadersData(prev => {
+      const nextPages = { ...prev.pages, [cleanId]: updatedPage };
+      const nextData: SiteHeadersData = {
+        ...prev,
+        pages: nextPages,
+        updated_at: new Date().toISOString()
+      };
+      saveStoredPageHeaders(nextData);
+      return nextData;
+    });
+
+    // Cloud persistence
+    try {
+      const res = await fetch('/api/page-headers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_page',
+          pageId: cleanId,
+          pageConfig: updatedPage,
+          adminEmail: options?.adminEmail || 'admin@polarisigl.com'
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.headers) {
+        setHeadersData(data.headers);
+        saveStoredPageHeaders(data.headers);
+      }
+    } catch (e) {
+      console.warn('Failed to sync page breadcrumb to server:', e);
+    }
+
+    return updatedPage;
+  };
+
+  const removePageBreadcrumb = async (pageId: string, adminEmail = 'admin@polarisigl.com') => {
+    const cleanId = pageId.trim();
+    const currentLocal = getStoredPageHeaders();
+    const existing = currentLocal.pages[cleanId] || headersData.pages[cleanId] || DEFAULT_PAGE_HEADERS[cleanId] || {
+      id: cleanId,
+      page_slug: `/${cleanId}`,
+      page_name: cleanId
+    };
+
+    const updatedPage: PageHeaderConfig = {
+      ...existing,
+      breadcrumb_image: '',
+      header_bg_image: '',
+      updated_at: new Date().toISOString(),
+      updated_by: adminEmail
+    };
+
+    setHeadersData(prev => {
+      const nextPages = { ...prev.pages, [cleanId]: updatedPage };
+      const nextData: SiteHeadersData = {
+        ...prev,
+        pages: nextPages,
+        updated_at: new Date().toISOString()
+      };
+      saveStoredPageHeaders(nextData);
+      return nextData;
+    });
+
+    try {
+      const res = await fetch('/api/page-headers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'remove_page_image',
+          pageId: cleanId,
+          adminEmail
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.headers) {
+        setHeadersData(data.headers);
+        saveStoredPageHeaders(data.headers);
+      }
+    } catch (e) {
+      console.warn('Failed to remove page breadcrumb on server:', e);
+    }
+  };
+
+  const saveTopHeader = async (imageUrl: string, options?: { overlay_opacity?: number; active?: boolean; adminEmail?: string }) => {
+    const updatedTop: HeaderBackgroundSettings = {
+      top_header_bg_image: imageUrl.trim(),
+      top_header_overlay_opacity: options?.overlay_opacity ?? 0.30,
+      top_header_active: options?.active ?? true,
+      updated_at: new Date().toISOString(),
+      updated_by: options?.adminEmail || 'admin@polarisigl.com'
+    };
+
+    setHeadersData(prev => {
+      const nextData: SiteHeadersData = {
+        ...prev,
+        top_header: updatedTop,
+        updated_at: new Date().toISOString()
+      };
+      saveStoredPageHeaders(nextData);
+      return nextData;
+    });
+
+    try {
+      const res = await fetch('/api/page-headers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_top_header',
+          topHeader: updatedTop,
+          adminEmail: options?.adminEmail || 'admin@polarisigl.com'
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.headers) {
+        setHeadersData(data.headers);
+        saveStoredPageHeaders(data.headers);
+      }
+    } catch (e) {
+      console.warn('Failed to sync top header to server:', e);
+    }
+
+    return updatedTop;
+  };
+
+  const removeTopHeader = async (adminEmail = 'admin@polarisigl.com') => {
+    const updatedTop: HeaderBackgroundSettings = {
+      top_header_bg_image: '',
+      top_header_overlay_opacity: 0.30,
+      top_header_active: false,
+      updated_at: new Date().toISOString(),
+      updated_by: adminEmail
+    };
+
+    setHeadersData(prev => {
+      const nextData: SiteHeadersData = {
+        ...prev,
+        top_header: updatedTop,
+        updated_at: new Date().toISOString()
+      };
+      saveStoredPageHeaders(nextData);
+      return nextData;
+    });
+
+    try {
+      const res = await fetch('/api/page-headers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'remove_top_header',
+          adminEmail
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.headers) {
+        setHeadersData(data.headers);
+        saveStoredPageHeaders(data.headers);
+      }
+    } catch (e) {
+      console.warn('Failed to remove top header on server:', e);
+    }
+  };
+
+  const resetAllHeaders = async () => {
+    const resetData: SiteHeadersData = {
+      pages: { ...DEFAULT_PAGE_HEADERS },
+      top_header: { ...DEFAULT_TOP_HEADER },
+      updated_at: new Date().toISOString()
+    };
+
+    saveStoredPageHeaders(resetData);
+    setHeadersData(resetData);
+
+    try {
+      await fetch('/api/page-headers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reset' })
+      });
+    } catch (e) {
+      console.warn('Failed to reset page headers on server:', e);
+    }
+  };
+
+  return {
+    headersData,
+    pages: headersData.pages || DEFAULT_PAGE_HEADERS,
+    topHeader: headersData.top_header || DEFAULT_TOP_HEADER,
+    loading,
+    error,
+    getPageHeader,
+    savePageBreadcrumb,
+    removePageBreadcrumb,
+    saveTopHeader,
+    removeTopHeader,
+    resetAllHeaders,
+    reload: fetchHeaders
   };
 };

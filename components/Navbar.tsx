@@ -6,7 +6,7 @@ import { SERVICES, PROJECTS, CONTACT_CONFIG } from '../site_data';
 import ProfilePDF from '../assets/PIGL COMPANY PROFILE.pdf';
 import ProfileCoverImg from '../assets/PIGL COMPANY PROFILE.jpg';
 import { Service, Project } from '../types';
-import { useNavigation } from '../hooks/useSupabaseData';
+import { useNavigation, usePageHeaders } from '../hooks/useSupabaseData';
 
 interface NavbarProps {
   currentPath?: string;
@@ -83,6 +83,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
   const [hoveredService, setHoveredService] = useState<Service>(SERVICES[0]);
   const [hoveredProject, setHoveredProject] = useState<Project>(PROJECTS[0]);
   const { navConfig } = useNavigation();
+  const { topHeader } = usePageHeaders();
 
   const menuDescriptions: Record<string, string> = {
     // About us - Company
@@ -254,6 +255,19 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
         className={`fixed top-0 w-full z-50 transition-all duration-500 print:hidden ${scrolled || activeDropdown ? 'bg-white shadow-xl' : 'bg-transparent'} ${scrolled ? 'py-3 md:py-4' : 'py-5 md:py-7'}`}
         onMouseLeave={() => setActiveDropdown(null)}
       >
+        {/* Top Header Background Image (Configurable via Admin CMS) */}
+        {Boolean(topHeader?.top_header_bg_image) && topHeader?.top_header_active !== false && !scrolled && !activeDropdown && (
+          <div className="absolute inset-0 pointer-events-none -z-20 overflow-hidden transition-opacity duration-500">
+            <img 
+              src={topHeader.top_header_bg_image} 
+              alt="Top Header Background" 
+              className="w-full h-full object-cover object-center"
+              style={{ opacity: 1 - (topHeader.top_header_overlay_opacity ?? 0.75) }}
+            />
+            <div className="absolute inset-0 bg-slate-950/60" />
+          </div>
+        )}
+
         {/* Dark Hue Gradient Overlay for Text Legibility (only when transparent) */}
         {!scrolled && !isLightPage && !activeDropdown && (
           <div className="absolute top-0 left-0 w-full h-[150px] bg-gradient-to-b from-slate-900/80 via-slate-900/40 to-transparent pointer-events-none -z-10" />

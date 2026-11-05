@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import ContactBg from '../assets/slider.jpeg';
 import InfraSketchImg from '../assets/infrastructure_sketch.jpg';
 import { CONTACT_CONFIG } from '../site_data';
-import { submitContactInquiry, useSiteSettings } from '../hooks/useSupabaseData';
+import { submitContactInquiry, useSiteSettings, usePageHeaders } from '../hooks/useSupabaseData';
 import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 
 const Contact: React.FC = () => {
   const { settings } = useSiteSettings();
+  const { getPageHeader } = usePageHeaders();
+  const pageHeader = getPageHeader('contact');
+  const breadcrumbImage = pageHeader.effective_image || ContactBg;
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -142,9 +145,10 @@ const Contact: React.FC = () => {
       <section className="relative bg-slate-950 pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src={ContactBg} 
+            src={breadcrumbImage} 
             alt="PIGL Engineering Desks" 
-            className="w-full h-full object-cover opacity-30 grayscale-[0.2]"
+            className="w-full h-full object-cover grayscale-[0.2]"
+            style={{ opacity: 1 - (pageHeader.overlay_opacity ?? 0.30) }}
             loading="eager"
             fetchPriority="high"
             decoding="async"

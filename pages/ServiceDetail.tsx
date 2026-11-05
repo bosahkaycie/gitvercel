@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useServices, submitContactInquiry, FALLBACK_SERVICES } from '../hooks/useSupabaseData';
+import { useServices, submitContactInquiry, FALLBACK_SERVICES, usePageHeaders } from '../hooks/useSupabaseData';
 import { PROJECTS, LEGACY_SERVICE_MAP, GROUND_INTELLIGENCE_SERVICES, SERVICES } from '../site_data';
 import { SERVICE_DETAILS_MAP, SERVICE_GALLERY_PRESETS, getEmbedVideoUrl } from './ServicesDetailsData';
 import { ServiceGalleryImage, ServiceDeliverableItem, CMSService } from '../types';
@@ -119,6 +119,7 @@ interface ServiceDetailProps {
 
 const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
   const { services, loading } = useServices();
+  const { getPageHeader } = usePageHeaders();
 
   // Get active service ID from URL path (e.g. /services/digital-intelligence)
   const pathname = currentPath || window.location.pathname;
@@ -387,15 +388,19 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ currentPath }) => {
     }
   };
 
+  const pageHeader = getPageHeader(id || service?.id || '');
+  const breadcrumbImage = pageHeader.has_custom_image ? pageHeader.breadcrumb_image : (service.hero_image || service.card_image || '/assets/slider.jpeg');
+
   return (
     <div className="flex flex-col bg-white font-sans">
       {/* Section A: Hero */}
       <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-28 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
-            src={service.hero_image || service.card_image}
+            src={breadcrumbImage}
             alt={`${service.title} - PIGL Specialist Engineering`}
-            className="w-full h-full object-cover opacity-35 grayscale-[0.1]"
+            className="w-full h-full object-cover grayscale-[0.1]"
+            style={{ opacity: 1 - (pageHeader.overlay_opacity ?? 0.35) }}
             loading="eager"
             fetchPriority="high"
             decoding="async"

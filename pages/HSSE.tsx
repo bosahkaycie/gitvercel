@@ -1,10 +1,14 @@
 import React, { useEffect } from 'react';
 import { HSSE_STATS, HSSE_POLICIES, CERTIFICATIONS } from '../site_data';
+import { usePageHeaders } from '../hooks/useSupabaseData';
 import HeroImg from '../assets/slider.jpeg'; // Reusing a safe asset
 import QualityImg from '../assets/IMG_6558.jpg'; // Technical/Field image
 import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 
 const HSSE: React.FC = () => {
+  const { getPageHeader } = usePageHeaders();
+  const pageHeader = getPageHeader('hsse');
+  const breadcrumbImage = pageHeader.effective_image || HeroImg;
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -32,8 +36,9 @@ const HSSE: React.FC = () => {
       <section className="relative bg-slate-950 pt-32 pb-16 md:pt-40 md:pb-32 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src={HeroImg} 
-            className="w-full h-full object-cover opacity-35 grayscale-[0.2]" 
+            src={breadcrumbImage} 
+            className="w-full h-full object-cover grayscale-[0.2]" 
+            style={{ opacity: 1 - (pageHeader.overlay_opacity ?? 0.35) }}
             alt="HSSE Excellence"
             loading="eager"
             fetchPriority="high"
