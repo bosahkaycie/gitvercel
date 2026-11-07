@@ -724,3 +724,39 @@ export interface NavigationConfig {
   updated_at?: string;
 }
 
+export type SocialPlatformId =
+  | 'linkedin'
+  | 'youtube'
+  | 'twitter' // X
+  | 'instagram'
+  | 'facebook'
+  | 'whatsapp'
+  | 'tiktok'
+  | 'threads'
+  | 'github'
+  | 'medium'
+  | 'telegram'
+  | 'custom';
+
+export interface SocialLinkItem {
+  id: string;
+  platform: SocialPlatformId;
+  label: string; // e.g. "LinkedIn", "YouTube", "X (Twitter)"
+  url: string; // e.g. "https://www.linkedin.com/company/polarisigl/"
+  handle?: string; // e.g. "@polarisigl"
+  icon_type?: 'preset' | 'custom_svg' | 'custom_image';
+  custom_svg?: string;
+  custom_icon_url?: string;
+  brand_color?: string; // hex color for brand hover/pill
+  hover_color?: string;
+  is_active: boolean; // toggle visibility
+  display_order: number;
+  show_in_footer: boolean;
+  show_in_contact: boolean;
+  show_in_header?: boolean;
+  aria_label?: string;
+  updated_at?: string;
+  created_at?: string;
+}
+
+

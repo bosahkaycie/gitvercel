@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import ContactBg from '../assets/slider.jpeg';
 import InfraSketchImg from '../assets/infrastructure_sketch.jpg';
 import { CONTACT_CONFIG } from '../site_data';
-import { submitContactInquiry, useSiteSettings, usePageHeaders } from '../hooks/useSupabaseData';
+import { submitContactInquiry, useSiteSettings, usePageHeaders, useSocialLinks } from '../hooks/useSupabaseData';
+import { SocialIcon } from '../components/SocialIcon';
 import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 
 const Contact: React.FC = () => {
   const { settings } = useSiteSettings();
+  const { socialLinks } = useSocialLinks();
+  const activeContactSocialLinks = (socialLinks || []).filter(l => l.is_active && l.show_in_contact);
   const { getPageHeader } = usePageHeaders();
   const pageHeader = getPageHeader('contact');
   const breadcrumbImage = pageHeader.effective_image || ContactBg;
@@ -302,6 +305,55 @@ const Contact: React.FC = () => {
                   <span>Chat on WhatsApp</span>
                 </a>
               </div>
+
+              {/* Official Social & Digital Channels */}
+              {activeContactSocialLinks.length > 0 && (
+                <div className="bg-slate-50/80 border border-slate-200/90 rounded-2xl p-6 sm:p-7 space-y-4 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 font-mono block">
+                      Connect Across Digital Channels
+                    </span>
+                    <span className="text-[11px] font-mono text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
+                      Official Channels
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {activeContactSocialLinks.map((item) => (
+                      <a
+                        key={item.id}
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={item.aria_label || `${item.label || item.platform_name} - PIGL`}
+                        className="group flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200/80 hover:border-emerald-500/60 hover:shadow-xs transition-all duration-200"
+                      >
+                        <div className="flex items-center space-x-3 min-w-0">
+                          <div
+                            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
+                            style={{
+                              backgroundColor: `${item.brand_color || '#059669'}15`,
+                              color: item.brand_color || '#059669'
+                            }}
+                          >
+                            <SocialIcon link={item} className="w-4 h-4 fill-current" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-slate-900 truncate group-hover:text-emerald-700 transition-colors">
+                              {item.label}
+                            </p>
+                            <p className="text-[11px] text-slate-500 truncate font-mono">
+                              {item.handle || item.platform_name}
+                            </p>
+                          </div>
+                        </div>
+                        <span className="text-slate-400 group-hover:text-emerald-700 group-hover:translate-x-0.5 transition-all text-xs font-bold shrink-0 ml-2">
+                          ↗
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Full-Width Google Map Placement (16:10 Aspect Ratio) */}
               <div className="space-y-3 pt-2">

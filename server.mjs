@@ -1469,6 +1469,189 @@ async function handler9(req, res) {
   return res.status(405).json({ success: false, error: "Method not allowed" });
 }
 
+// api/social-links.ts
+import { createClient as createClient9 } from "@supabase/supabase-js";
+
+// constants/socialPlatforms.ts
+var DEFAULT_SOCIAL_LINKS = [
+  {
+    id: "social-linkedin",
+    platform: "linkedin",
+    label: "LinkedIn",
+    url: "https://www.linkedin.com/company/polarisigl/",
+    handle: "@polarisigl",
+    icon_type: "preset",
+    brand_color: "#0A66C2",
+    hover_color: "#004182",
+    is_active: true,
+    display_order: 1,
+    show_in_footer: true,
+    show_in_contact: true,
+    show_in_header: false,
+    aria_label: "PIGL on LinkedIn",
+    created_at: "2026-01-01T00:00:00.000Z",
+    updated_at: "2026-01-01T00:00:00.000Z"
+  },
+  {
+    id: "social-youtube",
+    platform: "youtube",
+    label: "YouTube",
+    url: "https://www.youtube.com/@polarisigl",
+    handle: "@polarisigl",
+    icon_type: "preset",
+    brand_color: "#FF0000",
+    hover_color: "#CC0000",
+    is_active: true,
+    display_order: 2,
+    show_in_footer: true,
+    show_in_contact: true,
+    show_in_header: false,
+    aria_label: "PIGL Official YouTube Channel",
+    created_at: "2026-01-01T00:00:00.000Z",
+    updated_at: "2026-01-01T00:00:00.000Z"
+  },
+  {
+    id: "social-whatsapp",
+    platform: "whatsapp",
+    label: "WhatsApp Business",
+    url: "https://wa.me/2348097081333",
+    handle: "+234 809 7081 333",
+    icon_type: "preset",
+    brand_color: "#25D366",
+    hover_color: "#128C7E",
+    is_active: true,
+    display_order: 3,
+    show_in_footer: true,
+    show_in_contact: true,
+    show_in_header: false,
+    aria_label: "Chat with PIGL on WhatsApp",
+    created_at: "2026-01-01T00:00:00.000Z",
+    updated_at: "2026-01-01T00:00:00.000Z"
+  },
+  {
+    id: "social-twitter",
+    platform: "twitter",
+    label: "X (Twitter)",
+    url: "https://x.com/polarisigl",
+    handle: "@polarisigl",
+    icon_type: "preset",
+    brand_color: "#000000",
+    hover_color: "#1DA1F2",
+    is_active: false,
+    display_order: 4,
+    show_in_footer: true,
+    show_in_contact: true,
+    show_in_header: false,
+    aria_label: "PIGL on X (Twitter)",
+    created_at: "2026-01-01T00:00:00.000Z",
+    updated_at: "2026-01-01T00:00:00.000Z"
+  },
+  {
+    id: "social-instagram",
+    platform: "instagram",
+    label: "Instagram",
+    url: "https://www.instagram.com/polarisigl",
+    handle: "@polarisigl",
+    icon_type: "preset",
+    brand_color: "#E4405F",
+    hover_color: "#C13584",
+    is_active: false,
+    display_order: 5,
+    show_in_footer: true,
+    show_in_contact: true,
+    show_in_header: false,
+    aria_label: "PIGL on Instagram",
+    created_at: "2026-01-01T00:00:00.000Z",
+    updated_at: "2026-01-01T00:00:00.000Z"
+  },
+  {
+    id: "social-facebook",
+    platform: "facebook",
+    label: "Facebook",
+    url: "https://www.facebook.com/polarisigl",
+    handle: "polarisigl",
+    icon_type: "preset",
+    brand_color: "#1877F2",
+    hover_color: "#0d65d9",
+    is_active: false,
+    display_order: 6,
+    show_in_footer: true,
+    show_in_contact: true,
+    show_in_header: false,
+    aria_label: "PIGL on Facebook",
+    created_at: "2026-01-01T00:00:00.000Z",
+    updated_at: "2026-01-01T00:00:00.000Z"
+  }
+];
+
+// api/social-links.ts
+async function handler10(req, res) {
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,POST");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+  );
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+  let supabaseUrl = process.env.VITE_SUPABASE_URL || "";
+  if (supabaseUrl.startsWith("http://")) {
+    supabaseUrl = supabaseUrl.replace("http://", "https://");
+  }
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
+  if (!supabaseUrl || !supabaseKey) {
+    return res.status(500).json({ success: false, error: "Supabase credentials not configured on server." });
+  }
+  const supabase = createClient9(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false }
+  });
+  const STORAGE_PATH3 = "config/social_links.json";
+  if (req.method === "GET") {
+    try {
+      const { data, error } = await supabase.storage.from("media").download(STORAGE_PATH3);
+      if (error || !data) {
+        return res.status(200).json({ success: true, social_links: DEFAULT_SOCIAL_LINKS });
+      }
+      const text = await data.text();
+      const parsed = JSON.parse(text);
+      const links = Array.isArray(parsed) ? parsed : parsed.social_links || DEFAULT_SOCIAL_LINKS;
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      return res.status(200).json({ success: true, social_links: links });
+    } catch (err) {
+      return res.status(200).json({ success: true, social_links: DEFAULT_SOCIAL_LINKS, warning: err.message });
+    }
+  }
+  if (req.method === "POST") {
+    try {
+      const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
+      const links = body.social_links || (Array.isArray(body) ? body : DEFAULT_SOCIAL_LINKS);
+      const payload = {
+        social_links: links,
+        updated_at: (/* @__PURE__ */ new Date()).toISOString(),
+        updated_by: body.updated_by || "admin@polarisigl.com"
+      };
+      const { error } = await supabase.storage.from("media").upload(
+        STORAGE_PATH3,
+        JSON.stringify(payload, null, 2),
+        {
+          contentType: "application/json",
+          upsert: true
+        }
+      );
+      if (error) {
+        return res.status(500).json({ success: false, error: error.message });
+      }
+      return res.status(200).json({ success: true, social_links: links, updated_at: payload.updated_at });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+  return res.status(405).json({ success: false, error: "Method not allowed" });
+}
+
 // server.ts
 dotenv.config();
 var __filename = fileURLToPath(import.meta.url);
@@ -1577,6 +1760,9 @@ var server = http.createServer(async (req, res) => {
       }
       if (pathname.startsWith("/api/company-profile")) {
         return await handler9(wrappedReq, wrappedRes);
+      }
+      if (pathname.startsWith("/api/social-links")) {
+        return await handler10(wrappedReq, wrappedRes);
       }
       return wrappedRes.status(404).json({ success: false, error: "API endpoint not found" });
     } catch (apiErr) {

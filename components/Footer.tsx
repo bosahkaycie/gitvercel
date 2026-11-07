@@ -5,7 +5,8 @@ import { CONTACT_CONFIG } from '../site_data';
 import Iso9001Img from '../assets/Q-Mark (ISO 9001).png';
 import Iso45001Img from '../assets/Q-Mark (ISO 45001).png';
 import InfraSketchImg from '../assets/infrastructure_sketch.jpg';
-import { useEmailSubscribers, useNavigation, useSiteSettings, useCompanyProfile } from '../hooks/useSupabaseData';
+import { useEmailSubscribers, useNavigation, useSiteSettings, useCompanyProfile, useSocialLinks } from '../hooks/useSupabaseData';
+import { SocialIcon } from './SocialIcon';
 
 const Footer: React.FC = () => {
   const [email, setEmail] = React.useState('');
@@ -13,7 +14,9 @@ const Footer: React.FC = () => {
   const { addSubscriber } = useEmailSubscribers();
   const { navConfig } = useNavigation();
   const { settings } = useSiteSettings();
+  const { socialLinks } = useSocialLinks();
   const { document: companyProfileDoc } = useCompanyProfile();
+  const activeFooterSocialLinks = (socialLinks || []).filter(l => l.is_active && l.show_in_footer);
   const isProfilePublished = Boolean(companyProfileDoc?.is_published && companyProfileDoc?.file_url);
   const profileDownloadUrl = companyProfileDoc?.file_url || ProfilePDF;
   const profileDownloadFilename = companyProfileDoc?.filename || 'PIGL-Company-Profile.pdf';
@@ -109,17 +112,53 @@ const Footer: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="pt-2 flex items-center space-x-3">
-              <a href={settings?.linkedin_url || CONTACT_CONFIG.linkedin} target="_blank" rel="noopener noreferrer" aria-label="PIGL on LinkedIn" className="inline-flex items-center justify-center w-10 h-10 bg-slate-200 text-slate-600 hover:bg-emerald-600 hover:text-white transition-all rounded">
-                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                </svg>
-              </a>
-              <a href={settings?.youtube_url || "https://www.youtube.com/@polarisigl"} target="_blank" rel="noopener noreferrer" aria-label="PIGL Official YouTube Channel" className="inline-flex items-center justify-center w-10 h-10 bg-slate-200 text-slate-600 hover:bg-red-600 hover:text-white transition-all rounded">
-                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                </svg>
-              </a>
+            <div className="pt-2 flex flex-wrap items-center gap-2.5">
+              {activeFooterSocialLinks.length > 0 ? (
+                activeFooterSocialLinks.map((item) => (
+                  <a
+                    key={item.id}
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={item.aria_label || `${item.label || item.platform_name} - PIGL`}
+                    title={`${item.label} (${item.platform_name})`}
+                    className="group relative inline-flex items-center justify-center w-10 h-10 rounded-lg bg-slate-200/90 text-slate-700 hover:text-white transition-all duration-300 shadow-xs hover:shadow-md hover:-translate-y-0.5"
+                    onMouseEnter={(e) => {
+                      if (item.brand_color) {
+                        e.currentTarget.style.backgroundColor = item.brand_color;
+                        e.currentTarget.style.color = '#FFFFFF';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '';
+                      e.currentTarget.style.color = '';
+                    }}
+                  >
+                    <SocialIcon link={item} className="w-5 h-5 fill-current" />
+                  </a>
+                ))
+              ) : (
+                <>
+                  <a
+                    href={settings?.linkedin_url || CONTACT_CONFIG.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="PIGL on LinkedIn"
+                    className="inline-flex items-center justify-center w-10 h-10 bg-slate-200 text-slate-600 hover:bg-[#0A66C2] hover:text-white transition-all rounded-lg"
+                  >
+                    <SocialIcon platform="linkedin" className="w-5 h-5 fill-current" />
+                  </a>
+                  <a
+                    href={settings?.youtube_url || "https://www.youtube.com/@polarisigl"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="PIGL Official YouTube Channel"
+                    className="inline-flex items-center justify-center w-10 h-10 bg-slate-200 text-slate-600 hover:bg-[#FF0000] hover:text-white transition-all rounded-lg"
+                  >
+                    <SocialIcon platform="youtube" className="w-5 h-5 fill-current" />
+                  </a>
+                </>
+              )}
             </div>
           </div>
 

@@ -1040,6 +1040,32 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ theme = 'light', initialT
               </div>
             </div>
 
+            {/* Quick Jump to Full Social Media Channels Manager */}
+            <div className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+              isDark ? 'bg-indigo-950/20 border-indigo-900/40' : 'bg-indigo-50/70 border-indigo-200/70'
+            }`}>
+              <div className="space-y-0.5">
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                    Multi-Platform Social & Icon Management
+                  </span>
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-500/20">
+                    Dedicated CMS Module
+                  </span>
+                </div>
+                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Configure dynamic social channels (LinkedIn, YouTube, X, WhatsApp, Instagram, Facebook, etc.), custom SVGs, ordering, and placements in the dedicated manager.
+                </p>
+              </div>
+              <a
+                href="/admin?tab=social-links"
+                className="inline-flex items-center justify-center space-x-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition-all shadow-xs shrink-0 cursor-pointer"
+              >
+                <span>Open Social Links Manager</span>
+                <span>→</span>
+              </a>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-medium">
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-slate-700 dark:text-slate-300">

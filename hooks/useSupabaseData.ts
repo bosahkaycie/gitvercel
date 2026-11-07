@@ -32,8 +32,10 @@ import {
   PageHeaderConfig,
   HeaderBackgroundSettings,
   SiteHeadersData,
-  CompanyProfileDocument
+  CompanyProfileDocument,
+  SocialLinkItem
 } from '../types';
+import { DEFAULT_SOCIAL_LINKS } from '../constants/socialPlatforms';
 import { DEFAULT_PAGE_HEADERS, DEFAULT_TOP_HEADER } from '../api/page-headers';
 import CptThumbImg from '../assets/cpt.png';
 import DigitalThumbImg from '../assets/digital_intel_scanner.jpg';
@@ -6261,5 +6263,208 @@ export const useCompanyProfile = () => {
     removeProfileDocument,
     saveProfileMetadata,
     reload: fetchProfile
+  };
+};
+
+export const LOCAL_STORAGE_KEY_SOCIAL_LINKS = 'pigl_social_links_v1';
+
+export const getStoredSocialLinks = (): SocialLinkItem[] => {
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY_SOCIAL_LINKS);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return DEFAULT_SOCIAL_LINKS;
+};
+
+export const saveStoredSocialLinks = (links: SocialLinkItem[]): void => {
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY_SOCIAL_LINKS, JSON.stringify(links));
+  } catch {}
+};
+
+export const useSocialLinks = (adminMode = false) => {
+  const [socialLinks, setSocialLinks] = useState<SocialLinkItem[]>(() => {
+    const local = getStoredSocialLinks();
+    const sorted = [...local].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+    return adminMode ? sorted : sorted.filter(l => l.is_active);
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchSocialLinks = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    // 1. Initial fast local load
+    const local = getStoredSocialLinks();
+    if (local && local.length > 0) {
+      const sorted = [...local].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+      setSocialLinks(adminMode ? sorted : sorted.filter(l => l.is_active));
+    }
+
+    // 2. Fetch from backend API
+    try {
+      const res = await fetch('/api/social-links');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.social_links) && data.social_links.length > 0) {
+          const sorted = [...data.social_links].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+          saveStoredSocialLinks(sorted);
+          setSocialLinks(adminMode ? sorted : sorted.filter(l => l.is_active));
+          setLoading(false);
+          return;
+        }
+      }
+    } catch (apiErr) {
+      console.warn('API /api/social-links request failed, falling back to direct Supabase storage:', apiErr);
+    }
+
+    // 3. Fallback direct Supabase storage download
+    const client = getSupabaseClient();
+    if (client) {
+      try {
+        const { data, error: sbError } = await client.storage.from('media').download('config/social_links.json');
+        if (!sbError && data) {
+          const text = await data.text();
+          const parsed = JSON.parse(text);
+          const links = Array.isArray(parsed) ? parsed : (parsed.social_links || DEFAULT_SOCIAL_LINKS);
+          const sorted = [...links].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+          saveStoredSocialLinks(sorted);
+          setSocialLinks(adminMode ? sorted : sorted.filter(l => l.is_active));
+          setLoading(false);
+          return;
+        }
+      } catch (sbErr) {
+        console.warn('Direct Supabase storage social_links download failed:', sbErr);
+      }
+    }
+
+    setLoading(false);
+  }, [adminMode]);
+
+  useEffect(() => {
+    fetchSocialLinks();
+  }, [fetchSocialLinks]);
+
+  // Persist helper
+  const persistLinks = async (updatedLinks: SocialLinkItem[]) => {
+    const sorted = [...updatedLinks].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+    saveStoredSocialLinks(sorted);
+    setSocialLinks(adminMode ? sorted : sorted.filter(l => l.is_active));
+
+    // Send to API
+    try {
+      await fetch('/api/social-links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ social_links: sorted })
+      });
+    } catch (err) {
+      console.warn('API /api/social-links POST failed:', err);
+    }
+
+    // Also direct Supabase storage
+    const client = getSupabaseClient();
+    if (client) {
+      try {
+        await client.storage.from('media').upload(
+          'config/social_links.json',
+          JSON.stringify({ social_links: sorted, updated_at: new Date().toISOString() }, null, 2),
+          { contentType: 'application/json', upsert: true }
+        );
+      } catch (sbErr) {
+        console.warn('Direct Supabase storage social_links upload failed:', sbErr);
+      }
+    }
+  };
+
+  const addSocialLink = async (newLink: Omit<SocialLinkItem, 'id' | 'created_at' | 'updated_at'>) => {
+    const fullLink: SocialLinkItem = {
+      ...newLink,
+      id: `social-${newLink.platform}-${Date.now()}`,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    const current = getStoredSocialLinks();
+    const updated = [...current, fullLink];
+    await persistLinks(updated);
+    return fullLink;
+  };
+
+  const updateSocialLink = async (id: string, updates: Partial<SocialLinkItem>) => {
+    const current = getStoredSocialLinks();
+    const updated = current.map(item => {
+      if (item.id === id) {
+        return {
+          ...item,
+          ...updates,
+          updated_at: new Date().toISOString()
+        };
+      }
+      return item;
+    });
+    await persistLinks(updated);
+  };
+
+  const deleteSocialLink = async (id: string) => {
+    const current = getStoredSocialLinks();
+    const updated = current.filter(item => item.id !== id);
+    await persistLinks(updated);
+  };
+
+  const toggleActive = async (id: string) => {
+    const current = getStoredSocialLinks();
+    const updated = current.map(item => {
+      if (item.id === id) {
+        return {
+          ...item,
+          is_active: !item.is_active,
+          updated_at: new Date().toISOString()
+        };
+      }
+      return item;
+    });
+    await persistLinks(updated);
+  };
+
+  const reorderSocialLinks = async (reorderedIds: string[]) => {
+    const current = getStoredSocialLinks();
+    const map = new Map(current.map(c => [c.id, c]));
+    const updated: SocialLinkItem[] = [];
+
+    reorderedIds.forEach((id, index) => {
+      const item = map.get(id);
+      if (item) {
+        updated.push({ ...item, display_order: index + 1, updated_at: new Date().toISOString() });
+        map.delete(id);
+      }
+    });
+
+    map.forEach(item => {
+      updated.push({ ...item, display_order: updated.length + 1 });
+    });
+
+    await persistLinks(updated);
+  };
+
+  const resetToDefault = async () => {
+    await persistLinks(DEFAULT_SOCIAL_LINKS);
+  };
+
+  return {
+    socialLinks,
+    loading,
+    error,
+    reload: fetchSocialLinks,
+    addSocialLink,
+    updateSocialLink,
+    deleteSocialLink,
+    toggleActive,
+    reorderSocialLinks,
+    resetToDefault,
+    saveAll: persistLinks
   };
 };

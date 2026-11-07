@@ -17,6 +17,7 @@ import AdminVideos from './AdminVideos';
 import AdminNavigation from './AdminNavigation';
 import AdminPageHeaders from './AdminPageHeaders';
 import AdminCompanyProfile from './AdminCompanyProfile';
+import { AdminSocialLinks } from './AdminSocialLinks';
 import AdminMedia from './AdminMedia';
 import AdminSettings from './AdminSettings';
 import AdminInquiries from './AdminInquiries';
@@ -507,6 +508,8 @@ const AdminLayout: React.FC = () => {
         return <AdminMedia theme={theme} />;
       case 'company-profile':
         return <AdminCompanyProfile theme={theme} adminEmail={user?.email} />;
+      case 'social-links':
+        return <AdminSocialLinks theme={theme} />;
       case 'corporate-profile':
         return <AdminSettings theme={theme} initialTab="profile" />;
       case 'settings':
@@ -579,6 +582,11 @@ const AdminLayout: React.FC = () => {
       group: 'Website Content',
       title: 'Client Organisations',
       description: 'Manage corporate client and stakeholder logos displayed in the homepage carousel ticker.'
+    },
+    'social-links': {
+      group: 'Website Content',
+      title: 'Social Media Links & Channels',
+      description: 'Manage corporate social profiles, destination links, platform icons, brand colors, and frontend display placements.'
     },
     blog: {
       group: 'Website Content',
