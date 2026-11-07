@@ -184,12 +184,17 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
         type: item.type,
         layout,
         featured,
+        badge: item.badge,
+        is_external: item.is_external,
+        dropdown_items: item.dropdown_items || (item.sections ? item.sections.flatMap(s => s.links) : []),
         sections: item.sections?.map(sec => ({
           title: sec.title,
           links: sec.links.map(l => ({
             label: l.label,
             href: l.href,
-            description: l.description
+            description: l.description,
+            badge: l.badge,
+            is_external: l.is_external
           }))
         }))
       };
@@ -247,8 +252,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
     { name: 'Contact', href: '/contact', type: 'standard' },
   ];
 
-  const handleMobileNavClick = (linkName: string, isMega: boolean, e: React.MouseEvent) => {
-    if (isMega) {
+  const handleMobileNavClick = (linkName: string, hasSubmenu: boolean, e: React.MouseEvent) => {
+    if (hasSubmenu) {
       e.preventDefault();
       setMobileExpanded(mobileExpanded === linkName ? null : linkName);
     } else {
@@ -299,30 +304,96 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center h-full">
               <div className="flex items-center space-x-0.5 xl:space-x-1.5 mr-2 xl:mr-5">
-                {navLinks.map((link) => (
-                  <div 
-                    key={link.name} 
-                    className="relative h-full py-2 px-1.5 xl:px-2.5 flex items-center cursor-pointer shrink-0"
-                    onMouseEnter={() => link.type === 'mega' ? setActiveDropdown(link.name) : setActiveDropdown(null)}
-                  >
-                    <a
-                      href={link.href}
-                      className={`link-underline transition-all duration-300 flex items-center whitespace-nowrap text-[13px] xl:text-[14.5px] 2xl:text-[15px] font-medium tracking-tight ${
-                        activeDropdown === link.name 
-                          ? 'text-emerald-600' 
-                          : useDarkText 
-                            ? 'text-slate-800 hover:text-emerald-700' 
-                            : 'text-white hover:text-white/80'
-                      }`}
-                      onClick={() => setActiveDropdown(null)}
+                {navLinks.map((link) => {
+                  const hasDropdown = link.type === 'dropdown';
+                  const hasMega = link.type === 'mega';
+                  const hasSubmenu = hasMega || hasDropdown;
+                  const dropdownItems: HeaderNavSubLink[] = (link as any).dropdown_items?.length
+                    ? (link as any).dropdown_items
+                    : (link.sections && link.sections.length > 0
+                        ? link.sections.flatMap((s: any) => s.links || [])
+                        : []);
+
+                  return (
+                    <div 
+                      key={link.name} 
+                      className="relative h-full py-2 px-1.5 xl:px-2.5 flex items-center cursor-pointer shrink-0"
+                      onMouseEnter={() => hasSubmenu ? setActiveDropdown(link.name) : setActiveDropdown(null)}
                     >
-                      <span>{link.name}</span>
-                      {link.type === 'mega' && (
-                        <svg className={`w-3 h-3 xl:w-3.5 xl:h-3.5 ml-1 shrink-0 transition-transform duration-300 ${activeDropdown === link.name ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" /></svg>
+                      <a
+                        href={link.href}
+                        target={(link as any).is_external ? '_blank' : undefined}
+                        rel={(link as any).is_external ? 'noopener noreferrer' : undefined}
+                        className={`link-underline transition-all duration-300 flex items-center whitespace-nowrap text-[13px] xl:text-[14.5px] 2xl:text-[15px] font-medium tracking-tight ${
+                          activeDropdown === link.name 
+                            ? 'text-emerald-600' 
+                            : useDarkText 
+                              ? 'text-slate-800 hover:text-emerald-700' 
+                              : 'text-white hover:text-white/80'
+                        }`}
+                        onClick={() => setActiveDropdown(null)}
+                      >
+                        <span>{link.name}</span>
+                        {(link as any).badge && (
+                          <span className="ml-1 px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-emerald-100 text-emerald-800 shrink-0">
+                            {(link as any).badge}
+                          </span>
+                        )}
+                        {hasSubmenu && (
+                          <svg className={`w-3 h-3 xl:w-3.5 xl:h-3.5 ml-1 shrink-0 transition-transform duration-300 ${activeDropdown === link.name ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" /></svg>
+                        )}
+                      </a>
+
+                      {/* Standard / Ordinary Dropdown Menu Floating Card */}
+                      {hasDropdown && activeDropdown === link.name && (
+                        <div 
+                          className="absolute top-full left-0 mt-2 min-w-[250px] max-w-[340px] bg-white rounded-xl shadow-2xl border border-slate-200/90 py-2.5 z-50 animate-fade-in"
+                          onMouseEnter={() => setActiveDropdown(link.name)}
+                        >
+                          <div className="py-1">
+                            {dropdownItems.map((sub, sIdx) => (
+                              <a
+                                key={sub.id || sIdx}
+                                href={sub.href}
+                                target={sub.is_external ? '_blank' : undefined}
+                                rel={sub.is_external ? 'noopener noreferrer' : undefined}
+                                onClick={() => setActiveDropdown(null)}
+                                className="group flex items-start px-3.5 py-2.5 hover:bg-slate-50 transition-colors rounded-lg mx-1.5"
+                              >
+                                <span className="w-0 overflow-hidden group-hover:w-3.5 transition-all duration-300 text-emerald-500 mr-0 group-hover:mr-1.5 flex-shrink-0 font-black mt-0.5">→</span>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center space-x-1.5">
+                                    <span className="text-sm font-semibold text-slate-800 group-hover:text-emerald-700 transition-colors leading-tight">
+                                      {sub.label}
+                                    </span>
+                                    {sub.badge && (
+                                      <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800">
+                                        {sub.badge}
+                                      </span>
+                                    )}
+                                    {sub.is_external && (
+                                      <svg className="w-3 h-3 text-slate-400 group-hover:text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                    )}
+                                  </div>
+                                  {sub.description && (
+                                    <p className="text-[11px] text-slate-500 leading-tight mt-0.5 line-clamp-2">
+                                      {sub.description}
+                                    </p>
+                                  )}
+                                </div>
+                              </a>
+                            ))}
+                            {dropdownItems.length === 0 && (
+                              <div className="px-4 py-2.5 text-xs text-slate-400 text-center italic">
+                                No sub-items
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       )}
-                    </a>
-                  </div>
-                ))}
+                    </div>
+                  );
+                })}
               </div>
               
               <div className="flex items-center shrink-0 space-x-2 xl:space-x-3.5 pl-2 xl:pl-4 border-l border-slate-300/30">
@@ -392,7 +463,9 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
         {/* Mega Menu Dropdown Panels */}
         <div 
           className={`absolute top-full left-0 w-full bg-white border-t border-b border-slate-200 overflow-hidden transition-all duration-500 ease-in-out ${
-            activeDropdown ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
+            activeDropdown && navLinks.some(l => l.name === activeDropdown && l.type === 'mega') 
+              ? 'max-h-[800px] opacity-100' 
+              : 'max-h-0 opacity-0 pointer-events-none'
           }`}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -618,22 +691,76 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
           </div>
 
           <div className="flex flex-col space-y-2 flex-grow">
-            {navLinks.map((link, idx) => (
-              <div key={link.name} className={`transform transition-all duration-300 ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`} style={{ transitionDelay: `${idx * 50}ms` }}>
-                {/* Main Link / Accordion Toggle */}
-                <a
-                  href={link.href}
-                  className="flex items-center justify-between py-3 text-xl font-medium text-slate-800 hover:text-emerald-600 transition-colors"
-                  onClick={(e) => handleMobileNavClick(link.name, link.type === 'mega', e)}
-                >
-                  {link.name}
-                  {link.type === 'mega' && (
-                    <svg className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${mobileExpanded === link.name ? 'rotate-180 text-emerald-600' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+            {navLinks.map((link, idx) => {
+              const hasDropdown = link.type === 'dropdown';
+              const hasMega = link.type === 'mega';
+              const hasSubmenu = hasMega || hasDropdown;
+              const dropdownItems: HeaderNavSubLink[] = (link as any).dropdown_items?.length
+                ? (link as any).dropdown_items
+                : (link.sections && link.sections.length > 0
+                    ? link.sections.flatMap((s: any) => s.links || [])
+                    : []);
+
+              return (
+                <div key={link.name} className={`transform transition-all duration-300 ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`} style={{ transitionDelay: `${idx * 50}ms` }}>
+                  {/* Main Link / Accordion Toggle */}
+                  <a
+                    href={link.href}
+                    target={(link as any).is_external ? '_blank' : undefined}
+                    rel={(link as any).is_external ? 'noopener noreferrer' : undefined}
+                    className="flex items-center justify-between py-3 text-xl font-medium text-slate-800 hover:text-emerald-600 transition-colors"
+                    onClick={(e) => handleMobileNavClick(link.name, hasSubmenu, e)}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <span>{link.name}</span>
+                      {(link as any).badge && (
+                        <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-emerald-100 text-emerald-800">
+                          {(link as any).badge}
+                        </span>
+                      )}
+                    </div>
+                    {hasSubmenu && (
+                      <svg className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${mobileExpanded === link.name ? 'rotate-180 text-emerald-600' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                    )}
+                  </a>
+
+                  {/* Ordinary Dropdown Accordion Content */}
+                  {hasDropdown && (
+                    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${mobileExpanded === link.name ? 'max-h-[800px] opacity-100 mb-4' : 'max-h-0 opacity-0'}`}>
+                      <div className="pl-4 border-l-2 border-emerald-200 space-y-2 pt-2">
+                        {dropdownItems.map((sub, sIdx) => (
+                          <a
+                            key={sub.id || sIdx}
+                            href={sub.href}
+                            target={sub.is_external ? '_blank' : undefined}
+                            rel={sub.is_external ? 'noopener noreferrer' : undefined}
+                            onClick={() => setIsOpen(false)}
+                            className="block py-2 text-sm font-semibold text-slate-700 hover:text-emerald-700 transition-colors"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span>{sub.label}</span>
+                              {sub.badge && (
+                                <span className="text-[9px] font-bold uppercase px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800">
+                                  {sub.badge}
+                                </span>
+                              )}
+                            </div>
+                            {sub.description && (
+                              <p className="text-xs text-slate-500 font-normal mt-0.5">{sub.description}</p>
+                            )}
+                          </a>
+                        ))}
+                        {dropdownItems.length === 0 && (
+                          <div className="text-xs text-slate-400 py-2 italic">
+                            No sub-items
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   )}
-                </a>
-                
-                {/* Accordion Content */}
-                {link.type === 'mega' && (
+                  
+                  {/* Accordion Content */}
+                  {hasMega && (
                   <div className={`overflow-hidden transition-all duration-300 ease-in-out ${mobileExpanded === link.name ? 'max-h-[1200px] opacity-100 mb-4' : 'max-h-0 opacity-0'}`}>
                     <div className="pl-4 border-l-2 border-emerald-100 space-y-4 pt-2">
                       {link.layout === 'services' && (
@@ -721,7 +848,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentPath = '', onSearchClick }) => {
                   </div>
                 )}
               </div>
-            ))}
+            );
+          })}
           </div>
 
           {/* Mobile Bottom Actions */}

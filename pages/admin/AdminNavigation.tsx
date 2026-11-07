@@ -29,6 +29,29 @@ import {
 
 import AdminPageHeaders from './AdminPageHeaders';
 
+export const AVAILABLE_PAGES = [
+  { id: 'p-home', title: 'Home', slug: '/' },
+  { id: 'p-about', title: 'About Us', slug: '/about' },
+  { id: 'p-teams', title: 'Leadership & Teams', slug: '/teams' },
+  { id: 'p-services', title: 'Specialist Services', slug: '/services' },
+  { id: 'p-projects', title: 'Projects & Track Record', slug: '/projects' },
+  { id: 'p-careers', title: 'Careers & Talent', slug: '/careers' },
+  { id: 'p-csr', title: 'Corporate Social Responsibility (CSR)', slug: '/csr' },
+  { id: 'p-hsse', title: 'QHSE Standards & Certifications', slug: '/hsse' },
+  { id: 'p-network', title: 'Our Network & Base Offices', slug: '/network' },
+  { id: 'p-videos', title: 'Media & Technical Videos', slug: '/videos' },
+  { id: 'p-blog', title: 'Insights & Technical Blog', slug: '/blog' },
+  { id: 'p-vendors', title: 'Vendor & Partner Registration', slug: '/vendors' },
+  { id: 'p-contact', title: 'Contact & Quotation', slug: '/contact' }
+];
+
+export const AVAILABLE_DIVISIONS = [
+  { id: 'd-ges', title: 'GeoSolutions & Engineering Services', acronym: 'GES', slug: '/services/geosolutions-engineering-services' },
+  { id: 'd-mms', title: 'Metocean & Marine Solutions', acronym: 'MMS', slug: '/services/metocean-marine-solutions' },
+  { id: 'd-irm', title: 'Inspection, Repair & Maintenance', acronym: 'IRM', slug: '/services/integrated-construction-services' },
+  { id: 'd-is', title: 'Integrated Marine & Vessel Support', acronym: 'IS', slug: '/services/industrial-solutions' }
+];
+
 interface AdminNavigationProps {
   theme?: 'light' | 'dark';
   initialTab?: 'header' | 'footer' | 'pages' | 'headers';
@@ -54,6 +77,39 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ theme = 'light
   }, [initialTab]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // WordPress-Style Menu State
+  const [headerItems, setHeaderItems] = useState<HeaderNavItem[]>(navConfig.header || []);
+  const [hasUnsavedHeaderChanges, setHasUnsavedHeaderChanges] = useState(false);
+  const [isSavingHeader, setIsSavingHeader] = useState(false);
+
+  // Left Accordion state: 'pages' | 'divisions' | 'custom'
+  const [activeAccordion, setActiveAccordion] = useState<'pages' | 'divisions' | 'custom'>('pages');
+
+  // Checkbox selections for batch addition
+  const [selectedPages, setSelectedPages] = useState<Record<string, boolean>>({});
+  const [selectedDivisions, setSelectedDivisions] = useState<Record<string, boolean>>({});
+  const [pageSearchQuery, setPageSearchQuery] = useState('');
+
+  // Custom link form
+  const [customLinkName, setCustomLinkName] = useState('');
+  const [customLinkUrl, setCustomLinkUrl] = useState('');
+  const [customLinkType, setCustomLinkType] = useState<'standard' | 'dropdown' | 'mega' | 'external'>('standard');
+  const [customLinkExternal, setCustomLinkExternal] = useState(false);
+
+  // Expanded card in menu tree
+  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
+
+  // Inline sublink drafts per item
+  const [sublinkDrafts, setSublinkDrafts] = useState<Record<string, { label: string; href: string; description: string; badge: string; is_external: boolean }>>({});
+
+  // Synchronize local headerItems whenever navConfig updates
+  React.useEffect(() => {
+    if (navConfig?.header) {
+      setHeaderItems(navConfig.header);
+      setHasUnsavedHeaderChanges(false);
+    }
+  }, [navConfig.header]);
 
   // Modals state
   const [editingHeaderItem, setEditingHeaderItem] = useState<HeaderNavItem | null>(null);
@@ -111,7 +167,220 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ theme = 'light
   };
 
   // ----------------------------------------------------------------------------
-  // HEADER HANDLERS
+  // WORDPRESS-STYLE MENU BUILDER HANDLERS
+  // ----------------------------------------------------------------------------
+  const handleAddSelectedPages = () => {
+    const toAdd = Object.keys(selectedPages).filter(k => selectedPages[k]);
+    if (toAdd.length === 0) {
+      showToast('Please select at least one page to add');
+      return;
+    }
+
+    const newItems = [...headerItems];
+    toAdd.forEach(slug => {
+      const pageInfo = AVAILABLE_PAGES.find(p => p.slug === slug) || navConfig.pages.find(p => p.slug === slug);
+      const title = pageInfo ? pageInfo.title : slug;
+      newItems.push({
+        id: `nav-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        name: title,
+        href: slug,
+        type: 'standard',
+        is_active: true,
+        order: newItems.length + 1
+      });
+    });
+
+    setHeaderItems(newItems);
+    setSelectedPages({});
+    setHasUnsavedHeaderChanges(true);
+    showToast(`Added ${toAdd.length} page(s) to menu`);
+  };
+
+  const handleAddSelectedDivisions = () => {
+    const toAdd = Object.keys(selectedDivisions).filter(k => selectedDivisions[k]);
+    if (toAdd.length === 0) {
+      showToast('Please select at least one division to add');
+      return;
+    }
+
+    const newItems = [...headerItems];
+    toAdd.forEach(slug => {
+      const div = AVAILABLE_DIVISIONS.find(d => d.slug === slug);
+      if (!div) return;
+      newItems.push({
+        id: `nav-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        name: div.acronym ? `${div.acronym} - ${div.title}` : div.title,
+        href: div.slug,
+        type: 'standard',
+        badge: div.acronym,
+        is_active: true,
+        order: newItems.length + 1
+      });
+    });
+
+    setHeaderItems(newItems);
+    setSelectedDivisions({});
+    setHasUnsavedHeaderChanges(true);
+    showToast(`Added ${toAdd.length} division(s) to menu`);
+  };
+
+  const handleAddCustomLink = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customLinkName.trim() || !customLinkUrl.trim()) {
+      showToast('Please enter both Link Text and URL');
+      return;
+    }
+
+    const newItems = [
+      ...headerItems,
+      {
+        id: `nav-${Date.now()}`,
+        name: customLinkName.trim(),
+        href: customLinkUrl.trim(),
+        type: customLinkType,
+        is_external: customLinkExternal,
+        is_active: true,
+        order: headerItems.length + 1,
+        dropdown_items: []
+      }
+    ];
+
+    setHeaderItems(newItems);
+    setCustomLinkName('');
+    setCustomLinkUrl('');
+    setCustomLinkType('standard');
+    setCustomLinkExternal(false);
+    setHasUnsavedHeaderChanges(true);
+    showToast('Custom link added to menu');
+  };
+
+  const handleMoveHeaderItem = (index: number, direction: 'up' | 'down') => {
+    const targetIdx = direction === 'up' ? index - 1 : index + 1;
+    if (targetIdx < 0 || targetIdx >= headerItems.length) return;
+    const newItems = [...headerItems];
+    const temp = newItems[index];
+    newItems[index] = newItems[targetIdx];
+    newItems[targetIdx] = temp;
+    newItems.forEach((item, idx) => { item.order = idx + 1; });
+    setHeaderItems(newItems);
+    setHasUnsavedHeaderChanges(true);
+  };
+
+  const handleToggleHeaderItemActive = (id: string) => {
+    const newItems = headerItems.map(item => {
+      if (item.id === id) {
+        return { ...item, is_active: !item.is_active };
+      }
+      return item;
+    });
+    setHeaderItems(newItems);
+    setHasUnsavedHeaderChanges(true);
+  };
+
+  const handleDeleteHeaderItem = (id: string) => {
+    if (!window.confirm('Are you sure you want to remove this navigation item from the menu?')) return;
+    const newItems = headerItems.filter(item => item.id !== id);
+    newItems.forEach((item, idx) => { item.order = idx + 1; });
+    setHeaderItems(newItems);
+    if (expandedCardId === id) setExpandedCardId(null);
+    setHasUnsavedHeaderChanges(true);
+    showToast('Navigation item removed');
+  };
+
+  const handleUpdateHeaderItem = (id: string, patch: Partial<HeaderNavItem>) => {
+    const newItems = headerItems.map(item => {
+      if (item.id === id) {
+        return { ...item, ...patch };
+      }
+      return item;
+    });
+    setHeaderItems(newItems);
+    setHasUnsavedHeaderChanges(true);
+  };
+
+  const handleAddSubLinkToItem = (itemId: string) => {
+    const draft = sublinkDrafts[itemId] || { label: '', href: '', description: '', badge: '', is_external: false };
+    if (!draft.label.trim() || !draft.href.trim()) {
+      showToast('Please provide a label and URL for the sub-link');
+      return;
+    }
+    const newSubLink: HeaderNavSubLink = {
+      id: `sub-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      label: draft.label.trim(),
+      href: draft.href.trim(),
+      description: draft.description.trim() || undefined,
+      badge: draft.badge.trim() || undefined,
+      is_external: draft.is_external
+    };
+    const newItems = headerItems.map(item => {
+      if (item.id === itemId) {
+        const currentSubLinks = item.dropdown_items || (item.sections ? item.sections.flatMap(s => s.links) : []) || [];
+        return {
+          ...item,
+          dropdown_items: [...currentSubLinks, newSubLink]
+        };
+      }
+      return item;
+    });
+    setHeaderItems(newItems);
+    setSublinkDrafts(prev => ({
+      ...prev,
+      [itemId]: { label: '', href: '', description: '', badge: '', is_external: false }
+    }));
+    setHasUnsavedHeaderChanges(true);
+    showToast('Sub-link added to dropdown');
+  };
+
+  const handleDeleteSubLinkFromItem = (itemId: string, subLinkId: string) => {
+    const newItems = headerItems.map(item => {
+      if (item.id === itemId) {
+        const currentSubLinks = item.dropdown_items || (item.sections ? item.sections.flatMap(s => s.links) : []) || [];
+        return {
+          ...item,
+          dropdown_items: currentSubLinks.filter(l => l.id !== subLinkId)
+        };
+      }
+      return item;
+    });
+    setHeaderItems(newItems);
+    setHasUnsavedHeaderChanges(true);
+  };
+
+  const handleMoveSubLinkInItem = (itemId: string, index: number, direction: 'up' | 'down') => {
+    const newItems = headerItems.map(item => {
+      if (item.id === itemId) {
+        const currentSubLinks = [...(item.dropdown_items || (item.sections ? item.sections.flatMap(s => s.links) : []) || [])];
+        const targetIdx = direction === 'up' ? index - 1 : index + 1;
+        if (targetIdx < 0 || targetIdx >= currentSubLinks.length) return item;
+        const temp = currentSubLinks[index];
+        currentSubLinks[index] = currentSubLinks[targetIdx];
+        currentSubLinks[targetIdx] = temp;
+        return { ...item, dropdown_items: currentSubLinks };
+      }
+      return item;
+    });
+    setHeaderItems(newItems);
+    setHasUnsavedHeaderChanges(true);
+  };
+
+  const handleSaveAllHeaderNav = async () => {
+    setIsSavingHeader(true);
+    const normalized = headerItems.map((item, idx) => ({
+      ...item,
+      order: idx + 1
+    }));
+    const res = await saveHeaderNav(normalized);
+    setIsSavingHeader(false);
+    if (res !== false) {
+      setHasUnsavedHeaderChanges(false);
+      showToast('Navigation menu saved and live on website!');
+    } else {
+      showToast('Error saving navigation menu');
+    }
+  };
+
+  // ----------------------------------------------------------------------------
+  // HEADER HANDLERS (LEGACY / MODALS)
   // ----------------------------------------------------------------------------
   const handleMoveHeader = async (index: number, direction: 'up' | 'down') => {
     const items = [...navConfig.header];
@@ -530,273 +799,1084 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ theme = 'light
       )}
 
       {/* ==================================================================== */}
-      {/* TAB 1: HEADER NAVIGATION                                             */}
+      {/* TAB 1: HEADER NAVIGATION (WORDPRESS-STYLE MENU BUILDER)              */}
       {/* ==================================================================== */}
       {activeTab === 'header' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-              Reorder navigation items or manage collapsible submenus. Toggle visibility to hide items without deleting.
-            </p>
-            <button
-              onClick={() => {
-                setEditingHeaderItem({
-                  id: '',
-                  name: '',
-                  href: '',
-                  type: 'standard',
-                  is_active: true,
-                  order: navConfig.header.length + 1
-                });
-                setIsNewHeaderItem(true);
-                setIsHeaderModalOpen(true);
-              }}
-              className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-colors shadow-2xs"
-            >
-              <IconPlus className="w-3.5 h-3.5" />
-              <span>Add Menu Item</span>
-            </button>
+        <div className="space-y-6">
+          {/* Top Status & Save Bar */}
+          <div className={`p-4 sm:p-5 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+            isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200/90 shadow-2xs'
+          }`}>
+            <div>
+              <div className="flex items-center space-x-2.5">
+                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  Main Navigation Menu
+                </h3>
+                <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-100 text-emerald-900 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                  {headerItems.filter(i => i.is_active).length} Active Items
+                </span>
+                {hasUnsavedHeaderChanges && (
+                  <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-amber-100 text-amber-900 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300 dark:border-amber-800 animate-pulse">
+                    ● Unsaved Changes
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
+                WordPress-style navigation manager. Choose between <strong>Direct Links</strong>, <strong>Ordinary Dropdowns</strong>, or <strong>Mega Menus</strong>.
+              </p>
+            </div>
+
+            <div className="flex items-center space-x-3 shrink-0">
+              <button
+                type="button"
+                onClick={handleSaveAllHeaderNav}
+                disabled={isSavingHeader}
+                className={`px-5 py-2.5 rounded-xl text-xs font-bold flex items-center space-x-2 transition-all shadow-md ${
+                  hasUnsavedHeaderChanges
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white ring-2 ring-emerald-400 ring-offset-2 dark:ring-offset-slate-900'
+                    : 'bg-emerald-700 hover:bg-emerald-800 text-white'
+                } disabled:opacity-50`}
+              >
+                <IconCheck className="w-4 h-4" />
+                <span>{isSavingHeader ? 'Saving Menu...' : 'Save Menu'}</span>
+              </button>
+            </div>
           </div>
 
-          <div className="space-y-2.5">
-            {navConfig.header.map((item, idx) => {
-              const isExpanded = Boolean(expandedHeaderIds[item.id]);
-              const hasSections = item.type === 'mega' && item.sections && item.sections.length > 0;
+          {/* 2-Column WordPress Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            {/* -------------------------------------------------------------- */}
+            {/* LEFT COLUMN: ADD MENU ITEMS ACCORDION                         */}
+            {/* -------------------------------------------------------------- */}
+            <div className="lg:col-span-4 space-y-3.5">
+              <div className="px-1 flex items-center justify-between">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Add Menu Items
+                </span>
+                <span className="text-[11px] text-slate-600 dark:text-slate-400">
+                  Select &amp; click Add
+                </span>
+              </div>
 
-              return (
-                <div
-                  key={item.id}
-                  className={`rounded-xl border transition-all ${
-                    isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200/90 shadow-2xs'
-                  } ${!item.is_active ? 'opacity-60' : ''}`}
+              {/* Accordion 1: Pages */}
+              <div className={`rounded-xl border overflow-hidden transition-all ${
+                isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200/90 shadow-2xs'
+              }`}>
+                <button
+                  type="button"
+                  onClick={() => setActiveAccordion(activeAccordion === 'pages' ? ('' as any) : 'pages')}
+                  className="w-full p-3.5 flex items-center justify-between text-left font-bold text-xs sm:text-sm text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                 >
-                  <div className="p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
-                    {/* Item Info with drag handle indicator and reorder buttons */}
-                    <div className="flex items-center space-x-3 min-w-0">
-                      <div className="flex items-center space-x-1 shrink-0">
-                        <IconGripVertical className="w-4 h-4 text-slate-400 dark:text-slate-600" />
-                        <div className="flex flex-col space-y-0.5">
-                          <button
-                            disabled={idx === 0}
-                            onClick={() => handleMoveHeader(idx, 'up')}
-                            className="p-0.5 text-slate-600 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-400 disabled:opacity-20 transition-colors"
-                            title="Move up"
-                          >
-                            <IconArrowUp className="w-3 h-3" />
-                          </button>
-                          <button
-                            disabled={idx === navConfig.header.length - 1}
-                            onClick={() => handleMoveHeader(idx, 'down')}
-                            className="p-0.5 text-slate-600 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-400 disabled:opacity-20 transition-colors"
-                            title="Move down"
-                          >
-                            <IconArrowDown className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </div>
+                  <div className="flex items-center space-x-2">
+                    <span>Site Pages</span>
+                    <span className="px-1.5 py-0.5 text-[10px] rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono">
+                      {AVAILABLE_PAGES.length}
+                    </span>
+                  </div>
+                  {activeAccordion === 'pages' ? (
+                    <IconChevronDown className="w-4 h-4 text-slate-500" />
+                  ) : (
+                    <IconChevronRight className="w-4 h-4 text-slate-500" />
+                  )}
+                </button>
 
-                      <div className="min-w-0">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-bold text-slate-900 dark:text-white truncate">
-                            {item.name}
-                          </span>
-                          <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded ${
-                            item.type === 'mega'
-                              ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-300 dark:border-purple-800/60'
-                              : item.type === 'external'
-                                ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60'
-                                : 'bg-blue-100 text-blue-900 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-300 dark:border-blue-800/60'
-                          }`}>
-                            {item.type === 'mega' ? 'Mega Menu' : item.type === 'external' ? 'External' : 'Link'}
-                          </span>
-                          {!item.is_active && (
-                            <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                              Hidden
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center space-x-2 text-xs font-mono text-slate-700 dark:text-slate-300 mt-0.5">
-                          <span>Route: <strong className="text-slate-900 dark:text-slate-100 font-semibold">{item.href}</strong></span>
-                          {item.badge && (
-                            <span className="text-emerald-800 dark:text-emerald-400 font-bold">• Badge: "{item.badge}"</span>
-                          )}
-                        </div>
-                      </div>
+                {activeAccordion === 'pages' && (
+                  <div className="p-3.5 pt-0 border-t border-slate-100 dark:border-slate-800/80 space-y-3 animate-fade-in">
+                    {/* Search filter inside pages */}
+                    <div className="relative mt-2">
+                      <IconSearch className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        placeholder="Filter pages..."
+                        value={pageSearchQuery}
+                        onChange={e => setPageSearchQuery(e.target.value)}
+                        className={`w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border outline-none ${
+                          isDark ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                        }`}
+                      />
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center space-x-2 self-end md:self-center">
-                      {item.type === 'mega' && (
-                        <button
-                          type="button"
-                          onClick={() => toggleExpandHeader(item.id)}
-                          className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-colors flex items-center space-x-1.5 ${
-                            isExpanded
-                              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
-                              : 'bg-slate-50 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-100'
-                          }`}
-                        >
-                          <span>Submenu ({item.sections?.reduce((acc, s) => acc + s.links.length, 0) || 0})</span>
-                          {isExpanded ? <IconChevronDown className="w-3 h-3" /> : <IconChevronRight className="w-3 h-3" />}
-                        </button>
-                      )}
+                    {/* Checkboxes scroll list */}
+                    <div className="max-h-56 overflow-y-auto space-y-1 pr-1 border border-slate-100 dark:border-slate-800 rounded-lg p-2">
+                      {AVAILABLE_PAGES
+                        .filter(p => p.title.toLowerCase().includes(pageSearchQuery.toLowerCase()) || p.slug.toLowerCase().includes(pageSearchQuery.toLowerCase()))
+                        .map(page => {
+                          const isChecked = Boolean(selectedPages[page.slug]);
+                          return (
+                            <label
+                              key={page.id}
+                              className={`flex items-start space-x-2.5 p-2 rounded-md cursor-pointer text-xs transition-colors ${
+                                isChecked
+                                  ? 'bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200'
+                                  : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-300'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={e => {
+                                  setSelectedPages({
+                                    ...selectedPages,
+                                    [page.slug]: e.target.checked
+                                  });
+                                }}
+                                className="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
+                              />
+                              <div className="min-w-0 flex-1">
+                                <span className="font-semibold block truncate">{page.title}</span>
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">{page.slug}</span>
+                              </div>
+                            </label>
+                          );
+                        })}
+                    </div>
 
-                      <button
-                        type="button"
-                        onClick={() => handleToggleHeaderActive(item.id)}
-                        className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-colors ${
-                          item.is_active
-                            ? 'border-emerald-300 bg-emerald-50 text-emerald-900 dark:bg-emerald-950/40 dark:border-emerald-800 dark:text-emerald-300'
-                            : 'border-slate-300 bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                        }`}
-                      >
-                        {item.is_active ? 'Visible' : 'Hidden'}
-                      </button>
-
+                    {/* Actions bar for pages */}
+                    <div className="flex items-center justify-between pt-1">
                       <button
                         type="button"
                         onClick={() => {
-                          setEditingHeaderItem({ ...item });
-                          setIsNewHeaderItem(false);
-                          setIsHeaderModalOpen(true);
+                          const allChecked = AVAILABLE_PAGES.every(p => selectedPages[p.slug]);
+                          if (allChecked) {
+                            setSelectedPages({});
+                          } else {
+                            const next: Record<string, boolean> = {};
+                            AVAILABLE_PAGES.forEach(p => { next[p.slug] = true; });
+                            setSelectedPages(next);
+                          }
                         }}
-                        className="p-1.5 text-slate-600 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-400 transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
-                        title="Edit link details"
+                        className="text-[11px] font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                       >
-                        <IconEdit className="w-4 h-4" />
+                        {AVAILABLE_PAGES.every(p => selectedPages[p.slug]) ? 'Deselect All' : 'Select All'}
                       </button>
 
                       <button
                         type="button"
-                        onClick={() => handleDeleteHeader(item.id)}
-                        className="p-1.5 text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30"
-                        title="Delete menu item"
+                        onClick={handleAddSelectedPages}
+                        className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-emerald-600 dark:hover:bg-emerald-700 rounded-lg text-xs font-bold transition-colors shadow-2xs"
                       >
-                        <IconTrash className="w-4 h-4" />
+                        Add to Menu
                       </button>
                     </div>
                   </div>
+                )}
+              </div>
 
-                  {/* Mega Menu Expandable Sections */}
-                  {item.type === 'mega' && isExpanded && (
-                    <div className="px-4 pb-4 pt-2 border-t border-slate-200 dark:border-slate-800/80 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                          Dropdown Sections & Submenu Items
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleAddSection(item.id)}
-                          className="text-xs font-bold text-emerald-800 dark:text-emerald-400 hover:underline inline-flex items-center space-x-1"
-                        >
-                          <IconPlus className="w-3.5 h-3.5" />
-                          <span>Add New Section</span>
-                        </button>
+              {/* Accordion 2: Operating Divisions */}
+              <div className={`rounded-xl border overflow-hidden transition-all ${
+                isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200/90 shadow-2xs'
+              }`}>
+                <button
+                  type="button"
+                  onClick={() => setActiveAccordion(activeAccordion === 'divisions' ? ('' as any) : 'divisions')}
+                  className="w-full p-3.5 flex items-center justify-between text-left font-bold text-xs sm:text-sm text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                >
+                  <div className="flex items-center space-x-2">
+                    <span>Operating Divisions</span>
+                    <span className="px-1.5 py-0.5 text-[10px] rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold">
+                      Core 4
+                    </span>
+                  </div>
+                  {activeAccordion === 'divisions' ? (
+                    <IconChevronDown className="w-4 h-4 text-slate-500" />
+                  ) : (
+                    <IconChevronRight className="w-4 h-4 text-slate-500" />
+                  )}
+                </button>
+
+                {activeAccordion === 'divisions' && (
+                  <div className="p-3.5 pt-0 border-t border-slate-100 dark:border-slate-800/80 space-y-2.5 animate-fade-in">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+                      PIGL's approved 4 business divisions:
+                    </p>
+                    <div className="space-y-1.5">
+                      {AVAILABLE_DIVISIONS.map(div => {
+                        const isChecked = Boolean(selectedDivisions[div.slug]);
+                        return (
+                          <label
+                            key={div.id}
+                            className={`flex items-start space-x-2.5 p-2 rounded-md cursor-pointer text-xs transition-colors ${
+                              isChecked
+                                ? 'bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200'
+                                : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-300'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={e => {
+                                setSelectedDivisions({
+                                  ...selectedDivisions,
+                                  [div.slug]: e.target.checked
+                                });
+                              }}
+                              className="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center space-x-1.5">
+                                <span className="font-bold text-slate-900 dark:text-white">{div.acronym}</span>
+                                <span className="text-[10px] text-slate-500">({div.title})</span>
+                              </div>
+                              <span className="text-[10px] text-slate-400 font-mono truncate block">{div.slug}</span>
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+
+                    <div className="flex justify-end pt-1">
+                      <button
+                        type="button"
+                        onClick={handleAddSelectedDivisions}
+                        className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-emerald-600 dark:hover:bg-emerald-700 rounded-lg text-xs font-bold transition-colors shadow-2xs"
+                      >
+                        Add to Menu
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Accordion 3: Custom Links */}
+              <div className={`rounded-xl border overflow-hidden transition-all ${
+                isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200/90 shadow-2xs'
+              }`}>
+                <button
+                  type="button"
+                  onClick={() => setActiveAccordion(activeAccordion === 'custom' ? ('' as any) : 'custom')}
+                  className="w-full p-3.5 flex items-center justify-between text-left font-bold text-xs sm:text-sm text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                >
+                  <div className="flex items-center space-x-2">
+                    <span>Custom Links</span>
+                    <span className="text-[10px] text-slate-500 font-normal">URL &amp; Label</span>
+                  </div>
+                  {activeAccordion === 'custom' ? (
+                    <IconChevronDown className="w-4 h-4 text-slate-500" />
+                  ) : (
+                    <IconChevronRight className="w-4 h-4 text-slate-500" />
+                  )}
+                </button>
+
+                {activeAccordion === 'custom' && (
+                  <form onSubmit={handleAddCustomLink} className="p-3.5 pt-0 border-t border-slate-100 dark:border-slate-800/80 space-y-3 animate-fade-in">
+                    <div className="mt-2">
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+                        URL *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="https://... or /path"
+                        value={customLinkUrl}
+                        onChange={e => setCustomLinkUrl(e.target.value)}
+                        className={`w-full px-3 py-1.5 text-xs rounded-lg border outline-none font-mono ${
+                          isDark ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400'
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+                        Link Text *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Client Portal, Careers"
+                        value={customLinkName}
+                        onChange={e => setCustomLinkName(e.target.value)}
+                        className={`w-full px-3 py-1.5 text-xs rounded-lg border outline-none ${
+                          isDark ? 'bg-slate-950 border-slate-800 text-white placeholder-slate-500' : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400'
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+                        Menu Type
+                      </label>
+                      <select
+                        value={customLinkType}
+                        onChange={e => setCustomLinkType(e.target.value as any)}
+                        className={`w-full px-3 py-1.5 text-xs rounded-lg border outline-none ${
+                          isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                        }`}
+                      >
+                        <option value="standard">Standard Direct Link</option>
+                        <option value="dropdown">Ordinary Dropdown (with sub-links)</option>
+                        <option value="mega">Mega Menu (multi-column)</option>
+                        <option value="external">External Link</option>
+                      </select>
+                    </div>
+
+                    <label className="flex items-center space-x-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer pt-1">
+                      <input
+                        type="checkbox"
+                        checked={customLinkExternal}
+                        onChange={e => setCustomLinkExternal(e.target.checked)}
+                        className="rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
+                      />
+                      <span>Open link in new tab</span>
+                    </label>
+
+                    <div className="flex justify-end pt-1">
+                      <button
+                        type="submit"
+                        className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-emerald-600 dark:hover:bg-emerald-700 rounded-lg text-xs font-bold transition-colors shadow-2xs"
+                      >
+                        Add to Menu
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            </div>
+
+            {/* -------------------------------------------------------------- */}
+            {/* RIGHT COLUMN: MENU STRUCTURE TREE CANVAS                       */}
+            {/* -------------------------------------------------------------- */}
+            <div className="lg:col-span-8 space-y-3.5">
+              <div className="flex items-center justify-between px-1">
+                <div>
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Menu Structure
+                  </span>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    Drag/reorder items, choose dropdown or mega menu, and manage sub-items.
+                  </p>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newId = `nav-${Date.now()}`;
+                      const newItem: HeaderNavItem = {
+                        id: newId,
+                        name: 'New Link',
+                        href: '/',
+                        type: 'standard',
+                        is_active: true,
+                        order: headerItems.length + 1
+                      };
+                      setHeaderItems([...headerItems, newItem]);
+                      setExpandedCardId(newId);
+                      setHasUnsavedHeaderChanges(true);
+                    }}
+                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-colors"
+                  >
+                    <IconPlus className="w-3.5 h-3.5" />
+                    <span>Quick Item</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Items List */}
+              <div className="space-y-3">
+                {headerItems.map((item, idx) => {
+                  const isExpanded = expandedCardId === item.id;
+                  const isDropdown = item.type === 'dropdown';
+                  const isMega = item.type === 'mega';
+                  const isExternal = item.type === 'external';
+
+                  const subLinksList: HeaderNavSubLink[] = item.dropdown_items?.length
+                    ? item.dropdown_items
+                    : (item.sections && item.sections.length > 0
+                        ? item.sections.flatMap(s => s.links || [])
+                        : []);
+
+                  const totalMegaLinks = item.sections?.reduce((acc, s) => acc + s.links.length, 0) || 0;
+
+                  return (
+                    <div
+                      key={item.id}
+                      className={`rounded-xl border transition-all duration-200 overflow-hidden ${
+                        isDark ? 'bg-slate-900/70 border-slate-800' : 'bg-white border-slate-200 shadow-2xs'
+                      } ${!item.is_active ? 'opacity-65' : ''} ${
+                        isExpanded ? 'ring-2 ring-emerald-500/50 shadow-md' : ''
+                      }`}
+                    >
+                      {/* Item Main Header Bar */}
+                      <div className="p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div className="flex items-center space-x-3 min-w-0">
+                          {/* Reorder Buttons */}
+                          <div className="flex items-center space-x-1 shrink-0">
+                            <IconGripVertical className="w-4 h-4 text-slate-400 dark:text-slate-600" />
+                            <div className="flex flex-col space-y-0.5">
+                              <button
+                                disabled={idx === 0}
+                                onClick={() => handleMoveHeaderItem(idx, 'up')}
+                                className="p-0.5 text-slate-600 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-400 disabled:opacity-20 transition-colors"
+                                title="Move item up"
+                              >
+                                <IconArrowUp className="w-3 h-3" />
+                              </button>
+                              <button
+                                disabled={idx === headerItems.length - 1}
+                                onClick={() => handleMoveHeaderItem(idx, 'down')}
+                                className="p-0.5 text-slate-600 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-400 disabled:opacity-20 transition-colors"
+                                title="Move item down"
+                              >
+                                <IconArrowDown className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Item Identity */}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                                {item.name}
+                              </span>
+
+                              {/* Menu Type Badge */}
+                              <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded ${
+                                isMega
+                                  ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/70 dark:text-purple-300 border border-purple-300 dark:border-purple-800/60'
+                                  : isDropdown
+                                    ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/60'
+                                    : isExternal
+                                      ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60'
+                                      : 'bg-blue-100 text-blue-900 dark:bg-blue-950/70 dark:text-blue-300 border border-blue-300 dark:border-blue-800/60'
+                              }`}>
+                                {isMega ? 'Mega Menu' : isDropdown ? 'Ordinary Dropdown' : isExternal ? 'External Link' : 'Direct Link'}
+                              </span>
+
+                              {/* Sublink Count Tag */}
+                              {isDropdown && (
+                                <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                  {subLinksList.length} sub-links
+                                </span>
+                              )}
+
+                              {isMega && (
+                                <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-purple-50 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300">
+                                  {totalMegaLinks} links ({item.sections?.length || 0} sections)
+                                </span>
+                              )}
+
+                              {!item.is_active && (
+                                <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                  Hidden
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex items-center space-x-2 text-xs font-mono text-slate-600 dark:text-slate-400 mt-1">
+                              <span>Path: <strong className="text-slate-900 dark:text-slate-200 font-semibold">{item.href}</strong></span>
+                              {item.badge && (
+                                <span className="text-emerald-700 dark:text-emerald-400 font-bold">• Badge: "{item.badge}"</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Top Bar Actions */}
+                        <div className="flex items-center space-x-2 self-end md:self-center shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleHeaderItemActive(item.id)}
+                            className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-colors ${
+                              item.is_active
+                                ? 'border-emerald-300 bg-emerald-50 text-emerald-900 dark:bg-emerald-950/40 dark:border-emerald-800 dark:text-emerald-300'
+                                : 'border-slate-300 bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                            }`}
+                          >
+                            {item.is_active ? 'Visible' : 'Hidden'}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setExpandedCardId(isExpanded ? null : item.id)}
+                            className={`px-3 py-1 text-xs font-bold rounded-lg border transition-colors flex items-center space-x-1 ${
+                              isExpanded
+                                ? 'bg-slate-900 text-white dark:bg-slate-700 border-slate-900 dark:border-slate-700'
+                                : 'bg-slate-50 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-100'
+                            }`}
+                          >
+                            <span>{isExpanded ? 'Close' : 'Configure'}</span>
+                            {isExpanded ? <IconChevronDown className="w-3.5 h-3.5" /> : <IconChevronRight className="w-3.5 h-3.5" />}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteHeaderItem(item.id)}
+                            className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                            title="Remove menu item"
+                          >
+                            <IconTrash className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
 
-                      {hasSections ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                          {item.sections!.map((section) => {
-                            const isSectionCollapsed = Boolean(collapsedSectionIds[section.id]);
-                            return (
+                      {/* Expanded Settings Drawer */}
+                      {isExpanded && (
+                        <div className="p-4 sm:p-5 border-t border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-950/40 space-y-5 animate-fade-in">
+                          {/* Row 1: Label & Route */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                                Navigation Label *
+                              </label>
+                              <input
+                                type="text"
+                                value={item.name}
+                                onChange={e => handleUpdateHeaderItem(item.id, { name: e.target.value })}
+                                className={`w-full px-3.5 py-2 text-xs rounded-lg border outline-none font-bold ${
+                                  isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                                }`}
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                                Destination URL / Path *
+                              </label>
+                              <div className="flex space-x-2">
+                                <input
+                                  type="text"
+                                  value={item.href}
+                                  onChange={e => handleUpdateHeaderItem(item.id, { href: e.target.value })}
+                                  className={`flex-1 px-3.5 py-2 text-xs rounded-lg border outline-none font-mono ${
+                                    isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                                  }`}
+                                />
+                                <select
+                                  onChange={e => {
+                                    if (e.target.value) {
+                                      handleUpdateHeaderItem(item.id, { href: e.target.value });
+                                    }
+                                  }}
+                                  value=""
+                                  className={`px-2 py-2 text-xs rounded-lg border outline-none ${
+                                    isDark ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-300 text-slate-700'
+                                  }`}
+                                  title="Pick existing site page route"
+                                >
+                                  <option value="">Pick page...</option>
+                                  {AVAILABLE_PAGES.map(p => (
+                                    <option key={p.id} value={p.slug}>{p.title} ({p.slug})</option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Row 2: Menu Display Type (Radio Cards) */}
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
+                              Menu Display Type
+                            </label>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                              {/* Option 1: Direct Link */}
                               <div
-                                key={section.id}
-                                className={`rounded-lg border overflow-hidden ${
-                                  isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-white border-slate-300 shadow-2xs'
+                                onClick={() => handleUpdateHeaderItem(item.id, { type: 'standard' })}
+                                className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
+                                  item.type === 'standard' || item.type === 'external'
+                                    ? 'border-blue-500 bg-blue-50/80 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 ring-2 ring-blue-400/40'
+                                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:border-slate-300'
                                 }`}
                               >
-                                <div className="p-2.5 bg-slate-100 dark:bg-slate-900/60 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
-                                  <button
-                                    type="button"
-                                    onClick={() => toggleCollapseSection(section.id)}
-                                    className="flex items-center space-x-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 text-left hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors"
-                                  >
-                                    <span>{section.title}</span>
-                                    <span className="text-[10px] font-mono text-slate-600 dark:text-slate-400 font-semibold">
-                                      ({section.links.length})
-                                    </span>
-                                    {isSectionCollapsed ? (
-                                      <IconChevronRight className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
-                                    ) : (
-                                      <IconChevronDown className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
-                                    )}
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setTargetParentHeaderId(item.id);
-                                      setTargetSectionId(section.id);
-                                      setEditingSubLink({
-                                        id: '',
-                                        label: '',
-                                        href: '',
-                                        description: ''
-                                      });
-                                      setIsSubLinkModalOpen(true);
-                                    }}
-                                    className="text-[11px] font-bold text-emerald-800 dark:text-emerald-400 hover:underline"
-                                  >
-                                    + Add Link
-                                  </button>
+                                <div className="flex items-center space-x-2">
+                                  <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                                    item.type === 'standard' || item.type === 'external' ? 'border-blue-600 bg-blue-600' : 'border-slate-400'
+                                  }`}>
+                                    {(item.type === 'standard' || item.type === 'external') && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                                  </span>
+                                  <span className="font-bold text-xs">Standard Direct Link</span>
                                 </div>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 pl-5">
+                                  Directly navigates to the page URL without opening a menu.
+                                </p>
+                              </div>
 
-                                {!isSectionCollapsed && (
-                                  <div className="p-2 space-y-1.5 bg-slate-50/60 dark:bg-transparent">
-                                    {section.links.map((sublink) => (
-                                      <div
-                                        key={sublink.id}
-                                        className="flex items-center justify-between py-1.5 px-2.5 rounded bg-white dark:bg-slate-900/70 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-xs border border-slate-200/90 dark:border-slate-800/80 shadow-2xs"
-                                      >
-                                        <div className="min-w-0 pr-2">
-                                          <p className="font-bold text-slate-900 dark:text-white truncate">
-                                            {sublink.label}
-                                          </p>
-                                          <p className="text-[11px] text-slate-700 dark:text-slate-300 font-mono truncate font-medium">
-                                            {sublink.href}
-                                          </p>
-                                        </div>
-                                        <div className="flex items-center space-x-1 shrink-0">
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              setTargetParentHeaderId(item.id);
-                                              setTargetSectionId(section.id);
-                                              setEditingSubLink({ ...sublink });
-                                              setIsSubLinkModalOpen(true);
-                                            }}
-                                            className="p-1 text-slate-600 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-400 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
-                                            title="Edit sublink"
-                                          >
-                                            <IconEdit className="w-3.5 h-3.5" />
-                                          </button>
-                                          <button
-                                            type="button"
-                                            onClick={() => handleDeleteSubLink(item.id, section.id, sublink.id)}
-                                            className="p-1 text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 rounded hover:bg-red-50 dark:hover:bg-red-950/30"
-                                            title="Delete sublink"
-                                          >
-                                            <IconTrash className="w-3.5 h-3.5" />
-                                          </button>
-                                        </div>
+                              {/* Option 2: Ordinary Dropdown */}
+                              <div
+                                onClick={() => {
+                                  // initialize dropdown_items if empty
+                                  const current = item.dropdown_items?.length
+                                    ? item.dropdown_items
+                                    : (item.sections?.flatMap(s => s.links) || []);
+                                  handleUpdateHeaderItem(item.id, {
+                                    type: 'dropdown',
+                                    dropdown_items: current
+                                  });
+                                }}
+                                className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
+                                  item.type === 'dropdown'
+                                    ? 'border-emerald-500 bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 ring-2 ring-emerald-400/40'
+                                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:border-slate-300'
+                                }`}
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                                    item.type === 'dropdown' ? 'border-emerald-600 bg-emerald-600' : 'border-slate-400'
+                                  }`}>
+                                    {item.type === 'dropdown' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                                  </span>
+                                  <span className="font-bold text-xs">Ordinary Dropdown</span>
+                                </div>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 pl-5">
+                                  Standard vertical dropdown card with sleek list of sub-links.
+                                </p>
+                              </div>
+
+                              {/* Option 3: Mega Menu */}
+                              <div
+                                onClick={() => handleUpdateHeaderItem(item.id, { type: 'mega' })}
+                                className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
+                                  item.type === 'mega'
+                                    ? 'border-purple-500 bg-purple-50/80 dark:bg-purple-950/40 text-purple-900 dark:text-purple-200 ring-2 ring-purple-400/40'
+                                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:border-slate-300'
+                                }`}
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <span className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
+                                    item.type === 'mega' ? 'border-purple-600 bg-purple-600' : 'border-slate-400'
+                                  }`}>
+                                    {item.type === 'mega' && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                                  </span>
+                                  <span className="font-bold text-xs">Mega Menu (Retained)</span>
+                                </div>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 pl-5">
+                                  Full-width corporate showcase with multi-column sections &amp; featured teaser.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Row 3: Auxiliary settings */}
+                          <div className="flex flex-wrap items-center gap-6 pt-1">
+                            <div className="flex items-center space-x-2">
+                              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                Optional Badge:
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="e.g. 'NEW', 'PORTAL'"
+                                value={item.badge || ''}
+                                onChange={e => handleUpdateHeaderItem(item.id, { badge: e.target.value })}
+                                className={`px-2.5 py-1 text-xs rounded-md border outline-none ${
+                                  isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                                }`}
+                              />
+                            </div>
+
+                            <label className="flex items-center space-x-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={Boolean(item.is_external)}
+                                onChange={e => handleUpdateHeaderItem(item.id, { is_external: e.target.checked })}
+                                className="rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
+                              />
+                              <span>Open link in new tab</span>
+                            </label>
+
+                            <label className="flex items-center space-x-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={item.is_active}
+                                onChange={e => handleUpdateHeaderItem(item.id, { is_active: e.target.checked })}
+                                className="rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
+                              />
+                              <span>Visible in Top Header</span>
+                            </label>
+                          </div>
+
+                          {/* -------------------------------------------------------- */}
+                          {/* SUB-SECTION A: ORDINARY DROPDOWN SUB-LINKS MANAGER       */}
+                          {/* -------------------------------------------------------- */}
+                          {item.type === 'dropdown' && (
+                            <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <h4 className="text-xs font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
+                                    Ordinary Dropdown Sub-Items ({subLinksList.length})
+                                  </h4>
+                                  <p className="text-[11px] text-slate-500">
+                                    Links that will appear in the clean vertical dropdown under "{item.name}".
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Sub-links List */}
+                              <div className="space-y-2">
+                                {subLinksList.map((sub, sIdx) => (
+                                  <div
+                                    key={sub.id || sIdx}
+                                    className={`p-3 rounded-lg border flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${
+                                      isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200/90 shadow-2xs'
+                                    }`}
+                                  >
+                                    <div className="flex items-center space-x-2 min-w-0">
+                                      <div className="flex flex-col space-y-0.5 shrink-0">
+                                        <button
+                                          disabled={sIdx === 0}
+                                          onClick={() => handleMoveSubLinkInItem(item.id, sIdx, 'up')}
+                                          className="p-0.5 text-slate-400 hover:text-emerald-600 disabled:opacity-20"
+                                        >
+                                          <IconArrowUp className="w-2.5 h-2.5" />
+                                        </button>
+                                        <button
+                                          disabled={sIdx === subLinksList.length - 1}
+                                          onClick={() => handleMoveSubLinkInItem(item.id, sIdx, 'down')}
+                                          className="p-0.5 text-slate-400 hover:text-emerald-600 disabled:opacity-20"
+                                        >
+                                          <IconArrowDown className="w-2.5 h-2.5" />
+                                        </button>
                                       </div>
-                                    ))}
+
+                                      <div className="min-w-0">
+                                        <div className="flex items-center space-x-2">
+                                          <span className="font-bold text-xs text-slate-900 dark:text-white truncate">
+                                            {sub.label}
+                                          </span>
+                                          {sub.badge && (
+                                            <span className="px-1.5 py-0.2 text-[9px] font-bold rounded bg-emerald-100 text-emerald-800">
+                                              {sub.badge}
+                                            </span>
+                                          )}
+                                        </div>
+                                        <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono truncate block">
+                                          {sub.href} {sub.description ? `— ${sub.description}` : ''}
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center space-x-2 shrink-0 self-end sm:self-center">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteSubLinkFromItem(item.id, sub.id)}
+                                        className="p-1 text-slate-400 hover:text-red-600 rounded transition-colors"
+                                        title="Remove sublink"
+                                      >
+                                        <IconTrash className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+
+                                {subLinksList.length === 0 && (
+                                  <div className="p-4 rounded-lg border border-dashed border-slate-300 dark:border-slate-800 text-center text-xs text-slate-500 italic">
+                                    No sub-links in this dropdown yet. Use the form below to add one.
                                   </div>
                                 )}
                               </div>
-                            );
-                          })}
+
+                              {/* Inline Adder Card */}
+                              <div className={`p-3.5 rounded-xl border ${
+                                isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-emerald-50/40 border-emerald-200/60'
+                              }`}>
+                                <span className="text-[11px] font-black uppercase tracking-wider text-emerald-900 dark:text-emerald-300 block mb-2.5">
+                                  + Add Sub-Link to this Dropdown
+                                </span>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                                  <div className="sm:col-span-4">
+                                    <input
+                                      type="text"
+                                      placeholder="Sub-link Label *"
+                                      value={sublinkDrafts[item.id]?.label || ''}
+                                      onChange={e => {
+                                        const cur = sublinkDrafts[item.id] || { label: '', href: '', description: '', badge: '', is_external: false };
+                                        setSublinkDrafts({ ...sublinkDrafts, [item.id]: { ...cur, label: e.target.value } });
+                                      }}
+                                      className={`w-full px-3 py-1.5 text-xs rounded-lg border outline-none ${
+                                        isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                                      }`}
+                                    />
+                                  </div>
+
+                                  <div className="sm:col-span-4">
+                                    <input
+                                      type="text"
+                                      placeholder="URL Path (/route or https://) *"
+                                      value={sublinkDrafts[item.id]?.href || ''}
+                                      onChange={e => {
+                                        const cur = sublinkDrafts[item.id] || { label: '', href: '', description: '', badge: '', is_external: false };
+                                        setSublinkDrafts({ ...sublinkDrafts, [item.id]: { ...cur, href: e.target.value } });
+                                      }}
+                                      className={`w-full px-3 py-1.5 text-xs rounded-lg border outline-none font-mono ${
+                                        isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                                      }`}
+                                    />
+                                  </div>
+
+                                  <div className="sm:col-span-4">
+                                    <select
+                                      onChange={e => {
+                                        if (e.target.value) {
+                                          const p = AVAILABLE_PAGES.find(x => x.slug === e.target.value);
+                                          const cur = sublinkDrafts[item.id] || { label: '', href: '', description: '', badge: '', is_external: false };
+                                          setSublinkDrafts({
+                                            ...sublinkDrafts,
+                                            [item.id]: {
+                                              ...cur,
+                                              href: e.target.value,
+                                              label: cur.label || (p ? p.title : '')
+                                            }
+                                          });
+                                        }
+                                      }}
+                                      value=""
+                                      className={`w-full px-3 py-1.5 text-xs rounded-lg border outline-none ${
+                                        isDark ? 'bg-slate-950 border-slate-800 text-slate-300' : 'bg-white border-slate-300 text-slate-700'
+                                      }`}
+                                    >
+                                      <option value="">Or autofill from page...</option>
+                                      {AVAILABLE_PAGES.map(p => (
+                                        <option key={p.id} value={p.slug}>{p.title}</option>
+                                      ))}
+                                    </select>
+                                  </div>
+
+                                  <div className="sm:col-span-8">
+                                    <input
+                                      type="text"
+                                      placeholder="Optional short description (e.g. 'Engineering careers & talent opportunities')"
+                                      value={sublinkDrafts[item.id]?.description || ''}
+                                      onChange={e => {
+                                        const cur = sublinkDrafts[item.id] || { label: '', href: '', description: '', badge: '', is_external: false };
+                                        setSublinkDrafts({ ...sublinkDrafts, [item.id]: { ...cur, description: e.target.value } });
+                                      }}
+                                      className={`w-full px-3 py-1.5 text-xs rounded-lg border outline-none ${
+                                        isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                                      }`}
+                                    />
+                                  </div>
+
+                                  <div className="sm:col-span-4 flex justify-end">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleAddSubLinkToItem(item.id)}
+                                      className="w-full sm:w-auto px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors shadow-2xs"
+                                    >
+                                      + Add Sub-link
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* -------------------------------------------------------- */}
+                          {/* SUB-SECTION B: MEGA MENU SECTIONS & FEATURED CARD        */}
+                          {/* -------------------------------------------------------- */}
+                          {item.type === 'mega' && (
+                            <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <h4 className="text-xs font-black uppercase tracking-wider text-purple-900 dark:text-purple-300">
+                                    Mega Menu Columns &amp; Sections ({item.sections?.length || 0})
+                                  </h4>
+                                  <p className="text-[11px] text-slate-500">
+                                    Organise multiple categorized columns with nested links.
+                                  </p>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddSection(item.id)}
+                                  className="text-xs font-bold text-purple-700 dark:text-purple-300 hover:underline flex items-center space-x-1"
+                                >
+                                  <IconPlus className="w-3.5 h-3.5" />
+                                  <span>Add Section</span>
+                                </button>
+                              </div>
+
+                              {/* Sections Grid */}
+                              {item.sections && item.sections.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                                  {item.sections.map((section) => (
+                                    <div
+                                      key={section.id}
+                                      className={`rounded-lg border overflow-hidden ${
+                                        isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-white border-slate-300 shadow-2xs'
+                                      }`}
+                                    >
+                                      <div className="p-2.5 bg-slate-100 dark:bg-slate-900/60 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
+                                        <div className="flex items-center space-x-1.5">
+                                          <span className="text-xs font-bold text-slate-900 dark:text-white">{section.title}</span>
+                                          <span className="text-[10px] font-mono text-slate-500">({section.links.length})</span>
+                                        </div>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setTargetParentHeaderId(item.id);
+                                            setTargetSectionId(section.id);
+                                            setEditingSubLink({ id: '', label: '', href: '', description: '' });
+                                            setIsSubLinkModalOpen(true);
+                                          }}
+                                          className="text-[11px] font-bold text-purple-700 dark:text-purple-300 hover:underline"
+                                        >
+                                          + Add Link
+                                        </button>
+                                      </div>
+
+                                      <div className="p-2 space-y-1 bg-slate-50/60 dark:bg-transparent">
+                                        {section.links.map((sublink) => (
+                                          <div
+                                            key={sublink.id}
+                                            className="flex items-center justify-between py-1 px-2 rounded bg-white dark:bg-slate-900 text-xs border border-slate-200/90 dark:border-slate-800/80"
+                                          >
+                                            <div className="min-w-0 pr-2">
+                                              <p className="font-semibold text-slate-800 dark:text-white truncate">{sublink.label}</p>
+                                              <p className="text-[10px] text-slate-500 font-mono truncate">{sublink.href}</p>
+                                            </div>
+                                            <div className="flex items-center space-x-1 shrink-0">
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  setTargetParentHeaderId(item.id);
+                                                  setTargetSectionId(section.id);
+                                                  setEditingSubLink({ ...sublink });
+                                                  setIsSubLinkModalOpen(true);
+                                                }}
+                                                className="p-1 text-slate-500 hover:text-emerald-600"
+                                              >
+                                                <IconEdit className="w-3 h-3" />
+                                              </button>
+                                              <button
+                                                type="button"
+                                                onClick={() => handleDeleteSubLink(item.id, section.id, sublink.id)}
+                                                className="p-1 text-slate-400 hover:text-red-600"
+                                              >
+                                                <IconTrash className="w-3 h-3" />
+                                              </button>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="text-xs text-slate-500 italic">
+                                  This mega menu is dynamically driven by the services catalog or has no custom sections.
+                                </p>
+                              )}
+
+                              {/* Featured Teaser Card settings */}
+                              <div className={`p-3.5 rounded-xl border ${
+                                isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-purple-50/40 border-purple-200/60'
+                              }`}>
+                                <span className="text-[11px] font-black uppercase tracking-wider text-purple-900 dark:text-purple-300 block mb-2">
+                                  Featured Callout Teaser Card
+                                </span>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                  <input
+                                    type="text"
+                                    placeholder="Teaser Category (e.g. Corporate Overview)"
+                                    value={item.featured?.category || ''}
+                                    onChange={e => {
+                                      const cur = item.featured || { category: '', title: '', description: '', link: '' };
+                                      handleUpdateHeaderItem(item.id, { featured: { ...cur, category: e.target.value } });
+                                    }}
+                                    className={`px-3 py-1.5 text-xs rounded-lg border outline-none ${
+                                      isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                                    }`}
+                                  />
+                                  <input
+                                    type="text"
+                                    placeholder="Teaser Title"
+                                    value={item.featured?.title || ''}
+                                    onChange={e => {
+                                      const cur = item.featured || { category: '', title: '', description: '', link: '' };
+                                      handleUpdateHeaderItem(item.id, { featured: { ...cur, title: e.target.value } });
+                                    }}
+                                    className={`px-3 py-1.5 text-xs rounded-lg border outline-none ${
+                                      isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                                    }`}
+                                  />
+                                  <input
+                                    type="text"
+                                    placeholder="Target Link URL (/about or /services)"
+                                    value={item.featured?.link || ''}
+                                    onChange={e => {
+                                      const cur = item.featured || { category: '', title: '', description: '', link: '' };
+                                      handleUpdateHeaderItem(item.id, { featured: { ...cur, link: e.target.value } });
+                                    }}
+                                    className={`px-3 py-1.5 text-xs rounded-lg border outline-none font-mono ${
+                                      isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                                    }`}
+                                  />
+                                  <input
+                                    type="text"
+                                    placeholder="Cover Image URL (/assets/...)"
+                                    value={item.featured?.image || ''}
+                                    onChange={e => {
+                                      const cur = item.featured || { category: '', title: '', description: '', link: '' };
+                                      handleUpdateHeaderItem(item.id, { featured: { ...cur, image: e.target.value } });
+                                    }}
+                                    className={`px-3 py-1.5 text-xs rounded-lg border outline-none font-mono ${
+                                      isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-300 text-slate-900'
+                                    }`}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Card Footer Actions */}
+                          <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800">
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteHeaderItem(item.id)}
+                              className="text-xs font-bold text-red-600 hover:text-red-700 hover:underline"
+                            >
+                              Remove Menu Item
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setExpandedCardId(null)}
+                              className="px-3.5 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg text-xs font-bold transition-colors"
+                            >
+                              Done Editing
+                            </button>
+                          </div>
                         </div>
-                      ) : (
-                        <p className="text-xs text-slate-600 dark:text-slate-400 italic">
-                          This mega menu is dynamically driven by the services catalog or has no custom child sections.
-                        </p>
                       )}
                     </div>
-                  )}
-                </div>
-              );
-            })}
+                  );
+                })}
+
+                {headerItems.length === 0 && (
+                  <div className={`p-8 rounded-2xl border text-center ${
+                    isDark ? 'bg-slate-900/40 border-slate-800' : 'bg-white border-slate-200'
+                  }`}>
+                    <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">
+                      No menu items currently in the header navigation.
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Select pages or divisions from the left column to add them to your menu.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Bottom Action Bar */}
+              <div className="flex items-center justify-between pt-3">
+                <button
+                  type="button"
+                  onClick={() => setIsResetConfirmOpen(true)}
+                  className="text-xs text-red-600 dark:text-red-400 hover:underline font-semibold"
+                >
+                  Reset Menu to PIGL Defaults
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSaveAllHeaderNav}
+                  disabled={isSavingHeader}
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center space-x-2 transition-all shadow-md disabled:opacity-50"
+                >
+                  <IconCheck className="w-4 h-4" />
+                  <span>{isSavingHeader ? 'Saving Menu...' : 'Save Navigation Menu'}</span>
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       )}

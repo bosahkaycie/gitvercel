@@ -628,6 +628,7 @@ export interface HeaderNavSubLink {
   href: string;
   description?: string;
   is_external?: boolean;
+  badge?: string;
 }
 
 export interface HeaderNavSection {
@@ -640,11 +641,13 @@ export interface HeaderNavItem {
   id: string;
   name: string;
   href: string;
-  type: 'standard' | 'mega' | 'external';
+  type: 'standard' | 'dropdown' | 'mega' | 'external';
   layout?: 'links' | 'services' | 'projects';
   is_active: boolean;
   order: number;
   badge?: string;
+  is_external?: boolean;
+  dropdown_items?: HeaderNavSubLink[];
   sections?: HeaderNavSection[];
   featured?: {
     category: string;
