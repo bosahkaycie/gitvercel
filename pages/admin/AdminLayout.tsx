@@ -158,7 +158,7 @@ const AdminLayout: React.FC = () => {
   const { logs: auditLogs, logAction } = useAuditLogs();
   
   const { campaigns, loading: campaignsLoading, saveCampaign, dispatchCampaign, deleteCampaign } = useEmailCampaigns();
-  const { subscribers, loading: subscribersLoading, addSubscriber, deleteSubscriber } = useEmailSubscribers();
+  const { subscribers, loading: subscribersLoading, addSubscriber, deleteSubscriber } = useEmailSubscribers(true);
   const { followUps, loading: followUpsLoading, sendFollowUp } = useFollowUpEmails();
 
   const handleReviewVendorWithLog = async (id: string, data: any) => {

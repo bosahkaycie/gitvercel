@@ -92,8 +92,9 @@ const CountUp: React.FC<{ end: number; duration?: number; suffix?: string }> = (
 };
 
 // Robust HTML5 Video Component ensuring compliant autoplay, explicit DOM muting, and lifecycle management
-// Performance Engineering: Only loads and mounts the video when the slide is active or has been activated.
-// Inactive slides keep only the lightweight poster in the DOM, slashing initial video transfer from 4.3MB to ~1MB.
+// Performance Engineering: Only mounts and buffers the video when the slide is actively displayed.
+// When inactive, unmounts the video element to prevent background multi-video buffering.
+// On initial page load, defers video mounting until LCP and critical assets are fully rendered.
 const HeroSlideVideo: React.FC<{
   src: string;
   isActive: boolean;
@@ -105,19 +106,35 @@ const HeroSlideVideo: React.FC<{
 }> = ({ src, isActive, isHeroVisible, prefersReducedMotion = false, poster, title, isFirst = false }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [hasBeenActive, setHasBeenActive] = useState(isFirst);
+  const [shouldMountVideo, setShouldMountVideo] = useState(false);
   const hasPoster = Boolean(poster && poster.trim());
 
-  // Lazy load video stream only when slide becomes active and user does not prefer reduced motion
   useEffect(() => {
-    if (isActive && !prefersReducedMotion) {
-      setHasBeenActive(true);
+    // If slide is inactive or out of viewport or reduced motion is requested, do not mount video
+    if (!isActive || !isHeroVisible || prefersReducedMotion) {
+      setShouldMountVideo(false);
+      setIsVideoLoaded(false);
+      return;
     }
-  }, [isActive, prefersReducedMotion]);
+
+    // Save heavy bandwidth on mobile viewports; crisp poster image is displayed instead
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setShouldMountVideo(false);
+      return;
+    }
+
+    // Defer mounting initial video to ensure 100% LCP priority for the hero poster
+    const mountDelay = isFirst ? 1200 : 250;
+    const timer = setTimeout(() => {
+      setShouldMountVideo(true);
+    }, mountDelay);
+
+    return () => clearTimeout(timer);
+  }, [isActive, isHeroVisible, prefersReducedMotion, isFirst]);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !hasBeenActive) return;
+    if (!video || !shouldMountVideo) return;
 
     // Critical: Programmatically enforce DOM property muting to satisfy strict modern browser autoplay security policies
     video.muted = true;
@@ -160,7 +177,7 @@ const HeroSlideVideo: React.FC<{
     return () => {
       isSubscribed = false;
     };
-  }, [isActive, isHeroVisible, hasBeenActive, prefersReducedMotion, src]);
+  }, [isActive, isHeroVisible, shouldMountVideo, prefersReducedMotion, src]);
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-slate-950">
@@ -178,7 +195,7 @@ const HeroSlideVideo: React.FC<{
           decoding={isFirst ? "sync" : "async"}
         />
       )}
-      {hasBeenActive && !prefersReducedMotion && (
+      {shouldMountVideo && isActive && !prefersReducedMotion && (
         <video
           ref={videoRef}
           key={src}
@@ -189,7 +206,7 @@ const HeroSlideVideo: React.FC<{
           autoPlay
           disablePictureInPicture
           disableRemotePlayback
-          preload={isActive || isFirst ? 'auto' : 'none'}
+          preload="metadata"
           aria-label={title || 'Slide background video'}
           className={`w-full h-full object-cover pointer-events-none transition-opacity duration-700 ease-out ${
             !hasPoster || (isVideoLoaded && isActive) ? 'opacity-100' : 'opacity-0'

@@ -1359,6 +1359,9 @@ export const useBlogPost = (slugOrId: string) => {
 // ==============================================================================
 // 3. SLIDERS HOOKS
 // ==============================================================================
+let cachedSlidersPromise: Promise<CMSSlider[]> | null = null;
+let lastSlidersFetchTime = 0;
+
 export const useSliders = (adminMode = false) => {
   const [sliders, setSliders] = useState<CMSSlider[]>(() => {
     const local = getStoredSliders();
@@ -1370,7 +1373,15 @@ export const useSliders = (adminMode = false) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSliders = useCallback(async () => {
+  const fetchSliders = useCallback(async (force = false) => {
+    if (!force && !adminMode && cachedSlidersPromise && (Date.now() - lastSlidersFetchTime < 60000)) {
+      try {
+        const cached = await cachedSlidersPromise;
+        setSliders(cached);
+        return;
+      } catch {}
+    }
+
     setLoading(true);
     setError(null);
     const deletedIds = getDeletedSliderIds();
@@ -1421,6 +1432,10 @@ export const useSliders = (adminMode = false) => {
       normalized.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
       saveStoredSliders(normalized);
       const filtered = adminMode ? normalized : normalized.filter(s => s.is_active);
+      if (!adminMode) {
+        lastSlidersFetchTime = Date.now();
+        cachedSlidersPromise = Promise.resolve(filtered);
+      }
       setSliders(filtered);
       setLoading(false);
       return;
@@ -3533,61 +3548,82 @@ export const saveStoredSettings = (settings: SiteSettings) => {
   }
 };
 
+let cachedSettingsPromise: Promise<SiteSettings> | null = null;
+let lastSettingsFetchTime = 0;
+
 export const useSiteSettings = () => {
   const [settings, setSettings] = useState<SiteSettings>(getStoredSettings());
   const [loading, setLoading] = useState<boolean>(false);
 
-  const fetchSettings = useCallback(async () => {
-    const client = getSupabaseClient();
-
-    // 1. Fetch cloud settings config from /api/settings or direct storage
-    let cloudConfig: Partial<SiteSettings> = {};
-    try {
-      const resp = await fetch('/api/settings');
-      if (resp.ok) {
-        const json = await resp.json();
-        if (json.success && json.settings) {
-          cloudConfig = json.settings;
-        }
-      }
-    } catch {
-      if (client) {
-        try {
-          const { data: stData } = await client.storage.from('media').download('config/site_settings.json');
-          if (stData) {
-            cloudConfig = JSON.parse(await stData.text());
-          }
-        } catch {}
-      }
-    }
-
-    // 2. Fetch standard database row from site_settings table
-    let dbRow: any = null;
-    if (client) {
+  const fetchSettings = useCallback(async (force = false) => {
+    if (!force && cachedSettingsPromise && (Date.now() - lastSettingsFetchTime < 60000)) {
       try {
-        const { data } = await client.from('site_settings').select('*').limit(1).single();
-        if (data) dbRow = data;
+        const cached = await cachedSettingsPromise;
+        setSettings(cached);
+        return;
       } catch {}
     }
 
-    const local = getStoredSettings();
-    const merged: SiteSettings = {
-      ...FALLBACK_SETTINGS,
-      ...local,
-      ...(dbRow ? {
-        company_name: dbRow.company_name,
-        email_info: dbRow.primary_email || local.email_info,
-        phone: dbRow.primary_phone || local.phone,
-        address_hq: dbRow.address_port_harcourt || local.address_hq,
-        linkedin_url: dbRow.social_linkedin || local.linkedin_url,
-        youtube_url: dbRow.social_twitter || local.youtube_url
-      } : {}),
-      ...cloudConfig
-    };
+    const loadPromise = (async () => {
+      const client = getSupabaseClient();
 
-    saveStoredSettings(merged);
-    setSettings(merged);
-    setLoading(false);
+      // 1. Fetch cloud settings config from /api/settings or direct storage
+      let cloudConfig: Partial<SiteSettings> = {};
+      try {
+        const resp = await fetch('/api/settings');
+        if (resp.ok) {
+          const json = await resp.json();
+          if (json.success && json.settings) {
+            cloudConfig = json.settings;
+          }
+        }
+      } catch {
+        if (client) {
+          try {
+            const { data: stData } = await client.storage.from('media').download('config/site_settings.json');
+            if (stData) {
+              cloudConfig = JSON.parse(await stData.text());
+            }
+          } catch {}
+        }
+      }
+
+      // 2. Fetch standard database row from site_settings table
+      let dbRow: any = null;
+      if (client) {
+        try {
+          const { data } = await client.from('site_settings').select('*').limit(1).single();
+          if (data) dbRow = data;
+        } catch {}
+      }
+
+      const local = getStoredSettings();
+      const merged: SiteSettings = {
+        ...FALLBACK_SETTINGS,
+        ...local,
+        ...(dbRow ? {
+          company_name: dbRow.company_name,
+          email_info: dbRow.primary_email || local.email_info,
+          phone: dbRow.primary_phone || local.phone,
+          address_hq: dbRow.address_port_harcourt || local.address_hq,
+          linkedin_url: dbRow.social_linkedin || local.linkedin_url,
+          youtube_url: dbRow.social_twitter || local.youtube_url
+        } : {}),
+        ...cloudConfig
+      };
+
+      saveStoredSettings(merged);
+      lastSettingsFetchTime = Date.now();
+      return merged;
+    })();
+
+    cachedSettingsPromise = loadPromise;
+    try {
+      const result = await loadPromise;
+      setSettings(result);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -3644,6 +3680,8 @@ export const useSiteSettings = () => {
 
     // 3. Save to local storage for instant responsiveness
     saveStoredSettings(updated);
+    cachedSettingsPromise = null;
+    lastSettingsFetchTime = 0;
     setSettings(updated);
     return updated;
   };
@@ -4729,7 +4767,7 @@ export const useEmailCampaigns = () => {
   };
 };
 
-export const useEmailSubscribers = () => {
+export const useEmailSubscribers = (adminMode = false) => {
   const [subscribers, setSubscribers] = useState<EmailSubscriber[]>(getStoredSubscribers());
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -4758,8 +4796,10 @@ export const useEmailSubscribers = () => {
   }, []);
 
   useEffect(() => {
-    refreshSubscribers();
-  }, [refreshSubscribers]);
+    if (adminMode) {
+      refreshSubscribers();
+    }
+  }, [adminMode, refreshSubscribers]);
 
   const addSubscriber = async (subscriber: Partial<EmailSubscriber>): Promise<{ success: boolean; error?: string }> => {
     try {
@@ -5514,61 +5554,82 @@ export const saveStoredPageHeaders = (data: SiteHeadersData): void => {
   }
 };
 
+let cachedHeadersPromise: Promise<SiteHeadersData> | null = null;
+let lastHeadersFetchTime = 0;
+
 export const usePageHeaders = (adminMode = false) => {
   const [headersData, setHeadersData] = useState<SiteHeadersData>(getStoredPageHeaders());
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchHeaders = useCallback(async () => {
+  const fetchHeaders = useCallback(async (force = false) => {
+    if (!force && cachedHeadersPromise && (Date.now() - lastHeadersFetchTime < 60000)) {
+      try {
+        const cached = await cachedHeadersPromise;
+        setHeadersData(cached);
+        return;
+      } catch {}
+    }
+
     setLoading(true);
     setError(null);
 
-    let remoteData: SiteHeadersData | null = null;
+    const loadPromise = (async () => {
+      let remoteData: SiteHeadersData | null = null;
 
-    // 1. Fetch from /api/page-headers
-    try {
-      const res = await fetch('/api/page-headers');
-      if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
-        const json = await res.json();
-        if (json.success && json.headers) {
-          remoteData = json.headers;
-        }
-      }
-    } catch (e) {
-      console.warn('API /api/page-headers fetch error, checking storage fallback:', e);
-    }
-
-    // 2. Direct Supabase Storage fallback
-    if (!remoteData) {
-      const client = getSupabaseClient();
-      if (client) {
-        try {
-          const { data, error: stErr } = await client.storage.from('media').download('config/page_headers.json');
-          if (!stErr && data) {
-            const parsed = JSON.parse(await data.text());
-            if (parsed && typeof parsed.pages === 'object') {
-              remoteData = parsed;
-            }
+      // 1. Fetch from /api/page-headers
+      try {
+        const res = await fetch('/api/page-headers');
+        if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+          const json = await res.json();
+          if (json.success && json.headers) {
+            remoteData = json.headers;
           }
-        } catch (stErr) {
-          console.warn('Supabase storage fallback for page headers notice:', stErr);
+        }
+      } catch (e) {
+        console.warn('API /api/page-headers fetch error, checking storage fallback:', e);
+      }
+
+      // 2. Direct Supabase Storage fallback
+      if (!remoteData) {
+        const client = getSupabaseClient();
+        if (client) {
+          try {
+            const { data, error: stErr } = await client.storage.from('media').download('config/page_headers.json');
+            if (!stErr && data) {
+              const parsed = JSON.parse(await data.text());
+              if (parsed && typeof parsed.pages === 'object') {
+                remoteData = parsed;
+              }
+            }
+          } catch (stErr) {
+            console.warn('Supabase storage fallback for page headers notice:', stErr);
+          }
         }
       }
+
+      const currentLocal = getStoredPageHeaders();
+      const finalData: SiteHeadersData = {
+        pages: {
+          ...DEFAULT_PAGE_HEADERS,
+          ...(remoteData?.pages || currentLocal.pages)
+        },
+        top_header: remoteData?.top_header || currentLocal.top_header || DEFAULT_TOP_HEADER,
+        updated_at: remoteData?.updated_at || currentLocal.updated_at
+      };
+
+      saveStoredPageHeaders(finalData);
+      lastHeadersFetchTime = Date.now();
+      return finalData;
+    })();
+
+    cachedHeadersPromise = loadPromise;
+    try {
+      const result = await loadPromise;
+      setHeadersData(result);
+    } finally {
+      setLoading(false);
     }
-
-    const currentLocal = getStoredPageHeaders();
-    const finalData: SiteHeadersData = {
-      pages: {
-        ...DEFAULT_PAGE_HEADERS,
-        ...(remoteData?.pages || currentLocal.pages)
-      },
-      top_header: remoteData?.top_header || currentLocal.top_header || DEFAULT_TOP_HEADER,
-      updated_at: remoteData?.updated_at || currentLocal.updated_at
-    };
-
-    saveStoredPageHeaders(finalData);
-    setHeadersData(finalData);
-    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -5960,52 +6021,73 @@ export const saveStoredCompanyProfile = (doc: CompanyProfileDocument) => {
   } catch {}
 };
 
+let cachedCompanyProfilePromise: Promise<CompanyProfileDocument> | null = null;
+let lastCompanyProfileFetchTime = 0;
+
 export const useCompanyProfile = () => {
   const [profileDoc, setProfileDoc] = useState<CompanyProfileDocument>(getStoredCompanyProfile());
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProfile = useCallback(async () => {
+  const fetchProfile = useCallback(async (force = false) => {
+    if (!force && cachedCompanyProfilePromise && (Date.now() - lastCompanyProfileFetchTime < 60000)) {
+      try {
+        const cached = await cachedCompanyProfilePromise;
+        setProfileDoc(cached);
+        return;
+      } catch {}
+    }
+
     setLoading(true);
     setError(null);
 
-    let remoteData: CompanyProfileDocument | null = null;
+    const loadPromise = (async () => {
+      let remoteData: CompanyProfileDocument | null = null;
 
-    // 1. Fetch from /api/company-profile
-    try {
-      const res = await fetch('/api/company-profile');
-      if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
-        const json = await res.json();
-        if (json.success && json.document) {
-          remoteData = json.document;
-        }
-      }
-    } catch (e) {
-      console.warn('API /api/company-profile notice, falling back to direct storage:', e);
-    }
-
-    // 2. Direct Supabase Storage fallback
-    if (!remoteData) {
-      const client = getSupabaseClient();
-      if (client) {
-        try {
-          const { data, error: stErr } = await client.storage.from('media').download('config/company_profile.json');
-          if (!stErr && data) {
-            const parsed = JSON.parse(await data.text());
-            if (parsed && typeof parsed === 'object') {
-              remoteData = parsed;
-            }
+      // 1. Fetch from /api/company-profile
+      try {
+        const res = await fetch('/api/company-profile');
+        if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+          const json = await res.json();
+          if (json.success && json.document) {
+            remoteData = json.document;
           }
-        } catch (stErr) {
-          console.warn('Supabase storage fallback for company profile notice:', stErr);
+        }
+      } catch (e) {
+        console.warn('API /api/company-profile notice, falling back to direct storage:', e);
+      }
+
+      // 2. Direct Supabase Storage fallback
+      if (!remoteData) {
+        const client = getSupabaseClient();
+        if (client) {
+          try {
+            const { data, error: stErr } = await client.storage.from('media').download('config/company_profile.json');
+            if (!stErr && data) {
+              const parsed = JSON.parse(await data.text());
+              if (parsed && typeof parsed === 'object') {
+                remoteData = parsed;
+              }
+            }
+          } catch (stErr) {
+            console.warn('Supabase storage fallback for company profile notice:', stErr);
+          }
         }
       }
-    }
 
-    const finalDoc = remoteData || getStoredCompanyProfile() || DEFAULT_COMPANY_PROFILE;
-    saveStoredCompanyProfile(finalDoc);
-    setProfileDoc(finalDoc);
-    setLoading(false);
+      const finalDoc = remoteData || getStoredCompanyProfile() || DEFAULT_COMPANY_PROFILE;
+      saveStoredCompanyProfile(finalDoc);
+      lastCompanyProfileFetchTime = Date.now();
+      return finalDoc;
+    })();
+
+    cachedCompanyProfilePromise = loadPromise;
+    try {
+      const result = await loadPromise;
+      setProfileDoc(result);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -6125,6 +6207,8 @@ export const useCompanyProfile = () => {
     }
 
     if (uploadedDoc) {
+      cachedCompanyProfilePromise = null;
+      lastCompanyProfileFetchTime = 0;
       saveStoredCompanyProfile(uploadedDoc);
       setProfileDoc(uploadedDoc);
       setLoading(false);

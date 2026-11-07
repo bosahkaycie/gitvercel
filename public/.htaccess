@@ -58,14 +58,13 @@ Options -Indexes
   ExpiresByType video/mp4 "access plus 1 year"
 </IfModule>
 
-# 5. Prevent Browser Caching of HTML (Always Fetch Latest Vite Bundle)
+# 5. Prevent Stale Browser Caching of HTML while allowing Back/Forward Cache (bfcache)
 <FilesMatch "\.(html|htm)$">
   FileETag None
   <IfModule mod_headers.c>
     Header unset ETag
-    Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+    Header set Cache-Control "no-cache, must-revalidate"
     Header set Pragma "no-cache"
-    Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
   </IfModule>
 </FilesMatch>
 
@@ -100,6 +99,22 @@ Options -Indexes
   RewriteCond %{REQUEST_URI} ^/api/social-links/?$ [NC]
   RewriteCond %{DOCUMENT_ROOT}/api/social-links.php -f
   RewriteRule ^api/social-links/?$ /api/social-links.php [L,QSA]
+
+  RewriteCond %{REQUEST_URI} ^/api/settings/?$ [NC]
+  RewriteCond %{DOCUMENT_ROOT}/api/settings.php -f
+  RewriteRule ^api/settings/?$ /api/settings.php [L,QSA]
+
+  RewriteCond %{REQUEST_URI} ^/api/page-headers/?$ [NC]
+  RewriteCond %{DOCUMENT_ROOT}/api/page-headers.php -f
+  RewriteRule ^api/page-headers/?$ /api/page-headers.php [L,QSA]
+
+  RewriteCond %{REQUEST_URI} ^/api/client-logos/?$ [NC]
+  RewriteCond %{DOCUMENT_ROOT}/api/client-logos.php -f
+  RewriteRule ^api/client-logos/?$ /api/client-logos.php [L,QSA]
+
+  RewriteCond %{REQUEST_URI} ^/api/sliders/?$ [NC]
+  RewriteCond %{DOCUMENT_ROOT}/api/sliders.php -f
+  RewriteRule ^api/sliders/?$ /api/sliders.php [L,QSA]
 
   # 7B-2. Explicit Static Bypass for Search Crawlers (Favicon, Manifest, OG Banner, Robots, Sitemap)
   RewriteRule ^(favicon\.ico|favicon-[0-9]+x[0-9]+\.png|favicon\.png|favicon\.svg|icon-[0-9]+\.png|apple-touch-icon\.png|og-image\.(jpg|jpeg|png)|site\.webmanifest|robots\.txt|sitemap\.xml)$ - [L]

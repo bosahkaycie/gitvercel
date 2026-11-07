@@ -398,8 +398,11 @@ function generateHtmlForRoute(config) {
     ]
   };
 
+  const preloadTag = config.path === '/'
+    ? `  <link rel="preload" as="image" href="/assets/seismic_survey.webp" type="image/webp" fetchpriority="high">\n`
+    : '';
   const breadcrumbsTag = `<script type="application/ld+json" id="route-breadcrumb-schema">${JSON.stringify(breadcrumbsSchema)}</script>`;
-  html = html.replace('</head>', `  ${breadcrumbsTag}\n</head>`);
+  html = html.replace('</head>', `${preloadTag}  ${breadcrumbsTag}\n</head>`);
 
   // Replace Fallback Semantic Shell inside <noscript id="crawlable-semantic-shell">
   const noscriptContent = `
