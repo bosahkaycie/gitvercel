@@ -181,8 +181,8 @@ const Services: React.FC = () => {
 
   useEffect(() => {
     const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
+      threshold: 0.05,
+      rootMargin: '0px 0px 50px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -193,16 +193,19 @@ const Services: React.FC = () => {
       });
     }, observerOptions);
 
+    const revealElements = document.querySelectorAll('.reveal');
+    revealElements.forEach(el => observer.observe(el));
+
+    // Safety fallback: ensure all elements become visible immediately even if observer is delayed
     const timer = setTimeout(() => {
-      const revealElements = document.querySelectorAll('.reveal');
-      revealElements.forEach(el => observer.observe(el));
-    }, 100);
+      document.querySelectorAll('.reveal:not(.active)').forEach(el => el.classList.add('active'));
+    }, 200);
 
     return () => {
       clearTimeout(timer);
       observer.disconnect();
     };
-  }, [selectedId]);
+  }, [selectedId, services, loading]);
 
   // View state switcher logic
   const resolvedId = selectedId ? (LEGACY_SERVICE_MAP[selectedId] || selectedId) : null;
@@ -608,10 +611,10 @@ const Services: React.FC = () => {
       </section>
 
       {/* Main Services Architecture Grid */}
-      <section className="py-20 md:py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <section className="py-12 md:py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 md:space-y-12">
           
-          <div className="reveal max-w-3xl border-l-4 border-emerald-700 pl-6">
+          <div className="max-w-3xl border-l-4 border-emerald-700 pl-6">
             <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">Operating Divisions</h2>
             <p className="text-lg md:text-xl text-slate-600 leading-relaxed font-normal">
               Authoritative engineering divisions delivering accurate data, deep marine insight, infrastructure construction, and sustainable industrial solutions across Nigeria and Sub-Saharan Africa.
@@ -627,7 +630,7 @@ const Services: React.FC = () => {
                 <div 
                   key={platform.id} 
                   id={platformSlug} 
-                  className="group flex flex-col bg-white border border-slate-200/90 hover:border-emerald-600/60 rounded-2xl p-7 sm:p-8 lg:p-9 shadow-xs hover:shadow-2xl hover:shadow-slate-200/80 transition-all duration-400 ease-out hover:-translate-y-2 h-full relative overflow-hidden reveal"
+                  className="group flex flex-col bg-white border border-slate-200/90 hover:border-emerald-600/60 rounded-2xl p-7 sm:p-8 lg:p-9 shadow-xs hover:shadow-2xl hover:shadow-slate-200/80 transition-all duration-300 ease-out hover:-translate-y-1.5 h-full relative overflow-hidden"
                 >
                   {/* Editorial Division Image with Subtle Hover Zoom and Vignette */}
                   <a href={`/services/${platformSlug}`} className="relative aspect-[16/10] bg-slate-900 rounded-xl overflow-hidden mb-7 block">
@@ -710,7 +713,7 @@ const Services: React.FC = () => {
       </section>
 
       {/* Operational Lifecycle & Framework Section */}
-      <section className="bg-slate-900 py-24 md:py-32 border-t border-slate-800 reveal text-white relative overflow-hidden">
+      <section className="bg-slate-900 py-14 md:py-20 border-t border-slate-800 text-white relative overflow-hidden">
         {/* Subtle Background Glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -859,7 +862,7 @@ const Services: React.FC = () => {
             })}
           </div>
 
-          <div className="mt-20 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 bg-emerald-950 p-8 sm:p-12 text-white border border-emerald-800/40 shadow-xl relative overflow-hidden">
+          <div className="mt-12 md:mt-16 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 bg-emerald-950 p-8 sm:p-12 text-white border border-emerald-800/40 shadow-xl relative overflow-hidden">
             <div className="max-w-2xl">
               <p className="text-emerald-400 font-bold text-xs sm:text-sm uppercase tracking-wider mb-2">Technical Engagement</p>
               <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight leading-tight">
