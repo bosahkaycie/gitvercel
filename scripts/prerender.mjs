@@ -325,6 +325,22 @@ const routes = [
         </p>
       </section>
     `
+  },
+  {
+    path: '/campaigns/nog-energy-week-2027',
+    title: 'Nigeria Oil & Gas (NOG) Energy Week 2027 | PIGL Engagement Portal',
+    description: 'Official Polaris Integrated & GeoSolutions Limited (PIGL) delegate registration and stakeholder engagement portal for NOG Energy Week 2027 in Abuja, Nigeria.',
+    badge: 'Executive Technical Engagement',
+    h1: 'Nigeria Oil & Gas (NOG) Energy Week 2027',
+    intro: 'Connect with PIGL engineering directors and technical division leads across Geosolutions, Metocean, Pipeline Construction, and Industrial Solutions.',
+    sectionsHtml: `
+      <section style="margin-bottom: 2rem;">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: #34d399; margin-bottom: 0.5rem;">Official Delegate Registration & Technical Scoping</h2>
+        <p style="color: #cbd5e1; line-height: 1.6; margin: 0;">
+          Submit your contact details and operational inquiry to schedule an executive technical consultation at our conference stand.
+        </p>
+      </section>
+    `
   }
 ];
 

@@ -63,8 +63,9 @@ Options -Indexes
   FileETag None
   <IfModule mod_headers.c>
     Header unset ETag
-    Header set Cache-Control "no-cache, must-revalidate"
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
+    Header set X-LiteSpeed-Purge "*"
   </IfModule>
 </FilesMatch>
 
@@ -115,6 +116,10 @@ Options -Indexes
   RewriteCond %{REQUEST_URI} ^/api/sliders/?$ [NC]
   RewriteCond %{DOCUMENT_ROOT}/api/sliders.php -f
   RewriteRule ^api/sliders/?$ /api/sliders.php [L,QSA]
+
+  RewriteCond %{REQUEST_URI} ^/api/campaigns/?$ [NC]
+  RewriteCond %{DOCUMENT_ROOT}/api/campaigns.php -f
+  RewriteRule ^api/campaigns/?$ /api/campaigns.php [L,QSA]
 
   # 7B-2. Explicit Static Bypass for Search Crawlers (Favicon, Manifest, OG Banner, Robots, Sitemap)
   RewriteRule ^(favicon\.ico|favicon-[0-9]+x[0-9]+\.png|favicon\.png|favicon\.svg|icon-[0-9]+\.png|apple-touch-icon\.png|og-image\.(jpg|jpeg|png)|site\.webmanifest|robots\.txt|sitemap\.xml)$ - [L]
