@@ -48,6 +48,7 @@ const VendorHub = lazyWithRetry(() => import('./pages/VendorHub'));
 const Videos = lazyWithRetry(() => import('./pages/Videos'));
 const CSR = lazyWithRetry(() => import('./pages/CSR'));
 const AdminLayout = lazyWithRetry(() => import('./pages/admin/AdminLayout'));
+const PublicCampaign = lazyWithRetry(() => import('./pages/PublicCampaign'));
 const SearchOverlay = lazyWithRetry(() => import('./components/SearchOverlay'));
 const MaintenanceUpdateScreen = lazyWithRetry(() => import('./components/MaintenanceUpdateScreen'));
 
@@ -306,6 +307,15 @@ const App: React.FC = () => {
     return (
       <Suspense fallback={<PageFallback />}>
         <AdminLayout />
+      </Suspense>
+    );
+  }
+
+  // Handle Dedicated Public Campaign Portal (Standalone Layout without main Navbar/Footer - Part 4)
+  if (currentPath.startsWith('/campaigns/') || currentPath === '/campaigns') {
+    return (
+      <Suspense fallback={<PageFallback />}>
+        <PublicCampaign currentPath={currentPath} />
       </Suspense>
     );
   }

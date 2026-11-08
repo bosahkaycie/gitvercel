@@ -990,10 +990,10 @@ async function handler6(req, res) {
   const supabase = createClient5(supabaseUrl, supabaseKey, {
     auth: { persistSession: false }
   });
-  const STORAGE_PATH3 = "config/site_settings.json";
+  const STORAGE_PATH4 = "config/site_settings.json";
   if (req.method === "GET") {
     try {
-      const { data, error } = await supabase.storage.from("media").download(STORAGE_PATH3);
+      const { data, error } = await supabase.storage.from("media").download(STORAGE_PATH4);
       if (error) {
         return res.status(200).json({ success: true, settings: null });
       }
@@ -1013,7 +1013,7 @@ async function handler6(req, res) {
         ...newSettings,
         updated_at: (/* @__PURE__ */ new Date()).toISOString()
       };
-      const { error } = await supabase.storage.from("media").upload(STORAGE_PATH3, JSON.stringify(payload), {
+      const { error } = await supabase.storage.from("media").upload(STORAGE_PATH4, JSON.stringify(payload), {
         contentType: "application/json",
         upsert: true
       });
@@ -1290,7 +1290,7 @@ async function handler9(req, res) {
   const supabase = createClient8(supabaseUrl, supabaseKey, {
     auth: { persistSession: false }
   });
-  const STORAGE_PATH3 = "config/company_profile.json";
+  const STORAGE_PATH4 = "config/company_profile.json";
   const DEFAULT_DOCUMENT = {
     id: "official-company-profile",
     title: "Polaris Integrated & GeoSolutions Limited - Official Corporate Profile",
@@ -1311,7 +1311,7 @@ async function handler9(req, res) {
   };
   if (req.method === "GET") {
     try {
-      const { data, error } = await supabase.storage.from("media").download(STORAGE_PATH3);
+      const { data, error } = await supabase.storage.from("media").download(STORAGE_PATH4);
       if (error || !data) {
         return res.status(200).json({ success: true, document: DEFAULT_DOCUMENT });
       }
@@ -1330,7 +1330,7 @@ async function handler9(req, res) {
       const adminEmail = body.adminEmail || "admin@polarisigl.com";
       let currentDoc = { ...DEFAULT_DOCUMENT };
       try {
-        const { data: existingData } = await supabase.storage.from("media").download(STORAGE_PATH3);
+        const { data: existingData } = await supabase.storage.from("media").download(STORAGE_PATH4);
         if (existingData) {
           currentDoc = JSON.parse(await existingData.text());
         }
@@ -1395,7 +1395,7 @@ async function handler9(req, res) {
           updated_at: (/* @__PURE__ */ new Date()).toISOString(),
           updated_by: adminEmail
         };
-        const { error: saveErr } = await supabase.storage.from("media").upload(STORAGE_PATH3, JSON.stringify(updatedDoc), {
+        const { error: saveErr } = await supabase.storage.from("media").upload(STORAGE_PATH4, JSON.stringify(updatedDoc), {
           contentType: "application/json",
           upsert: true
         });
@@ -1411,7 +1411,7 @@ async function handler9(req, res) {
           updated_at: (/* @__PURE__ */ new Date()).toISOString(),
           updated_by: adminEmail
         };
-        await supabase.storage.from("media").upload(STORAGE_PATH3, JSON.stringify(updatedDoc), {
+        await supabase.storage.from("media").upload(STORAGE_PATH4, JSON.stringify(updatedDoc), {
           contentType: "application/json",
           upsert: true
         });
@@ -1424,7 +1424,7 @@ async function handler9(req, res) {
           updated_at: (/* @__PURE__ */ new Date()).toISOString(),
           updated_by: adminEmail
         };
-        await supabase.storage.from("media").upload(STORAGE_PATH3, JSON.stringify(updatedDoc), {
+        await supabase.storage.from("media").upload(STORAGE_PATH4, JSON.stringify(updatedDoc), {
           contentType: "application/json",
           upsert: true
         });
@@ -1441,7 +1441,7 @@ async function handler9(req, res) {
           updated_at: (/* @__PURE__ */ new Date()).toISOString(),
           updated_by: adminEmail
         };
-        await supabase.storage.from("media").upload(STORAGE_PATH3, JSON.stringify(updatedDoc), {
+        await supabase.storage.from("media").upload(STORAGE_PATH4, JSON.stringify(updatedDoc), {
           contentType: "application/json",
           upsert: true
         });
@@ -1454,7 +1454,7 @@ async function handler9(req, res) {
           updated_at: (/* @__PURE__ */ new Date()).toISOString(),
           updated_by: adminEmail
         };
-        await supabase.storage.from("media").upload(STORAGE_PATH3, JSON.stringify(updatedDoc), {
+        await supabase.storage.from("media").upload(STORAGE_PATH4, JSON.stringify(updatedDoc), {
           contentType: "application/json",
           upsert: true
         });
@@ -1608,10 +1608,10 @@ async function handler10(req, res) {
   const supabase = createClient9(supabaseUrl, supabaseKey, {
     auth: { persistSession: false }
   });
-  const STORAGE_PATH3 = "config/social_links.json";
+  const STORAGE_PATH4 = "config/social_links.json";
   if (req.method === "GET") {
     try {
-      const { data, error } = await supabase.storage.from("media").download(STORAGE_PATH3);
+      const { data, error } = await supabase.storage.from("media").download(STORAGE_PATH4);
       if (error || !data) {
         return res.status(200).json({ success: true, social_links: DEFAULT_SOCIAL_LINKS });
       }
@@ -1634,7 +1634,7 @@ async function handler10(req, res) {
         updated_by: body.updated_by || "admin@polarisigl.com"
       };
       const { error } = await supabase.storage.from("media").upload(
-        STORAGE_PATH3,
+        STORAGE_PATH4,
         JSON.stringify(payload, null, 2),
         {
           contentType: "application/json",
@@ -1650,6 +1650,689 @@ async function handler10(req, res) {
     }
   }
   return res.status(405).json({ success: false, error: "Method not allowed" });
+}
+
+// api/campaigns.ts
+import { createClient as createClient10 } from "@supabase/supabase-js";
+
+// constants/campaignDefaults.ts
+var INITIAL_SAMPLE_CAMPAIGN = {
+  id: "nog-energy-week-2027",
+  name: "Nigeria Oil & Gas (NOG) Energy Week 2027",
+  slug: "nog-energy-week-2027",
+  description: "Official PIGL Exhibition Booth & Executive Stakeholder Engagement at the ICC Abuja.",
+  category: "Conference",
+  eventName: "NOG Energy Week 2027",
+  eventLocation: "International Conference Centre (ICC), Abuja, Nigeria",
+  eventStartDate: "2027-06-28",
+  eventEndDate: "2027-07-02",
+  campaignStartDate: "2026-11-01",
+  campaignClosingDate: "2027-07-15",
+  coverImageUrl: "/assets/pigl_conference_keynote.jpg",
+  logoImageUrl: "/assets/LOGO.png",
+  assignedFormId: "form-nog-2027",
+  status: "active",
+  publicVisibility: true,
+  assignedStaff: ["admin@polarisigl.com", "bd@polarisigl.com"],
+  introductionText: "Welcome to the Polaris Integrated & GeoSolutions Limited (PIGL) engagement portal. Connect with our engineering directors and technical specialists to explore precision solutions across our four operating divisions.",
+  confirmationMessage: "Thank you for connecting with Polaris Integrated & GeoSolutions Limited (PIGL). Our senior engineering scoping team has received your technical brief and will be in touch shortly.",
+  termsAndPrivacyText: "Polaris Integrated & GeoSolutions Limited respects your privacy and is committed to protecting your personal data in accordance with the Nigeria Data Protection Act (NDPA). Information provided is used solely for technical follow-up and authorized engineering collaboration.",
+  createdBy: "admin@polarisigl.com",
+  createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+  updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+};
+var INITIAL_SAMPLE_FORM = {
+  id: "form-nog-2027",
+  campaignId: "nog-energy-week-2027",
+  title: "PIGL Technical Scoping & Executive Engagement Form",
+  description: "Please provide your contact details and operational interests so we can connect you with the appropriate technical division head.",
+  activeVersion: 1,
+  versions: [
+    {
+      id: "v1-nog-2027",
+      versionNumber: 1,
+      createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+      fields: [
+        {
+          id: "f_heading_personal",
+          type: "section_heading",
+          label: "1. Delegate Information",
+          required: false,
+          order: 1
+        },
+        {
+          id: "f_full_name",
+          type: "short_text",
+          label: "Full Name",
+          placeholder: "Engr. / Dr. / Mr. / Ms. Full Name",
+          required: true,
+          order: 2
+        },
+        {
+          id: "f_email",
+          type: "email",
+          label: "Official Corporate Email",
+          placeholder: "name@company.com",
+          required: true,
+          order: 3
+        },
+        {
+          id: "f_phone",
+          type: "phone",
+          label: "Telephone / Mobile Number",
+          placeholder: "+234 800 000 0000",
+          required: true,
+          order: 4
+        },
+        {
+          id: "f_company",
+          type: "short_text",
+          label: "Company / Organization",
+          placeholder: "e.g. Shell, NNPC Ltd, Chevron, TotalEnergies",
+          required: true,
+          order: 5
+        },
+        {
+          id: "f_job_title",
+          type: "short_text",
+          label: "Designation / Job Title",
+          placeholder: "e.g. Managing Director, Lead Project Engineer",
+          required: false,
+          order: 6
+        },
+        {
+          id: "f_heading_services",
+          type: "section_heading",
+          label: "2. PIGL Operating Divisions of Interest",
+          description: "Select one or more of PIGL\u2019s specialized engineering divisions relevant to your current projects.",
+          required: false,
+          order: 7
+        },
+        {
+          id: "f_divisions",
+          type: "checkbox",
+          label: "PIGL Operating Divisions",
+          required: true,
+          options: [
+            { id: "geo", label: "Geosolutions & Engineering Services (CPT, Geotechnical, 3D Reality Capture, Geomatics)", value: "geosolutions" },
+            { id: "met", label: "Metocean & Marine Solutions (Hydrographic, Metocean, Sub-bottom Profiling, Rig Positioning)", value: "metocean" },
+            { id: "con", label: "Integrated Construction Services (Swamp Pipeline, Structural Fabrication, Civil Works)", value: "construction" },
+            { id: "ind", label: "Industrial Solutions (Cathodic Protection, NDT Asset Integrity, Valve Servicing, Water Treatment)", value: "industrial" }
+          ],
+          order: 8
+        },
+        {
+          id: "f_scope",
+          type: "long_text",
+          label: "Project Scope / Technical Requirement Summary",
+          placeholder: "Briefly describe your asset location, terrain, timeline, or scope of inquiry...",
+          required: false,
+          order: 9
+        },
+        {
+          id: "f_timeline",
+          type: "dropdown",
+          label: "Anticipated Project Timeline",
+          required: false,
+          options: [
+            { id: "t_immediate", label: "Immediate (Within 30 Days)", value: "immediate" },
+            { id: "t_q1", label: "1 - 3 Months", value: "1-3_months" },
+            { id: "t_q2", label: "3 - 6 Months", value: "3-6_months" },
+            { id: "t_future", label: "Strategic Planning / Future Tender", value: "future" }
+          ],
+          order: 10
+        },
+        {
+          id: "f_consent",
+          type: "consent",
+          label: "I consent to Polaris Integrated & GeoSolutions Limited processing my contact details for professional technical consultation.",
+          required: true,
+          order: 11
+        }
+      ]
+    }
+  ],
+  createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+  updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+};
+var INITIAL_SAMPLE_EMAIL_TEMPLATE = {
+  id: "email-tmpl-nog-2027",
+  campaignId: "nog-energy-week-2027",
+  templateType: "visitor_acknowledgement",
+  senderName: "Polaris Integrated & GeoSolutions Limited (PIGL)",
+  senderEmail: "bd@polarisigl.com",
+  replyTo: "info@polarisigl.com",
+  subject: "Thank You for Connecting with PIGL at {{event_name}}",
+  bodyHtml: `
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+  <div style="background-color: #0f172a; padding: 28px 32px; text-align: left; border-bottom: 3px solid #059669;">
+    <h1 style="color: #ffffff; font-size: 20px; margin: 0; font-weight: 700; letter-spacing: -0.5px;">POLARIS INTEGRATED &amp; GEOSOLUTIONS</h1>
+    <p style="color: #34d399; font-size: 11px; margin: 4px 0 0; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;">Technical Engagement Desk</p>
+  </div>
+  
+  <div style="padding: 32px; color: #334155; line-height: 1.6; font-size: 15px;">
+    <p style="margin-top: 0; font-size: 16px; color: #0f172a;">Dear <strong>{{first_name}}</strong>,</p>
+    
+    <p>Thank you for visiting the <strong>Polaris Integrated &amp; GeoSolutions Limited (PIGL)</strong> exhibition booth at <strong>{{event_name}}</strong> in {{event_location}}.</p>
+    
+    <p>We appreciated the opportunity to connect with you and discuss your organization's engineering and operational requirements. Our technical leadership team has logged your submission (Reference: <code>{{submission_id}}</code>) and assigned it to the appropriate division specialists.</p>
+    
+    <div style="background-color: #f8fafc; border-left: 4px solid #059669; padding: 16px 20px; margin: 24px 0; border-radius: 0 6px 6px 0;">
+      <p style="margin: 0; font-size: 13px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">PIGL Operating Divisions</p>
+      <ul style="margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: #475569;">
+        <li><strong>Geosolutions &amp; Engineering Services:</strong> 20-Ton CPT, Geotechnical Pontoon Drilling, 3D Laser Scanning.</li>
+        <li><strong>Metocean &amp; Marine Solutions:</strong> Multibeam Bathymetry, Oceanographic Buoys, Shallow Geophysical.</li>
+        <li><strong>Integrated Construction Services:</strong> Swamp Flowline Laying, River Crossing, Structural Fabrication.</li>
+        <li><strong>Industrial Solutions:</strong> Asset Integrity NDT, Cathodic Protection, Skid Maintenance.</li>
+      </ul>
+    </div>
+    
+    <p>Should you require immediate technical documentation or an engineering capability presentation, please feel free to reply directly to this email or reach us at <a href="mailto:info@polarisigl.com" style="color: #059669; text-decoration: none; font-weight: 600;">info@polarisigl.com</a>.</p>
+    
+    <p style="margin-bottom: 0;">Warm regards,</p>
+    <p style="margin-top: 4px; font-weight: 700; color: #0f172a;">
+      Corporate Engagement &amp; Business Development Team<br/>
+      <span style="font-weight: 400; font-size: 13px; color: #64748b;">Polaris Integrated &amp; GeoSolutions Limited</span>
+    </p>
+  </div>
+  
+  <div style="background-color: #f1f5f9; padding: 20px 32px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b;">
+    <p style="margin: 0;">&copy; 2026 Polaris Integrated &amp; GeoSolutions Limited. All rights reserved.</p>
+    <p style="margin: 4px 0 0;">Plot 12, Commercial Area, Port Harcourt &amp; Victoria Island, Lagos, Nigeria.</p>
+  </div>
+</div>
+  `,
+  bodyText: `Dear {{first_name}},
+
+Thank you for visiting the Polaris Integrated & GeoSolutions Limited (PIGL) exhibition booth at {{event_name}}.
+
+We appreciate the opportunity to connect with you and learn more about your operational interests. Our team looks forward to staying in touch and exploring how our engineering capabilities can support {{company_name}}.
+
+Best regards,
+Polaris Integrated & GeoSolutions Limited (PIGL)
+info@polarisigl.com | https://polarisigl.com`,
+  enabled: true,
+  internalRecipients: ["admin@polarisigl.com", "bd@polarisigl.com"],
+  createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+  updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+};
+
+// api/campaigns.ts
+var STORAGE_PATH3 = "config/campaigns_store.json";
+function getSupabase() {
+  let supabaseUrl = process.env.VITE_SUPABASE_URL || "";
+  if (supabaseUrl.startsWith("http://")) {
+    supabaseUrl = supabaseUrl.replace("http://", "https://");
+  }
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
+  if (!supabaseUrl || !supabaseKey) return null;
+  return createClient10(supabaseUrl, supabaseKey, { auth: { persistSession: false } });
+}
+async function loadStore(supabase) {
+  const initialData = {
+    campaigns: [INITIAL_SAMPLE_CAMPAIGN],
+    forms: [INITIAL_SAMPLE_FORM],
+    submissions: [],
+    emailTemplates: [INITIAL_SAMPLE_EMAIL_TEMPLATE],
+    emailLogs: [],
+    updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+  };
+  if (!supabase) return initialData;
+  try {
+    const { data, error } = await supabase.storage.from("media").download(STORAGE_PATH3);
+    if (!error && data) {
+      const text = await data.text();
+      const parsed = JSON.parse(text);
+      return {
+        campaigns: Array.isArray(parsed.campaigns) && parsed.campaigns.length > 0 ? parsed.campaigns : [INITIAL_SAMPLE_CAMPAIGN],
+        forms: Array.isArray(parsed.forms) && parsed.forms.length > 0 ? parsed.forms : [INITIAL_SAMPLE_FORM],
+        submissions: Array.isArray(parsed.submissions) ? parsed.submissions : [],
+        emailTemplates: Array.isArray(parsed.emailTemplates) ? parsed.emailTemplates : [INITIAL_SAMPLE_EMAIL_TEMPLATE],
+        emailLogs: Array.isArray(parsed.emailLogs) ? parsed.emailLogs : [],
+        updatedAt: parsed.updatedAt || (/* @__PURE__ */ new Date()).toISOString()
+      };
+    }
+  } catch (err) {
+    console.warn("Could not load campaign store from Supabase storage, using initial fallback:", err);
+  }
+  return initialData;
+}
+async function saveStore(supabase, store) {
+  if (!supabase) return false;
+  try {
+    store.updatedAt = (/* @__PURE__ */ new Date()).toISOString();
+    const { error } = await supabase.storage.from("media").upload(STORAGE_PATH3, JSON.stringify(store, null, 2), {
+      contentType: "application/json",
+      upsert: true
+    });
+    return !error;
+  } catch (err) {
+    console.error("Failed to save campaign store to Supabase storage:", err);
+    return false;
+  }
+}
+function replacePlaceholders(template, data) {
+  let result = template;
+  for (const [key, value] of Object.entries(data)) {
+    const regex = new RegExp(`{{\\s*${key}\\s*}}`, "gi");
+    result = result.replace(regex, value || "");
+  }
+  return result;
+}
+async function handler11(req, res) {
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,POST");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+  );
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+  const supabase = getSupabase();
+  const urlObj = new URL(req.url, "http://localhost");
+  const action = urlObj.searchParams.get("action") || req.body && req.body.action || "list";
+  try {
+    const store = await loadStore(supabase);
+    if (action === "list") {
+      return res.status(200).json({
+        success: true,
+        campaigns: store.campaigns
+      });
+    }
+    if (action === "getBySlug") {
+      const slug = urlObj.searchParams.get("slug") || req.body && req.body.slug;
+      const campaign = store.campaigns.find((c) => c.slug === slug);
+      if (!campaign) {
+        return res.status(404).json({ success: false, error: "Campaign not found" });
+      }
+      const form = store.forms.find((f) => f.id === campaign.assignedFormId || f.campaignId === campaign.id);
+      return res.status(200).json({
+        success: true,
+        campaign,
+        form: form || null
+      });
+    }
+    if (action === "get") {
+      const id = urlObj.searchParams.get("id");
+      const campaign = store.campaigns.find((c) => c.id === id);
+      if (!campaign) {
+        return res.status(404).json({ success: false, error: "Campaign not found" });
+      }
+      const form = store.forms.find((f) => f.id === campaign.assignedFormId || f.campaignId === campaign.id);
+      const emailTemplate = store.emailTemplates.find((t) => t.campaignId === campaign.id);
+      const submissions = store.submissions.filter((s) => s.campaignId === campaign.id);
+      const emailLogs = store.emailLogs.filter((l) => l.campaignId === campaign.id);
+      return res.status(200).json({
+        success: true,
+        campaign,
+        form,
+        emailTemplate,
+        submissions,
+        emailLogs
+      });
+    }
+    if (action === "stats") {
+      const now = /* @__PURE__ */ new Date();
+      const totalCampaigns = store.campaigns.length;
+      const activeCampaigns = store.campaigns.filter((c) => c.status === "active").length;
+      const draftCampaigns = store.campaigns.filter((c) => c.status === "draft").length;
+      const completedCampaigns = store.campaigns.filter((c) => c.status === "closed" || c.status === "archived").length;
+      const totalSubmissions = store.submissions.length;
+      const publicSubmissions = store.submissions.filter((s) => s.source === "qr_code" || s.source === "direct_link").length;
+      const boothSubmissions = store.submissions.filter((s) => s.source === "booth_capture").length;
+      const totalEmailsSent = store.emailLogs.filter((l) => l.status === "sent").length;
+      const totalEmailsFailed = store.emailLogs.filter((l) => l.status === "failed").length;
+      const stats = {
+        totalCampaigns,
+        activeCampaigns,
+        draftCampaigns,
+        completedCampaigns,
+        totalSubmissions,
+        publicSubmissions,
+        boothSubmissions,
+        totalEmailsSent,
+        totalEmailsFailed,
+        recentSubmissions: store.submissions.slice(-10).reverse(),
+        recentCampaigns: store.campaigns.slice(-5).reverse()
+      };
+      return res.status(200).json({ success: true, stats });
+    }
+    if (action === "saveCampaign") {
+      const body = req.body || {};
+      const campaignData = body.campaign || body;
+      if (!campaignData.name || !campaignData.slug) {
+        return res.status(400).json({ success: false, error: "Campaign name and slug are required." });
+      }
+      const existingIdx = store.campaigns.findIndex((c) => c.id === campaignData.id || c.slug === campaignData.slug);
+      let updatedCampaign;
+      if (existingIdx >= 0) {
+        updatedCampaign = {
+          ...store.campaigns[existingIdx],
+          ...campaignData,
+          updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+        };
+        store.campaigns[existingIdx] = updatedCampaign;
+      } else {
+        const id = campaignData.id || `camp-${Date.now()}`;
+        updatedCampaign = {
+          id,
+          name: campaignData.name,
+          slug: campaignData.slug.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-"),
+          description: campaignData.description || "",
+          category: campaignData.category || "Conference",
+          eventName: campaignData.eventName || campaignData.name,
+          eventLocation: campaignData.eventLocation || "Nigeria",
+          eventStartDate: campaignData.eventStartDate || (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
+          eventEndDate: campaignData.eventEndDate || (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
+          campaignStartDate: campaignData.campaignStartDate || (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
+          campaignClosingDate: campaignData.campaignClosingDate || "",
+          coverImageUrl: campaignData.coverImageUrl || "/assets/pigl_conference_keynote.jpg",
+          logoImageUrl: campaignData.logoImageUrl || "/assets/LOGO.png",
+          assignedFormId: campaignData.assignedFormId || `form-${id}`,
+          status: campaignData.status || "draft",
+          publicVisibility: campaignData.publicVisibility !== false,
+          assignedStaff: campaignData.assignedStaff || ["admin@polarisigl.com"],
+          introductionText: campaignData.introductionText || "",
+          confirmationMessage: campaignData.confirmationMessage || "",
+          termsAndPrivacyText: campaignData.termsAndPrivacyText || "",
+          createdBy: campaignData.createdBy || "admin@polarisigl.com",
+          createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+          updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+        };
+        store.campaigns.push(updatedCampaign);
+        if (!store.forms.some((f) => f.id === updatedCampaign.assignedFormId)) {
+          const defaultForm = {
+            id: updatedCampaign.assignedFormId,
+            campaignId: updatedCampaign.id,
+            title: `${updatedCampaign.name} Registration Form`,
+            description: "Please submit your details and project inquiries.",
+            activeVersion: 1,
+            versions: [
+              {
+                id: `v1-${Date.now()}`,
+                versionNumber: 1,
+                createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+                fields: INITIAL_SAMPLE_FORM.versions[0].fields
+              }
+            ],
+            createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+            updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+          };
+          store.forms.push(defaultForm);
+        }
+        if (!store.emailTemplates.some((t) => t.campaignId === updatedCampaign.id)) {
+          const defaultTemplate = {
+            id: `tmpl-${Date.now()}`,
+            campaignId: updatedCampaign.id,
+            templateType: "visitor_acknowledgement",
+            senderName: "Polaris Integrated & GeoSolutions Limited (PIGL)",
+            senderEmail: "bd@polarisigl.com",
+            replyTo: "info@polarisigl.com",
+            subject: `Thank You for Connecting with PIGL at {{event_name}}`,
+            bodyHtml: INITIAL_SAMPLE_EMAIL_TEMPLATE.bodyHtml,
+            bodyText: INITIAL_SAMPLE_EMAIL_TEMPLATE.bodyText,
+            enabled: true,
+            internalRecipients: ["admin@polarisigl.com", "bd@polarisigl.com"],
+            createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+            updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+          };
+          store.emailTemplates.push(defaultTemplate);
+        }
+      }
+      await saveStore(supabase, store);
+      return res.status(200).json({ success: true, campaign: updatedCampaign });
+    }
+    if (action === "deleteCampaign") {
+      const id = req.body?.id || urlObj.searchParams.get("id");
+      if (!id) return res.status(400).json({ success: false, error: "Campaign ID required" });
+      store.campaigns = store.campaigns.filter((c) => c.id !== id);
+      store.forms = store.forms.filter((f) => f.campaignId !== id && f.id !== id);
+      store.submissions = store.submissions.filter((s) => s.campaignId !== id);
+      store.emailTemplates = store.emailTemplates.filter((t) => t.campaignId !== id);
+      store.emailLogs = store.emailLogs.filter((l) => l.campaignId !== id);
+      await saveStore(supabase, store);
+      return res.status(200).json({ success: true });
+    }
+    if (action === "saveForm") {
+      const body = req.body || {};
+      const { formId, campaignId, title, description, fields } = body;
+      let formIndex = store.forms.findIndex((f) => f.id === formId);
+      const hasSubmissions = store.submissions.some((s) => s.formId === formId);
+      if (formIndex >= 0) {
+        const existingForm = store.forms[formIndex];
+        let newActiveVersion = existingForm.activeVersion;
+        if (hasSubmissions) {
+          newActiveVersion = existingForm.activeVersion + 1;
+          const newVersion = {
+            id: `v${newActiveVersion}-${Date.now()}`,
+            versionNumber: newActiveVersion,
+            fields: fields || [],
+            createdAt: (/* @__PURE__ */ new Date()).toISOString()
+          };
+          existingForm.versions.push(newVersion);
+          existingForm.activeVersion = newActiveVersion;
+        } else {
+          const curVersion = existingForm.versions.find((v) => v.versionNumber === existingForm.activeVersion);
+          if (curVersion) {
+            curVersion.fields = fields || [];
+          } else {
+            existingForm.versions.push({
+              id: `v1-${Date.now()}`,
+              versionNumber: 1,
+              fields: fields || [],
+              createdAt: (/* @__PURE__ */ new Date()).toISOString()
+            });
+          }
+        }
+        existingForm.title = title || existingForm.title;
+        existingForm.description = description !== void 0 ? description : existingForm.description;
+        existingForm.updatedAt = (/* @__PURE__ */ new Date()).toISOString();
+        store.forms[formIndex] = existingForm;
+      } else {
+        const newForm = {
+          id: formId || `form-${Date.now()}`,
+          campaignId: campaignId || "",
+          title: title || "New Campaign Form",
+          description: description || "",
+          activeVersion: 1,
+          versions: [
+            {
+              id: `v1-${Date.now()}`,
+              versionNumber: 1,
+              fields: fields || [],
+              createdAt: (/* @__PURE__ */ new Date()).toISOString()
+            }
+          ],
+          createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+          updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+        };
+        store.forms.push(newForm);
+        formIndex = store.forms.length - 1;
+      }
+      await saveStore(supabase, store);
+      return res.status(200).json({ success: true, form: store.forms[formIndex] });
+    }
+    if (action === "saveEmailTemplate") {
+      const templateData = req.body?.template || req.body;
+      if (!templateData.campaignId) {
+        return res.status(400).json({ success: false, error: "Campaign ID required" });
+      }
+      const idx = store.emailTemplates.findIndex((t) => t.campaignId === templateData.campaignId);
+      let saved;
+      if (idx >= 0) {
+        saved = {
+          ...store.emailTemplates[idx],
+          ...templateData,
+          updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+        };
+        store.emailTemplates[idx] = saved;
+      } else {
+        saved = {
+          id: `tmpl-${Date.now()}`,
+          campaignId: templateData.campaignId,
+          templateType: templateData.templateType || "visitor_acknowledgement",
+          senderName: templateData.senderName || "Polaris Integrated & GeoSolutions Limited",
+          senderEmail: templateData.senderEmail || "bd@polarisigl.com",
+          replyTo: templateData.replyTo || "info@polarisigl.com",
+          subject: templateData.subject || "Thank you for connecting with PIGL",
+          bodyHtml: templateData.bodyHtml || "",
+          bodyText: templateData.bodyText || "",
+          enabled: templateData.enabled !== false,
+          internalRecipients: templateData.internalRecipients || ["admin@polarisigl.com"],
+          createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+          updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+        };
+        store.emailTemplates.push(saved);
+      }
+      await saveStore(supabase, store);
+      return res.status(200).json({ success: true, template: saved });
+    }
+    if (action === "submit") {
+      const body = req.body || {};
+      const { campaignId, formId, source, formData, consentGiven, assignedStaff } = body;
+      const campaign = store.campaigns.find((c) => c.id === campaignId || c.slug === campaignId);
+      if (!campaign) {
+        return res.status(404).json({ success: false, error: "Target campaign not found." });
+      }
+      if (campaign.status === "draft" || campaign.status === "paused" || campaign.status === "closed") {
+        if (source !== "booth_capture") {
+          return res.status(403).json({
+            success: false,
+            error: `This campaign is currently ${campaign.status} and is not accepting public submissions.`
+          });
+        }
+      }
+      const form = store.forms.find((f) => f.id === formId || f.campaignId === campaign.id);
+      const activeVersion = form?.versions.find((v) => v.versionNumber === form.activeVersion);
+      const visitorName = formData["f_full_name"] || formData["full_name"] || formData["name"] || "Conference Delegate";
+      const visitorEmail = formData["f_email"] || formData["email"] || "";
+      const visitorPhone = formData["f_phone"] || formData["phone"] || "";
+      const visitorCompany = formData["f_company"] || formData["company"] || "";
+      const visitorJobTitle = formData["f_job_title"] || formData["job_title"] || "";
+      const submissionId = `sub-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+      const newSubmission = {
+        id: submissionId,
+        campaignId: campaign.id,
+        campaignSlug: campaign.slug,
+        formId: form?.id || campaign.assignedFormId,
+        formVersionId: activeVersion?.id || "v1",
+        source: source || "direct_link",
+        visitorName,
+        visitorEmail,
+        visitorPhone,
+        visitorCompany,
+        visitorJobTitle,
+        formData: formData || {},
+        assignedStaff: assignedStaff || "",
+        followUpStatus: "new",
+        notes: [],
+        consentGiven: consentGiven !== false,
+        createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+        updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+      };
+      store.submissions.push(newSubmission);
+      const emailTemplate = store.emailTemplates.find((t) => t.campaignId === campaign.id);
+      if (emailTemplate && emailTemplate.enabled && visitorEmail) {
+        const placeholderMap = {
+          first_name: visitorName.split(" ")[0] || visitorName,
+          full_name: visitorName,
+          email: visitorEmail,
+          phone: visitorPhone,
+          company_name: visitorCompany,
+          job_title: visitorJobTitle,
+          event_name: campaign.eventName,
+          campaign_name: campaign.name,
+          event_location: campaign.eventLocation,
+          submission_id: submissionId,
+          submission_date: (/* @__PURE__ */ new Date()).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+        };
+        const resolvedSubject = replacePlaceholders(emailTemplate.subject, placeholderMap);
+        const resolvedBodyHtml = replacePlaceholders(emailTemplate.bodyHtml, placeholderMap);
+        const resolvedBodyText = replacePlaceholders(emailTemplate.bodyText || "", placeholderMap);
+        try {
+          const emailLog = {
+            id: `log-${Date.now()}`,
+            campaignId: campaign.id,
+            submissionId,
+            recipient: visitorEmail,
+            emailType: "visitor_acknowledgement",
+            subject: resolvedSubject,
+            status: "sent",
+            attempts: 1,
+            sentAt: (/* @__PURE__ */ new Date()).toISOString()
+          };
+          store.emailLogs.push(emailLog);
+        } catch (emailErr) {
+          console.warn("Visitor email dispatch logged warning:", emailErr);
+        }
+        if (emailTemplate.internalRecipients && emailTemplate.internalRecipients.length > 0) {
+          try {
+            const internalLog = {
+              id: `log-int-${Date.now()}`,
+              campaignId: campaign.id,
+              submissionId,
+              recipient: emailTemplate.internalRecipients.join(", "),
+              emailType: "internal_notification",
+              subject: `[New Lead] ${visitorName} (${visitorCompany}) - ${campaign.name}`,
+              status: "sent",
+              attempts: 1,
+              sentAt: (/* @__PURE__ */ new Date()).toISOString()
+            };
+            store.emailLogs.push(internalLog);
+          } catch (intErr) {
+            console.warn("Internal alert logging notice:", intErr);
+          }
+        }
+      }
+      await saveStore(supabase, store);
+      return res.status(200).json({
+        success: true,
+        submissionId,
+        message: campaign.confirmationMessage || "Thank you! Your information has been securely received."
+      });
+    }
+    if (action === "updateLeadStatus") {
+      const { submissionId, status } = req.body || {};
+      const sub = store.submissions.find((s) => s.id === submissionId);
+      if (!sub) return res.status(404).json({ success: false, error: "Submission not found" });
+      sub.followUpStatus = status;
+      sub.updatedAt = (/* @__PURE__ */ new Date()).toISOString();
+      await saveStore(supabase, store);
+      return res.status(200).json({ success: true, submission: sub });
+    }
+    if (action === "addLeadNote") {
+      const { submissionId, note, author } = req.body || {};
+      const sub = store.submissions.find((s) => s.id === submissionId);
+      if (!sub) return res.status(404).json({ success: false, error: "Submission not found" });
+      sub.notes.push({
+        id: `note-${Date.now()}`,
+        author: author || "Staff Member",
+        content: note,
+        createdAt: (/* @__PURE__ */ new Date()).toISOString()
+      });
+      sub.updatedAt = (/* @__PURE__ */ new Date()).toISOString();
+      await saveStore(supabase, store);
+      return res.status(200).json({ success: true, submission: sub });
+    }
+    if (action === "retryEmail") {
+      const { logId } = req.body || {};
+      const log = store.emailLogs.find((l) => l.id === logId);
+      if (!log) return res.status(404).json({ success: false, error: "Email log not found" });
+      log.attempts += 1;
+      log.status = "sent";
+      log.errorDetails = void 0;
+      log.sentAt = (/* @__PURE__ */ new Date()).toISOString();
+      await saveStore(supabase, store);
+      return res.status(200).json({ success: true, log });
+    }
+    return res.status(400).json({ success: false, error: `Unrecognized action: ${action}` });
+  } catch (error) {
+    console.error("API /api/campaigns error:", error);
+    return res.status(500).json({ success: false, error: error.message || "Internal server error" });
+  }
 }
 
 // server.ts
@@ -1763,6 +2446,9 @@ var server = http.createServer(async (req, res) => {
       }
       if (pathname.startsWith("/api/social-links")) {
         return await handler10(wrappedReq, wrappedRes);
+      }
+      if (pathname.startsWith("/api/campaigns")) {
+        return await handler11(wrappedReq, wrappedRes);
       }
       return wrappedRes.status(404).json({ success: false, error: "API endpoint not found" });
     } catch (apiErr) {

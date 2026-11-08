@@ -29,7 +29,10 @@ import {
   IconBuilding,
   IconShield,
   IconFileCheck,
-  IconShare
+  IconShare,
+  IconPlus,
+  IconTrendingUp,
+  IconActivity
 } from './AdminIcons';
 
 interface AdminSidebarProps {
@@ -150,7 +153,21 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       title: 'Marketing & Communications',
       items: [
         { id: 'testimonials', label: 'Client Testimonials', Icon: IconPartners },
-        { id: 'campaigns', label: 'Newsletter and subscriptions', Icon: IconCampaign }
+        { id: 'campaigns', label: 'Newsletter and subscriptions', Icon: IconMail }
+      ]
+    },
+    {
+      id: 'campaign-engagement',
+      title: 'Campaigns & Lead Capture',
+      items: [
+        { id: 'campaign-overview', label: 'Overview', Icon: IconActivity },
+        { id: 'campaign-manager', label: 'All Campaigns', Icon: IconCampaign },
+        { id: 'campaign-create', label: 'Create Campaign', Icon: IconPlus },
+        { id: 'campaign-forms', label: 'Form Builder', Icon: IconFileCheck },
+        { id: 'campaign-emails', label: 'Email Automation', Icon: IconMail },
+        { id: 'campaign-leads', label: 'Leads & Submissions', Icon: IconUsers },
+        { id: 'campaign-reports', label: 'Campaign Reports', Icon: IconTrendingUp },
+        { id: 'campaign-settings', label: 'Settings', Icon: IconSettings }
       ]
     },
     {

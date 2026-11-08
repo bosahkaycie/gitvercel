@@ -18,6 +18,7 @@ import AdminNavigation from './AdminNavigation';
 import AdminPageHeaders from './AdminPageHeaders';
 import AdminCompanyProfile from './AdminCompanyProfile';
 import { AdminSocialLinks } from './AdminSocialLinks';
+import { CampaignManager } from './campaigns/CampaignManager';
 import AdminMedia from './AdminMedia';
 import AdminSettings from './AdminSettings';
 import AdminInquiries from './AdminInquiries';
@@ -510,6 +511,23 @@ const AdminLayout: React.FC = () => {
         return <AdminCompanyProfile theme={theme} adminEmail={user?.email} />;
       case 'social-links':
         return <AdminSocialLinks theme={theme} />;
+      case 'campaign-manager':
+      case 'campaigns-engagement':
+        return <CampaignManager initialSubTab="all" adminEmail={user?.email} theme={theme} />;
+      case 'campaign-overview':
+        return <CampaignManager initialSubTab="overview" adminEmail={user?.email} theme={theme} />;
+      case 'campaign-create':
+        return <CampaignManager initialSubTab="create" adminEmail={user?.email} theme={theme} />;
+      case 'campaign-forms':
+        return <CampaignManager initialSubTab="forms" adminEmail={user?.email} theme={theme} />;
+      case 'campaign-emails':
+        return <CampaignManager initialSubTab="emails" adminEmail={user?.email} theme={theme} />;
+      case 'campaign-leads':
+        return <CampaignManager initialSubTab="leads" adminEmail={user?.email} theme={theme} />;
+      case 'campaign-reports':
+        return <CampaignManager initialSubTab="reports" adminEmail={user?.email} theme={theme} />;
+      case 'campaign-settings':
+        return <CampaignManager initialSubTab="settings" adminEmail={user?.email} theme={theme} />;
       case 'corporate-profile':
         return <AdminSettings theme={theme} initialTab="profile" />;
       case 'settings':
