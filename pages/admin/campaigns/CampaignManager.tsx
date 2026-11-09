@@ -49,12 +49,14 @@ interface CampaignManagerProps {
   initialSubTab?: CampaignSubTab;
   adminEmail?: string;
   theme?: 'light' | 'dark';
+  onNavigateTab?: (tab: string) => void;
 }
 
 export const CampaignManager: React.FC<CampaignManagerProps> = ({
   initialSubTab = 'overview',
   adminEmail = 'admin@polarisigl.com',
-  theme = 'light'
+  theme = 'light',
+  onNavigateTab
 }) => {
   const [subTab, setSubTab] = useState<CampaignSubTab>(initialSubTab);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -83,8 +85,28 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
   const [boothModalCampaign, setBoothModalCampaign] = useState<Campaign | null>(null);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
 
+  // Sync with prop when external tab changes
+  useEffect(() => {
+    if (initialSubTab) {
+      if (initialSubTab === 'create') {
+        setEditingCampaign(null);
+      }
+      setSubTab(initialSubTab);
+    }
+  }, [initialSubTab]);
+
+  const switchSubTab = (newSubTab: CampaignSubTab) => {
+    if (newSubTab === 'create') {
+      setEditingCampaign(null);
+    }
+    setSubTab(newSubTab);
+    if (onNavigateTab) {
+      onNavigateTab(`campaign-${newSubTab === 'all' ? 'manager' : newSubTab}`);
+    }
+  };
+
   // Load initial data
-  const loadData = async () => {
+  const loadData = async (preferredId?: string) => {
     setLoading(true);
     try {
       const [allCamps, currentStats] = await Promise.all([
@@ -94,14 +116,18 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
       setCampaigns(allCamps);
       setStats(currentStats);
 
-      const targetId = selectedCampaignId || (allCamps.length > 0 ? allCamps[0].id : '');
+      const targetId = preferredId || selectedCampaignId || (allCamps.length > 0 ? allCamps[0].id : '');
       if (targetId) {
         setSelectedCampaignId(targetId);
-        const details = await getCampaignDetails(targetId);
-        setActiveForm(details.form);
-        setActiveEmailTemplate(details.emailTemplate);
-        setSubmissions(details.submissions);
-        setEmailLogs(details.emailLogs);
+        try {
+          const details = await getCampaignDetails(targetId);
+          setActiveForm(details.form);
+          setActiveEmailTemplate(details.emailTemplate);
+          setSubmissions(details.submissions);
+          setEmailLogs(details.emailLogs);
+        } catch (detailErr) {
+          console.warn('Could not load details for campaign:', targetId, detailErr);
+        }
       }
     } catch (err) {
       console.error('Error initializing campaigns data:', err);
@@ -213,12 +239,7 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
           return (
             <button
               key={item.id}
-              onClick={() => {
-                if (item.id === 'create') {
-                  setEditingCampaign(null);
-                }
-                setSubTab(item.id);
-              }}
+              onClick={() => switchSubTab(item.id)}
               className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 cursor-pointer ${
                 isActive
                   ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs'
@@ -242,13 +263,10 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
         <CampaignOverview
           stats={stats}
           campaigns={campaigns}
-          onCreateCampaignClick={() => {
-            setEditingCampaign(null);
-            setSubTab('create');
-          }}
+          onCreateCampaignClick={() => switchSubTab('create')}
           onSelectCampaign={camp => {
             handleSelectCampaign(camp);
-            setSubTab('leads');
+            switchSubTab('leads');
           }}
           onOpenBoothCapture={() => {
             if (selectedCampaign) setBoothModalCampaign(selectedCampaign);
@@ -259,10 +277,7 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
       {subTab === 'all' && (
         <CampaignList
           campaigns={campaigns}
-          onCreateClick={() => {
-            setEditingCampaign(null);
-            setSubTab('create');
-          }}
+          onCreateClick={() => switchSubTab('create')}
           onEditCampaign={camp => {
             setEditingCampaign(camp);
             setSubTab('create');
@@ -278,14 +293,39 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
 
       {subTab === 'create' && (
         <CampaignEditor
+          key={editingCampaign?.id || 'new-campaign'}
           campaign={editingCampaign}
           adminEmail={adminEmail}
           onSaved={saved => {
-            loadData();
-            setSubTab('all');
+            loadData(saved.id);
+            setEditingCampaign(null);
+            switchSubTab('all');
           }}
-          onCancel={() => setSubTab('all')}
+          onCancel={() => {
+            setEditingCampaign(null);
+            switchSubTab('all');
+          }}
         />
+      )}
+
+      {(subTab === 'forms' || subTab === 'emails' || subTab === 'leads' || subTab === 'reports') && campaigns.length === 0 && (
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center max-w-lg mx-auto space-y-4">
+          <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-950/60 rounded-xl flex items-center justify-center mx-auto text-emerald-600">
+            <IconCampaign className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            No Campaigns Created Yet
+          </h3>
+          <p className="text-xs text-slate-500">
+            Create your first event campaign to begin building customized registration forms, automated email workflows, and capturing leads.
+          </p>
+          <button
+            onClick={() => switchSubTab('create')}
+            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all inline-flex items-center gap-2 cursor-pointer"
+          >
+            <IconPlus className="w-4 h-4" /> Create Campaign Now
+          </button>
+        </div>
       )}
 
       {subTab === 'forms' && selectedCampaign && activeForm && (

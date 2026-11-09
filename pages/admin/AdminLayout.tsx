@@ -513,21 +513,21 @@ const AdminLayout: React.FC = () => {
         return <AdminSocialLinks theme={theme} />;
       case 'campaign-manager':
       case 'campaigns-engagement':
-        return <CampaignManager initialSubTab="all" adminEmail={user?.email} theme={theme} />;
+        return <CampaignManager key={currentTab} initialSubTab="all" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'campaign-overview':
-        return <CampaignManager initialSubTab="overview" adminEmail={user?.email} theme={theme} />;
+        return <CampaignManager key={currentTab} initialSubTab="overview" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'campaign-create':
-        return <CampaignManager initialSubTab="create" adminEmail={user?.email} theme={theme} />;
+        return <CampaignManager key={currentTab} initialSubTab="create" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'campaign-forms':
-        return <CampaignManager initialSubTab="forms" adminEmail={user?.email} theme={theme} />;
+        return <CampaignManager key={currentTab} initialSubTab="forms" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'campaign-emails':
-        return <CampaignManager initialSubTab="emails" adminEmail={user?.email} theme={theme} />;
+        return <CampaignManager key={currentTab} initialSubTab="emails" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'campaign-leads':
-        return <CampaignManager initialSubTab="leads" adminEmail={user?.email} theme={theme} />;
+        return <CampaignManager key={currentTab} initialSubTab="leads" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'campaign-reports':
-        return <CampaignManager initialSubTab="reports" adminEmail={user?.email} theme={theme} />;
+        return <CampaignManager key={currentTab} initialSubTab="reports" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'campaign-settings':
-        return <CampaignManager initialSubTab="settings" adminEmail={user?.email} theme={theme} />;
+        return <CampaignManager key={currentTab} initialSubTab="settings" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'corporate-profile':
         return <AdminSettings theme={theme} initialTab="profile" />;
       case 'settings':

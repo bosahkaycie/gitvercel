@@ -1931,6 +1931,9 @@ async function handler11(req, res) {
     res.status(200).end();
     return;
   }
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
   const supabase = getSupabase();
   const urlObj = new URL(req.url, "http://localhost");
   const action = urlObj.searchParams.get("action") || req.body && req.body.action || "list";

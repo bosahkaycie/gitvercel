@@ -47,9 +47,9 @@ export async function getCampaigns(): Promise<Campaign[]> {
     if (data?.success && Array.isArray(data.campaigns)) {
       return data.campaigns;
     }
-    return [INITIAL_SAMPLE_CAMPAIGN];
+    return [];
   } catch {
-    return [INITIAL_SAMPLE_CAMPAIGN];
+    return [];
   }
 }
 
@@ -62,20 +62,8 @@ export async function getCampaignBySlug(slug: string): Promise<{ campaign: Campa
         form: data.form || null
       };
     }
-    if (slug === INITIAL_SAMPLE_CAMPAIGN.slug) {
-      return {
-        campaign: INITIAL_SAMPLE_CAMPAIGN,
-        form: INITIAL_SAMPLE_FORM
-      };
-    }
     throw new Error(data?.error || 'Campaign not found');
   } catch (err: any) {
-    if (slug === INITIAL_SAMPLE_CAMPAIGN.slug) {
-      return {
-        campaign: INITIAL_SAMPLE_CAMPAIGN,
-        form: INITIAL_SAMPLE_FORM
-      };
-    }
     throw err;
   }
 }
@@ -98,26 +86,8 @@ export async function getCampaignDetails(id: string): Promise<{
         emailLogs: data.emailLogs || []
       };
     }
-    if (id === INITIAL_SAMPLE_CAMPAIGN.id) {
-      return {
-        campaign: INITIAL_SAMPLE_CAMPAIGN,
-        form: INITIAL_SAMPLE_FORM,
-        emailTemplate: INITIAL_SAMPLE_EMAIL_TEMPLATE,
-        submissions: [],
-        emailLogs: []
-      };
-    }
     throw new Error(data?.error || 'Campaign details not found');
   } catch (err: any) {
-    if (id === INITIAL_SAMPLE_CAMPAIGN.id) {
-      return {
-        campaign: INITIAL_SAMPLE_CAMPAIGN,
-        form: INITIAL_SAMPLE_FORM,
-        emailTemplate: INITIAL_SAMPLE_EMAIL_TEMPLATE,
-        submissions: [],
-        emailLogs: []
-      };
-    }
     throw err;
   }
 }
@@ -129,8 +99,8 @@ export async function getCampaignStats(): Promise<CampaignStatsSummary> {
       return data.stats;
     }
     return {
-      totalCampaigns: 1,
-      activeCampaigns: 1,
+      totalCampaigns: 0,
+      activeCampaigns: 0,
       draftCampaigns: 0,
       completedCampaigns: 0,
       totalSubmissions: 0,
@@ -139,12 +109,12 @@ export async function getCampaignStats(): Promise<CampaignStatsSummary> {
       totalEmailsSent: 0,
       totalEmailsFailed: 0,
       recentSubmissions: [],
-      recentCampaigns: [INITIAL_SAMPLE_CAMPAIGN]
+      recentCampaigns: []
     };
   } catch {
     return {
-      totalCampaigns: 1,
-      activeCampaigns: 1,
+      totalCampaigns: 0,
+      activeCampaigns: 0,
       draftCampaigns: 0,
       completedCampaigns: 0,
       totalSubmissions: 0,
@@ -153,7 +123,7 @@ export async function getCampaignStats(): Promise<CampaignStatsSummary> {
       totalEmailsSent: 0,
       totalEmailsFailed: 0,
       recentSubmissions: [],
-      recentCampaigns: [INITIAL_SAMPLE_CAMPAIGN]
+      recentCampaigns: []
     };
   }
 }

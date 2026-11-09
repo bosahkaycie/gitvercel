@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Campaign,
   CampaignCategory,
@@ -23,7 +23,7 @@ export const CampaignEditor: React.FC<CampaignEditorProps> = ({
 }) => {
   const isEditing = Boolean(campaign?.id);
 
-  const [formData, setFormData] = useState<Partial<Campaign>>(() => {
+  const getInitialState = (): Partial<Campaign> => {
     if (campaign) return { ...campaign };
     return {
       name: '',
@@ -45,10 +45,18 @@ export const CampaignEditor: React.FC<CampaignEditorProps> = ({
       confirmationMessage: 'Thank you for connecting with Polaris Integrated & GeoSolutions Limited (PIGL). Our technical leadership team has received your submission.',
       termsAndPrivacyText: 'Polaris Integrated & GeoSolutions Limited respects your privacy and complies with the Nigeria Data Protection Act (NDPA).'
     };
-  });
+  };
 
+  const [formData, setFormData] = useState<Partial<Campaign>>(getInitialState);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    setFormData(getInitialState());
+    setErrorMsg(null);
+    setSuccessMsg(null);
+  }, [campaign?.id, adminEmail]);
 
   // Auto slug generator from name
   const handleNameChange = (name: string) => {
@@ -84,10 +92,12 @@ export const CampaignEditor: React.FC<CampaignEditorProps> = ({
 
     try {
       const saved = await saveCampaign(formData);
-      onSaved(saved);
+      setSuccessMsg(`Campaign "${saved.name}" successfully ${isEditing ? 'updated' : 'created'}! Redirecting to campaign manager...`);
+      setTimeout(() => {
+        onSaved(saved);
+      }, 800);
     } catch (err: any) {
       setErrorMsg(err.message || 'Failed to save campaign.');
-    } finally {
       setIsSaving(false);
     }
   };
@@ -115,8 +125,16 @@ export const CampaignEditor: React.FC<CampaignEditorProps> = ({
 
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
         {errorMsg && (
-          <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-xl text-red-600 dark:text-red-400 text-xs font-semibold">
-            {errorMsg}
+          <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-xl text-red-600 dark:text-red-400 text-xs font-semibold flex items-center gap-2">
+            <IconX className="w-4 h-4 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
+        {successMsg && (
+          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-700 dark:text-emerald-400 text-xs font-bold flex items-center gap-2">
+            <IconCheck className="w-4 h-4 shrink-0 text-emerald-600" />
+            <span>{successMsg}</span>
           </div>
         )}
 
