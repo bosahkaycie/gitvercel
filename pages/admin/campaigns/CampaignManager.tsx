@@ -297,9 +297,21 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
           campaign={editingCampaign}
           adminEmail={adminEmail}
           onSaved={saved => {
-            loadData(saved.id);
+            setCampaigns(prev => {
+              const idx = prev.findIndex(c => c.id === saved.id);
+              if (idx >= 0) {
+                const next = [...prev];
+                next[idx] = saved;
+                return next;
+              }
+              return [saved, ...prev];
+            });
+            setSelectedCampaignId(saved.id);
             setEditingCampaign(null);
             switchSubTab('all');
+            setTimeout(() => {
+              loadData(saved.id);
+            }, 600);
           }}
           onCancel={() => {
             setEditingCampaign(null);

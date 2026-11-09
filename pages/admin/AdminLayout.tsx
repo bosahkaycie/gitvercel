@@ -513,21 +513,38 @@ const AdminLayout: React.FC = () => {
         return <AdminSocialLinks theme={theme} />;
       case 'campaign-manager':
       case 'campaigns-engagement':
-        return <CampaignManager key={currentTab} initialSubTab="all" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'campaign-overview':
-        return <CampaignManager key={currentTab} initialSubTab="overview" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'campaign-create':
-        return <CampaignManager key={currentTab} initialSubTab="create" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'campaign-forms':
-        return <CampaignManager key={currentTab} initialSubTab="forms" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'campaign-emails':
-        return <CampaignManager key={currentTab} initialSubTab="emails" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'campaign-leads':
-        return <CampaignManager key={currentTab} initialSubTab="leads" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'campaign-reports':
-        return <CampaignManager key={currentTab} initialSubTab="reports" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
       case 'campaign-settings':
-        return <CampaignManager key={currentTab} initialSubTab="settings" adminEmail={user?.email} theme={theme} onNavigateTab={handleTabChange} />;
+        return (
+          <CampaignManager
+            key="campaign-manager-core"
+            initialSubTab={
+              currentTab === 'campaign-overview'
+                ? 'overview'
+                : currentTab === 'campaign-create'
+                ? 'create'
+                : currentTab === 'campaign-forms'
+                ? 'forms'
+                : currentTab === 'campaign-emails'
+                ? 'emails'
+                : currentTab === 'campaign-leads'
+                ? 'leads'
+                : currentTab === 'campaign-reports'
+                ? 'reports'
+                : currentTab === 'campaign-settings'
+                ? 'settings'
+                : 'all'
+            }
+            adminEmail={user?.email}
+            theme={theme}
+            onNavigateTab={handleTabChange}
+          />
+        );
       case 'corporate-profile':
         return <AdminSettings theme={theme} initialTab="profile" />;
       case 'settings':
