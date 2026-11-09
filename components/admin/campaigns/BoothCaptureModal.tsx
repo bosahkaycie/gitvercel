@@ -174,10 +174,13 @@ export const BoothCaptureModal: React.FC<BoothCaptureModalProps> = ({
     for (const f of fields) {
       if (f.required && f.type !== 'section_heading' && f.type !== 'descriptive_text') {
         const val = dynamicValues[f.id];
-        if (f.type === 'consent' && !val && val !== undefined) {
-          setErrorMsg(`Please confirm: "${f.label}"`);
-          setIsSubmitting(false);
-          return;
+        if (f.type === 'consent') {
+          if (val === false) {
+            setErrorMsg(`Please confirm consent requirement: "${f.label}"`);
+            setIsSubmitting(false);
+            return;
+          }
+          continue;
         }
         if (val === undefined || val === null || val === '' || (Array.isArray(val) && val.length === 0)) {
           setErrorMsg(`Please provide a value for "${f.label}".`);
@@ -215,6 +218,11 @@ export const BoothCaptureModal: React.FC<BoothCaptureModalProps> = ({
     const visitorJobTitle = findValueByKeywords(['job_title', 'designation', 'role', 'title']) || '';
     const customInquiry = findValueByKeywords(['custom', 'scope', 'inquiry', 'requirement']) || '';
     const divisions = findValueByKeywords(['service_divisions', 'divisions']) || [];
+
+    const consentField = fields.find(f => f.type === 'consent');
+    if (consentField && dynamicValues[consentField.id] === undefined) {
+      dynamicValues[consentField.id] = true;
+    }
 
     // Unified payload
     const payloadData: Record<string, any> = {
