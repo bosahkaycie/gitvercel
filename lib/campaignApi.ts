@@ -15,26 +15,42 @@ import {
 
 async function fetchApi(action: string, options: RequestInit = {}): Promise<any> {
   const isPost = options.method === 'POST';
-  const cacheBuster = isPost ? '' : `&_t=${Date.now()}`;
-  let url = `/api/campaigns?action=${action}${cacheBuster}`;
-  
+  const cacheBuster = `&_t=${Date.now()}`;
+  const isBrowser = typeof window !== 'undefined';
+  const isProd = isBrowser && window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1');
+
+  // In production (Hostinger), direct to PHP endpoint first
+  const primaryEndpoint = isProd ? '/api/campaigns.php' : '/api/campaigns';
+  const fallbackEndpoint = isProd ? '/api/campaigns' : '/api/campaigns.php';
+
+  const fetchOptions: RequestInit = {
+    ...options,
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      ...(options.headers || {})
+    }
+  };
+
+  const primaryUrl = `${primaryEndpoint}?action=${action}${cacheBuster}`;
   try {
-    let res = await fetch(url, options);
-    if (!res.ok) {
-      // Try php endpoint fallback
-      const phpUrl = `/api/campaigns.php?action=${action}${cacheBuster}`;
-      const phpRes = await fetch(phpUrl, options);
-      if (phpRes.ok) {
-        return await phpRes.json();
-      }
+    const res = await fetch(primaryUrl, fetchOptions);
+    if (res.ok) {
+      return await res.json();
+    }
+    // Try fallback endpoint
+    const fallbackUrl = `${fallbackEndpoint}?action=${action}${cacheBuster}`;
+    const fallbackRes = await fetch(fallbackUrl, fetchOptions);
+    if (fallbackRes.ok) {
+      return await fallbackRes.json();
     }
     return await res.json();
   } catch (err: any) {
-    console.warn(`API call /api/campaigns?action=${action} failed, attempting PHP mirror:`, err);
+    console.warn(`Primary API call ${primaryUrl} failed, attempting mirror:`, err);
     try {
-      const phpUrl = `/api/campaigns.php?action=${action}${cacheBuster}`;
-      const phpRes = await fetch(phpUrl, options);
-      return await phpRes.json();
+      const fallbackUrl = `${fallbackEndpoint}?action=${action}${cacheBuster}`;
+      const fallbackRes = await fetch(fallbackUrl, fetchOptions);
+      return await fallbackRes.json();
     } catch (e: any) {
       console.error(`Both API endpoints failed:`, e);
       throw e;

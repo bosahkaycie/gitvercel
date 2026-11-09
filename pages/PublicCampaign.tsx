@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Campaign, CampaignForm } from '../types/campaign';
+import { Campaign, CampaignForm, CampaignFormField } from '../types/campaign';
 import { getCampaignBySlug, submitCampaignForm } from '../lib/campaignApi';
 import LogoImg from '../assets/LOGO.png';
 
@@ -7,32 +7,75 @@ interface PublicCampaignProps {
   currentPath: string;
 }
 
-interface DivisionCardOption {
-  id: string;
-  title: string;
-  description: string;
-}
-
-const PIGL_DIVISIONS: DivisionCardOption[] = [
+const DEFAULT_FALLBACK_FIELDS: CampaignFormField[] = [
   {
-    id: 'geosolutions',
-    title: 'Geosolutions & Engineering',
-    description: 'CPT sounding, geotechnical drilling, soil mechanics & 3D reality capture'
+    id: 'full_name',
+    type: 'short_text',
+    label: 'Full Name',
+    placeholder: 'e.g. Engr. Oladipo Adeleke',
+    required: true,
+    order: 1
   },
   {
-    id: 'metocean',
-    title: 'Metocean & Marine Solutions',
-    description: 'Hydrographic surveying, oceanographic modeling, bathymetry & sub-bottom profiling'
+    id: 'email',
+    type: 'email',
+    label: 'Corporate / Official Email Address',
+    placeholder: 'e.g. o.adeleke@energyfirm.com',
+    required: true,
+    order: 2
   },
   {
-    id: 'construction',
-    title: 'Integrated Construction',
-    description: 'Swamp pipeline construction, structural fabrication, piling & civil works'
+    id: 'phone',
+    type: 'phone',
+    label: 'Phone / WhatsApp Number',
+    placeholder: '+234 803 000 0000',
+    required: false,
+    order: 3
   },
   {
-    id: 'industrial',
-    title: 'Industrial Solutions',
-    description: 'Cathodic protection, NDT asset integrity testing & maintenance operations'
+    id: 'company',
+    type: 'short_text',
+    label: 'Company / Operating Organisation',
+    placeholder: 'e.g. Shell, NNPC Ltd, Chevron, TotalEnergies, Seplat',
+    required: true,
+    order: 4
+  },
+  {
+    id: 'job_title',
+    type: 'short_text',
+    label: 'Job Title / Designation',
+    placeholder: 'e.g. Executive Director, Lead Project Engineer',
+    required: false,
+    order: 5
+  },
+  {
+    id: 'service_divisions',
+    type: 'checkbox',
+    label: 'PIGL Operating Divisions of Interest',
+    required: false,
+    order: 6,
+    options: [
+      { id: 'opt_geo', label: 'Geosolutions & Engineering (CPT, 3D Laser Scanning, Geotechnical)', value: 'Geosolutions & Engineering' },
+      { id: 'opt_marine', label: 'Metocean & Marine Solutions (Hydrographic, Metocean, Sub-bottom)', value: 'Metocean & Marine Solutions' },
+      { id: 'opt_const', label: 'Integrated Construction (Swamp Pipelines, Structural Works)', value: 'Integrated Construction' },
+      { id: 'opt_ind', label: 'Industrial Solutions (Cathodic Protection, NDT Asset Integrity)', value: 'Industrial Solutions' }
+    ]
+  },
+  {
+    id: 'custom_inquiry_scope',
+    type: 'long_text',
+    label: 'Custom Technical Requirements / Unlisted Inquiries',
+    description: 'Type any unlisted scope, specialized equipment, tender timeline, or technical requirement.',
+    placeholder: 'Describe your specific project scope, asset location, or inquiry...',
+    required: false,
+    order: 7
+  },
+  {
+    id: 'consent_ndpa',
+    type: 'consent',
+    label: 'I consent to Polaris Integrated & GeoSolutions Limited contacting me regarding this inquiry in accordance with the Nigeria Data Protection Act (NDPA).',
+    required: true,
+    order: 8
   }
 ];
 
@@ -45,27 +88,8 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Form submission state
-  const [formData, setFormData] = useState<{
-    fullName: string;
-    email: string;
-    phone: string;
-    company: string;
-    jobTitle: string;
-    divisions: string[];
-    customScope: string;
-    consent: boolean;
-  }>({
-    fullName: '',
-    email: '',
-    phone: '',
-    company: '',
-    jobTitle: '',
-    divisions: [],
-    customScope: '',
-    consent: true
-  });
-
+  // Dynamic Form submission state
+  const [formData, setFormData] = useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
@@ -115,13 +139,29 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
     };
   }, [slug]);
 
-  const handleDivisionToggle = (title: string) => {
+  // Derive active version & fields dynamically from form builder
+  const activeVersion = form?.versions?.find(v => v.versionNumber === form.activeVersion)
+    || form?.versions?.[form.versions.length - 1];
+
+  const rawFields = activeVersion?.fields && activeVersion.fields.length > 0
+    ? activeVersion.fields
+    : DEFAULT_FALLBACK_FIELDS;
+
+  // Sort fields by order
+  const fields = [...rawFields].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  const handleFieldChange = (fieldId: string, value: any) => {
+    setFormData(prev => ({ ...prev, [fieldId]: value }));
+  };
+
+  const handleCheckboxToggle = (fieldId: string, optionValue: string) => {
     setFormData(prev => {
-      const exists = prev.divisions.includes(title);
+      const current = Array.isArray(prev[fieldId]) ? prev[fieldId] : [];
+      const exists = current.includes(optionValue);
       const next = exists
-        ? prev.divisions.filter(d => d !== title)
-        : [...prev.divisions, title];
-      return { ...prev, divisions: next };
+        ? current.filter((v: string) => v !== optionValue)
+        : [...current, optionValue];
+      return { ...prev, [fieldId]: next };
     });
   };
 
@@ -129,39 +169,66 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
     e.preventDefault();
     if (!campaign) return;
 
-    if (!formData.fullName.trim()) {
-      setFormError('Please enter your full name.');
-      return;
-    }
+    setFormError(null);
 
-    if (!formData.email.trim() || !formData.email.includes('@')) {
-      setFormError('Please provide a valid corporate or official email address.');
-      return;
-    }
-
-    if (!formData.consent) {
-      setFormError('Please confirm your consent to allow PIGL to follow up with your inquiry.');
-      return;
+    // Dynamic field validation
+    for (const f of fields) {
+      if (f.required && f.type !== 'section_heading' && f.type !== 'descriptive_text') {
+        const val = formData[f.id];
+        if (f.type === 'consent' && !val) {
+          setFormError(`Please confirm your agreement: "${f.label}"`);
+          return;
+        }
+        if (val === undefined || val === null || val === '' || (Array.isArray(val) && val.length === 0)) {
+          setFormError(`Please provide a value for "${f.label}".`);
+          return;
+        }
+        if (f.type === 'email' && typeof val === 'string' && !val.includes('@')) {
+          setFormError(`Please enter a valid email address for "${f.label}".`);
+          return;
+        }
+      }
     }
 
     setIsSubmitting(true);
-    setFormError(null);
 
-    const payload = {
-      full_name: formData.fullName.trim(),
-      email: formData.email.trim(),
-      phone: formData.phone.trim(),
-      company: formData.company.trim(),
-      job_title: formData.jobTitle.trim(),
-      service_divisions: formData.divisions,
-      custom_inquiry_scope: formData.customScope.trim(),
-      f_full_name: formData.fullName.trim(),
-      f_email: formData.email.trim(),
-      f_phone: formData.phone.trim(),
-      f_company: formData.company.trim(),
-      f_job_title: formData.jobTitle.trim(),
-      f_divisions: formData.divisions,
-      f_custom_scope: formData.customScope.trim()
+    // Extract standard top-level attributes to populate leads table
+    const findValueByKeywords = (keywords: string[]) => {
+      for (const f of fields) {
+        const idLower = f.id.toLowerCase();
+        const labelLower = f.label.toLowerCase();
+        for (const kw of keywords) {
+          if (idLower === kw || idLower.includes(kw) || labelLower.includes(kw)) {
+            if (formData[f.id] !== undefined && formData[f.id] !== '') {
+              return formData[f.id];
+            }
+          }
+        }
+      }
+      return '';
+    };
+
+    const visitorName = findValueByKeywords(['full_name', 'fullname', 'name']) || 'Conference Delegate';
+    const visitorEmail = findValueByKeywords(['email', 'corporate_email']) || '';
+    const visitorPhone = findValueByKeywords(['phone', 'whatsapp', 'mobile', 'tel']) || '';
+    const visitorCompany = findValueByKeywords(['company', 'organisation', 'organization']) || '';
+    const visitorJobTitle = findValueByKeywords(['job_title', 'designation', 'role', 'title']) || '';
+    const customInquiry = findValueByKeywords(['custom', 'scope', 'inquiry', 'requirement', 'notes']) || '';
+
+    const payload: Record<string, any> = {
+      ...formData,
+      full_name: visitorName,
+      email: visitorEmail,
+      phone: visitorPhone,
+      company: visitorCompany,
+      job_title: visitorJobTitle,
+      custom_inquiry_scope: customInquiry,
+      f_full_name: visitorName,
+      f_email: visitorEmail,
+      f_phone: visitorPhone,
+      f_company: visitorCompany,
+      f_job_title: visitorJobTitle,
+      f_custom_scope: customInquiry
     };
 
     try {
@@ -258,6 +325,7 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
   // Success Confirmation Screen (Pure Light Theme)
   // -------------------------------------------------------------
   if (submitSuccess) {
+    const confirmationEmail = formData['email'] || formData['f_email'] || 'your corporate address';
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center font-sans">
         <div className="max-w-lg w-full bg-white border border-slate-200 p-8 sm:p-12 rounded-2xl shadow-sm relative text-center">
@@ -289,7 +357,7 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
             {campaign.eventLocation && (
               <p>&bull; Venue: <strong className="text-slate-800">{campaign.eventLocation}</strong></p>
             )}
-            <p>&bull; An official acknowledgement has been queued for: <strong className="text-slate-800">{formData.email}</strong></p>
+            <p>&bull; An official acknowledgement has been queued for: <strong className="text-slate-800">{confirmationEmail}</strong></p>
           </div>
 
           {/* Action Links */}
@@ -321,8 +389,12 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
   }
 
   // -------------------------------------------------------------
-  // Main Visitor Form (Straightforward, Light Theme)
+  // Main Visitor Form (Dynamically Driven by Form Builder & Light Themed)
   // -------------------------------------------------------------
+  const displayTitle = form?.title || `Connect with PIGL at ${campaign.eventName || campaign.name}`;
+  const displayDescription = form?.description || campaign.introductionText ||
+    `Complete this brief form to connect directly with Polaris Integrated & GeoSolutions Limited (PIGL) during ${campaign.eventName || 'the event'}.`;
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-slate-900 selection:text-white">
       {/* Pristine Light Header */}
@@ -345,182 +417,234 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
         {/* Intro Card */}
         <div className="mb-6 text-center sm:text-left">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Connect with PIGL
+            {displayTitle}
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
-            {campaign.introductionText ||
-              `Complete this brief form to connect directly with Polaris Integrated & GeoSolutions Limited (PIGL) during ${campaign.eventName || 'the event'}.`}
+            {displayDescription}
           </p>
         </div>
 
-        {/* Form Card */}
+        {/* Dynamic Form Card */}
         <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-10">
           {formError && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold flex items-center gap-2">
-              <span className="font-bold">Error:</span> {formError}
+              <span className="font-bold">Notice:</span> {formError}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* 1. Attendee Contact Details */}
-            <div className="space-y-4">
-              <div className="pb-2 border-b border-slate-100">
-                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  1. Your Contact Information
-                </h2>
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {fields.map(field => {
+              // 1. Section Heading
+              if (field.type === 'section_heading') {
+                return (
+                  <div key={field.id} className="pt-4 pb-1 border-b border-slate-100">
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                      {field.label}
+                    </h2>
+                    {field.description && (
+                      <p className="text-[11px] text-slate-400 mt-0.5">{field.description}</p>
+                    )}
+                  </div>
+                );
+              }
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-700">
-                    Full Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Engr. Oladipo Adeleke"
-                    value={formData.fullName}
-                    onChange={e => setFormData({ ...formData, fullName: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
-                  />
-                </div>
+              // 2. Descriptive Text
+              if (field.type === 'descriptive_text') {
+                return (
+                  <div key={field.id} className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 text-xs text-slate-600 leading-relaxed">
+                    {field.label}
+                  </div>
+                );
+              }
 
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-700">
-                    Corporate / Official Email <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="e.g. o.adeleke@energyfirm.com"
-                    value={formData.email}
-                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
-                  />
-                </div>
-              </div>
+              // 3. Long Text (Textarea)
+              if (field.type === 'long_text') {
+                return (
+                  <div key={field.id} className="space-y-1.5">
+                    <label className="block text-xs font-semibold text-slate-700">
+                      {field.label} {field.required && <span className="text-red-500">*</span>}
+                    </label>
+                    {field.description && (
+                      <p className="text-[11px] text-slate-500 leading-relaxed">{field.description}</p>
+                    )}
+                    <textarea
+                      rows={3}
+                      required={field.required}
+                      placeholder={field.placeholder || ''}
+                      value={formData[field.id] || ''}
+                      onChange={e => handleFieldChange(field.id, e.target.value)}
+                      className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
+                    />
+                  </div>
+                );
+              }
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-700">
-                    Phone / WhatsApp Number
-                  </label>
-                  <input
-                    type="tel"
-                    placeholder="+234 803 000 0000"
-                    value={formData.phone}
-                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-700">
-                    Company / Organization <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Shell, NNPC Ltd, TotalEnergies, Seplat"
-                    value={formData.company}
-                    onChange={e => setFormData({ ...formData, company: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-700">
-                  Job Designation / Role
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Managing Director, Lead Project Engineer, Asset Manager"
-                  value={formData.jobTitle}
-                  onChange={e => setFormData({ ...formData, jobTitle: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
-                />
-              </div>
-            </div>
-
-            {/* 2. Areas of Technical Interest */}
-            <div className="space-y-3">
-              <div className="pb-2 border-b border-slate-100 flex items-center justify-between">
-                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  2. PIGL Operating Divisions of Interest
-                </h2>
-                <span className="text-[11px] text-slate-400">Select any that apply</span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {PIGL_DIVISIONS.map(div => {
-                  const isChecked = formData.divisions.includes(div.title);
-                  return (
-                    <label
-                      key={div.id}
-                      onClick={() => handleDivisionToggle(div.title)}
-                      className={`p-4 rounded-xl border text-left transition-all cursor-pointer flex items-start gap-3 select-none ${
-                        isChecked
-                          ? 'border-slate-900 bg-slate-50 ring-1 ring-slate-900'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
-                      }`}
+              // 4. Dropdown Select
+              if (field.type === 'dropdown') {
+                return (
+                  <div key={field.id} className="space-y-1.5">
+                    <label className="block text-xs font-semibold text-slate-700">
+                      {field.label} {field.required && <span className="text-red-500">*</span>}
+                    </label>
+                    <select
+                      required={field.required}
+                      value={formData[field.id] || ''}
+                      onChange={e => handleFieldChange(field.id, e.target.value)}
+                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors cursor-pointer"
                     >
+                      <option value="">Select an option...</option>
+                      {(field.options || []).map(opt => (
+                        <option key={opt.id} value={opt.value || opt.label}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    {field.description && (
+                      <p className="text-[11px] text-slate-400">{field.description}</p>
+                    )}
+                  </div>
+                );
+              }
+
+              // 5. Radio Single Choice
+              if (field.type === 'radio') {
+                const currentVal = formData[field.id] || '';
+                return (
+                  <div key={field.id} className="space-y-2">
+                    <label className="block text-xs font-semibold text-slate-700">
+                      {field.label} {field.required && <span className="text-red-500">*</span>}
+                    </label>
+                    {field.description && (
+                      <p className="text-[11px] text-slate-500">{field.description}</p>
+                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {(field.options || []).map(opt => {
+                        const optVal = opt.value || opt.label;
+                        const isSelected = currentVal === optVal;
+                        return (
+                          <label
+                            key={opt.id}
+                            onClick={() => handleFieldChange(field.id, optVal)}
+                            className={`p-3 rounded-xl border text-xs font-medium cursor-pointer flex items-center gap-2.5 transition-all select-none ${
+                              isSelected
+                                ? 'border-slate-900 bg-slate-50 ring-1 ring-slate-900 text-slate-900'
+                                : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name={field.id}
+                              checked={isSelected}
+                              onChange={() => {}}
+                              className="text-slate-900 focus:ring-slate-900"
+                            />
+                            <span>{opt.label}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              }
+
+              // 6. Checkboxes (Multi-select)
+              if (field.type === 'checkbox') {
+                const currentVals = Array.isArray(formData[field.id]) ? formData[field.id] : [];
+                return (
+                  <div key={field.id} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-semibold text-slate-700">
+                        {field.label} {field.required && <span className="text-red-500">*</span>}
+                      </label>
+                      <span className="text-[11px] text-slate-400">Select all that apply</span>
+                    </div>
+                    {field.description && (
+                      <p className="text-[11px] text-slate-500">{field.description}</p>
+                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {(field.options || []).map(opt => {
+                        const optVal = opt.value || opt.label;
+                        const isChecked = currentVals.includes(optVal);
+                        return (
+                          <label
+                            key={opt.id}
+                            onClick={() => handleCheckboxToggle(field.id, optVal)}
+                            className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex items-start gap-2.5 select-none ${
+                              isChecked
+                                ? 'border-slate-900 bg-slate-50 ring-1 ring-slate-900 text-slate-900'
+                                : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => {}}
+                              className="mt-0.5 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
+                            />
+                            <div className="flex-1">
+                              <p className="text-xs font-semibold leading-snug">{opt.label}</p>
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              }
+
+              // 7. Consent Checkbox
+              if (field.type === 'consent') {
+                return (
+                  <div key={field.id} className="pt-2">
+                    <label className="flex items-start gap-3 cursor-pointer select-none">
                       <input
                         type="checkbox"
-                        checked={isChecked}
-                        onChange={() => {}} // Handled by container onClick
+                        required={field.required}
+                        checked={Boolean(formData[field.id])}
+                        onChange={e => handleFieldChange(field.id, e.target.checked)}
                         className="mt-0.5 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
                       />
-                      <div className="flex-1">
-                        <p className="text-xs font-bold text-slate-900 leading-snug">
-                          {div.title}
-                        </p>
-                        <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-                          {div.description}
-                        </p>
-                      </div>
+                      <span className="text-xs text-slate-600 leading-relaxed">
+                        {field.label} {field.required && <span className="text-red-500">*</span>}
+                      </span>
                     </label>
-                  );
-                })}
-              </div>
-            </div>
+                  </div>
+                );
+              }
 
-            {/* 3. Custom Requirements / Unlisted Inquiries (Spacious Textarea) */}
-            <div className="space-y-2">
-              <div className="pb-2 border-b border-slate-100">
-                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  3. Custom Technical Inquiries &amp; Scope Requirements
-                </h2>
-              </div>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                If you have a specialized requirement, unlisted equipment need, upcoming RFP, or specific project location, describe it below:
-              </p>
-              <textarea
-                rows={3}
-                placeholder="e.g. Deepwater autonomous pipeline bathymetry, specialized drone LiDAR survey for swamp terrain, cathodic protection inspection timeline, joint venture collaboration..."
-                value={formData.customScope}
-                onChange={e => setFormData({ ...formData, customScope: e.target.value })}
-                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
-              />
-            </div>
-
-            {/* 4. Consent and Privacy (NDPA) */}
-            <div className="pt-2">
-              <label className="flex items-start gap-3 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={formData.consent}
-                  onChange={e => setFormData({ ...formData, consent: e.target.checked })}
-                  className="mt-0.5 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
-                />
-                <span className="text-xs text-slate-500 leading-relaxed">
-                  I consent to Polaris Integrated &amp; GeoSolutions Limited (PIGL) recording my details to follow up with technical documentation, proposals, and industry updates in accordance with the Nigeria Data Protection Act (NDPA).
-                </span>
-              </label>
-            </div>
+              // 8. Standard single line inputs (short_text, email, phone, number, date)
+              return (
+                <div key={field.id} className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-slate-700">
+                    {field.label} {field.required && <span className="text-red-500">*</span>}
+                  </label>
+                  <input
+                    type={
+                      field.type === 'email'
+                        ? 'email'
+                        : field.type === 'phone'
+                        ? 'tel'
+                        : field.type === 'number'
+                        ? 'number'
+                        : field.type === 'date'
+                        ? 'date'
+                        : 'text'
+                    }
+                    required={field.required}
+                    placeholder={field.placeholder || ''}
+                    value={formData[field.id] || ''}
+                    onChange={e => handleFieldChange(field.id, e.target.value)}
+                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
+                  />
+                  {field.description && (
+                    <p className="text-[11px] text-slate-400">{field.description}</p>
+                  )}
+                </div>
+              );
+            })}
 
             {/* Submit Button */}
-            <div className="pt-2">
+            <div className="pt-4 border-t border-slate-100">
               <button
                 type="submit"
                 disabled={isSubmitting}

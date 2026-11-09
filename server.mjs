@@ -2216,8 +2216,8 @@ Polaris Integrated & GeoSolutions Limited (PIGL)`,
     if (action === "saveForm") {
       const body = req.body || {};
       const { formId, campaignId, title, description, fields } = body;
-      let formIndex = store.forms.findIndex((f) => f.id === formId);
-      const hasSubmissions = store.submissions.some((s) => s.formId === formId);
+      let formIndex = store.forms.findIndex((f) => f.id === formId || campaignId && f.campaignId === campaignId);
+      const hasSubmissions = store.submissions.some((s) => s.formId === formId || campaignId && s.campaignId === campaignId);
       if (formIndex >= 0) {
         const existingForm = store.forms[formIndex];
         let newActiveVersion = existingForm.activeVersion;
