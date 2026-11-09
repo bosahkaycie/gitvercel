@@ -774,6 +774,41 @@ if ($action === 'submit') {
                 'errorDetails' => $sent ? null : 'Host mail relay delivery deferred',
                 'createdAt' => date('c')
             ];
+
+            // Internal Alert to PIGL Team
+            $internalRecipients = !empty($emailTmpl['internalRecipients']) ? $emailTmpl['internalRecipients'] : [];
+            if (!empty($internalRecipients) && is_array($internalRecipients)) {
+                $alertSubject = "[PIGL Lead Alert] New Visitor: {$visitorName} ({$visitorCompany}) at {$campaign['eventName']}";
+                $alertBody = "<h2>New Lead Capture - {$campaign['eventName']}</h2>"
+                    . "<p><strong>Visitor:</strong> {$visitorName}</p>"
+                    . "<p><strong>Email:</strong> {$visitorEmail}</p>"
+                    . "<p><strong>Phone:</strong> {$visitorPhone}</p>"
+                    . "<p><strong>Company:</strong> {$visitorCompany}</p>"
+                    . "<p><strong>Designation:</strong> {$visitorJobTitle}</p>"
+                    . "<p><strong>Source:</strong> {$source}</p>"
+                    . "<p><strong>Reference ID:</strong> {$submissionId}</p>"
+                    . "<hr><p>View and manage this lead in the administrator dashboard: <a href='https://polarisigl.com/admin?tab=campaign-leads'>polarisigl.com/admin?tab=campaign-leads</a></p>";
+
+                foreach ($internalRecipients as $intEmail) {
+                    $intEmail = trim($intEmail);
+                    if (!empty($intEmail) && strpos($intEmail, '@') !== false) {
+                        $intSent = @mail($intEmail, $alertSubject, $alertBody, $headers);
+                        $store['emailLogs'][] = [
+                            'id' => 'log-' . time() . '-' . rand(100, 999),
+                            'campaignId' => $campaign['id'],
+                            'submissionId' => $submissionId,
+                            'recipientEmail' => $intEmail,
+                            'recipientName' => 'PIGL Business Development',
+                            'subject' => $alertSubject,
+                            'status' => $intSent ? 'sent' : 'failed',
+                            'attempts' => 1,
+                            'sentAt' => $intSent ? date('c') : null,
+                            'errorDetails' => $intSent ? null : 'Host mail relay delivery deferred',
+                            'createdAt' => date('c')
+                        ];
+                    }
+                }
+            }
         }
     }
 

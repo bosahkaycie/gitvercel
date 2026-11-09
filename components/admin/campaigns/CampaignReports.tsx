@@ -40,13 +40,14 @@ export const CampaignReports: React.FC<CampaignReportsProps> = ({
   };
 
   submissions.forEach(s => {
-    const divs = s.formData?.f_divisions || [];
+    const divs = s.formData?.service_divisions || s.formData?.f_divisions || [];
     if (Array.isArray(divs)) {
       divs.forEach((d: string) => {
-        if (d.includes('geo')) divisionCounts['Geosolutions & Engineering Services']++;
-        else if (d.includes('met')) divisionCounts['Metocean & Marine Solutions']++;
-        else if (d.includes('con')) divisionCounts['Integrated Construction Services']++;
-        else if (d.includes('ind')) divisionCounts['Industrial Solutions']++;
+        const lower = String(d).toLowerCase();
+        if (lower.includes('geo')) divisionCounts['Geosolutions & Engineering Services']++;
+        else if (lower.includes('met') || lower.includes('marine')) divisionCounts['Metocean & Marine Solutions']++;
+        else if (lower.includes('con') || lower.includes('pipeline')) divisionCounts['Integrated Construction Services']++;
+        else if (lower.includes('ind') || lower.includes('cathodic') || lower.includes('ndt')) divisionCounts['Industrial Solutions']++;
       });
     }
   });
