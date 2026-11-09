@@ -52,6 +52,80 @@ interface CampaignManagerProps {
   onNavigateTab?: (tab: string) => void;
 }
 
+const getFallbackForm = (camp: Campaign): CampaignForm => {
+  return {
+    id: camp.assignedFormId || `form-${camp.id}`,
+    campaignId: camp.id,
+    title: `${camp.name} Registration Form`,
+    description: `Official registration and technical inquiry form for ${camp.name}`,
+    activeVersion: 1,
+    versions: [
+      {
+        id: `v1-${camp.id}`,
+        versionNumber: 1,
+        createdAt: new Date().toISOString(),
+        fields: [
+          { id: 'full_name', type: 'short_text', label: 'Full Name', required: true, order: 1, placeholder: 'e.g. Engr. Oladipo Adeleke' },
+          { id: 'email', type: 'email', label: 'Corporate / Official Email Address', required: true, order: 2, placeholder: 'e.g. name@energyfirm.com' },
+          { id: 'phone', type: 'phone', label: 'Phone / WhatsApp Number', required: true, order: 3, placeholder: '+234 803 000 0000' },
+          { id: 'company', type: 'short_text', label: 'Company / Operating Organisation', required: true, order: 4, placeholder: 'e.g. Shell, NNPC Ltd, Chevron, TotalEnergies, Seplat' },
+          { id: 'job_title', type: 'short_text', label: 'Job Title / Designation', required: false, order: 5, placeholder: 'e.g. Executive Director, Lead Project Engineer' },
+          {
+            id: 'service_divisions',
+            type: 'checkbox',
+            label: 'PIGL Operating Divisions of Interest',
+            required: false,
+            order: 6,
+            options: [
+              { id: 'opt_geo', label: 'Geosolutions & Engineering (CPT, 3D Laser Scanning, Geotechnical)', value: 'Geosolutions & Engineering' },
+              { id: 'opt_marine', label: 'Metocean & Marine Solutions (Hydrographic, Metocean, Sub-bottom)', value: 'Metocean & Marine Solutions' },
+              { id: 'opt_const', label: 'Integrated Construction (Swamp Pipelines, Structural Works)', value: 'Integrated Construction' },
+              { id: 'opt_ind', label: 'Industrial Solutions (Cathodic Protection, NDT Asset Integrity)', value: 'Industrial Solutions' }
+            ]
+          },
+          {
+            id: 'custom_inquiry_scope',
+            type: 'long_text',
+            label: 'Custom Technical Requirements / Unlisted Inquiries',
+            description: 'Type any unlisted scope, specialized equipment, tender timeline, or technical requirement.',
+            placeholder: 'Describe your specific project scope, asset location, or inquiry...',
+            required: false,
+            order: 7
+          },
+          {
+            id: 'consent_ndpa',
+            type: 'consent',
+            label: 'I consent to Polaris Integrated & GeoSolutions Limited contacting me regarding this inquiry in accordance with the Nigeria Data Protection Act (NDPA).',
+            required: true,
+            order: 8
+          }
+        ]
+      }
+    ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+};
+
+const getFallbackTemplate = (camp: Campaign): CampaignEmailTemplate => {
+  const eventName = camp.eventName || camp.name;
+  return {
+    id: `tmpl-${camp.id}`,
+    campaignId: camp.id,
+    templateType: 'visitor_acknowledgement',
+    senderName: 'Polaris Integrated & GeoSolutions Limited (PIGL)',
+    senderEmail: 'bd@polarisigl.com',
+    replyTo: 'info@polarisigl.com',
+    subject: `Thank You for Connecting with PIGL at ${eventName}`,
+    bodyHtml: `<p>Dear {{first_name}},</p><p>Thank you for connecting with Polaris Integrated &amp; GeoSolutions Limited (PIGL) at {{event_name}}.</p><p>Our technical leadership team has received your inquiry regarding our engineering and geomatics services and will be in touch shortly.</p><p>Warm regards,<br><strong>Business Development Directorate</strong><br>Polaris Integrated &amp; GeoSolutions Limited (PIGL)</p>`,
+    bodyText: `Dear {{first_name}},\n\nThank you for connecting with Polaris Integrated & GeoSolutions Limited (PIGL) at {{event_name}}.\n\nOur technical leadership team has received your inquiry and will be in touch shortly.\n\nWarm regards,\nBusiness Development Directorate\nPolaris Integrated & GeoSolutions Limited (PIGL)`,
+    enabled: true,
+    internalRecipients: ['admin@polarisigl.com', 'bd@polarisigl.com'],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+};
+
 export const CampaignManager: React.FC<CampaignManagerProps> = ({
   initialSubTab = 'overview',
   adminEmail = 'admin@polarisigl.com',
@@ -340,18 +414,18 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
         </div>
       )}
 
-      {subTab === 'forms' && selectedCampaign && activeForm && (
+      {subTab === 'forms' && selectedCampaign && (
         <CampaignFormBuilder
           campaign={selectedCampaign}
-          form={activeForm}
+          form={activeForm || getFallbackForm(selectedCampaign)}
           onFormUpdated={updated => setActiveForm(updated)}
         />
       )}
 
-      {subTab === 'emails' && selectedCampaign && activeEmailTemplate && (
+      {subTab === 'emails' && selectedCampaign && (
         <CampaignEmailAutomation
           campaign={selectedCampaign}
-          template={activeEmailTemplate}
+          template={activeEmailTemplate || getFallbackTemplate(selectedCampaign)}
           logs={emailLogs}
           onTemplateUpdated={updated => setActiveEmailTemplate(updated)}
           onLogsUpdated={updatedLogs => setEmailLogs(updatedLogs)}

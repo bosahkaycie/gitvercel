@@ -1939,7 +1939,102 @@ async function handler11(req, res) {
   const action = urlObj.searchParams.get("action") || req.body && req.body.action || "list";
   try {
     const store = await loadStore(supabase);
+    const createDefaultForm = (camp) => {
+      const assignedFormId = camp.assignedFormId || `form-${camp.id}`;
+      return {
+        id: assignedFormId,
+        campaignId: camp.id,
+        title: `${camp.name} Registration Form`,
+        description: `Official registration and inquiry form for ${camp.name}`,
+        activeVersion: 1,
+        versions: [
+          {
+            id: `v1-${Date.now()}`,
+            versionNumber: 1,
+            createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+            fields: [
+              { id: "full_name", type: "short_text", label: "Full Name", required: true, order: 1, placeholder: "e.g. Engr. Oladipo Adeleke" },
+              { id: "email", type: "email", label: "Corporate / Official Email Address", required: true, order: 2, placeholder: "e.g. name@energyfirm.com" },
+              { id: "phone", type: "phone", label: "Phone / WhatsApp Number", required: true, order: 3, placeholder: "+234 803 000 0000" },
+              { id: "company", type: "short_text", label: "Company / Operating Organisation", required: true, order: 4, placeholder: "e.g. Shell, NNPC Ltd, Chevron, TotalEnergies, Seplat" },
+              { id: "job_title", type: "short_text", label: "Job Title / Designation", required: false, order: 5, placeholder: "e.g. Executive Director, Lead Project Engineer" },
+              {
+                id: "service_divisions",
+                type: "checkbox",
+                label: "PIGL Operating Divisions of Interest",
+                required: false,
+                order: 6,
+                options: [
+                  { id: "opt_geo", label: "Geosolutions & Engineering (CPT, 3D Laser Scanning, Geotechnical)", value: "Geosolutions & Engineering" },
+                  { id: "opt_marine", label: "Metocean & Marine Solutions (Hydrographic, Metocean, Sub-bottom)", value: "Metocean & Marine Solutions" },
+                  { id: "opt_const", label: "Integrated Construction (Swamp Pipelines, Structural Works)", value: "Integrated Construction" },
+                  { id: "opt_ind", label: "Industrial Solutions (Cathodic Protection, NDT Asset Integrity)", value: "Industrial Solutions" }
+                ]
+              },
+              {
+                id: "custom_inquiry_scope",
+                type: "long_text",
+                label: "Custom Technical Requirements / Unlisted Inquiries",
+                description: "Type any unlisted scope, specialized equipment, tender timeline, or technical requirement.",
+                placeholder: "Describe your specific project scope, asset location, or inquiry...",
+                required: false,
+                order: 7
+              },
+              {
+                id: "consent_ndpa",
+                type: "consent",
+                label: "I consent to Polaris Integrated & GeoSolutions Limited contacting me regarding this inquiry in accordance with the Nigeria Data Protection Act (NDPA).",
+                required: true,
+                order: 8
+              }
+            ]
+          }
+        ],
+        createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+        updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+      };
+    };
+    const createDefaultEmailTemplate = (camp) => {
+      const eventName = camp.eventName || camp.name;
+      return {
+        id: `tmpl-${Date.now()}-${Math.floor(Math.random() * 900 + 100)}`,
+        campaignId: camp.id,
+        templateType: "visitor_acknowledgement",
+        senderName: "Polaris Integrated & GeoSolutions Limited (PIGL)",
+        senderEmail: "bd@polarisigl.com",
+        replyTo: "info@polarisigl.com",
+        subject: `Thank You for Connecting with PIGL at ${eventName}`,
+        bodyHtml: `<p>Dear {{first_name}},</p><p>Thank you for connecting with Polaris Integrated &amp; GeoSolutions Limited (PIGL) at {{event_name}}.</p><p>Our technical leadership team has received your inquiry regarding our engineering and geomatics services and will be in touch shortly.</p><p>Warm regards,<br><strong>Business Development Directorate</strong><br>Polaris Integrated &amp; GeoSolutions Limited (PIGL)</p>`,
+        bodyText: `Dear {{first_name}},
+
+Thank you for connecting with Polaris Integrated & GeoSolutions Limited (PIGL) at {{event_name}}.
+
+Our technical leadership team has received your inquiry and will be in touch shortly.
+
+Warm regards,
+Business Development Directorate
+Polaris Integrated & GeoSolutions Limited (PIGL)`,
+        enabled: true,
+        internalRecipients: ["admin@polarisigl.com", "bd@polarisigl.com"],
+        createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+        updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+      };
+    };
     if (action === "list") {
+      let dirty = false;
+      for (const c of store.campaigns) {
+        if (!store.forms.some((f) => f.id === c.assignedFormId || f.campaignId === c.id)) {
+          store.forms.push(createDefaultForm(c));
+          dirty = true;
+        }
+        if (!store.emailTemplates.some((t) => t.campaignId === c.id)) {
+          store.emailTemplates.push(createDefaultEmailTemplate(c));
+          dirty = true;
+        }
+      }
+      if (dirty) {
+        await saveStore(supabase, store);
+      }
       return res.status(200).json({
         success: true,
         campaigns: store.campaigns
@@ -1951,11 +2046,16 @@ async function handler11(req, res) {
       if (!campaign) {
         return res.status(404).json({ success: false, error: "Campaign not found" });
       }
-      const form = store.forms.find((f) => f.id === campaign.assignedFormId || f.campaignId === campaign.id);
+      let form = store.forms.find((f) => f.id === campaign.assignedFormId || f.campaignId === campaign.id);
+      if (!form) {
+        form = createDefaultForm(campaign);
+        store.forms.push(form);
+        await saveStore(supabase, store);
+      }
       return res.status(200).json({
         success: true,
         campaign,
-        form: form || null
+        form
       });
     }
     if (action === "get") {
@@ -1964,8 +2064,22 @@ async function handler11(req, res) {
       if (!campaign) {
         return res.status(404).json({ success: false, error: "Campaign not found" });
       }
-      const form = store.forms.find((f) => f.id === campaign.assignedFormId || f.campaignId === campaign.id);
-      const emailTemplate = store.emailTemplates.find((t) => t.campaignId === campaign.id);
+      let dirty = false;
+      let form = store.forms.find((f) => f.id === campaign.assignedFormId || f.campaignId === campaign.id);
+      if (!form) {
+        form = createDefaultForm(campaign);
+        store.forms.push(form);
+        dirty = true;
+      }
+      let emailTemplate = store.emailTemplates.find((t) => t.campaignId === campaign.id);
+      if (!emailTemplate) {
+        emailTemplate = createDefaultEmailTemplate(campaign);
+        store.emailTemplates.push(emailTemplate);
+        dirty = true;
+      }
+      if (dirty) {
+        await saveStore(supabase, store);
+      }
       const submissions = store.submissions.filter((s) => s.campaignId === campaign.id);
       const emailLogs = store.emailLogs.filter((l) => l.campaignId === campaign.id);
       return res.status(200).json({

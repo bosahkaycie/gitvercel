@@ -86,46 +86,75 @@ function saveCampaignStore($supabase_url, $supabase_key, $storage_file, $store) 
 // Standard approved default form fields for newly created campaigns
 function getDefaultCampaignFormFields() {
     return [
-        ['id' => 'full_name', 'name' => 'full_name', 'label' => 'Full Name', 'type' => 'text', 'placeholder' => 'Engr. / Dr. / Mr. / Ms. Full Name', 'required' => true, 'order' => 1],
-        ['id' => 'email', 'name' => 'email', 'label' => 'Corporate Email Address', 'type' => 'email', 'placeholder' => 'name@company.com', 'required' => true, 'order' => 2],
-        ['id' => 'phone', 'name' => 'phone', 'label' => 'Phone / WhatsApp Number', 'type' => 'tel', 'placeholder' => '+234 800 000 0000', 'required' => true, 'order' => 3],
-        ['id' => 'company', 'name' => 'company', 'label' => 'Company / Organisation', 'type' => 'text', 'placeholder' => 'e.g. Shell, NNPC Ltd, Chevron, TotalEnergies', 'required' => true, 'order' => 4],
-        ['id' => 'job_title', 'name' => 'job_title', 'label' => 'Job Title / Designation', 'type' => 'text', 'placeholder' => 'e.g. Managing Director, Lead Project Engineer', 'required' => true, 'order' => 5],
+        [
+            'id' => 'full_name',
+            'type' => 'short_text',
+            'label' => 'Full Name',
+            'placeholder' => 'e.g. Engr. Oladipo Adeleke',
+            'required' => true,
+            'order' => 1
+        ],
+        [
+            'id' => 'email',
+            'type' => 'email',
+            'label' => 'Corporate / Official Email Address',
+            'placeholder' => 'e.g. name@energyfirm.com',
+            'required' => true,
+            'order' => 2
+        ],
+        [
+            'id' => 'phone',
+            'type' => 'phone',
+            'label' => 'Phone / WhatsApp Number',
+            'placeholder' => '+234 803 000 0000',
+            'required' => true,
+            'order' => 3
+        ],
+        [
+            'id' => 'company',
+            'type' => 'short_text',
+            'label' => 'Company / Operating Organisation',
+            'placeholder' => 'e.g. Shell, NNPC Ltd, Chevron, TotalEnergies, Seplat',
+            'required' => true,
+            'order' => 4
+        ],
+        [
+            'id' => 'job_title',
+            'type' => 'short_text',
+            'label' => 'Job Title / Designation',
+            'placeholder' => 'e.g. Executive Director, Lead Project Engineer',
+            'required' => false,
+            'order' => 5
+        ],
         [
             'id' => 'service_divisions',
-            'name' => 'service_divisions',
+            'type' => 'checkbox',
             'label' => 'PIGL Operating Divisions of Interest',
-            'type' => 'checkbox_group',
-            'required' => true,
+            'required' => false,
             'order' => 6,
             'options' => [
-                'Survey & Geomatics (Onshore / Offshore)',
-                'Geotechnical, Geophysical & Foundation Engineering',
-                'MetOcean & Environmental Oceanography',
-                'Advanced 3D Laser Scanning & Reality Capture'
+                ['id' => 'opt_geo', 'label' => 'Geosolutions & Engineering (CPT, 3D Laser Scanning, Geotechnical)', 'value' => 'Geosolutions & Engineering'],
+                ['id' => 'opt_marine', 'label' => 'Metocean & Marine Solutions (Hydrographic, Metocean, Sub-bottom)', 'value' => 'Metocean & Marine Solutions'],
+                ['id' => 'opt_const', 'label' => 'Integrated Construction (Swamp Pipelines, Structural Works)', 'value' => 'Integrated Construction'],
+                ['id' => 'opt_ind', 'label' => 'Industrial Solutions (Cathodic Protection, NDT Asset Integrity)', 'value' => 'Industrial Solutions']
             ]
         ],
         [
-            'id' => 'engagement_type',
-            'name' => 'engagement_type',
-            'label' => 'Purpose of Engagement',
-            'type' => 'select',
-            'required' => true,
-            'order' => 7,
-            'options' => [
-                'Upcoming Project / RFP Collaboration',
-                'Technical Capability & Service Inquiry',
-                'Executive Partnership / Joint Venture',
-                'Vendor / Subcontractor Evaluation',
-                'General Networking'
-            ]
+            'id' => 'custom_inquiry_scope',
+            'type' => 'long_text',
+            'label' => 'Custom Technical Requirements / Unlisted Inquiries',
+            'description' => 'Type any unlisted scope, specialized equipment, tender timeline, or technical requirement.',
+            'placeholder' => 'Describe your specific project scope, asset location, or inquiry...',
+            'required' => false,
+            'order' => 7
         ],
-        ['id' => 'project_timeline', 'name' => 'project_timeline', 'label' => 'Estimated Project Timeline', 'type' => 'select', 'required' => false, 'order' => 8, 'options' => ['Immediate (0 - 3 months)', 'Short Term (3 - 6 months)', 'Medium Term (6 - 12 months)', 'Long Term / Planning Phase (12+ months)']],
-        ['id' => 'project_description', 'name' => 'project_description', 'label' => 'Project Description / Specific Scope', 'type' => 'textarea', 'placeholder' => 'Briefly describe your asset location, terrain, timeline, or scope of inquiry...', 'required' => false, 'order' => 9],
-        ['id' => 'preferred_followup', 'name' => 'preferred_followup', 'label' => 'Preferred Follow-up Method', 'type' => 'select', 'required' => false, 'order' => 10, 'options' => ['Email Technical Dossier', 'Virtual Meeting (Microsoft Teams / Zoom)', 'In-person Technical Presentation (PIGL Office)', 'Executive Phone Briefing']],
-        ['id' => 'location_interest', 'name' => 'location_interest', 'label' => 'Asset / Operational Basin', 'type' => 'select', 'required' => false, 'order' => 11, 'options' => ['Niger Delta Onshore (Swamp / Land)', 'Deep Offshore (Gulf of Guinea)', 'Lagos / Western Basin', 'Inland Basins (Chad, Benue, Dahomey)', 'International / Cross-Border']],
-        ['id' => 'booth_notes', 'name' => 'booth_notes', 'label' => 'Technical Discussion Summary', 'type' => 'textarea', 'placeholder' => 'Key takeaways, tender requirements, follow-up timeline...', 'required' => false, 'order' => 12],
-        ['id' => 'consent_ndpa', 'name' => 'consent_ndpa', 'label' => 'I consent to Polaris Integrated & GeoSolutions Limited contacting me regarding this inquiry in accordance with the Nigeria Data Protection Act (NDPA).', 'type' => 'consent', 'required' => true, 'order' => 13]
+        [
+            'id' => 'consent_ndpa',
+            'type' => 'consent',
+            'label' => 'I consent to Polaris Integrated & GeoSolutions Limited contacting me regarding this inquiry in accordance with the Nigeria Data Protection Act (NDPA).',
+            'required' => true,
+            'order' => 8
+        ]
     ];
 }
 
@@ -138,8 +167,82 @@ if (isset($body['action'])) {
 
 $store = getCampaignStore($supabase_url, $supabase_key, $storage_file);
 
-// 1. GET: List All Campaigns
+// Helper to generate default form structure for a campaign
+function createDefaultCampaignForm($campaign) {
+    $assignedFormId = !empty($campaign['assignedFormId']) ? $campaign['assignedFormId'] : 'form-' . $campaign['id'];
+    return [
+        'id' => $assignedFormId,
+        'campaignId' => $campaign['id'],
+        'title' => $campaign['name'] . ' Registration Form',
+        'description' => 'Official technical registration and inquiry form for ' . $campaign['name'],
+        'activeVersion' => 1,
+        'versions' => [
+            [
+                'id' => 'v1-' . time(),
+                'versionNumber' => 1,
+                'createdAt' => date('c'),
+                'fields' => getDefaultCampaignFormFields()
+            ]
+        ],
+        'createdAt' => date('c'),
+        'updatedAt' => date('c')
+    ];
+}
+
+// Helper to generate default email template for a campaign
+function createDefaultCampaignEmailTemplate($campaign) {
+    $eventName = !empty($campaign['eventName']) ? $campaign['eventName'] : $campaign['name'];
+    return [
+        'id' => 'tmpl-' . time() . '-' . rand(100, 999),
+        'campaignId' => $campaign['id'],
+        'templateType' => 'visitor_acknowledgement',
+        'senderName' => 'Polaris Integrated & GeoSolutions Limited (PIGL)',
+        'senderEmail' => 'bd@polarisigl.com',
+        'replyTo' => 'info@polarisigl.com',
+        'subject' => 'Thank You for Connecting with PIGL at ' . $eventName,
+        'bodyHtml' => "<p>Dear {{first_name}},</p><p>Thank you for connecting with Polaris Integrated &amp; GeoSolutions Limited (PIGL) at {{event_name}}.</p><p>Our technical leadership team has received your inquiry regarding our engineering and geomatics services and will be in touch shortly.</p><p>Warm regards,<br><strong>Business Development Directorate</strong><br>Polaris Integrated &amp; GeoSolutions Limited (PIGL)</p>",
+        'bodyText' => "Dear {{first_name}},\n\nThank you for connecting with Polaris Integrated & GeoSolutions Limited (PIGL) at {{event_name}}.\n\nOur technical leadership team has received your inquiry and will be in touch shortly.\n\nWarm regards,\nBusiness Development Directorate\nPolaris Integrated & GeoSolutions Limited (PIGL)",
+        'enabled' => true,
+        'internalRecipients' => ['admin@polarisigl.com', 'bd@polarisigl.com'],
+        'createdAt' => date('c'),
+        'updatedAt' => date('c')
+    ];
+}
+
+// 1. GET: List All Campaigns (Self-healing: ensure all campaigns have forms & templates)
 if ($action === 'list') {
+    $storeDirty = false;
+    foreach ($store['campaigns'] as &$camp) {
+        $hasForm = false;
+        foreach ($store['forms'] as $f) {
+            if ($f['id'] === $camp['assignedFormId'] || $f['campaignId'] === $camp['id']) {
+                $hasForm = true;
+                break;
+            }
+        }
+        if (!$hasForm) {
+            $store['forms'][] = createDefaultCampaignForm($camp);
+            $storeDirty = true;
+        }
+
+        $hasTmpl = false;
+        foreach ($store['emailTemplates'] as $t) {
+            if ($t['campaignId'] === $camp['id']) {
+                $hasTmpl = true;
+                break;
+            }
+        }
+        if (!$hasTmpl) {
+            $store['emailTemplates'][] = createDefaultCampaignEmailTemplate($camp);
+            $storeDirty = true;
+        }
+    }
+    unset($camp);
+
+    if ($storeDirty) {
+        saveCampaignStore($supabase_url, $supabase_key, $storage_file, $store);
+    }
+
     echo json_encode(['success' => true, 'campaigns' => $store['campaigns'] ?: []]);
     exit();
 }
@@ -161,13 +264,19 @@ if ($action === 'getBySlug') {
         exit();
     }
 
-    // Find assigned form
+    // Find assigned form (or auto-generate if missing)
     $form = null;
     foreach ($store['forms'] as $f) {
         if ($f['id'] === $campaign['assignedFormId'] || $f['campaignId'] === $campaign['id']) {
             $form = $f;
             break;
         }
+    }
+
+    if (!$form) {
+        $form = createDefaultCampaignForm($campaign);
+        $store['forms'][] = $form;
+        saveCampaignStore($supabase_url, $supabase_key, $storage_file, $store);
     }
 
     echo json_encode([
@@ -195,6 +304,7 @@ if ($action === 'get') {
         exit();
     }
 
+    $storeDirty = false;
     $form = null;
     foreach ($store['forms'] as $f) {
         if ($f['id'] === $campaign['assignedFormId'] || $f['campaignId'] === $campaign['id']) {
@@ -203,12 +313,28 @@ if ($action === 'get') {
         }
     }
 
+    if (!$form) {
+        $form = createDefaultCampaignForm($campaign);
+        $store['forms'][] = $form;
+        $storeDirty = true;
+    }
+
     $emailTemplate = null;
     foreach ($store['emailTemplates'] as $t) {
         if ($t['campaignId'] === $campaign['id']) {
             $emailTemplate = $t;
             break;
         }
+    }
+
+    if (!$emailTemplate) {
+        $emailTemplate = createDefaultCampaignEmailTemplate($campaign);
+        $store['emailTemplates'][] = $emailTemplate;
+        $storeDirty = true;
+    }
+
+    if ($storeDirty) {
+        saveCampaignStore($supabase_url, $supabase_key, $storage_file, $store);
     }
 
     $submissions = array_values(array_filter($store['submissions'], function ($s) use ($id) {

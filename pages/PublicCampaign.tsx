@@ -1,11 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { Campaign, CampaignForm, CampaignFormField } from '../types/campaign';
+import { Campaign, CampaignForm } from '../types/campaign';
 import { getCampaignBySlug, submitCampaignForm } from '../lib/campaignApi';
 import LogoImg from '../assets/LOGO.png';
 
 interface PublicCampaignProps {
   currentPath: string;
 }
+
+interface DivisionCardOption {
+  id: string;
+  title: string;
+  description: string;
+}
+
+const PIGL_DIVISIONS: DivisionCardOption[] = [
+  {
+    id: 'geosolutions',
+    title: 'Geosolutions & Engineering',
+    description: 'CPT sounding, geotechnical drilling, soil mechanics & 3D reality capture'
+  },
+  {
+    id: 'metocean',
+    title: 'Metocean & Marine Solutions',
+    description: 'Hydrographic surveying, oceanographic modeling, bathymetry & sub-bottom profiling'
+  },
+  {
+    id: 'construction',
+    title: 'Integrated Construction',
+    description: 'Swamp pipeline construction, structural fabrication, piling & civil works'
+  },
+  {
+    id: 'industrial',
+    title: 'Industrial Solutions',
+    description: 'Cathodic protection, NDT asset integrity testing & maintenance operations'
+  }
+];
 
 export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) => {
   // Extract slug from /campaigns/:slug
@@ -17,7 +46,26 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
   const [error, setError] = useState<string | null>(null);
 
   // Form submission state
-  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [formData, setFormData] = useState<{
+    fullName: string;
+    email: string;
+    phone: string;
+    company: string;
+    jobTitle: string;
+    divisions: string[];
+    customScope: string;
+    consent: boolean;
+  }>({
+    fullName: '',
+    email: '',
+    phone: '',
+    company: '',
+    jobTitle: '',
+    divisions: [],
+    customScope: '',
+    consent: true
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
@@ -67,51 +115,61 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
     };
   }, [slug]);
 
-  const activeVersion = form?.versions.find(v => v.versionNumber === form.activeVersion) || form?.versions[0];
-  const fields = activeVersion?.fields || [];
-
-  const handleInputChange = (fieldId: string, value: any) => {
-    setFormData(prev => ({ ...prev, [fieldId]: value }));
-  };
-
-  const handleCheckboxToggle = (fieldId: string, optionValue: string) => {
-    const current = (formData[fieldId] as string[]) || [];
-    const next = current.includes(optionValue)
-      ? current.filter(v => v !== optionValue)
-      : [...current, optionValue];
-    setFormData(prev => ({ ...prev, [fieldId]: next }));
+  const handleDivisionToggle = (title: string) => {
+    setFormData(prev => {
+      const exists = prev.divisions.includes(title);
+      const next = exists
+        ? prev.divisions.filter(d => d !== title)
+        : [...prev.divisions, title];
+      return { ...prev, divisions: next };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!campaign) return;
 
+    if (!formData.fullName.trim()) {
+      setFormError('Please enter your full name.');
+      return;
+    }
+
+    if (!formData.email.trim() || !formData.email.includes('@')) {
+      setFormError('Please provide a valid corporate or official email address.');
+      return;
+    }
+
+    if (!formData.consent) {
+      setFormError('Please confirm your consent to allow PIGL to follow up with your inquiry.');
+      return;
+    }
+
     setIsSubmitting(true);
     setFormError(null);
 
-    // Validate required fields
-    for (const f of fields) {
-      if (f.required && f.type !== 'section_heading' && f.type !== 'descriptive_text') {
-        const val = formData[f.id];
-        if (f.type === 'consent' && !val) {
-          setFormError(`Please confirm your agreement to: "${f.label}"`);
-          setIsSubmitting(false);
-          return;
-        }
-        if (!val || (Array.isArray(val) && val.length === 0)) {
-          setFormError(`Field "${f.label}" is required.`);
-          setIsSubmitting(false);
-          return;
-        }
-      }
-    }
+    const payload = {
+      full_name: formData.fullName.trim(),
+      email: formData.email.trim(),
+      phone: formData.phone.trim(),
+      company: formData.company.trim(),
+      job_title: formData.jobTitle.trim(),
+      service_divisions: formData.divisions,
+      custom_inquiry_scope: formData.customScope.trim(),
+      f_full_name: formData.fullName.trim(),
+      f_email: formData.email.trim(),
+      f_phone: formData.phone.trim(),
+      f_company: formData.company.trim(),
+      f_job_title: formData.jobTitle.trim(),
+      f_divisions: formData.divisions,
+      f_custom_scope: formData.customScope.trim()
+    };
 
     try {
       const res = await submitCampaignForm({
         campaignId: campaign.id,
-        formId: form?.id || campaign.assignedFormId,
+        formId: form?.id || campaign.assignedFormId || `form-${campaign.id}`,
         source,
-        formData,
+        formData: payload,
         consentGiven: true
       });
 
@@ -120,7 +178,7 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
         setSubmitSuccess(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        setFormError('Submission failed. Please check your network and try again.');
+        setFormError(res.error || 'Submission failed. Please check your network and try again.');
       }
     } catch (err: any) {
       setFormError(err.message || 'An unexpected error occurred during submission.');
@@ -129,31 +187,35 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
     }
   };
 
-  // Loading state
+  // -------------------------------------------------------------
+  // Loading State (Pure Light Theme)
+  // -------------------------------------------------------------
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-white text-center">
-        <div className="w-10 h-10 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4" />
-        <h2 className="text-sm font-bold uppercase tracking-wider text-emerald-400">
-          Loading Official Engagement Portal...
-        </h2>
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center font-sans">
+        <div className="w-10 h-10 border-3 border-slate-900 border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
+          Loading Official PIGL Visitor Portal...
+        </p>
       </div>
     );
   }
 
-  // Error state / 404
+  // -------------------------------------------------------------
+  // Error / Unavailable State (Pure Light Theme)
+  // -------------------------------------------------------------
   if (error || !campaign) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-white text-center">
-        <div className="max-w-md bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl">
-          <img src={LogoImg} alt="PIGL" className="h-10 mx-auto mb-6 opacity-90" />
-          <h1 className="text-xl font-bold text-white mb-2">Campaign Portal Unavailable</h1>
-          <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-            {error || 'The requested event engagement campaign does not exist or has been relocated.'}
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center font-sans">
+        <div className="max-w-md w-full bg-white border border-slate-200 p-8 rounded-2xl shadow-sm text-center">
+          <img src={LogoImg} alt="PIGL" className="h-10 mx-auto mb-5 object-contain" />
+          <h1 className="text-lg font-bold text-slate-900 mb-2">Campaign Portal Unavailable</h1>
+          <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+            {error || 'The requested event engagement campaign does not exist or has concluded.'}
           </p>
           <a
             href="/"
-            className="inline-block px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-colors"
+            className="inline-block px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs uppercase tracking-wider rounded-xl transition-colors shadow-xs"
           >
             Visit PIGL Corporate Website
           </a>
@@ -162,26 +224,28 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
     );
   }
 
-  // Inactive / Paused / Draft states for public visitors
+  // -------------------------------------------------------------
+  // Inactive / Paused / Draft State (Pure Light Theme)
+  // -------------------------------------------------------------
   if (campaign.status !== 'active') {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-white text-center">
-        <div className="max-w-lg bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl">
-          <img src={LogoImg} alt="PIGL" className="h-10 mx-auto mb-6 opacity-90" />
-          <span className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 rounded-md border border-slate-700">
-            {campaign.eventName}
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center font-sans">
+        <div className="max-w-md w-full bg-white border border-slate-200 p-8 sm:p-10 rounded-2xl shadow-sm text-center">
+          <img src={LogoImg} alt="PIGL" className="h-10 mx-auto mb-6 object-contain" />
+          <span className="inline-block px-3 py-1 text-[11px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 rounded-full border border-slate-200 mb-3">
+            {campaign.eventName || campaign.name}
           </span>
-          <h1 className="text-2xl font-bold text-white mt-4 mb-2">{campaign.name}</h1>
-          <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+          <h1 className="text-xl font-bold text-slate-900 mb-2">{campaign.name}</h1>
+          <p className="text-xs text-slate-600 mb-6 leading-relaxed">
             {campaign.status === 'paused'
-              ? 'Submissions for this event are temporarily paused. Please check back shortly or contact our technical team directly.'
+              ? 'Submissions for this event are temporarily paused. Please check back shortly or connect with our technical directors directly.'
               : campaign.status === 'closed'
-              ? 'This event has formally concluded. Thank you to all delegates and stakeholders who engaged with PIGL.'
-              : 'This event campaign is currently in preparation and will open to delegates soon.'}
+              ? 'This event engagement has formally concluded. Thank you to all delegates who visited our exhibition stand.'
+              : 'This event campaign is currently in preparation and will open to attendees shortly.'}
           </p>
           <a
             href="/"
-            className="inline-block px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-colors"
+            className="inline-block px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs uppercase tracking-wider rounded-xl transition-colors shadow-xs"
           >
             Explore PIGL Engineering Services
           </a>
@@ -190,333 +254,299 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
     );
   }
 
-  // Success Confirmation Screen (Part 4.3)
+  // -------------------------------------------------------------
+  // Success Confirmation Screen (Pure Light Theme)
+  // -------------------------------------------------------------
   if (submitSuccess) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-white text-center animate-fadeIn">
-        <div className="max-w-lg w-full bg-slate-900 border border-emerald-900/60 p-8 sm:p-10 rounded-2xl shadow-2xl relative overflow-hidden">
-          <div className="w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-500 text-emerald-400 flex items-center justify-center mx-auto mb-6 text-2xl">
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center font-sans">
+        <div className="max-w-lg w-full bg-white border border-slate-200 p-8 sm:p-12 rounded-2xl shadow-sm relative text-center">
+          {/* Brand Logo */}
+          <img src={LogoImg} alt="PIGL" className="h-10 mx-auto mb-6 object-contain" />
+
+          {/* Success Check Pill */}
+          <div className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
             ✓
           </div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 font-mono">
-            Reference: {submissionId}
+
+          <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block mb-1">
+            Reference ID: {submissionId || 'PIGL-DELEGATE'}
           </span>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mt-2 mb-4 tracking-tight">
+
+          <h1 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">
             Thank You for Connecting!
           </h1>
-          <p className="text-sm text-slate-300 leading-relaxed mb-6">
+
+          <p className="text-xs text-slate-600 leading-relaxed mb-6">
             {campaign.confirmationMessage ||
-              'Your details have been securely recorded. Our technical division leads will review your inquiry and connect with you shortly.'}
+              'Your details have been securely recorded. Our technical leadership team will review your inquiry and follow up with technical documentation.'}
           </p>
 
-          <div className="p-4 bg-slate-950/80 rounded-xl border border-slate-800 text-xs text-left text-slate-400 space-y-1 mb-8">
-            <p className="font-semibold text-slate-300">Confirmation Summary:</p>
-            <p>&bull; Event: <strong className="text-white">{campaign.eventName}</strong></p>
-            <p>&bull; Venue: <strong className="text-white">{campaign.eventLocation}</strong></p>
-            <p>&bull; An official acknowledgement email has been queued to your corporate address.</p>
+          {/* Event Context Card */}
+          <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 text-xs text-left text-slate-600 space-y-1.5 mb-6">
+            <p className="font-semibold text-slate-900">Engagement Record:</p>
+            <p>&bull; Event: <strong className="text-slate-800">{campaign.eventName}</strong></p>
+            {campaign.eventLocation && (
+              <p>&bull; Venue: <strong className="text-slate-800">{campaign.eventLocation}</strong></p>
+            )}
+            <p>&bull; An official acknowledgement has been queued for: <strong className="text-slate-800">{formData.email}</strong></p>
           </div>
 
+          {/* Action Links */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
-              href="/"
-              className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-colors shadow-lg"
+              href="/assets/PIGL COMPANY PROFILE.pdf"
+              download="PIGL_Company_Profile.pdf"
+              className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs flex items-center justify-center gap-2"
             >
-              Visit PIGL Corporate Portal
+              Download PIGL Profile (PDF)
             </a>
-            <button
-              onClick={() => {
-                setSubmitSuccess(false);
-                setFormData({});
-              }}
-              className="px-6 py-3 border border-slate-700 hover:border-slate-500 text-slate-300 font-bold text-xs uppercase tracking-wider rounded-xl transition-colors cursor-pointer"
+            <a
+              href="/"
+              className="px-5 py-3 border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs uppercase tracking-wider rounded-xl transition-colors flex items-center justify-center"
             >
-              Submit Another Inquiry
-            </button>
+              Explore PIGL Services
+            </a>
           </div>
+
+          <p className="text-[11px] text-slate-400 mt-8">
+            Need urgent assistance? Contact our Business Development office at{' '}
+            <a href="mailto:bd@polarisigl.com" className="text-slate-900 font-medium underline">
+              bd@polarisigl.com
+            </a>
+          </p>
         </div>
       </div>
     );
   }
 
-  // Active Public Standalone Form (Part 4.1)
+  // -------------------------------------------------------------
+  // Main Visitor Form (Straightforward, Light Theme)
+  // -------------------------------------------------------------
   return (
-    <div className="min-h-screen bg-slate-950 font-sans selection:bg-emerald-500 selection:text-white pb-16">
-      {/* Focused Header (NO Main Website Nav) */}
-      <header className="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-3">
-            <img src={LogoImg} alt="PIGL" className="h-9 w-auto" />
-            <div className="border-l border-slate-700 pl-3">
-              <span className="text-xs font-bold tracking-tight text-white block uppercase">
-                Polaris Integrated &amp; GeoSolutions
-              </span>
-              <span className="text-[10px] text-emerald-400 font-mono block">
-                Official Engagement Desk
-              </span>
-            </div>
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-slate-900 selection:text-white">
+      {/* Pristine Light Header */}
+      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 shadow-xs">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+          <a href="/" className="inline-block" title="Polaris Integrated & GeoSolutions Limited">
+            <img src={LogoImg} alt="PIGL Logo" className="h-9 sm:h-10 w-auto object-contain" />
           </a>
 
-          <div className="hidden sm:flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold uppercase tracking-wider">
-              {campaign.category}
+          <div className="text-right">
+            <span className="inline-block text-[11px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-3 py-1 rounded-full border border-slate-200">
+              {campaign.eventName || 'PIGL Event Intake'}
             </span>
           </div>
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12">
-        {/* Event Hero Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden mb-8">
-          <div className="relative z-10 space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-[11px] font-bold uppercase tracking-wider">
-                {campaign.eventName}
-              </span>
-              <span className="text-xs text-slate-400 font-mono">
-                {campaign.eventLocation}
-              </span>
-            </div>
-
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-              {campaign.name}
-            </h1>
-
-            {campaign.introductionText && (
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl pt-2">
-                {campaign.introductionText}
-              </p>
-            )}
-          </div>
-
-          <div className="absolute -top-12 -right-12 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Main Content Area */}
+      <main className="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        {/* Intro Card */}
+        <div className="mb-6 text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            Connect with PIGL
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
+            {campaign.introductionText ||
+              `Complete this brief form to connect directly with Polaris Integrated & GeoSolutions Limited (PIGL) during ${campaign.eventName || 'the event'}.`}
+          </p>
         </div>
 
-        {/* Dynamic Form Card */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xl">
-          <div className="pb-6 border-b border-slate-100 dark:border-slate-800 mb-8">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-              {form?.title || 'Delegate & Stakeholder Registration'}
-            </h2>
-            {form?.description && (
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                {form.description}
-              </p>
-            )}
-          </div>
-
+        {/* Form Card */}
+        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-10">
           {formError && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-xl text-red-700 dark:text-red-400 text-xs font-semibold">
-              {formError}
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold flex items-center gap-2">
+              <span className="font-bold">Error:</span> {formError}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {fields.map(field => {
-              if (field.type === 'section_heading') {
-                return (
-                  <div key={field.id} className="pt-6 pb-2 border-b border-slate-100 dark:border-slate-800">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                      {field.label}
-                    </h3>
-                    {field.description && (
-                      <p className="text-xs text-slate-500 mt-0.5">{field.description}</p>
-                    )}
-                  </div>
-                );
-              }
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* 1. Attendee Contact Details */}
+            <div className="space-y-4">
+              <div className="pb-2 border-b border-slate-100">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  1. Your Contact Information
+                </h2>
+              </div>
 
-              if (field.type === 'descriptive_text') {
-                return (
-                  <p key={field.id} className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                    {field.label}
-                  </p>
-                );
-              }
-
-              if (field.type === 'consent') {
-                return (
-                  <div key={field.id} className="pt-4 border-t border-slate-100 dark:border-slate-800">
-                    <label className="flex items-start gap-3 cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        required={field.required}
-                        checked={Boolean(formData[field.id])}
-                        onChange={e => handleInputChange(field.id, e.target.checked)}
-                        className="mt-1 rounded text-emerald-600 focus:ring-emerald-500"
-                      />
-                      <span className="text-xs text-slate-600 dark:text-slate-400 leading-snug">
-                        {field.label} {field.required && <span className="text-red-500">*</span>}
-                      </span>
-                    </label>
-                  </div>
-                );
-              }
-
-              if (field.type === 'checkbox' && field.options) {
-                return (
-                  <div key={field.id} className="space-y-2">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                      {field.label} {field.required && <span className="text-red-500">*</span>}
-                    </label>
-                    {field.description && (
-                      <p className="text-xs text-slate-500">{field.description}</p>
-                    )}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                      {field.options.map(opt => {
-                        const checked = ((formData[field.id] as string[]) || []).includes(opt.value);
-                        return (
-                          <label
-                            key={opt.id}
-                            className={`flex items-start gap-2.5 p-3 rounded-xl border transition-colors cursor-pointer select-none text-xs ${
-                              checked
-                                ? 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-500/60 text-emerald-900 dark:text-emerald-200'
-                                : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-300'
-                            }`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={() => handleCheckboxToggle(field.id, opt.value)}
-                              className="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500"
-                            />
-                            <span className="font-medium leading-snug">{opt.label}</span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              }
-
-              if (field.type === 'radio' && field.options) {
-                return (
-                  <div key={field.id} className="space-y-2">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                      {field.label} {field.required && <span className="text-red-500">*</span>}
-                    </label>
-                    <div className="space-y-2">
-                      {field.options.map(opt => (
-                        <label
-                          key={opt.id}
-                          className="flex items-center gap-2.5 text-xs text-slate-700 dark:text-slate-300 cursor-pointer"
-                        >
-                          <input
-                            type="radio"
-                            name={field.id}
-                            required={field.required}
-                            value={opt.value}
-                            checked={formData[field.id] === opt.value}
-                            onChange={e => handleInputChange(field.id, e.target.value)}
-                            className="text-emerald-600 focus:ring-emerald-500"
-                          />
-                          <span>{opt.label}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                );
-              }
-
-              if (field.type === 'dropdown' && field.options) {
-                return (
-                  <div key={field.id} className="space-y-1.5">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                      {field.label} {field.required && <span className="text-red-500">*</span>}
-                    </label>
-                    <select
-                      required={field.required}
-                      value={formData[field.id] || ''}
-                      onChange={e => handleInputChange(field.id, e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
-                    >
-                      <option value="">Select an option...</option>
-                      {field.options.map(opt => (
-                        <option key={opt.id} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                );
-              }
-
-              if (field.type === 'long_text') {
-                return (
-                  <div key={field.id} className="space-y-1.5">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                      {field.label} {field.required && <span className="text-red-500">*</span>}
-                    </label>
-                    <textarea
-                      rows={3}
-                      required={field.required}
-                      placeholder={field.placeholder || ''}
-                      value={formData[field.id] || ''}
-                      onChange={e => handleInputChange(field.id, e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
-                    />
-                  </div>
-                );
-              }
-
-              // Standard inputs (short_text, email, phone, number, date)
-              return (
-                <div key={field.id} className="space-y-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                    {field.label} {field.required && <span className="text-red-500">*</span>}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-slate-700">
+                    Full Name <span className="text-red-500">*</span>
                   </label>
                   <input
-                    type={
-                      field.type === 'email'
-                        ? 'email'
-                        : field.type === 'phone'
-                        ? 'tel'
-                        : field.type === 'number'
-                        ? 'number'
-                        : field.type === 'date'
-                        ? 'date'
-                        : 'text'
-                    }
-                    required={field.required}
-                    placeholder={field.placeholder || ''}
-                    value={formData[field.id] || ''}
-                    onChange={e => handleInputChange(field.id, e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
+                    type="text"
+                    required
+                    placeholder="e.g. Engr. Oladipo Adeleke"
+                    value={formData.fullName}
+                    onChange={e => setFormData({ ...formData, fullName: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
                   />
-                  {field.description && (
-                    <p className="text-[11px] text-slate-400">{field.description}</p>
-                  )}
                 </div>
-              );
-            })}
 
-            {/* Privacy note */}
-            {campaign.termsAndPrivacyText && (
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed pt-2">
-                {campaign.termsAndPrivacyText}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-slate-700">
+                    Corporate / Official Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="e.g. o.adeleke@energyfirm.com"
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-slate-700">
+                    Phone / WhatsApp Number
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="+234 803 000 0000"
+                    value={formData.phone}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-slate-700">
+                    Company / Organization <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Shell, NNPC Ltd, TotalEnergies, Seplat"
+                    value={formData.company}
+                    onChange={e => setFormData({ ...formData, company: e.target.value })}
+                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-slate-700">
+                  Job Designation / Role
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Managing Director, Lead Project Engineer, Asset Manager"
+                  value={formData.jobTitle}
+                  onChange={e => setFormData({ ...formData, jobTitle: e.target.value })}
+                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* 2. Areas of Technical Interest */}
+            <div className="space-y-3">
+              <div className="pb-2 border-b border-slate-100 flex items-center justify-between">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  2. PIGL Operating Divisions of Interest
+                </h2>
+                <span className="text-[11px] text-slate-400">Select any that apply</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {PIGL_DIVISIONS.map(div => {
+                  const isChecked = formData.divisions.includes(div.title);
+                  return (
+                    <label
+                      key={div.id}
+                      onClick={() => handleDivisionToggle(div.title)}
+                      className={`p-4 rounded-xl border text-left transition-all cursor-pointer flex items-start gap-3 select-none ${
+                        isChecked
+                          ? 'border-slate-900 bg-slate-50 ring-1 ring-slate-900'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => {}} // Handled by container onClick
+                        className="mt-0.5 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
+                      />
+                      <div className="flex-1">
+                        <p className="text-xs font-bold text-slate-900 leading-snug">
+                          {div.title}
+                        </p>
+                        <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                          {div.description}
+                        </p>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 3. Custom Requirements / Unlisted Inquiries (Spacious Textarea) */}
+            <div className="space-y-2">
+              <div className="pb-2 border-b border-slate-100">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  3. Custom Technical Inquiries &amp; Scope Requirements
+                </h2>
+              </div>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                If you have a specialized requirement, unlisted equipment need, upcoming RFP, or specific project location, describe it below:
               </p>
-            )}
+              <textarea
+                rows={3}
+                placeholder="e.g. Deepwater autonomous pipeline bathymetry, specialized drone LiDAR survey for swamp terrain, cathodic protection inspection timeline, joint venture collaboration..."
+                value={formData.customScope}
+                onChange={e => setFormData({ ...formData, customScope: e.target.value })}
+                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
+              />
+            </div>
+
+            {/* 4. Consent and Privacy (NDPA) */}
+            <div className="pt-2">
+              <label className="flex items-start gap-3 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={formData.consent}
+                  onChange={e => setFormData({ ...formData, consent: e.target.checked })}
+                  className="mt-0.5 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
+                />
+                <span className="text-xs text-slate-500 leading-relaxed">
+                  I consent to Polaris Integrated &amp; GeoSolutions Limited (PIGL) recording my details to follow up with technical documentation, proposals, and industry updates in accordance with the Nigeria Data Protection Act (NDPA).
+                </span>
+              </label>
+            </div>
 
             {/* Submit Button */}
-            <div className="pt-4">
+            <div className="pt-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm uppercase tracking-wider rounded-xl transition-all shadow-lg hover:shadow-emerald-900/30 cursor-pointer disabled:opacity-50"
+                className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {isSubmitting ? 'Transmitting Inquiries...' : 'Submit Engagement Inquiry'}
+                {isSubmitting ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Submitting Your Details...
+                  </>
+                ) : (
+                  'Submit Details & Connect with PIGL'
+                )}
               </button>
             </div>
           </form>
         </div>
 
-        {/* Minimal Footer */}
-        <footer className="mt-12 text-center text-xs text-slate-500 space-y-1">
-          <p>&copy; {new Date().getFullYear()} Polaris Integrated &amp; GeoSolutions Limited (PIGL). All rights reserved.</p>
-          <p className="text-slate-600">Nigeria Energy &amp; Geosolutions Infrastructure Operations</p>
+        {/* Clean Light Footer */}
+        <footer className="mt-12 text-center text-xs text-slate-400 space-y-1">
+          <p>&copy; {new Date().getFullYear()} Polaris Integrated &amp; GeoSolutions Limited (PIGL).</p>
+          <p className="text-slate-500">Corporate Headquarters: Plot 4, Block 113, Admiralty Way, Lekki Phase 1, Lagos</p>
         </footer>
       </main>
     </div>
   );
 };
+
 export default PublicCampaign;
