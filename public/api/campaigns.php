@@ -578,11 +578,11 @@ if ($action === 'submit') {
     }
 
     $submissionId = 'sub-' . time() . '-' . rand(100, 999);
-    $visitorName = isset($formData['full_name']) ? $formData['full_name'] : (isset($formData['name']) ? $formData['name'] : 'Visitor');
-    $visitorEmail = isset($formData['email']) ? $formData['email'] : '';
-    $visitorPhone = isset($formData['phone']) ? $formData['phone'] : '';
-    $visitorCompany = isset($formData['company']) ? $formData['company'] : '';
-    $visitorJobTitle = isset($formData['job_title']) ? $formData['job_title'] : '';
+    $visitorName = !empty($formData['full_name']) ? $formData['full_name'] : (!empty($formData['name']) ? $formData['name'] : (!empty($formData['f_full_name']) ? $formData['f_full_name'] : 'Conference Delegate'));
+    $visitorEmail = !empty($formData['email']) ? $formData['email'] : (!empty($formData['f_email']) ? $formData['f_email'] : '');
+    $visitorPhone = !empty($formData['phone']) ? $formData['phone'] : (!empty($formData['f_phone']) ? $formData['f_phone'] : '');
+    $visitorCompany = !empty($formData['company']) ? $formData['company'] : (!empty($formData['f_company']) ? $formData['f_company'] : '');
+    $visitorJobTitle = !empty($formData['job_title']) ? $formData['job_title'] : (!empty($formData['f_job_title']) ? $formData['f_job_title'] : '');
 
     $submission = [
         'id' => $submissionId,
