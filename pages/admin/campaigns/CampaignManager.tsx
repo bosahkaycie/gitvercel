@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Campaign,
   CampaignForm,
@@ -32,7 +32,10 @@ import {
   IconTrendingUp,
   IconSettings,
   IconChevronDown,
-  IconExternal
+  IconExternal,
+  IconRefresh,
+  IconSparkles,
+  IconX
 } from '../../../components/admin/AdminIcons';
 
 export type CampaignSubTab =
@@ -179,6 +182,97 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
     }
   };
 
+  // Real-time synchronization state & tracking refs
+  const knownSubmissionsRef = useRef<Set<string>>(new Set());
+  const isInitialLoadDoneRef = useRef<boolean>(false);
+  const isSyncingRef = useRef<boolean>(false);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [newLeadToast, setNewLeadToast] = useState<{
+    id: string;
+    name: string;
+    company: string;
+    eventName: string;
+  } | null>(null);
+
+  // Synthesize client-side audio chime for instantaneous real-time arrival
+  const playNewLeadChime = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const now = ctx.currentTime;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(659.25, now); // E5
+      osc.frequency.setValueAtTime(830.61, now + 0.09); // G#5
+
+      gain.gain.setValueAtTime(0.09, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } catch (e) {
+      // Audio autoplay policy restricted or unavailable
+    }
+  };
+
+  // Silent background sync without full-screen loading spinners
+  const silentSync = async (force: boolean = false) => {
+    if (!selectedCampaignId || isSyncingRef.current) return;
+    isSyncingRef.current = true;
+    setIsSyncing(true);
+
+    try {
+      const [details, currentStats] = await Promise.all([
+        getCampaignDetails(selectedCampaignId),
+        getCampaignStats()
+      ]);
+
+      setStats(currentStats);
+
+      if (details.submissions && Array.isArray(details.submissions)) {
+        // Detect newly captured leads
+        if (isInitialLoadDoneRef.current) {
+          const freshLeads = details.submissions.filter(
+            s => !knownSubmissionsRef.current.has(s.id)
+          );
+
+          if (freshLeads.length > 0) {
+            const newest = freshLeads[0];
+            setNewLeadToast({
+              id: newest.id,
+              name: newest.visitorName || 'New Visitor',
+              company: newest.visitorCompany || 'Direct Inquiry',
+              eventName: details.campaign?.eventName || details.campaign?.name || 'Active Campaign'
+            });
+            playNewLeadChime();
+          }
+        }
+
+        // Register all current IDs
+        details.submissions.forEach(s => knownSubmissionsRef.current.add(s.id));
+        setSubmissions(details.submissions);
+      }
+
+      if (details.emailLogs) {
+        setEmailLogs(details.emailLogs);
+      }
+
+      isInitialLoadDoneRef.current = true;
+    } catch (err) {
+      console.warn('Background sync error:', err);
+    } finally {
+      isSyncingRef.current = false;
+      setIsSyncing(false);
+    }
+  };
+
   // Load initial data
   const loadData = async (preferredId?: string) => {
     setLoading(true);
@@ -199,6 +293,11 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
           setActiveEmailTemplate(details.emailTemplate);
           setSubmissions(details.submissions);
           setEmailLogs(details.emailLogs);
+
+          if (details.submissions) {
+            details.submissions.forEach(s => knownSubmissionsRef.current.add(s.id));
+          }
+          isInitialLoadDoneRef.current = true;
         } catch (detailErr) {
           console.warn('Could not load details for campaign:', targetId, detailErr);
         }
@@ -214,15 +313,83 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
     loadData();
   }, []);
 
+  // Adaptive background polling & live cross-tab event bus
+  useEffect(() => {
+    if (!selectedCampaignId) return;
+
+    // 1. Adaptive Polling Interval (every 3.5 seconds)
+    const pollInterval = setInterval(() => {
+      if (typeof document !== 'undefined' && !document.hidden) {
+        silentSync();
+      }
+    }, 3500);
+
+    // 2. Tab Visibility & Window Focus instant sync
+    const handleFocusSync = () => {
+      if (typeof document !== 'undefined' && !document.hidden) {
+        silentSync(true);
+      }
+    };
+    window.addEventListener('focus', handleFocusSync);
+    document.addEventListener('visibilitychange', handleFocusSync);
+
+    // 3. Cross-Tab Real-time BroadcastChannel
+    let broadcastChan: BroadcastChannel | null = null;
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      try {
+        broadcastChan = new BroadcastChannel('pigl_lead_realtime_bus');
+        broadcastChan.onmessage = (ev) => {
+          if (ev.data?.type === 'NEW_LEAD') {
+            silentSync(true);
+          }
+        };
+      } catch (e) {}
+    }
+
+    // 4. Cross-Window LocalStorage Event
+    const handleStorageEvent = (ev: StorageEvent) => {
+      if (ev.key === 'pigl_lead_event') {
+        silentSync(true);
+      }
+    };
+    window.addEventListener('storage', handleStorageEvent);
+
+    return () => {
+      clearInterval(pollInterval);
+      window.removeEventListener('focus', handleFocusSync);
+      document.removeEventListener('visibilitychange', handleFocusSync);
+      window.removeEventListener('storage', handleStorageEvent);
+      if (broadcastChan) {
+        try {
+          broadcastChan.close();
+        } catch (e) {}
+      }
+    };
+  }, [selectedCampaignId]);
+
+  // Auto-dismiss new lead toast after 7 seconds
+  useEffect(() => {
+    if (newLeadToast) {
+      const timer = setTimeout(() => {
+        setNewLeadToast(null);
+      }, 7000);
+      return () => clearTimeout(timer);
+    }
+  }, [newLeadToast]);
+
   // When selected campaign changes, fetch its children
   const handleSelectCampaign = async (camp: Campaign) => {
     setSelectedCampaignId(camp.id);
+    knownSubmissionsRef.current.clear();
     try {
       const details = await getCampaignDetails(camp.id);
       setActiveForm(details.form);
       setActiveEmailTemplate(details.emailTemplate);
       setSubmissions(details.submissions);
       setEmailLogs(details.emailLogs);
+      if (details.submissions) {
+        details.submissions.forEach(s => knownSubmissionsRef.current.add(s.id));
+      }
     } catch (err) {
       console.error(err);
     }
@@ -253,18 +420,82 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Real-Time Lead Alert Toast */}
+      {newLeadToast && (
+        <div className="fixed top-5 right-5 z-50 max-w-md w-full bg-white dark:bg-slate-900 border-2 border-emerald-500 rounded-2xl shadow-2xl p-4 flex items-start gap-3.5 animate-in slide-in-from-top-4 duration-300">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 text-emerald-600 flex items-center justify-center shrink-0 shadow-xs">
+            <IconSparkles className="w-5 h-5 text-emerald-600 animate-pulse" />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-full">
+                New Visitor Captured Live
+              </span>
+              <span className="text-[11px] text-slate-400">Just now</span>
+            </div>
+
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate mt-1">
+              {newLeadToast.name}
+            </h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+              {newLeadToast.company} &bull; {newLeadToast.eventName}
+            </p>
+
+            <div className="mt-2.5 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  switchSubTab('leads');
+                  setNewLeadToast(null);
+                }}
+                className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 underline cursor-pointer"
+              >
+                Open in Leads Table &rarr;
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setNewLeadToast(null)}
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
+          >
+            <IconX className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Module Title & Active Campaign Quick Switcher Bar */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               Campaigns &amp; Lead Capture
             </h1>
+
+            {/* Real-time live status pill */}
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-full">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
+                LIVE SYNC
+              </span>
+              <button
+                type="button"
+                onClick={() => silentSync(true)}
+                className="text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 cursor-pointer transition-transform hover:rotate-180 duration-300"
+                title="Force refresh now"
+              >
+                <IconRefresh className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Event registration, dynamic form generation, QR codes, automated email workflows, and booth captures.
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Real-time event visitor capture, live leads stream, dynamic forms, and automated acknowledgements.
           </p>
         </div>
 

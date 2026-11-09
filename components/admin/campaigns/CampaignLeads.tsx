@@ -108,9 +108,15 @@ export const CampaignLeads: React.FC<CampaignLeadsProps> = ({
       {/* Top Header & Quick Actions */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Leads &amp; Visitor Submissions</h2>
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Leads &amp; Visitor Submissions</h2>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+              Live Stream
+            </span>
+          </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Registered prospects &amp; delegates for <strong>{campaign.name}</strong> ({submissions.length} total)
+            Registered prospects &amp; delegates for <strong>{campaign.name}</strong> ({submissions.length} total) &bull; Synchronizes automatically in real time
           </p>
         </div>
 
@@ -208,11 +214,16 @@ export const CampaignLeads: React.FC<CampaignLeadsProps> = ({
                       className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 cursor-pointer transition-colors"
                     >
                       <td className="px-5 py-3.5">
-                        <div className="font-bold text-slate-900 dark:text-white">
-                          {sub.visitorName}
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-slate-900 dark:text-white">{sub.visitorName}</span>
+                          {(Date.now() - new Date(sub.createdAt).getTime()) < 300000 && (
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-500 text-white animate-pulse shrink-0">
+                              NEW
+                            </span>
+                          )}
                         </div>
                         <span className="text-[10px] text-slate-400 font-mono">
-                          ID: {sub.id.substring(0, 14)}
+                          ID: {sub.id.substring(0, 16)}
                         </span>
                       </td>
 

@@ -215,6 +215,27 @@ export async function submitCampaignForm(payload: {
   if (!data?.success) {
     throw new Error(data?.error || 'Submission failed');
   }
+
+  // Cross-tab real-time event broadcast
+  if (typeof window !== 'undefined') {
+    try {
+      if ('BroadcastChannel' in window) {
+        const channel = new BroadcastChannel('pigl_lead_realtime_bus');
+        channel.postMessage({
+          type: 'NEW_LEAD',
+          campaignId: payload.campaignId,
+          submissionId: data.submissionId,
+          timestamp: Date.now()
+        });
+      }
+      localStorage.setItem('pigl_lead_event', JSON.stringify({
+        campaignId: payload.campaignId,
+        submissionId: data.submissionId,
+        timestamp: Date.now()
+      }));
+    } catch (e) {}
+  }
+
   return data;
 }
 

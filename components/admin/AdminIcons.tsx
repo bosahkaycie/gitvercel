@@ -466,6 +466,19 @@ export const IconShare: React.FC<IconProps> = ({ className = 'w-4 h-4', size = 1
   </svg>
 );
 
+export const IconRefresh: React.FC<IconProps> = ({ className = 'w-4 h-4', size = 16, ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+  </svg>
+);
+
+export const IconSparkles: React.FC<IconProps> = ({ className = 'w-4 h-4', size = 16, ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+    <path d="M5 3v4M3 5h4M19 17v4M17 19h4" />
+  </svg>
+);
+
 
 
 
