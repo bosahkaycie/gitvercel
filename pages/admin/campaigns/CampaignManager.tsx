@@ -186,6 +186,12 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
   const knownSubmissionsRef = useRef<Set<string>>(new Set());
   const isInitialLoadDoneRef = useRef<boolean>(false);
   const isSyncingRef = useRef<boolean>(false);
+  const selectedCampaignIdRef = useRef<string>(selectedCampaignId);
+
+  useEffect(() => {
+    selectedCampaignIdRef.current = selectedCampaignId;
+  }, [selectedCampaignId]);
+
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [newLeadToast, setNewLeadToast] = useState<{
     id: string;
@@ -224,13 +230,14 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
 
   // Silent background sync without full-screen loading spinners
   const silentSync = async (force: boolean = false) => {
-    if (!selectedCampaignId || isSyncingRef.current) return;
+    const targetId = selectedCampaignIdRef.current || selectedCampaignId;
+    if (!targetId || isSyncingRef.current) return;
     isSyncingRef.current = true;
     setIsSyncing(true);
 
     try {
       const [details, currentStats] = await Promise.all([
-        getCampaignDetails(selectedCampaignId),
+        getCampaignDetails(targetId),
         getCampaignStats()
       ]);
 
@@ -287,6 +294,7 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
       const targetId = preferredId || selectedCampaignId || (allCamps.length > 0 ? allCamps[0].id : '');
       if (targetId) {
         setSelectedCampaignId(targetId);
+        selectedCampaignIdRef.current = targetId;
         try {
           const details = await getCampaignDetails(targetId);
           setActiveForm(details.form);
@@ -317,23 +325,22 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
   useEffect(() => {
     if (!selectedCampaignId) return;
 
-    // 1. Adaptive Polling Interval (every 3.5 seconds)
-    const pollInterval = setInterval(() => {
-      if (typeof document !== 'undefined' && !document.hidden) {
-        silentSync();
-      }
-    }, 3500);
+    // 1. Immediate sync check
+    silentSync(true);
 
-    // 2. Tab Visibility & Window Focus instant sync
+    // 2. High-speed background polling (every 2.5 seconds)
+    const pollInterval = setInterval(() => {
+      silentSync();
+    }, 2500);
+
+    // 3. Tab Visibility & Window Focus instant sync
     const handleFocusSync = () => {
-      if (typeof document !== 'undefined' && !document.hidden) {
-        silentSync(true);
-      }
+      silentSync(true);
     };
     window.addEventListener('focus', handleFocusSync);
     document.addEventListener('visibilitychange', handleFocusSync);
 
-    // 3. Cross-Tab Real-time BroadcastChannel
+    // 4. Cross-Tab Real-time BroadcastChannel
     let broadcastChan: BroadcastChannel | null = null;
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
       try {
@@ -346,7 +353,7 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
       } catch (e) {}
     }
 
-    // 4. Cross-Window LocalStorage Event
+    // 5. Cross-Window LocalStorage Event
     const handleStorageEvent = (ev: StorageEvent) => {
       if (ev.key === 'pigl_lead_event') {
         silentSync(true);
