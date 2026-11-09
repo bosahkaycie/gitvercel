@@ -15,13 +15,14 @@ import {
 
 async function fetchApi(action: string, options: RequestInit = {}): Promise<any> {
   const isPost = options.method === 'POST';
-  let url = `/api/campaigns?action=${action}`;
+  const cacheBuster = isPost ? '' : `&_t=${Date.now()}`;
+  let url = `/api/campaigns?action=${action}${cacheBuster}`;
   
   try {
     let res = await fetch(url, options);
     if (!res.ok) {
       // Try php endpoint fallback
-      const phpUrl = `/api/campaigns.php?action=${action}`;
+      const phpUrl = `/api/campaigns.php?action=${action}${cacheBuster}`;
       const phpRes = await fetch(phpUrl, options);
       if (phpRes.ok) {
         return await phpRes.json();
@@ -31,7 +32,7 @@ async function fetchApi(action: string, options: RequestInit = {}): Promise<any>
   } catch (err: any) {
     console.warn(`API call /api/campaigns?action=${action} failed, attempting PHP mirror:`, err);
     try {
-      const phpUrl = `/api/campaigns.php?action=${action}`;
+      const phpUrl = `/api/campaigns.php?action=${action}${cacheBuster}`;
       const phpRes = await fetch(phpUrl, options);
       return await phpRes.json();
     } catch (e: any) {
