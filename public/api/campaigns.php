@@ -158,6 +158,19 @@ function getDefaultCampaignFormFields() {
     ];
 }
 
+// Helper function for dynamic email placeholder substitution
+function replaceEmailPlaceholders($templateText, $vars) {
+    if (empty($templateText)) return '';
+    $result = $templateText;
+    foreach ($vars as $key => $val) {
+        $valStr = (string)$val;
+        // Match {{key}}, {{ key }}, {key}, { key }, case-insensitively
+        $pattern = '/\{\{\s*' . preg_quote($key, '/') . '\s*\}\}|\{\s*' . preg_quote($key, '/') . '\s*\}/i';
+        $result = preg_replace($pattern, $valStr, $result);
+    }
+    return $result;
+}
+
 $action = isset($_GET['action']) ? $_GET['action'] : 'list';
 $input = file_get_contents('php://input');
 $body = json_decode($input, true) ?: [];
@@ -743,16 +756,45 @@ if ($action === 'submit') {
         }
 
         if ($emailTmpl) {
-            $subject = str_replace(
-                ['{{visitor_name}}', '{{event_name}}', '{{company}}'],
-                [$visitorName, $campaign['eventName'], $visitorCompany],
-                $emailTmpl['subject']
-            );
-            $bodyHtml = str_replace(
-                ['{{first_name}}', '{{visitor_name}}', '{{event_name}}', '{{company}}'],
-                [explode(' ', $visitorName)[0], $visitorName, $campaign['eventName'], $visitorCompany],
-                $emailTmpl['bodyHtml']
-            );
+            $eventName = !empty($campaign['eventName']) ? $campaign['eventName'] : $campaign['name'];
+            $eventLocation = !empty($campaign['eventLocation']) ? $campaign['eventLocation'] : 'PIGL Exhibition Stand';
+            $submissionDate = date('d M Y');
+            $submissionTime = date('H:i');
+            $refId = strtoupper($submissionId);
+
+            $placeholderVars = [
+                'submission_id' => $refId,
+                'reference_id' => $refId,
+                'visit_reference' => $refId,
+                'event_name' => $eventName,
+                'event' => $eventName,
+                'campaign_name' => $campaign['name'],
+                'event_location' => $eventLocation,
+                'location' => $eventLocation,
+                'submission_date' => $submissionDate,
+                'date_received' => $submissionDate,
+                'date' => $submissionDate,
+                'submission_time' => $submissionTime,
+                'time' => $submissionTime,
+                'first_name' => explode(' ', trim($visitorName))[0] ?: $visitorName,
+                'full_name' => $visitorName,
+                'visitor_name' => $visitorName,
+                'name' => $visitorName,
+                'company' => !empty($visitorCompany) ? $visitorCompany : 'Your Organisation',
+                'company_name' => !empty($visitorCompany) ? $visitorCompany : 'Your Organisation',
+                'job_title' => !empty($visitorJobTitle) ? $visitorJobTitle : '',
+                'designation' => !empty($visitorJobTitle) ? $visitorJobTitle : '',
+                'email' => $visitorEmail,
+                'phone' => $visitorPhone,
+                'event_start_date' => !empty($campaign['eventStartDate']) ? $campaign['eventStartDate'] : '',
+                'event_end_date' => !empty($campaign['eventEndDate']) ? $campaign['eventEndDate'] : '',
+                'event_dates' => !empty($campaign['eventStartDate']) ? ($campaign['eventStartDate'] . (!empty($campaign['eventEndDate']) ? ' to ' . $campaign['eventEndDate'] : '')) : '',
+                'year' => date('Y')
+            ];
+
+            $subject = replaceEmailPlaceholders($emailTmpl['subject'], $placeholderVars);
+            $bodyHtml = replaceEmailPlaceholders($emailTmpl['bodyHtml'], $placeholderVars);
+            $bodyText = !empty($emailTmpl['bodyText']) ? replaceEmailPlaceholders($emailTmpl['bodyText'], $placeholderVars) : '';
 
             $headers = "MIME-Version: 1.0\r\n";
             $headers .= "Content-Type: text/html; charset=UTF-8\r\n";

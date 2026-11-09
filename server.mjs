@@ -1914,7 +1914,7 @@ async function saveStore(supabase, store) {
 function replacePlaceholders(template, data) {
   let result = template;
   for (const [key, value] of Object.entries(data)) {
-    const regex = new RegExp(`{{\\s*${key}\\s*}}`, "gi");
+    const regex = new RegExp(`{{\\s*${key}\\s*}}|{\\s*${key}\\s*}`, "gi");
     result = result.replace(regex, value || "");
   }
   return result;
@@ -2353,18 +2353,34 @@ Polaris Integrated & GeoSolutions Limited (PIGL)`,
       store.submissions.push(newSubmission);
       const emailTemplate = store.emailTemplates.find((t) => t.campaignId === campaign.id);
       if (emailTemplate && emailTemplate.enabled && visitorEmail) {
+        const submissionDateFormatted = (/* @__PURE__ */ new Date()).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+        const submissionTimeFormatted = (/* @__PURE__ */ new Date()).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+        const refIdFormatted = submissionId.toUpperCase();
         const placeholderMap = {
           first_name: visitorName.split(" ")[0] || visitorName,
           full_name: visitorName,
+          visitor_name: visitorName,
+          name: visitorName,
           email: visitorEmail,
           phone: visitorPhone,
+          company: visitorCompany,
           company_name: visitorCompany,
           job_title: visitorJobTitle,
-          event_name: campaign.eventName,
+          designation: visitorJobTitle,
+          event_name: campaign.eventName || campaign.name,
+          event: campaign.eventName || campaign.name,
           campaign_name: campaign.name,
-          event_location: campaign.eventLocation,
-          submission_id: submissionId,
-          submission_date: (/* @__PURE__ */ new Date()).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+          event_location: campaign.eventLocation || "PIGL Exhibition Stand",
+          location: campaign.eventLocation || "PIGL Exhibition Stand",
+          submission_id: refIdFormatted,
+          reference_id: refIdFormatted,
+          visit_reference: refIdFormatted,
+          submission_date: submissionDateFormatted,
+          date_received: submissionDateFormatted,
+          date: submissionDateFormatted,
+          submission_time: submissionTimeFormatted,
+          time: submissionTimeFormatted,
+          year: (/* @__PURE__ */ new Date()).getFullYear().toString()
         };
         const resolvedSubject = replacePlaceholders(emailTemplate.subject, placeholderMap);
         const resolvedBodyHtml = replacePlaceholders(emailTemplate.bodyHtml, placeholderMap);

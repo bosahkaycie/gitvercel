@@ -21,6 +21,7 @@ const SUPPORTED_PLACEHOLDERS = [
   { code: '{{company_name}}', desc: 'Organization / Company' },
   { code: '{{job_title}}', desc: 'Job designation' },
   { code: '{{email}}', desc: 'Corporate email address' },
+  { code: '{{phone}}', desc: 'Phone / WhatsApp number' },
   { code: '{{event_name}}', desc: 'Campaign / Event name' },
   { code: '{{event_location}}', desc: 'Event venue / city' },
   { code: '{{submission_id}}', desc: 'Unique lead reference ID' },
