@@ -196,6 +196,16 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
     }
   }, [mobileOpen]);
 
+  const isCampaignManager = user?.role === 'Campaign Manager';
+
+  // Role-based navigation: Campaign Managers are strictly isolated to the Campaign & Lead Capture module
+  const visibleNavGroups = navGroups.filter(group => {
+    if (isCampaignManager) {
+      return group.id === 'campaign-engagement';
+    }
+    return true;
+  });
+
   const sidebarContent = (
     <div
       className={`flex flex-col h-full max-h-screen select-none border-r transition-all duration-300 font-sans ${
@@ -216,9 +226,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           href="/admin"
           onClick={(e) => {
             e.preventDefault();
-            handleLinkClick('dashboard');
+            handleLinkClick(isCampaignManager ? 'campaign-overview' : 'dashboard');
           }}
-          title="PIGL CMS Dashboard"
+          title={isCampaignManager ? "PIGL Campaigns & Lead Portal" : "PIGL CMS Dashboard"}
           className="flex items-center space-x-2.5 focus:outline-none group overflow-hidden"
         >
           {!isCollapsed ? (
@@ -285,7 +295,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
       {/* Nav Links (Scrollable with clean vertical hierarchy) */}
       <nav className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-2.5 py-3 space-y-3.5 no-scrollbar">
-        {navGroups.map((group) => {
+        {visibleNavGroups.map((group) => {
           const isGroupCollapsed = Boolean(collapsedGroups[group.id]);
           const hasActiveItem = group.items.some((item) => item.id === currentTab);
 

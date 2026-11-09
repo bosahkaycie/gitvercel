@@ -29,7 +29,12 @@ const ROLE_PERMISSIONS: Record<AdminRole, { title: string; description: string; 
   'Super Admin': {
     title: 'Administrator (Super Admin)',
     description: 'Full unrestricted system authority across all PIGL database tables, user management, and cloud storage.',
-    badges: ['Manage Admins', 'Services CMS', 'Blog CMS', 'Hero Sliders', 'Inquiries Desk', 'Media Storage', 'System Settings']
+    badges: ['Manage Admins', 'Services CMS', 'Blog CMS', 'Hero Sliders', 'Inquiries Desk', 'Media Storage', 'System Settings', 'Campaigns & Leads']
+  },
+  'Campaign Manager': {
+    title: 'Campaign Officer / Manager (Dedicated Event & Lead Desk)',
+    description: 'Dedicated event desk. Manages campaigns, dynamic form builders, automated attendee emails, booth visitor captures, and lead exports without access to general website CMS, inquiries desk, or system settings.',
+    badges: ['Campaigns & Leads', 'Stand Lead Capture', 'Form Builder', 'Automated Emails', 'Export Leads']
   },
   'Content Editor': {
     title: 'Content Administrator (Content Editor)',
@@ -367,10 +372,12 @@ Role: ${role} (${ROLE_PERMISSIONS[role].title})`;
                   const roleStyle =
                     user.role === 'Super Admin'
                       ? 'bg-amber-100 text-amber-900 border-amber-300/60 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-700/50'
-                      : user.role === 'Content Editor'
+                      : user.role === 'Campaign Manager'
                       ? 'bg-emerald-100 text-emerald-900 border-emerald-300/60 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-700/50'
-                      : user.role === 'Inquiries Manager'
+                      : user.role === 'Content Editor'
                       ? 'bg-blue-100 text-blue-900 border-blue-300/60 dark:bg-blue-950/80 dark:text-blue-300 dark:border-blue-700/50'
+                      : user.role === 'Inquiries Manager'
+                      ? 'bg-purple-100 text-purple-900 border-purple-300/60 dark:bg-purple-950/80 dark:text-purple-300 dark:border-purple-700/50'
                       : 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
 
                   return (
@@ -556,10 +563,11 @@ Role: ${role} (${ROLE_PERMISSIONS[role].title})`;
                     isDark ? 'bg-slate-800 border-slate-700 text-white focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-950 focus:border-emerald-600 shadow-2xs'
                   }`}
                 >
-                  <option value="Super Admin">Administrator (Super Admin - Full System & Database Authority)</option>
-                  <option value="Content Editor">Content Administrator (Content Editor - Services, Blog, Sliders & Media)</option>
-                  <option value="Inquiries Manager">Manager (Inquiries Desk - Client RFPs & Consultations Desk)</option>
-                  <option value="Viewer">Viewer (Read-Only Metrics & Content Review)</option>
+                  <option value="Super Admin">Administrator (Super Admin - Full System &amp; Database Authority)</option>
+                  <option value="Campaign Manager">Campaign Officer / Manager (Dedicated Event Desk - Campaigns, Forms, Emails &amp; Leads ONLY)</option>
+                  <option value="Content Editor">Content Administrator (Content Editor - Services, Blog, Sliders &amp; Media)</option>
+                  <option value="Inquiries Manager">Manager (Inquiries Desk - Client RFPs &amp; Consultations Desk)</option>
+                  <option value="Viewer">Viewer (Read-Only Metrics &amp; Content Review)</option>
                 </select>
               </div>
 

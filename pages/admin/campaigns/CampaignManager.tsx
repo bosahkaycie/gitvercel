@@ -51,6 +51,7 @@ export type CampaignSubTab =
 interface CampaignManagerProps {
   initialSubTab?: CampaignSubTab;
   adminEmail?: string;
+  userRole?: string;
   theme?: 'light' | 'dark';
   onNavigateTab?: (tab: string) => void;
 }
@@ -132,6 +133,7 @@ const getFallbackTemplate = (camp: Campaign): CampaignEmailTemplate => {
 export const CampaignManager: React.FC<CampaignManagerProps> = ({
   initialSubTab = 'overview',
   adminEmail = 'admin@polarisigl.com',
+  userRole,
   theme = 'light',
   onNavigateTab
 }) => {
@@ -500,6 +502,12 @@ export const CampaignManager: React.FC<CampaignManagerProps> = ({
                 <IconRefresh className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
               </button>
             </div>
+
+            {userRole === 'Campaign Manager' && (
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800">
+                Campaign Officer Desk
+              </span>
+            )}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Real-time event visitor capture, live leads stream, dynamic forms, and automated acknowledgements.

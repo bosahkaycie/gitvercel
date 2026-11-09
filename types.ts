@@ -388,7 +388,7 @@ export interface CoreValue {
   icon: string;
 }
 
-export type AdminRole = 'Super Admin' | 'Content Editor' | 'Inquiries Manager' | 'Viewer';
+export type AdminRole = 'Super Admin' | 'Campaign Manager' | 'Content Editor' | 'Inquiries Manager' | 'Viewer';
 
 export interface AdminUser {
   id: string;

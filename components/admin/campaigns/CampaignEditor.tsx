@@ -48,9 +48,30 @@ export const CampaignEditor: React.FC<CampaignEditorProps> = ({
   };
 
   const [formData, setFormData] = useState<Partial<Campaign>>(getInitialState);
+  const [staffInput, setStaffInput] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  const handleAddStaff = () => {
+    const email = staffInput.trim().toLowerCase();
+    if (!email || !email.includes('@')) return;
+    const current = formData.assignedStaff || [];
+    if (!current.includes(email)) {
+      setFormData(prev => ({
+        ...prev,
+        assignedStaff: [...current, email]
+      }));
+    }
+    setStaffInput('');
+  };
+
+  const handleRemoveStaff = (emailToRemove: string) => {
+    setFormData(prev => ({
+      ...prev,
+      assignedStaff: (prev.assignedStaff || []).filter(e => e !== emailToRemove)
+    }));
+  };
 
   useEffect(() => {
     setFormData(getInitialState());
@@ -357,6 +378,68 @@ export const CampaignEditor: React.FC<CampaignEditorProps> = ({
                 onChange={e => setFormData(prev => ({ ...prev, termsAndPrivacyText: e.target.value }))}
                 className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Section 4: Staff Assignment & Campaign Administrators */}
+        <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+              4. Assigned Campaign Administrators &amp; Stand Staff
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Specify authorized team members or dedicated Campaign Managers assigned to operate this event, capture stand leads, and view submissions.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <input
+                type="email"
+                placeholder="e.g. conference.officer@polarisigl.com"
+                value={staffInput}
+                onChange={e => setStaffInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddStaff();
+                  }
+                }}
+                className="flex-1 px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
+              />
+              <button
+                type="button"
+                onClick={handleAddStaff}
+                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                Assign Staff
+              </button>
+            </div>
+
+            {/* Assigned Staff Badges */}
+            <div className="flex flex-wrap gap-2 pt-1">
+              {(formData.assignedStaff || []).map((staffEmail) => (
+                <span
+                  key={staffEmail}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300 rounded-lg text-xs font-semibold"
+                >
+                  <span>{staffEmail}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveStaff(staffEmail)}
+                    className="p-0.5 hover:text-red-500 rounded-full transition-colors cursor-pointer"
+                    title={`Remove ${staffEmail}`}
+                  >
+                    <IconX className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+              {(!formData.assignedStaff || formData.assignedStaff.length === 0) && (
+                <p className="text-xs text-slate-400 italic">
+                  No specific staff restricted (open to all authorized administrators &amp; campaign officers).
+                </p>
+              )}
             </div>
           </div>
         </div>

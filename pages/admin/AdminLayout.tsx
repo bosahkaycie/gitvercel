@@ -50,6 +50,21 @@ import AdminNotificationCenter from '../../components/admin/AdminNotificationCen
 
 const AdminLayout: React.FC = () => {
   const { user, loading: authLoading, isAuthenticated, login, logout, updateProfile, updatePassword } = useAdminAuth();
+  const isCampaignManager = user?.role === 'Campaign Manager';
+
+  const CAMPAIGN_ALLOWED_TABS = [
+    'campaign-manager',
+    'campaigns-engagement',
+    'campaign-overview',
+    'campaign-create',
+    'campaign-forms',
+    'campaign-emails',
+    'campaign-leads',
+    'campaign-reports',
+    'campaign-settings',
+    'profile'
+  ];
+
   const [currentTab, setCurrentTab] = useState<string>(() => {
     try {
       if (typeof window !== 'undefined') {
@@ -73,6 +88,13 @@ const AdminLayout: React.FC = () => {
       }
     } catch {}
   };
+
+  // Route protection for dedicated Campaign Managers
+  useEffect(() => {
+    if (isCampaignManager && !CAMPAIGN_ALLOWED_TABS.includes(currentTab)) {
+      handleTabChange('campaign-overview');
+    }
+  }, [isCampaignManager, currentTab]);
 
   useEffect(() => {
     const handleUrlChange = () => {
@@ -309,6 +331,20 @@ const AdminLayout: React.FC = () => {
   const pendingVendorsCount = vendors.filter(v => v.status === 'pending').length;
 
   const renderContent = () => {
+    // Strict isolation guard: Campaign Managers can ONLY access campaign tabs
+    if (isCampaignManager && !CAMPAIGN_ALLOWED_TABS.includes(currentTab)) {
+      return (
+        <CampaignManager
+          key="campaign-manager-core"
+          initialSubTab="overview"
+          adminEmail={user?.email}
+          userRole={user?.role}
+          theme={theme}
+          onNavigateTab={handleTabChange}
+        />
+      );
+    }
+
     switch (currentTab) {
       case 'dashboard':
         return (
@@ -494,6 +530,25 @@ const AdminLayout: React.FC = () => {
           />
         );
       case 'users':
+        if (user?.role !== 'Super Admin') {
+          return (
+            <div className="p-8 text-center max-w-md mx-auto my-12 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+              <div className="w-12 h-12 bg-amber-100 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <IconShield className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2">Access Restricted</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-5 leading-relaxed">
+                Administrator and account credential administration is restricted to authorized Super Administrators only.
+              </p>
+              <button
+                onClick={() => handleTabChange(isCampaignManager ? 'campaign-overview' : 'dashboard')}
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer"
+              >
+                Return to Authorized Area
+              </button>
+            </div>
+          );
+        }
         return (
           <AdminUsers
             users={users}
@@ -541,6 +596,7 @@ const AdminLayout: React.FC = () => {
                 : 'all'
             }
             adminEmail={user?.email}
+            userRole={user?.role}
             theme={theme}
             onNavigateTab={handleTabChange}
           />
@@ -692,6 +748,46 @@ const AdminLayout: React.FC = () => {
       group: 'Settings',
       title: 'Admin Profile',
       description: 'Update your administrator name, avatar, and account password.'
+    },
+    'campaign-overview': {
+      group: 'Campaigns & Lead Capture',
+      title: 'Campaigns Overview',
+      description: 'Performance metrics, real-time visitor stats, and campaign distribution.'
+    },
+    'campaign-manager': {
+      group: 'Campaigns & Lead Capture',
+      title: 'All Campaigns',
+      description: 'Create and administer corporate events, exhibitions, and engagement campaigns.'
+    },
+    'campaign-create': {
+      group: 'Campaigns & Lead Capture',
+      title: 'Create Campaign',
+      description: 'Configure new event campaign, dates, URLs, and assigned staff.'
+    },
+    'campaign-forms': {
+      group: 'Campaigns & Lead Capture',
+      title: 'Dynamic Form Builder',
+      description: 'Customize intake forms and fields for each campaign without code changes.'
+    },
+    'campaign-emails': {
+      group: 'Campaigns & Lead Capture',
+      title: 'Email Automation',
+      description: 'Configure automated branded acknowledgement emails and notification triggers.'
+    },
+    'campaign-leads': {
+      group: 'Campaigns & Lead Capture',
+      title: 'Leads & Submissions',
+      description: 'Real-time visitor lead stream, booth captures, and CSV export.'
+    },
+    'campaign-reports': {
+      group: 'Campaigns & Lead Capture',
+      title: 'Campaign Reports',
+      description: 'Conversion rates, acquisition channels, and follow-up analytics.'
+    },
+    'campaign-settings': {
+      group: 'Campaigns & Lead Capture',
+      title: 'Campaign Settings',
+      description: 'Default privacy notices, event categories, and data retention configuration.'
     }
   };
 
@@ -767,15 +863,17 @@ const AdminLayout: React.FC = () => {
               </a>
 
               {/* Real-time Activity Notification Bell */}
-              <AdminNotificationCenter
-                inquiries={inquiries}
-                vendors={vendors}
-                applications={applications}
-                followUps={followUps}
-                auditLogs={auditLogs}
-                onNavigateTab={(tab) => setCurrentTab(tab)}
-                theme={theme}
-              />
+              {!isCampaignManager && (
+                <AdminNotificationCenter
+                  inquiries={inquiries}
+                  vendors={vendors}
+                  applications={applications}
+                  followUps={followUps}
+                  auditLogs={auditLogs}
+                  onNavigateTab={(tab) => setCurrentTab(tab)}
+                  theme={theme}
+                />
+              )}
 
               {/* Theme Toggle Button */}
               <button
@@ -849,17 +947,31 @@ const AdminLayout: React.FC = () => {
                         <span>Admin Profile & Security</span>
                       </button>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCurrentTab('settings');
-                          setIsUserDropdownOpen(false);
-                        }}
-                        className="w-full px-3.5 py-2 text-left flex items-center space-x-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                      >
-                        <IconSettings className="w-4 h-4 text-slate-400" />
-                        <span>Corporate & System Settings</span>
-                      </button>
+                      {isCampaignManager ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCurrentTab('campaign-settings');
+                            setIsUserDropdownOpen(false);
+                          }}
+                          className="w-full px-3.5 py-2 text-left flex items-center space-x-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        >
+                          <IconSettings className="w-4 h-4 text-slate-400" />
+                          <span>Campaign Settings</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCurrentTab('settings');
+                            setIsUserDropdownOpen(false);
+                          }}
+                          className="w-full px-3.5 py-2 text-left flex items-center space-x-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        >
+                          <IconSettings className="w-4 h-4 text-slate-400" />
+                          <span>Corporate &amp; System Settings</span>
+                        </button>
+                      )}
                     </div>
 
                     <div className="border-t border-slate-100 dark:border-slate-800 pt-1">
