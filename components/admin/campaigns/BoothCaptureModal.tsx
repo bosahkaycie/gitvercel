@@ -569,13 +569,12 @@ export const BoothCaptureModal: React.FC<BoothCaptureModalProps> = ({
                           <label className="flex items-start gap-3 cursor-pointer select-none">
                             <input
                               type="checkbox"
-                              required={field.required}
                               checked={dynamicValues[field.id] !== undefined ? Boolean(dynamicValues[field.id]) : true}
                               onChange={e => handleFieldChange(field.id, e.target.checked)}
                               className="mt-0.5 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
                             />
                             <span className="text-xs text-slate-600 leading-relaxed">
-                              {field.label} {field.required && <span className="text-red-500">*</span>}
+                              {field.label}
                             </span>
                           </label>
                         </div>

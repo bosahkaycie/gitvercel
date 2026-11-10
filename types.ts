@@ -115,6 +115,7 @@ export interface CMSBlogPost {
   excerpt: string;
   content: string;
   featured_image?: string;
+  gallery_images?: string[];
   author: string;
   category: string;
   tags: string[];

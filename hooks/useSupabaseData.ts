@@ -122,6 +122,19 @@ export const FALLBACK_SERVICES: CMSService[] = SERVICES.map((s, idx) => {
 });
 
 // Fallback seed blog posts
+// Helper to parse gallery images encoded in content comments
+export const parseGalleryFromContent = (content?: string): string[] => {
+  if (!content) return [];
+  const match = content.match(/<!--\s*pigl_gallery:\s*(\[[\s\S]*?\])\s*-->/);
+  if (match) {
+    try {
+      const parsed = JSON.parse(match[1]);
+      if (Array.isArray(parsed)) return parsed.filter((u): u is string => typeof u === 'string' && Boolean(u.trim()));
+    } catch (e) {}
+  }
+  return [];
+};
+
 const FALLBACK_BLOGS: CMSBlogPost[] = [
   {
     id: 'b-1',
@@ -148,6 +161,12 @@ Key technical deliverables included:
 
 Through digital reality capture, asset owners avoided more than 300 hours of hot-work field measuring and reduced overall shutdown duration by 35%. PIGL remains dedicated to driving safety, efficiency, and engineering excellence across Nigeria's energy corridors.`,
     featured_image: '/assets/digital_intel_scanner.jpg',
+    gallery_images: [
+      '/assets/digital_intel_scanner.jpg',
+      '/assets/pigl_3d_laser_scan_facility_cooler-CUnmm91U.jpg',
+      '/assets/pigl_3d_reality_capture_jetty_plant-CifHN2xH.jpg',
+      '/assets/pigl_3d_laser_scan_manifold_station-DtyXXbQ0.jpg'
+    ],
     author: 'Dr. Chigozie Dimgba',
     category: 'Technical Updates',
     tags: ['3D Reality Capture', 'Digital Twins', 'Leica RTC360', 'Brownfield Engineering', 'Niger Delta'],
@@ -184,6 +203,12 @@ Under this alliance, PIGL integrates Frankstar's state-of-the-art oceanographic 
 
 With stringent regulatory oversight in Nigerian offshore waters, accurate metocean data is essential for Environmental Impact Assessments (EIAs), rig positioning, and spill trajectory modeling. PIGL and Frankstar deliver turnkey data streams accessible via secure cloud dashboards.`,
     featured_image: '/assets/marine_intel_metocean.jpg',
+    gallery_images: [
+      '/assets/marine_intel_metocean.jpg',
+      '/assets/field_operations_marine.jpg',
+      '/assets/pigl_marine_crew_vessel-BeKXaUgs.jpg',
+      '/assets/pigl_subbottom_profiler_sb216s-B0zcGJyx.jpg'
+    ],
     author: 'PIGL Marine Technical Team',
     category: 'Project Milestones',
     tags: ['Marine Intelligence', 'Frankstar Technology', 'Metocean', 'Oceanography', 'Gulf of Guinea'],
@@ -217,6 +242,12 @@ Operating across challenging terrains—including mangrove swamps, intertidal mu
 
 PIGL remains committed to delivering high-integrity engineering solutions while protecting our personnel, our clients, and the natural environment.`,
     featured_image: '/assets/team.jpeg',
+    gallery_images: [
+      '/assets/team.jpeg',
+      '/assets/pigl_field_team_swamp-BL95t4P9.jpg',
+      '/assets/IMG_6170.jpg',
+      '/assets/boots_on_ground.jpeg'
+    ],
     author: 'Layefa Oruoghor (HSSE Manager)',
     category: 'HSSEQ & Safety',
     tags: ['HSSE', 'ISO 45001', 'Safety Milestone', 'Zero LTI', 'Indigenous Engineering'],
@@ -1270,10 +1301,23 @@ export const useBlogPosts = (category?: string, adminMode = false) => {
       const { data, error: sbError } = await query;
       if (sbError) throw sbError;
 
+      const enrichBlogWithGallery = (p: CMSBlogPost): CMSBlogPost => {
+        const fromContent = parseGalleryFromContent(p.content);
+        const gallery = Array.isArray(p.gallery_images) && p.gallery_images.length > 0
+          ? p.gallery_images
+          : (fromContent.length > 0 ? fromContent : (p.featured_image ? [p.featured_image] : []));
+        const featured = p.featured_image || (gallery.length > 0 ? gallery[0] : '/assets/IMG_6170.jpg');
+        return {
+          ...p,
+          featured_image: featured,
+          gallery_images: gallery.includes(featured) ? gallery : [featured, ...gallery]
+        };
+      };
+
       if (data && data.length > 0) {
-        setPosts(data as CMSBlogPost[]);
+        setPosts((data as CMSBlogPost[]).map(enrichBlogWithGallery));
       } else {
-        const localData = getStoredBlogs();
+        const localData = getStoredBlogs().map(enrichBlogWithGallery);
         setPosts(adminMode ? localData : localData.filter(p => p.status === 'published'));
       }
     } catch (err: any) {
@@ -1293,13 +1337,37 @@ export const useBlogPosts = (category?: string, adminMode = false) => {
   const savePost = async (post: Partial<CMSBlogPost> & { title: string; content: string }) => {
     const client = getSupabaseClient();
     const slug = post.slug || post.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+
+    // Extract gallery images & strip previous gallery comment from content
+    let rawContent = (post.content || '').replace(/\s*<!--\s*pigl_gallery:\s*\[[\s\S]*?\]\s*-->\s*$/g, '').trim();
+
+    let galleryImages = Array.isArray(post.gallery_images) && post.gallery_images.length > 0
+      ? [...post.gallery_images]
+      : parseGalleryFromContent(post.content);
+
+    if (galleryImages.length === 0 && post.featured_image) {
+      galleryImages = [post.featured_image];
+    }
+
+    // Determine featured image
+    let featuredImage = post.featured_image || (galleryImages.length > 0 ? galleryImages[0] : '/assets/IMG_6170.jpg');
+    if (featuredImage && !galleryImages.includes(featuredImage)) {
+      galleryImages = [featuredImage, ...galleryImages];
+    }
+
+    // Embed gallery metadata comment for universal persistence
+    const contentWithGallery = galleryImages.length > 0
+      ? `${rawContent}\n\n<!-- pigl_gallery: ${JSON.stringify(galleryImages)} -->`
+      : rawContent;
+
     const updated: CMSBlogPost = {
       id: (post.id && isValidUUID(post.id)) ? post.id : generateUUID(),
       slug,
       title: post.title,
-      excerpt: post.excerpt || post.content.substring(0, 150) + '...',
-      content: post.content,
-      featured_image: post.featured_image || '/assets/IMG_6170.jpg',
+      excerpt: post.excerpt || rawContent.substring(0, 150) + '...',
+      content: contentWithGallery,
+      featured_image: featuredImage,
+      gallery_images: galleryImages,
       author: post.author || 'PIGL Technical Communications Desk',
       category: post.category || 'Technical Updates',
       tags: post.tags || ['Engineering', 'PIGL'],
@@ -1314,7 +1382,9 @@ export const useBlogPosts = (category?: string, adminMode = false) => {
 
     if (client) {
       try {
-        const { error: saveErr } = await client.from('blog_posts').upsert(updated);
+        // Strip gallery_images when writing to PostgREST to prevent missing column error
+        const { gallery_images, ...dbPayload } = updated;
+        const { error: saveErr } = await client.from('blog_posts').upsert(dbPayload);
         if (saveErr) console.warn('Supabase savePost warning:', saveErr.message);
       } catch (err) {
         console.warn('Network error saving post to Supabase, continuing with local store:', err);

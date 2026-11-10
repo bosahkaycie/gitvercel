@@ -158,6 +158,128 @@ function getDefaultCampaignFormFields() {
     ];
 }
 
+// Direct Socket SMTP Mailer with SSL on port 465 (glacier.mxrouting.net)
+function send_campaign_smtp($to, $bcc, $reply_to, $subject, $html, $text, $fromName = '', $fromEmail = '') {
+    $host = getenv('SMTP_HOST') ?: 'glacier.mxrouting.net';
+    $port = (int)(getenv('SMTP_PORT') ?: 465);
+    $user = getenv('SMTP_USER') ?: 'hello@polarisigl.com';
+    $pass = getenv('SMTP_PASS') ?: '6JMJ2WPfHRv9ypt5jzVy';
+
+    $fromName = $fromName ?: 'Polaris Integrated & GeoSolutions Limited';
+    $fromEmail = $fromEmail ?: 'hello@polarisigl.com';
+    $from = "\"{$fromName}\" <{$fromEmail}>";
+
+    $timeout = 12;
+    $protocol = ($port == 465) ? 'ssl://' : '';
+    
+    $socket = @fsockopen($protocol . $host, $port, $errno, $errstr, $timeout);
+    if (!$socket) {
+        return ['success' => false, 'error' => "Cannot connect to SMTP host {$host}:{$port} ({$errstr})"];
+    }
+
+    stream_set_timeout($socket, $timeout);
+
+    $read = function() use ($socket) {
+        $response = '';
+        while ($line = fgets($socket, 515)) {
+            $response .= $line;
+            if (substr($line, 3, 1) === ' ') break;
+        }
+        return $response;
+    };
+
+    $send = function($cmd) use ($socket, $read) {
+        fputs($socket, $cmd . "\r\n");
+        return $read();
+    };
+
+    $initial = $read();
+    if (substr($initial, 0, 3) !== '220') {
+        fclose($socket);
+        return ['success' => false, 'error' => "SMTP greeting error: {$initial}"];
+    }
+
+    $send("EHLO " . ($_SERVER['SERVER_NAME'] ?? 'polarisigl.com'));
+
+    if (!empty($user) && !empty($pass)) {
+        $auth_resp = $send("AUTH LOGIN");
+        if (substr($auth_resp, 0, 3) !== '334') {
+            fclose($socket);
+            return ['success' => false, 'error' => "AUTH LOGIN rejected: {$auth_resp}"];
+        }
+        $send(base64_encode($user));
+        $pass_resp = $send(base64_encode($pass));
+        if (substr($pass_resp, 0, 3) !== '235') {
+            fclose($socket);
+            return ['success' => false, 'error' => "SMTP Auth failed for user {$user}"];
+        }
+    }
+
+    $send("MAIL FROM:<{$user}>");
+
+    $recipients = [];
+    if (!empty($to)) {
+        $recipients = array_merge($recipients, is_array($to) ? $to : explode(',', $to));
+    }
+    if (!empty($bcc)) {
+        $recipients = array_merge($recipients, is_array($bcc) ? $bcc : explode(',', $bcc));
+    }
+
+    foreach ($recipients as $r) {
+        $r = trim($r);
+        if (!empty($r) && strpos($r, '@') !== false) {
+            $send("RCPT TO:<{$r}>");
+        }
+    }
+
+    $data_resp = $send("DATA");
+    if (substr($data_resp, 0, 3) !== '354') {
+        fclose($socket);
+        return ['success' => false, 'error' => "SMTP DATA rejected: {$data_resp}"];
+    }
+
+    $boundary = "==_Multipart_Boundary_x" . md5(time()) . "x";
+    $messageId = "<pigl-lead-" . time() . "." . uniqid() . "@polarisigl.com>";
+
+    $headers = "Message-ID: {$messageId}\r\n";
+    $headers .= "Date: " . date('r') . "\r\n";
+    $headers .= "From: {$from}\r\n";
+    if (!empty($to)) {
+        $headers .= "To: " . (is_array($to) ? implode(', ', $to) : $to) . "\r\n";
+    }
+    $headers .= "Reply-To: {$reply_to}\r\n";
+    $headers .= "Subject: =?UTF-8?B?" . base64_encode($subject) . "?=\r\n";
+    $headers .= "MIME-Version: 1.0\r\n";
+    $headers .= "Content-Type: multipart/alternative; boundary=\"{$boundary}\"\r\n";
+    $headers .= "X-Mailer: Polaris Integrated & GeoSolutions Hostinger Mailer 1.0\r\n";
+
+    $body = "--{$boundary}\r\n";
+    $body .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $body .= "Content-Transfer-Encoding: base64\r\n\r\n";
+    $body .= chunk_split(base64_encode($text ?: strip_tags($html))) . "\r\n";
+
+    if (!empty($html)) {
+        $body .= "--{$boundary}\r\n";
+        $body .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $body .= "Content-Transfer-Encoding: base64\r\n\r\n";
+        $body .= chunk_split(base64_encode($html)) . "\r\n";
+    }
+
+    $body .= "--{$boundary}--\r\n";
+
+    fputs($socket, $headers . "\r\n" . $body . "\r\n.\r\n");
+    $finish = $read();
+
+    $send("QUIT");
+    fclose($socket);
+
+    if (substr($finish, 0, 3) === '250') {
+        return ['success' => true, 'messageId' => $messageId];
+    } else {
+        return ['success' => false, 'error' => "SMTP transmission error: {$finish}"];
+    }
+}
+
 // Helper function for dynamic email placeholder substitution
 function replaceEmailPlaceholders($templateText, $vars) {
     if (empty($templateText)) return '';
@@ -764,47 +886,103 @@ if ($action === 'submit') {
             $submissionDate = date('d M Y');
             $submissionTime = date('H:i');
             $refId = strtoupper($submissionId);
+            $firstName = explode(' ', trim($visitorName))[0] ?: $visitorName;
 
             $placeholderVars = [
+                // Reference Identifiers
                 'submission_id' => $refId,
+                'submissionId' => $refId,
                 'reference_id' => $refId,
+                'referenceId' => $refId,
                 'visit_reference' => $refId,
+                'visitReference' => $refId,
+                'ref_id' => $refId,
+                'refId' => $refId,
+                'reference' => $refId,
+
+                // Event & Venue
                 'event_name' => $eventName,
+                'eventName' => $eventName,
                 'event' => $eventName,
                 'campaign_name' => $campaign['name'],
+                'campaignName' => $campaign['name'],
+                'campaign' => $campaign['name'],
                 'event_location' => $eventLocation,
+                'eventLocation' => $eventLocation,
                 'location' => $eventLocation,
+                'venue' => $eventLocation,
+
+                // Dates & Timestamps
                 'submission_date' => $submissionDate,
+                'submissionDate' => $submissionDate,
                 'date_received' => $submissionDate,
+                'dateReceived' => $submissionDate,
                 'date' => $submissionDate,
                 'submission_time' => $submissionTime,
+                'submissionTime' => $submissionTime,
                 'time' => $submissionTime,
-                'first_name' => explode(' ', trim($visitorName))[0] ?: $visitorName,
-                'full_name' => $visitorName,
-                'visitor_name' => $visitorName,
-                'name' => $visitorName,
-                'company' => !empty($visitorCompany) ? $visitorCompany : 'Your Organisation',
-                'company_name' => !empty($visitorCompany) ? $visitorCompany : 'Your Organisation',
-                'job_title' => !empty($visitorJobTitle) ? $visitorJobTitle : '',
-                'designation' => !empty($visitorJobTitle) ? $visitorJobTitle : '',
-                'email' => $visitorEmail,
-                'phone' => $visitorPhone,
                 'event_start_date' => !empty($campaign['eventStartDate']) ? $campaign['eventStartDate'] : '',
                 'event_end_date' => !empty($campaign['eventEndDate']) ? $campaign['eventEndDate'] : '',
                 'event_dates' => !empty($campaign['eventStartDate']) ? ($campaign['eventStartDate'] . (!empty($campaign['eventEndDate']) ? ' to ' . $campaign['eventEndDate'] : '')) : '',
-                'year' => date('Y')
+                'year' => date('Y'),
+
+                // Visitor Details
+                'first_name' => $firstName,
+                'firstName' => $firstName,
+                'full_name' => $visitorName,
+                'fullName' => $visitorName,
+                'visitor_name' => $visitorName,
+                'visitorName' => $visitorName,
+                'name' => $visitorName,
+                'company' => !empty($visitorCompany) ? $visitorCompany : 'Your Organisation',
+                'company_name' => !empty($visitorCompany) ? $visitorCompany : 'Your Organisation',
+                'companyName' => !empty($visitorCompany) ? $visitorCompany : 'Your Organisation',
+                'job_title' => !empty($visitorJobTitle) ? $visitorJobTitle : 'Valued Delegate',
+                'jobTitle' => !empty($visitorJobTitle) ? $visitorJobTitle : 'Valued Delegate',
+                'designation' => !empty($visitorJobTitle) ? $visitorJobTitle : 'Valued Delegate',
+                'email' => $visitorEmail,
+                'visitor_email' => $visitorEmail,
+                'visitorEmail' => $visitorEmail,
+                'phone' => !empty($visitorPhone) ? $visitorPhone : '',
+                'visitor_phone' => !empty($visitorPhone) ? $visitorPhone : '',
+                'visitorPhone' => !empty($visitorPhone) ? $visitorPhone : ''
             ];
 
             $subject = replaceEmailPlaceholders($emailTmpl['subject'], $placeholderVars);
             $bodyHtml = replaceEmailPlaceholders($emailTmpl['bodyHtml'], $placeholderVars);
             $bodyText = !empty($emailTmpl['bodyText']) ? replaceEmailPlaceholders($emailTmpl['bodyText'], $placeholderVars) : '';
 
-            $headers = "MIME-Version: 1.0\r\n";
-            $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-            $headers .= "From: " . $emailTmpl['senderName'] . " <" . $emailTmpl['senderEmail'] . ">\r\n";
-            $headers .= "Reply-To: " . $emailTmpl['replyTo'] . "\r\n";
+            $fromName = !empty($emailTmpl['senderName']) ? $emailTmpl['senderName'] : 'Polaris Integrated & GeoSolutions Limited';
+            $fromEmail = !empty($emailTmpl['senderEmail']) ? $emailTmpl['senderEmail'] : 'hello@polarisigl.com';
+            $replyToEmail = !empty($emailTmpl['replyTo']) ? $emailTmpl['replyTo'] : 'info@polarisigl.com';
 
-            $sent = @mail($visitorEmail, $subject, $bodyHtml, $headers);
+            // 1. Dispatch Visitor Acknowledgement via Direct SSL SMTP (Port 465)
+            $smtpResult = send_campaign_smtp(
+                $visitorEmail,
+                null,
+                $replyToEmail,
+                $subject,
+                $bodyHtml,
+                $bodyText,
+                $fromName,
+                $fromEmail
+            );
+
+            $isSent = !empty($smtpResult['success']);
+            $errorMsg = !$isSent ? ($smtpResult['error'] ?? 'SMTP delivery error') : null;
+
+            // Fallback to local mail() only if SMTP encounters network issues
+            if (!$isSent) {
+                $headers = "MIME-Version: 1.0\r\n";
+                $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+                $headers .= "From: {$fromName} <{$fromEmail}>\r\n";
+                $headers .= "Reply-To: {$replyToEmail}\r\n";
+                $mailSent = @mail($visitorEmail, $subject, $bodyHtml, $headers);
+                if ($mailSent) {
+                    $isSent = true;
+                    $errorMsg = null;
+                }
+            }
 
             $store['emailLogs'][] = [
                 'id' => 'log-' . time() . '-' . rand(10, 99),
@@ -813,42 +991,67 @@ if ($action === 'submit') {
                 'recipientEmail' => $visitorEmail,
                 'recipientName' => $visitorName,
                 'subject' => $subject,
-                'status' => $sent ? 'sent' : 'failed',
+                'status' => $isSent ? 'sent' : 'failed',
                 'attempts' => 1,
-                'sentAt' => $sent ? date('c') : null,
-                'errorDetails' => $sent ? null : 'Host mail relay delivery deferred',
+                'sentAt' => $isSent ? date('c') : null,
+                'errorDetails' => $errorMsg,
                 'createdAt' => date('c')
             ];
 
-            // Internal Alert to PIGL Team
+            // 2. Dispatch Internal Alerts to PIGL Stakeholders via SMTP
             $internalRecipients = !empty($emailTmpl['internalRecipients']) ? $emailTmpl['internalRecipients'] : [];
             if (!empty($internalRecipients) && is_array($internalRecipients)) {
-                $alertSubject = "[PIGL Lead Alert] New Visitor: {$visitorName} ({$visitorCompany}) at {$campaign['eventName']}";
-                $alertBody = "<h2>New Lead Capture - {$campaign['eventName']}</h2>"
-                    . "<p><strong>Visitor:</strong> {$visitorName}</p>"
+                $studentBadge = !empty($isStudent) ? '<span style="background-color:#dcfce7;color:#166534;padding:2px 8px;border-radius:9999px;font-weight:bold;font-size:11px;">🎓 STUDENT</span>' : '';
+                $alertSubject = "[PIGL Lead Alert] New Visitor: {$visitorName} ({$visitorCompany}) at {$eventName}";
+                $alertBody = "<h2>New Lead Capture - {$eventName}</h2>"
+                    . "<p><strong>Visitor:</strong> {$visitorName} {$studentBadge}</p>"
                     . "<p><strong>Email:</strong> {$visitorEmail}</p>"
                     . "<p><strong>Phone:</strong> {$visitorPhone}</p>"
-                    . "<p><strong>Company:</strong> {$visitorCompany}</p>"
+                    . "<p><strong>Company / University:</strong> {$visitorCompany}</p>"
                     . "<p><strong>Designation:</strong> {$visitorJobTitle}</p>"
                     . "<p><strong>Source:</strong> {$source}</p>"
-                    . "<p><strong>Reference ID:</strong> {$submissionId}</p>"
+                    . "<p><strong>Reference ID:</strong> {$refId}</p>"
+                    . "<p><strong>Date & Time:</strong> {$submissionDate} {$submissionTime}</p>"
                     . "<hr><p>View and manage this lead in the administrator dashboard: <a href='https://polarisigl.com/admin?tab=campaign-leads'>polarisigl.com/admin?tab=campaign-leads</a></p>";
 
+                $validRecipients = [];
                 foreach ($internalRecipients as $intEmail) {
                     $intEmail = trim($intEmail);
                     if (!empty($intEmail) && strpos($intEmail, '@') !== false) {
-                        $intSent = @mail($intEmail, $alertSubject, $alertBody, $headers);
+                        $validRecipients[] = $intEmail;
+                    }
+                }
+
+                if (!empty($validRecipients)) {
+                    $primaryRecipient = $validRecipients[0];
+                    $bccRecipients = array_slice($validRecipients, 1);
+
+                    $intSmtpResult = send_campaign_smtp(
+                        $primaryRecipient,
+                        $bccRecipients,
+                        $replyToEmail,
+                        $alertSubject,
+                        $alertBody,
+                        strip_tags($alertBody),
+                        $fromName,
+                        $fromEmail
+                    );
+
+                    $intSent = !empty($intSmtpResult['success']);
+                    $intError = !$intSent ? ($intSmtpResult['error'] ?? 'SMTP alert delivery error') : null;
+
+                    foreach ($validRecipients as $intEmail) {
                         $store['emailLogs'][] = [
                             'id' => 'log-' . time() . '-' . rand(100, 999),
                             'campaignId' => $campaign['id'],
                             'submissionId' => $submissionId,
                             'recipientEmail' => $intEmail,
-                            'recipientName' => 'PIGL Business Development',
+                            'recipientName' => 'PIGL Team',
                             'subject' => $alertSubject,
                             'status' => $intSent ? 'sent' : 'failed',
                             'attempts' => 1,
                             'sentAt' => $intSent ? date('c') : null,
-                            'errorDetails' => $intSent ? null : 'Host mail relay delivery deferred',
+                            'errorDetails' => $intError,
                             'createdAt' => date('c')
                         ];
                     }
@@ -930,6 +1133,135 @@ if ($action === 'retryEmail') {
     }
     http_response_code(404);
     echo json_encode(['success' => false, 'error' => 'Email log not found']);
+    exit();
+}
+
+// 13. POST: Send Test / Preview Email with populated dynamic tags
+if ($action === 'testEmail') {
+    $campaignId = isset($body['campaignId']) ? $body['campaignId'] : '';
+    $targetEmail = isset($body['targetEmail']) ? trim($body['targetEmail']) : 'hello@polarisigl.com';
+    $customHtml = isset($body['bodyHtml']) ? $body['bodyHtml'] : null;
+    $customSubject = isset($body['subject']) ? $body['subject'] : null;
+
+    $campaign = null;
+    foreach ($store['campaigns'] as $c) {
+        if ($c['id'] === $campaignId) {
+            $campaign = $c;
+            break;
+        }
+    }
+    if (!$campaign) {
+        $campaign = !empty($store['campaigns']) ? $store['campaigns'][0] : [
+            'id' => 'camp-default',
+            'name' => 'NAPE 2026',
+            'eventName' => 'NAPE 2026',
+            'eventLocation' => 'EKO HOTELS AND SUITES, LAGOS'
+        ];
+    }
+
+    $emailTmpl = null;
+    foreach ($store['emailTemplates'] as $t) {
+        if ($t['campaignId'] === $campaign['id']) {
+            $emailTmpl = $t;
+            break;
+        }
+    }
+    if (!$emailTmpl) {
+        $emailTmpl = createDefaultCampaignEmailTemplate($campaign);
+    }
+
+    $eventName = !empty($campaign['eventName']) ? $campaign['eventName'] : $campaign['name'];
+    $eventLocation = !empty($campaign['eventLocation']) ? $campaign['eventLocation'] : 'Eko Hotels & Suites, Victoria Island, Lagos';
+    $submissionDate = date('d M Y');
+    $submissionTime = date('H:i');
+    $refId = 'PIGL-LEAD-' . date('Ymd') . '-TEST';
+
+    $testVars = [
+        'submission_id' => $refId,
+        'submissionId' => $refId,
+        'reference_id' => $refId,
+        'referenceId' => $refId,
+        'visit_reference' => $refId,
+        'visitReference' => $refId,
+        'ref_id' => $refId,
+        'refId' => $refId,
+        'reference' => $refId,
+        'event_name' => $eventName,
+        'eventName' => $eventName,
+        'event' => $eventName,
+        'campaign_name' => $campaign['name'],
+        'campaignName' => $campaign['name'],
+        'campaign' => $campaign['name'],
+        'event_location' => $eventLocation,
+        'eventLocation' => $eventLocation,
+        'location' => $eventLocation,
+        'venue' => $eventLocation,
+        'submission_date' => $submissionDate,
+        'submissionDate' => $submissionDate,
+        'date_received' => $submissionDate,
+        'dateReceived' => $submissionDate,
+        'date' => $submissionDate,
+        'submission_time' => $submissionTime,
+        'submissionTime' => $submissionTime,
+        'time' => $submissionTime,
+        'first_name' => 'Engr. Oladipo',
+        'firstName' => 'Engr. Oladipo',
+        'full_name' => 'Engr. Oladipo Adeleke',
+        'fullName' => 'Engr. Oladipo Adeleke',
+        'visitor_name' => 'Engr. Oladipo Adeleke',
+        'visitorName' => 'Engr. Oladipo Adeleke',
+        'name' => 'Engr. Oladipo Adeleke',
+        'company' => 'Shell Petroleum Development Company',
+        'company_name' => 'Shell Petroleum Development Company',
+        'companyName' => 'Shell Petroleum Development Company',
+        'job_title' => 'Lead Geomatics Specialist',
+        'jobTitle' => 'Lead Geomatics Specialist',
+        'designation' => 'Lead Geomatics Specialist',
+        'email' => $targetEmail,
+        'visitor_email' => $targetEmail,
+        'visitorEmail' => $targetEmail,
+        'phone' => '+234 803 123 4567',
+        'visitor_phone' => '+234 803 123 4567',
+        'visitorPhone' => '+234 803 123 4567',
+        'year' => date('Y')
+    ];
+
+    $rawSubject = $customSubject ?: $emailTmpl['subject'];
+    $rawBodyHtml = $customHtml ?: $emailTmpl['bodyHtml'];
+    $rawBodyText = !empty($emailTmpl['bodyText']) ? $emailTmpl['bodyText'] : strip_tags($rawBodyHtml);
+
+    $testSubject = '[PREVIEW TEST] ' . replaceEmailPlaceholders($rawSubject, $testVars);
+    $testBodyHtml = replaceEmailPlaceholders($rawBodyHtml, $testVars);
+    $testBodyText = replaceEmailPlaceholders($rawBodyText, $testVars);
+
+    $fromName = !empty($emailTmpl['senderName']) ? $emailTmpl['senderName'] : 'Polaris Integrated & GeoSolutions Limited';
+    $fromEmail = !empty($emailTmpl['senderEmail']) ? $emailTmpl['senderEmail'] : 'hello@polarisigl.com';
+    $replyToEmail = !empty($emailTmpl['replyTo']) ? $emailTmpl['replyTo'] : 'info@polarisigl.com';
+
+    $res = send_campaign_smtp(
+        $targetEmail,
+        null,
+        $replyToEmail,
+        $testSubject,
+        $testBodyHtml,
+        $testBodyText,
+        $fromName,
+        $fromEmail
+    );
+
+    if ($res['success']) {
+        echo json_encode([
+            'success' => true,
+            'message' => "Live test preview email successfully sent to {$targetEmail} with all dynamic tags replaced!",
+            'messageId' => $res['messageId'] ?? null
+        ]);
+    } else {
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'error' => "SMTP Delivery Failed: " . ($res['error'] ?? 'Unknown network issue')
+        ]);
+    }
     exit();
 }
 

@@ -275,6 +275,23 @@ export async function retryEmailLog(logId: string): Promise<CampaignEmailLog> {
   return data.log;
 }
 
+export async function sendCampaignTestEmail(payload: {
+  campaignId: string;
+  targetEmail: string;
+  subject?: string;
+  bodyHtml?: string;
+}): Promise<{ success: boolean; message: string }> {
+  const data = await fetchApi('testEmail', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'testEmail', ...payload })
+  });
+  if (!data?.success) {
+    throw new Error(data?.error || 'Failed to send test email');
+  }
+  return data;
+}
+
 /**
  * Enterprise Safe CSV Export with Formula Injection Protection (Part 8.5)
  */

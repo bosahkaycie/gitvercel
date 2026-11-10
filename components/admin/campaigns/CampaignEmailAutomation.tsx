@@ -4,7 +4,7 @@ import {
   CampaignEmailTemplate,
   CampaignEmailLog
 } from '../../../types/campaign';
-import { saveEmailTemplate, retryEmailLog } from '../../../lib/campaignApi';
+import { saveEmailTemplate, retryEmailLog, sendCampaignTestEmail } from '../../../lib/campaignApi';
 import { IconCheck, IconMail, IconSend, IconUsers, IconActivity } from '../AdminIcons';
 
 interface CampaignEmailAutomationProps {
@@ -25,7 +25,11 @@ const SUPPORTED_PLACEHOLDERS = [
   { code: '{{event_name}}', desc: 'Campaign / Event name' },
   { code: '{{event_location}}', desc: 'Event venue / city' },
   { code: '{{submission_id}}', desc: 'Unique lead reference ID' },
-  { code: '{{submission_date}}', desc: 'Date of submission' }
+  { code: '{{visit_reference}}', desc: 'Visit reference ID alias' },
+  { code: '{{submission_date}}', desc: 'Date of submission' },
+  { code: '{{date_received}}', desc: 'Date received alias' },
+  { code: '{{time}}', desc: 'Submission time (HH:MM)' },
+  { code: '{{year}}', desc: 'Current calendar year' }
 ];
 
 export const CampaignEmailAutomation: React.FC<CampaignEmailAutomationProps> = ({
@@ -46,6 +50,11 @@ export const CampaignEmailAutomation: React.FC<CampaignEmailAutomationProps> = (
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [retryingLogId, setRetryingLogId] = useState<string | null>(null);
+
+  // Test email preview state
+  const [testEmailAddress, setTestEmailAddress] = useState('hello@polarisigl.com');
+  const [isSendingTest, setIsSendingTest] = useState(false);
+  const [testResult, setTestResult] = useState<{ success?: boolean; message?: string } | null>(null);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,6 +94,28 @@ export const CampaignEmailAutomation: React.FC<CampaignEmailAutomationProps> = (
       alert('Retry failed.');
     } finally {
       setRetryingLogId(null);
+    }
+  };
+
+  const handleSendTestEmail = async () => {
+    if (!testEmailAddress || !testEmailAddress.includes('@')) {
+      alert('Please provide a valid recipient email address.');
+      return;
+    }
+    setIsSendingTest(true);
+    setTestResult(null);
+    try {
+      const res = await sendCampaignTestEmail({
+        campaignId: campaign.id,
+        targetEmail: testEmailAddress.trim(),
+        subject: formData.subject,
+        bodyHtml: formData.bodyHtml
+      });
+      setTestResult({ success: true, message: res.message || `Test preview successfully sent to ${testEmailAddress}!` });
+    } catch (err: any) {
+      setTestResult({ success: false, message: err.message || 'Failed to dispatch test email.' });
+    } finally {
+      setIsSendingTest(false);
     }
   };
 
@@ -281,6 +312,48 @@ export const CampaignEmailAutomation: React.FC<CampaignEmailAutomationProps> = (
                   <IconSend className="w-4 h-4" />
                   {isSaving ? 'Saving Template...' : 'Save Email Automation'}
                 </button>
+              </div>
+
+              {/* Instant Test Preview Dispatcher */}
+              <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
+                <div className="flex items-center gap-2">
+                  <IconMail className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">
+                    Send Live Preview Test
+                  </h4>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Verify how dynamic tags (reference ID, dates, and event venue) resolve in real inboxes before delegates submit.
+                </p>
+                <div className="space-y-2">
+                  <input
+                    type="email"
+                    placeholder="Enter preview email..."
+                    value={testEmailAddress}
+                    onChange={e => setTestEmailAddress(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white focus:ring-1 focus:ring-emerald-500"
+                  />
+                  {testResult && (
+                    <div
+                      className={`p-2 rounded-lg text-[11px] leading-tight font-medium ${
+                        testResult.success
+                          ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                          : 'bg-red-50 dark:bg-red-950/50 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800'
+                      }`}
+                    >
+                      {testResult.message}
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleSendTestEmail}
+                    disabled={isSendingTest}
+                    className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    <IconSend className="w-3.5 h-3.5" />
+                    {isSendingTest ? 'Dispatching via SMTP...' : 'Dispatch Preview Email'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
