@@ -2,14 +2,82 @@ import React, { useState } from 'react';
 import { CMSBlogPost } from '../../types';
 import RichTextEditor from '../../components/admin/RichTextEditor';
 import ImageUploader from '../../components/admin/ImageUploader';
+import { parseGalleryFromContent } from '../../hooks/useSupabaseData';
 import {
   IconSearch,
   IconCheck,
   IconClose,
   IconGlobe,
   IconEye,
-  IconActivity
+  IconActivity,
+  IconPlus,
+  IconTrash,
+  IconMedia,
+  IconSparkles
 } from '../../components/admin/AdminIcons';
+
+const PIGL_MEDIA_LIBRARY_PRESETS = [
+  {
+    url: '/assets/pigl_3d_laser_scan_facility_cooler-CUnmm91U.jpg',
+    title: '3D Laser Scanning Facility Cooler',
+    tag: '3D Reality Capture'
+  },
+  {
+    url: '/assets/pigl_3d_laser_scan_manifold_station-DtyXXbQ0.jpg',
+    title: 'Offshore Flowstation Manifold 3D Scan',
+    tag: 'Digital Twin'
+  },
+  {
+    url: '/assets/pigl_3d_reality_capture_jetty_plant-CifHN2xH.jpg',
+    title: 'Jetty Plant Reality Capture',
+    tag: 'Reality Capture'
+  },
+  {
+    url: '/assets/pigl_marine_crew_vessel-BeKXaUgs.jpg',
+    title: 'PIGL Hydrographic & Crew Support Vessel',
+    tag: 'Marine & Metocean'
+  },
+  {
+    url: '/assets/pigl_offshore_geotech_drilling_barge-zSVP95dC.jpg',
+    title: 'Geotechnical Pontoon Drilling Rig',
+    tag: 'Geosolutions'
+  },
+  {
+    url: '/assets/pigl_offshore_drill_crew_casing-B8l5kXVY.jpg',
+    title: 'Offshore Drill Crew Running Casing',
+    tag: 'Geotechnical'
+  },
+  {
+    url: '/assets/pigl_pipeline_construction_swamp_cat-B8_iivUg.jpg',
+    title: 'Swamp Pipeline Excavation Operations',
+    tag: 'Construction'
+  },
+  {
+    url: '/assets/pigl_pipeline_marine_welding-KuU54HxW.jpg',
+    title: 'Marine Pipeline Orbital Welding',
+    tag: 'Pipeline'
+  },
+  {
+    url: '/assets/pigl_subbottom_profiler_sb216s-B0zcGJyx.jpg',
+    title: 'Sub-Bottom Profiler Geophysical Rig',
+    tag: 'Geophysics'
+  },
+  {
+    url: '/assets/cpt.png',
+    title: '20-Ton Heavy Duty CPT Rig',
+    tag: 'CPT Testing'
+  },
+  {
+    url: '/assets/digitwin.png',
+    title: 'Digital Twin Dense 3D Point Cloud Mesh',
+    tag: 'Digital Twin'
+  },
+  {
+    url: '/assets/IMG_6170.jpg',
+    title: 'Field Engineering Inspection Operations',
+    tag: 'Field Operations'
+  }
+];
 
 interface AdminBlogEditorProps {
   initialData?: CMSBlogPost | null;
@@ -38,7 +106,30 @@ const AdminBlogEditor: React.FC<AdminBlogEditorProps> = ({
   const [category, setCategory] = useState(initialData?.category || BLOG_CATEGORIES[0]);
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || '');
   const [content, setContent] = useState(initialData?.content || '');
-  const [featuredImage, setFeaturedImage] = useState(initialData?.featured_image || '/assets/IMG_6170.jpg');
+
+  // WordPress-Grade Multi-Image Gallery & Featured Cover State
+  const [galleryImages, setGalleryImages] = useState<string[]>(() => {
+    let list: string[] = [];
+    if (Array.isArray(initialData?.gallery_images) && initialData.gallery_images.length > 0) {
+      list = [...initialData.gallery_images];
+    } else if (initialData?.content) {
+      list = parseGalleryFromContent(initialData.content);
+    }
+    if (initialData?.featured_image && !list.includes(initialData.featured_image)) {
+      list = [initialData.featured_image, ...list];
+    }
+    if (list.length === 0 && initialData?.featured_image) {
+      list = [initialData.featured_image];
+    }
+    return list.filter(Boolean);
+  });
+  const [featuredImage, setFeaturedImage] = useState<string>(() => {
+    return initialData?.featured_image || (initialData?.gallery_images?.[0] ?? '/assets/IMG_6170.jpg');
+  });
+  const [customImageUrl, setCustomImageUrl] = useState('');
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [insertSuccessMsg, setInsertSuccessMsg] = useState<string | null>(null);
+
   const [author, setAuthor] = useState(initialData?.author || 'Dr. Chigozie Dimgba');
   const [tagsStr, setTagsStr] = useState((initialData?.tags || ['Engineering', 'PIGL', 'Nigeria']).join(', '));
   const [status, setStatus] = useState<'draft' | 'published' | 'archived'>(initialData?.status || 'published');
@@ -64,6 +155,46 @@ const AdminBlogEditor: React.FC<AdminBlogEditorProps> = ({
       const autoSlug = newTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
       setSlug(autoSlug);
     }
+  };
+
+  const handleAddImage = (url: string) => {
+    const cleanUrl = url.trim();
+    if (!cleanUrl) return;
+    setGalleryImages(prev => {
+      if (prev.includes(cleanUrl)) return prev;
+      return [...prev, cleanUrl];
+    });
+    if (!featuredImage || featuredImage === '/assets/IMG_6170.jpg') {
+      setFeaturedImage(cleanUrl);
+    }
+    setCustomImageUrl('');
+  };
+
+  const handleSetFeatured = (url: string) => {
+    setFeaturedImage(url);
+    setGalleryImages(prev => {
+      if (!prev.includes(url)) {
+        return [url, ...prev];
+      }
+      return prev;
+    });
+  };
+
+  const handleRemoveImage = (url: string) => {
+    setGalleryImages(prev => {
+      const next = prev.filter(item => item !== url);
+      if (featuredImage === url) {
+        setFeaturedImage(next[0] || '');
+      }
+      return next;
+    });
+  };
+
+  const handleInsertIntoContent = (url: string, title?: string) => {
+    const markdown = `\n\n![${title || 'Article Figure'}](${url})\n\n`;
+    setContent(prev => prev + markdown);
+    setInsertSuccessMsg('Image inserted into article body!');
+    setTimeout(() => setInsertSuccessMsg(null), 3000);
   };
 
   // Auto-generate SEO metadata from content
@@ -98,7 +229,7 @@ const AdminBlogEditor: React.FC<AdminBlogEditorProps> = ({
   const keywordInSlug = effectiveKeyword ? effectiveSlug.toLowerCase().includes(effectiveKeyword.replace(/\s+/g, '-')) : null;
   const keywordInContent = effectiveKeyword ? content.toLowerCase().includes(effectiveKeyword) : null;
   const hasH2orH3 = /^##+ /m.test(content);
-  const hasImage = Boolean(featuredImage);
+  const hasImage = Boolean(featuredImage || galleryImages.length > 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,7 +249,8 @@ const AdminBlogEditor: React.FC<AdminBlogEditorProps> = ({
       slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
       excerpt: excerpt || content.substring(0, 160) + '...',
       content,
-      featured_image: featuredImage,
+      featured_image: featuredImage || galleryImages[0] || '/assets/IMG_6170.jpg',
+      gallery_images: galleryImages,
       author,
       category,
       tags,
@@ -637,24 +769,222 @@ const AdminBlogEditor: React.FC<AdminBlogEditorProps> = ({
             </div>
           </div>
 
-          {/* Featured Image */}
-          <div className={`border rounded-xl p-6 shadow-sm space-y-4 ${
+          {/* WordPress-Style Post Media & Gallery Manager */}
+          <div className={`border rounded-xl p-5 shadow-sm space-y-4 ${
             isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
           }`}>
-            <h3 className={`text-sm font-bold uppercase tracking-wider border-b pb-2 ${
-              isDark ? 'text-white border-slate-800' : 'text-slate-900 border-slate-100'
-            }`}>
-              Featured Image
-            </h3>
+            <div className="flex items-center justify-between border-b pb-2">
+              <div className="flex items-center space-x-2">
+                <IconMedia className="w-4 h-4 text-emerald-500" />
+                <h3 className={`text-sm font-bold uppercase tracking-wider ${
+                  isDark ? 'text-white' : 'text-slate-900'
+                }`}>
+                  Post Media &amp; Gallery
+                </h3>
+              </div>
+              <span className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded-full ${
+                isDark ? 'bg-slate-800 text-emerald-400' : 'bg-emerald-50 text-emerald-700'
+              }`}>
+                {galleryImages.length} {galleryImages.length === 1 ? 'image' : 'images'}
+              </span>
+            </div>
 
-            <ImageUploader
-              label="Article Cover"
-              currentUrl={featuredImage}
-              onUploadComplete={(url) => setFeaturedImage(url)}
-              bucket="blog"
-              helperText="High quality cover image (16:9 ratio recommended)"
-              theme={theme}
-            />
+            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Attach multiple images like WordPress blogs. Choose one as the <strong>Featured Cover</strong>, insert any into the article body, or showcase them in the post gallery.
+            </p>
+
+            {insertSuccessMsg && (
+              <div className="p-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs rounded-lg flex items-center space-x-1.5 animate-fadeIn">
+                <IconCheck className="w-3.5 h-3.5 shrink-0" />
+                <span>{insertSuccessMsg}</span>
+              </div>
+            )}
+
+            {/* Attached Images Grid */}
+            {galleryImages.length > 0 ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {galleryImages.map((imgUrl, idx) => {
+                    const isCover = featuredImage === imgUrl;
+                    return (
+                      <div
+                        key={`${imgUrl}-${idx}`}
+                        className={`group relative rounded-lg overflow-hidden border transition-all ${
+                          isCover
+                            ? 'ring-2 ring-emerald-500 border-emerald-500 shadow-md'
+                            : isDark
+                            ? 'border-slate-800 bg-slate-800/40 hover:border-slate-700'
+                            : 'border-slate-200 bg-slate-50 hover:border-slate-300'
+                        }`}
+                      >
+                        {/* Thumbnail image */}
+                        <div className="relative aspect-video w-full bg-slate-900 overflow-hidden">
+                          <img
+                            src={imgUrl}
+                            alt={`Gallery image ${idx + 1}`}
+                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = '/assets/IMG_6170.jpg';
+                            }}
+                          />
+                          {/* Featured Cover Badge */}
+                          {isCover && (
+                            <span className="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded shadow-sm flex items-center space-x-1">
+                              <span>★ Featured Cover</span>
+                            </span>
+                          )}
+
+                          {/* Delete button */}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(imgUrl)}
+                            title="Remove from post"
+                            className="absolute top-2 right-2 p-1.5 rounded-md bg-slate-950/70 hover:bg-red-600 text-white transition-colors cursor-pointer"
+                          >
+                            <IconTrash className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Card Actions */}
+                        <div className={`p-2 flex items-center justify-between gap-1 text-[11px] ${
+                          isDark ? 'bg-slate-900/90' : 'bg-white'
+                        }`}>
+                          {!isCover ? (
+                            <button
+                              type="button"
+                              onClick={() => handleSetFeatured(imgUrl)}
+                              className="text-emerald-600 dark:text-emerald-400 hover:underline font-bold flex items-center space-x-1 cursor-pointer"
+                            >
+                              <span>★ Set as Featured</span>
+                            </button>
+                          ) : (
+                            <span className="text-emerald-600 dark:text-emerald-400 font-bold text-[10px]">
+                              Primary Cover
+                            </span>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => handleInsertIntoContent(imgUrl)}
+                            className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold cursor-pointer"
+                            title="Insert into Markdown content"
+                          >
+                            Insert in Post →
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className={`text-center py-6 border-2 border-dashed rounded-lg ${
+                isDark ? 'border-slate-800 text-slate-500' : 'border-slate-200 text-slate-400'
+              }`}>
+                <IconMedia className="w-8 h-8 mx-auto mb-1.5 opacity-50" />
+                <p className="text-xs font-semibold">No media attached yet</p>
+                <p className="text-[11px]">Upload an image below or select from corporate presets</p>
+              </div>
+            )}
+
+            {/* Add Image Options */}
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3">
+              {/* Image Uploader */}
+              <ImageUploader
+                label="Upload New Photo"
+                onUploadComplete={(url) => handleAddImage(url)}
+                bucket="blog"
+                helperText="Upload any high-res JPG, PNG or WEBP"
+                theme={theme}
+              />
+
+              {/* Paste URL or Select from PIGL Library */}
+              <div className="flex flex-col gap-2 pt-1">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={customImageUrl}
+                    onChange={(e) => setCustomImageUrl(e.target.value)}
+                    placeholder="Or paste external/asset URL..."
+                    className={`flex-1 p-2 border rounded-lg text-xs ${
+                      isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-300 text-slate-900'
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleAddImage(customImageUrl)}
+                    disabled={!customImageUrl.trim()}
+                    className="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold disabled:opacity-50 cursor-pointer"
+                  >
+                    Add
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowMediaPicker(!showMediaPicker)}
+                  className={`w-full py-2 px-3 rounded-lg border text-xs font-bold transition-colors flex items-center justify-center space-x-1.5 cursor-pointer ${
+                    showMediaPicker
+                      ? 'bg-slate-800 text-white border-slate-700'
+                      : isDark
+                      ? 'bg-slate-800/80 border-slate-700 text-slate-300 hover:text-white'
+                      : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  <IconSparkles className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>{showMediaPicker ? 'Hide PIGL Media Library' : 'Choose from PIGL Media Library'}</span>
+                </button>
+              </div>
+
+              {/* PIGL Media Library Quick Picker */}
+              {showMediaPicker && (
+                <div className={`p-3 rounded-lg border space-y-2 max-h-64 overflow-y-auto ${
+                  isDark ? 'bg-slate-950/80 border-slate-800' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <p className={`text-[10px] font-bold uppercase tracking-wider ${
+                    isDark ? 'text-slate-400' : 'text-slate-500'
+                  }`}>
+                    PIGL Corporate Assets (Click to attach):
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {PIGL_MEDIA_LIBRARY_PRESETS.map((preset) => {
+                      const isAttached = galleryImages.includes(preset.url);
+                      return (
+                        <button
+                          key={preset.url}
+                          type="button"
+                          onClick={() => handleAddImage(preset.url)}
+                          className={`relative text-left rounded overflow-hidden border transition-all p-1 flex items-center space-x-2 group cursor-pointer ${
+                            isAttached
+                              ? 'border-emerald-500 bg-emerald-500/10'
+                              : isDark
+                              ? 'border-slate-800 bg-slate-900 hover:border-slate-700'
+                              : 'border-slate-200 bg-white hover:border-slate-300'
+                          }`}
+                        >
+                          <img
+                            src={preset.url}
+                            alt={preset.title}
+                            className="w-10 h-10 rounded object-cover shrink-0"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = '/assets/IMG_6170.jpg';
+                            }}
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[11px] font-bold truncate text-slate-900 dark:text-white">
+                              {preset.title}
+                            </p>
+                            <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-semibold block">
+                              {isAttached ? '✓ Attached' : preset.tag}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Tags */}
