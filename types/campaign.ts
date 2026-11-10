@@ -105,6 +105,7 @@ export interface CampaignSubmission {
   visitorPhone?: string;
   visitorCompany?: string;
   visitorJobTitle?: string;
+  isStudent?: boolean;
   formData: Record<string, any>;
   assignedStaff?: string;
   followUpStatus: LeadFollowUpStatus;

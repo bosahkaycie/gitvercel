@@ -107,7 +107,7 @@ function getDefaultCampaignFormFields() {
             'type' => 'phone',
             'label' => 'Phone / WhatsApp Number',
             'placeholder' => '+234 803 000 0000',
-            'required' => true,
+            'required' => false,
             'order' => 3
         ],
         [
@@ -722,6 +722,8 @@ if ($action === 'submit') {
     $visitorPhone = !empty($formData['phone']) ? $formData['phone'] : (!empty($formData['f_phone']) ? $formData['f_phone'] : '');
     $visitorCompany = !empty($formData['company']) ? $formData['company'] : (!empty($formData['f_company']) ? $formData['f_company'] : '');
     $visitorJobTitle = !empty($formData['job_title']) ? $formData['job_title'] : (!empty($formData['f_job_title']) ? $formData['f_job_title'] : '');
+    $isStudent = !empty($formData['is_student']) || !empty($formData['isStudent']) || !empty($formData['f_is_student']) || !empty($body['isStudent']);
+    $formData['is_student'] = (bool)$isStudent;
 
     $submission = [
         'id' => $submissionId,
@@ -734,6 +736,7 @@ if ($action === 'submit') {
         'visitorPhone' => $visitorPhone,
         'visitorCompany' => $visitorCompany,
         'visitorJobTitle' => $visitorJobTitle,
+        'isStudent' => (bool)$isStudent,
         'formData' => $formData,
         'assignedStaff' => isset($body['assignedStaff']) ? $body['assignedStaff'] : '',
         'followUpStatus' => 'new',

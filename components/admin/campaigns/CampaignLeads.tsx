@@ -43,9 +43,13 @@ export const CampaignLeads: React.FC<CampaignLeadsProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sourceFilter, setSourceFilter] = useState<string>('all');
+  const [attendeeFilter, setAttendeeFilter] = useState<'all' | 'students' | 'corporate'>('all');
   const [selectedLead, setSelectedLead] = useState<CampaignSubmission | null>(null);
   const [newNoteText, setNewNoteText] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const isStudentLead = (sub: CampaignSubmission) =>
+    Boolean(sub.isStudent || sub.formData?.is_student === true || sub.formData?.is_student === 'true' || sub.formData?.isStudent === true);
 
   // Filtered leads
   const filteredSubmissions = submissions.filter(s => {
@@ -59,8 +63,13 @@ export const CampaignLeads: React.FC<CampaignLeadsProps> = ({
 
     const matchStatus = statusFilter === 'all' || s.followUpStatus === statusFilter;
     const matchSource = sourceFilter === 'all' || s.source === sourceFilter;
+    const isStudent = isStudentLead(s);
+    const matchAttendee =
+      attendeeFilter === 'all' ||
+      (attendeeFilter === 'students' && isStudent) ||
+      (attendeeFilter === 'corporate' && !isStudent);
 
-    return matchSearch && matchStatus && matchSource;
+    return matchSearch && matchStatus && matchSource && matchAttendee;
   });
 
   // Handle status update
@@ -141,7 +150,7 @@ export const CampaignLeads: React.FC<CampaignLeadsProps> = ({
       </div>
 
       {/* Filter Toolbar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
         <div className="relative">
           <IconSearch className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -180,6 +189,18 @@ export const CampaignLeads: React.FC<CampaignLeadsProps> = ({
             <option value="booth_capture">Administrator Booth Capture</option>
           </select>
         </div>
+
+        <div>
+          <select
+            value={attendeeFilter}
+            onChange={e => setAttendeeFilter(e.target.value as any)}
+            className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-emerald-500 font-medium"
+          >
+            <option value="all">All Delegate Types</option>
+            <option value="corporate">Corporate Industry Only</option>
+            <option value="students">🎓 Students Only</option>
+          </select>
+        </div>
       </div>
 
       {/* Leads Table */}
@@ -214,8 +235,13 @@ export const CampaignLeads: React.FC<CampaignLeadsProps> = ({
                       className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 cursor-pointer transition-colors"
                     >
                       <td className="px-5 py-3.5">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="font-bold text-slate-900 dark:text-white">{sub.visitorName}</span>
+                          {isStudentLead(sub) && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-800 border border-indigo-200 dark:bg-indigo-950 dark:text-indigo-300 dark:border-indigo-800 shadow-xs">
+                              🎓 Student
+                            </span>
+                          )}
                           {(Date.now() - new Date(sub.createdAt).getTime()) < 300000 && (
                             <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-500 text-white animate-pulse shrink-0">
                               NEW
@@ -306,11 +332,18 @@ export const CampaignLeads: React.FC<CampaignLeadsProps> = ({
             {/* Drawer Header */}
             <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                  {selectedLead.visitorName}
-                </h3>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                    {selectedLead.visitorName}
+                  </h3>
+                  {isStudentLead(selectedLead) && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-800 border border-indigo-200 dark:bg-indigo-950 dark:text-indigo-300 dark:border-indigo-800">
+                      🎓 Student Delegate
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {selectedLead.visitorCompany || 'Independent Delegate'} &bull; {selectedLead.visitorJobTitle || 'Representative'}
+                  {selectedLead.visitorCompany || (isStudentLead(selectedLead) ? 'Student / University Delegate' : 'Independent Delegate')} &bull; {selectedLead.visitorJobTitle || 'Representative'}
                 </p>
               </div>
               <button

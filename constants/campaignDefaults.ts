@@ -78,7 +78,7 @@ export const INITIAL_SAMPLE_FORM: CampaignForm = {
           type: 'phone',
           label: 'Telephone / Mobile Number',
           placeholder: '+234 800 000 0000',
-          required: true,
+          required: false,
           order: 4
         },
         {

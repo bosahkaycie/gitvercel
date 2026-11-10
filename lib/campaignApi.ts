@@ -295,6 +295,7 @@ export function exportLeadsToCsv(
     'Phone Number',
     'Company',
     'Job Title',
+    'Is Student',
     'Follow-up Status',
     'Assigned Staff',
     ...inputFields.map(f => f.label)
@@ -327,6 +328,7 @@ export function exportLeadsToCsv(
       escapeCsv(sub.visitorPhone || ''),
       escapeCsv(sub.visitorCompany || ''),
       escapeCsv(sub.visitorJobTitle || ''),
+      escapeCsv(sub.isStudent || sub.formData?.is_student === true || sub.formData?.is_student === 'true' ? 'Yes' : 'No'),
       escapeCsv(sub.followUpStatus.toUpperCase()),
       escapeCsv(sub.assignedStaff || ''),
       ...dynamicValues.map(escapeCsv)

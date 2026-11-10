@@ -95,6 +95,7 @@ export const BoothCaptureModal: React.FC<BoothCaptureModalProps> = ({
   const [activeForm, setActiveForm] = useState<CampaignForm | null>(form || null);
   const [loadingForm, setLoadingForm] = useState<boolean>(!form || (form.campaignId !== campaign.id && form.id !== campaign.assignedFormId));
   const [dynamicValues, setDynamicValues] = useState<Record<string, any>>({});
+  const [isStudent, setIsStudent] = useState<boolean>(false);
   const [discussionNotes, setDiscussionNotes] = useState<string>('');
   const [followupAction, setFollowupAction] = useState<string>('technical_proposal');
 
@@ -170,9 +171,10 @@ export const BoothCaptureModal: React.FC<BoothCaptureModalProps> = ({
     setIsSubmitting(true);
     setErrorMsg(null);
 
-    // Dynamic field validation
+    // Dynamic field validation - Note: Phone is strictly OPTIONAL across all campaign captures
     for (const f of fields) {
-      if (f.required && f.type !== 'section_heading' && f.type !== 'descriptive_text') {
+      const isPhone = f.type === 'phone' || f.id.toLowerCase().includes('phone') || f.id.toLowerCase().includes('tel') || f.id.toLowerCase().includes('whatsapp');
+      if (f.required && !isPhone && f.type !== 'section_heading' && f.type !== 'descriptive_text') {
         const val = dynamicValues[f.id];
         if (f.type === 'consent') {
           if (val === false) {
@@ -236,6 +238,8 @@ export const BoothCaptureModal: React.FC<BoothCaptureModalProps> = ({
       custom_inquiry_scope: customInquiry,
       discussion_notes: discussionNotes.trim(),
       followup_priority: followupAction,
+      is_student: isStudent,
+      isStudent: isStudent,
 
       // Legacy prefix compatibility
       f_full_name: visitorName,
@@ -245,6 +249,7 @@ export const BoothCaptureModal: React.FC<BoothCaptureModalProps> = ({
       f_job_title: visitorJobTitle,
       f_divisions: divisions,
       f_custom_scope: customInquiry,
+      f_is_student: isStudent,
       f_scope: [
         customInquiry ? `[Scope]: ${customInquiry}` : '',
         discussionNotes.trim() ? `[Stand Discussion Notes]: ${discussionNotes.trim()}` : ''
@@ -279,6 +284,7 @@ export const BoothCaptureModal: React.FC<BoothCaptureModalProps> = ({
 
   const resetForNextVisitor = () => {
     setDynamicValues({});
+    setIsStudent(false);
     setDiscussionNotes('');
     setFollowupAction('technical_proposal');
     setSuccessMsg(null);
@@ -577,10 +583,14 @@ export const BoothCaptureModal: React.FC<BoothCaptureModalProps> = ({
                     }
 
                     // 8. Standard single line inputs (short_text, email, phone, number, date)
+                    const isPhoneField = field.type === 'phone' || field.id.toLowerCase().includes('phone') || field.id.toLowerCase().includes('tel') || field.id.toLowerCase().includes('whatsapp');
+                    const isFieldRequired = field.required && !isPhoneField;
+
                     return (
                       <div key={field.id} className="space-y-1.5">
                         <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                          {field.label} {field.required && <span className="text-red-500">*</span>}
+                          {field.label} {isFieldRequired && <span className="text-red-500">*</span>}
+                          {isPhoneField && <span className="text-[11px] font-normal text-slate-400 normal-case ml-1.5">(Optional)</span>}
                         </label>
                         <input
                           type={
@@ -594,7 +604,7 @@ export const BoothCaptureModal: React.FC<BoothCaptureModalProps> = ({
                               ? 'date'
                               : 'text'
                           }
-                          required={field.required}
+                          required={isFieldRequired}
                           placeholder={field.placeholder || ''}
                           value={dynamicValues[field.id] || ''}
                           onChange={e => handleFieldChange(field.id, e.target.value)}
@@ -606,6 +616,30 @@ export const BoothCaptureModal: React.FC<BoothCaptureModalProps> = ({
                       </div>
                     );
                   })}
+                </div>
+
+                {/* Student Identification Checkbox */}
+                <div className="p-4 bg-slate-50 border border-slate-200/90 rounded-2xl">
+                  <label className="flex items-start gap-3 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      id="booth_is_student"
+                      checked={isStudent}
+                      onChange={e => setIsStudent(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
+                    />
+                    <div className="space-y-0.5">
+                      <span className="text-xs font-bold text-slate-800 flex items-center gap-2">
+                        <span>Are you a student?</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                          🎓 Student Attendee
+                        </span>
+                      </span>
+                      <p className="text-[11px] text-slate-500 leading-relaxed">
+                        Check if the visitor is attending as an undergraduate, postgraduate student, or academic delegate.
+                      </p>
+                    </div>
+                  </label>
                 </div>
               </div>
 

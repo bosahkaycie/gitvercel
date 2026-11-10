@@ -171,9 +171,10 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
 
     setFormError(null);
 
-    // Dynamic field validation
+    // Dynamic field validation - Note: Phone is strictly OPTIONAL across all campaign captures
     for (const f of fields) {
-      if (f.required && f.type !== 'section_heading' && f.type !== 'descriptive_text') {
+      const isPhone = f.type === 'phone' || f.id.toLowerCase().includes('phone') || f.id.toLowerCase().includes('tel') || f.id.toLowerCase().includes('whatsapp');
+      if (f.required && !isPhone && f.type !== 'section_heading' && f.type !== 'descriptive_text') {
         const val = formData[f.id];
         if (f.type === 'consent' && !val) {
           setFormError(`Please confirm your agreement: "${f.label}"`);
@@ -214,9 +215,12 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
     const visitorCompany = findValueByKeywords(['company', 'organisation', 'organization']) || '';
     const visitorJobTitle = findValueByKeywords(['job_title', 'designation', 'role', 'title']) || '';
     const customInquiry = findValueByKeywords(['custom', 'scope', 'inquiry', 'requirement', 'notes']) || '';
+    const isStudent = Boolean(formData['is_student']);
 
     const payload: Record<string, any> = {
       ...formData,
+      is_student: isStudent,
+      isStudent: isStudent,
       full_name: visitorName,
       email: visitorEmail,
       phone: visitorPhone,
@@ -228,7 +232,8 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
       f_phone: visitorPhone,
       f_company: visitorCompany,
       f_job_title: visitorJobTitle,
-      f_custom_scope: customInquiry
+      f_custom_scope: customInquiry,
+      f_is_student: isStudent
     };
 
     try {
@@ -613,10 +618,14 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
               }
 
               // 8. Standard single line inputs (short_text, email, phone, number, date)
+              const isPhoneField = field.type === 'phone' || field.id.toLowerCase().includes('phone') || field.id.toLowerCase().includes('tel') || field.id.toLowerCase().includes('whatsapp');
+              const isFieldRequired = field.required && !isPhoneField;
+
               return (
                 <div key={field.id} className="space-y-1.5">
                   <label className="block text-xs font-semibold text-slate-700">
-                    {field.label} {field.required && <span className="text-red-500">*</span>}
+                    {field.label} {isFieldRequired && <span className="text-red-500">*</span>}
+                    {isPhoneField && <span className="text-[11px] font-normal text-slate-400 ml-1.5">(Optional)</span>}
                   </label>
                   <input
                     type={
@@ -630,7 +639,7 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
                         ? 'date'
                         : 'text'
                     }
-                    required={field.required}
+                    required={isFieldRequired}
                     placeholder={field.placeholder || ''}
                     value={formData[field.id] || ''}
                     onChange={e => handleFieldChange(field.id, e.target.value)}
@@ -642,6 +651,30 @@ export const PublicCampaign: React.FC<PublicCampaignProps> = ({ currentPath }) =
                 </div>
               );
             })}
+
+            {/* Student Identification Checkbox */}
+            <div className="p-4 bg-slate-50 border border-slate-200/90 rounded-2xl">
+              <label className="flex items-start gap-3 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  id="public_is_student"
+                  checked={Boolean(formData['is_student'])}
+                  onChange={e => handleFieldChange('is_student', e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
+                />
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-slate-800 flex items-center gap-2">
+                    <span>Are you a student?</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                      🎓 Student Delegate
+                    </span>
+                  </span>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Check this box if you are attending as a university student, academic researcher, or youth delegate.
+                  </p>
+                </div>
+              </label>
+            </div>
 
             {/* Submit Button */}
             <div className="pt-4 border-t border-slate-100">

@@ -137,7 +137,7 @@ export default async function handler(req: any, res: any) {
             fields: [
               { id: 'full_name', type: 'short_text', label: 'Full Name', required: true, order: 1, placeholder: 'e.g. Engr. Oladipo Adeleke' },
               { id: 'email', type: 'email', label: 'Corporate / Official Email Address', required: true, order: 2, placeholder: 'e.g. name@energyfirm.com' },
-              { id: 'phone', type: 'phone', label: 'Phone / WhatsApp Number', required: true, order: 3, placeholder: '+234 803 000 0000' },
+              { id: 'phone', type: 'phone', label: 'Phone / WhatsApp Number', required: false, order: 3, placeholder: '+234 803 000 0000' },
               { id: 'company', type: 'short_text', label: 'Company / Operating Organisation', required: true, order: 4, placeholder: 'e.g. Shell, NNPC Ltd, Chevron, TotalEnergies, Seplat' },
               { id: 'job_title', type: 'short_text', label: 'Job Title / Designation', required: false, order: 5, placeholder: 'e.g. Executive Director, Lead Project Engineer' },
               {
@@ -570,6 +570,12 @@ export default async function handler(req: any, res: any) {
       const visitorPhone = formData['f_phone'] || formData['phone'] || '';
       const visitorCompany = formData['f_company'] || formData['company'] || '';
       const visitorJobTitle = formData['f_job_title'] || formData['job_title'] || '';
+      const isStudent = Boolean(
+        formData['is_student'] ||
+        formData['isStudent'] ||
+        formData['f_is_student'] ||
+        (req.body && req.body.isStudent)
+      );
 
       const submissionId = `sub-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
 
@@ -585,7 +591,8 @@ export default async function handler(req: any, res: any) {
         visitorPhone,
         visitorCompany,
         visitorJobTitle,
-        formData: formData || {},
+        isStudent,
+        formData: { ...(formData || {}), is_student: isStudent },
         assignedStaff: assignedStaff || '',
         followUpStatus: 'new',
         notes: [],
