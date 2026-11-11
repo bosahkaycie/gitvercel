@@ -124,6 +124,12 @@ Options -Indexes
   # 7B-2. Explicit Static Bypass for Search Crawlers (Favicon, Manifest, OG Banner, Robots, Sitemap)
   RewriteRule ^(favicon\.ico|favicon-[0-9]+x[0-9]+\.png|favicon\.png|favicon\.svg|icon-[0-9]+\.png|apple-touch-icon\.png|og-image\.(jpg|jpeg|png)|site\.webmanifest|robots\.txt|sitemap\.xml)$ - [L]
 
+  # 7B-3. Dynamic Blog Post Open Graph & Social Preview Router
+  # Injects blog post featured_image, title & excerpt for WhatsApp, LinkedIn, Twitter/X, Facebook & visitors
+  RewriteCond %{REQUEST_URI} ^/blog/([^/]+)/?$ [NC]
+  RewriteCond %{DOCUMENT_ROOT}/blog-preview.php -f
+  RewriteRule ^blog/([^/]+)/?$ /blog-preview.php?slug=$1 [L,QSA]
+
   # 7C. If requested resource is a physical file or directory, serve it directly
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d

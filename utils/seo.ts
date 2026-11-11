@@ -47,7 +47,7 @@ export const PIGL_COMPANY_IDENTITY = {
   ],
   url: 'https://polarisigl.com/',
   logoUrl: 'https://polarisigl.com/icon-512.png',
-  defaultOgImage: 'https://polarisigl.com/og-image.jpg',
+  defaultOgImage: 'https://polarisigl.com/og-image.jpg?v=2',
   headquarters: {
     streetAddress: '#3 Diamond Close, Castle & Green Estate, Off Eneka Link Road',
     addressLocality: 'Port Harcourt',
