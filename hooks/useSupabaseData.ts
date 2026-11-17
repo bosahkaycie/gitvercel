@@ -3594,6 +3594,18 @@ export const useJobOpenings = (adminMode = false) => {
   return { jobs, loading, reload: fetchJobs, saveJob, deleteJob };
 };
 
+export const useJobOpening = (idOrSlug: string) => {
+  const { jobs, loading } = useJobOpenings(true);
+  const normalized = (idOrSlug || '').toLowerCase().trim();
+  const job = jobs.find(j => 
+    j.id === idOrSlug ||
+    j.id.toLowerCase() === normalized ||
+    j.id.replace(/^job-/, '').toLowerCase() === normalized.replace(/^job-/, '') ||
+    j.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') === normalized.replace(/^job-/, '')
+  );
+  return { job, loading, allJobs: jobs };
+};
+
 // ==============================================================================
 // 11. JOB APPLICATIONS (CV INBOX) HOOK
 // ==============================================================================

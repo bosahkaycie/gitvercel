@@ -39,6 +39,7 @@ const Teams = lazyWithRetry(() => import('./pages/Teams'));
 const Network = lazyWithRetry(() => import('./pages/Network'));
 const Contact = lazyWithRetry(() => import('./pages/Contact'));
 const Careers = lazyWithRetry(() => import('./pages/Careers'));
+const JobDetail = lazyWithRetry(() => import('./pages/JobDetail'));
 const News = lazyWithRetry(() => import('./pages/News'));
 const Blog = lazyWithRetry(() => import('./pages/Blog'));
 const BlogPost = lazyWithRetry(() => import('./pages/BlogPost'));
@@ -356,11 +357,8 @@ const App: React.FC = () => {
     }
     if (currentPath.startsWith('/careers/')) {
       const careerId = currentPath.split('/careers/')[1]?.replace(/\/$/, '');
-      if (careerId && typeof window !== 'undefined') {
-        const url = new URL(window.location.href);
-        url.pathname = '/careers';
-        url.searchParams.set('job', careerId);
-        window.history.replaceState(null, '', url.toString());
+      if (careerId) {
+        return <JobDetail currentPath={currentPath} />;
       }
       return <Careers />;
     }

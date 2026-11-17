@@ -263,6 +263,102 @@ const routes = [
     `
   },
   {
+    path: '/careers/job-digital-asset-manager',
+    title: 'Digital Asset Manager | PIGL Careers Nigeria',
+    description: 'We are seeking a creative, organised and results-driven Digital Asset Manager to oversee and manage the company digital presence across multiple platforms. Port Harcourt on-site role.',
+    badge: 'Active Vacancy',
+    h1: 'Digital Asset Manager',
+    intro: 'Location: Port Harcourt (On-site) • Employment Type: Full-time • Experience: 3+ Years',
+    sectionsHtml: `
+      <section style="margin-bottom: 2rem;">
+        <h2 style="color: #34d399; font-size: 1.4rem;">About the Role</h2>
+        <p style="color: #cbd5e1; line-height: 1.7;">
+          Oversee social media channels, corporate website maintenance, SEO strategies, content distribution, and digital marketing initiatives for PIGL.
+        </p>
+      </section>
+    `
+  },
+  {
+    path: '/careers/job-hydrographic-surveyor',
+    title: 'Hydrographic Surveyor | PIGL Careers Nigeria',
+    description: 'We are hiring a Hydrographic Surveyor to plan and execute hydrographic survey operations in swamp, coastal and offshore environments. Port Harcourt on-site role.',
+    badge: 'Active Vacancy',
+    h1: 'Hydrographic Surveyor',
+    intro: 'Location: Port Harcourt (On-site) • Employment Type: Full-time • Experience: 3+ Years',
+    sectionsHtml: `
+      <section style="margin-bottom: 2rem;">
+        <h2 style="color: #34d399; font-size: 1.4rem;">About the Role</h2>
+        <p style="color: #cbd5e1; line-height: 1.7;">
+          Acquire, validate and process bathymetric and positioning data, prepare charts, maps and reports that meet client and regulatory standards, and support dredging and construction activities.
+        </p>
+      </section>
+    `
+  },
+  {
+    path: '/careers/job-project-surveyor',
+    title: 'Project Surveyor | PIGL Careers Nigeria',
+    description: 'We are seeking an experienced Project Surveyor to plan, coordinate and execute land, swamp and offshore surveying activities in support of energy projects.',
+    badge: 'Active Vacancy',
+    h1: 'Project Surveyor',
+    intro: 'Location: Port Harcourt (On-site) • Employment Type: Full-time • Experience: 4+ Years',
+    sectionsHtml: `
+      <section style="margin-bottom: 2rem;">
+        <h2 style="color: #34d399; font-size: 1.4rem;">About the Role</h2>
+        <p style="color: #cbd5e1; line-height: 1.7;">
+          Ensure accurate positioning and mapping for project deliverables, prepare survey reports and drawings, and maintain data integrity in line with company quality standards.
+        </p>
+      </section>
+    `
+  },
+  {
+    path: '/careers/job-geophysical-surveyor',
+    title: 'Geophysical Surveyor | PIGL Careers Nigeria',
+    description: 'We are hiring a Geophysical Surveyor to plan, execute and supervise geophysical surveys across swamp, land and offshore project sites in support of energy and infrastructure projects.',
+    badge: 'Active Vacancy',
+    h1: 'Geophysical Surveyor',
+    intro: 'Location: Port Harcourt (On-site) • Employment Type: Full-time • Experience: 3+ Years',
+    sectionsHtml: `
+      <section style="margin-bottom: 2rem;">
+        <h2 style="color: #34d399; font-size: 1.4rem;">About the Role</h2>
+        <p style="color: #cbd5e1; line-height: 1.7;">
+          Acquire high-quality field data, ensure adherence to safety and quality standards, and deliver clear technical reports and maps for major energy projects.
+        </p>
+      </section>
+    `
+  },
+  {
+    path: '/careers/job-data-processor-marine-survey',
+    title: 'Data Processor – Marine Survey | PIGL Careers Nigeria',
+    description: 'We are seeking a Data Processor – Marine Survey to process, validate, interpret and integrate hydrographic, geophysical and oceanographic data acquired during offshore and marine survey campaigns.',
+    badge: 'Active Vacancy',
+    h1: 'Data Processor – Marine Survey',
+    intro: 'Location: Port Harcourt (On-site) • Employment Type: Full-time • Experience: 3+ Years',
+    sectionsHtml: `
+      <section style="margin-bottom: 2rem;">
+        <h2 style="color: #34d399; font-size: 1.4rem;">About the Role</h2>
+        <p style="color: #cbd5e1; line-height: 1.7;">
+          Generate high-accuracy bathymetric models, digital terrain surfaces, seabed classification charts and comprehensive technical reports.
+        </p>
+      </section>
+    `
+  },
+  {
+    path: '/careers/job-project-manager',
+    title: 'Project Manager | PIGL Careers Nigeria',
+    description: 'We are hiring a Project Manager to oversee the planning, execution, monitoring and completion of engineering and geosolutions projects. Port Harcourt on-site role.',
+    badge: 'Active Vacancy',
+    h1: 'Project Manager',
+    intro: 'Location: Port Harcourt (On-site) • Employment Type: Full-time • Experience: 5+ Years',
+    sectionsHtml: `
+      <section style="margin-bottom: 2rem;">
+        <h2 style="color: #34d399; font-size: 1.4rem;">About the Role</h2>
+        <p style="color: #cbd5e1; line-height: 1.7;">
+          Lead multidisciplinary teams across swamp, land and offshore environments, coordinate expediting and inspection, and deliver projects to ISO-compliant standards.
+        </p>
+      </section>
+    `
+  },
+  {
     path: '/hsse',
     title: 'HSSEQ Standards & ISO Certifications | PIGL Safety Governance',
     description: 'Health, Safety, Security, Environment, and Quality (HSSEQ) governance at PIGL. Certified to ISO 9001:2015 and ISO 45001:2018 with over 500,000+ safe man-hours and zero Lost Time Injuries (LTI) across all onshore and offshore campaigns.',
