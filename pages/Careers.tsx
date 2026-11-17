@@ -18,6 +18,45 @@ const Careers: React.FC = () => {
   const [submissionPhase, setSubmissionPhase] = useState('');
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
+  const [flyerModalImage, setFlyerModalImage] = useState<{ url: string; title: string } | null>(null);
+  const [shareToast, setShareToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const targetJob = params.get('job') || params.get('id');
+    if (targetJob) {
+      setExpandedJobId(targetJob);
+      setTimeout(() => {
+        const el = document.getElementById(targetJob);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 350);
+    }
+  }, [jobs]);
+
+  const handleShareJob = (job: any) => {
+    const shareUrl = `https://polarisigl.com/careers?job=${encodeURIComponent(job.id)}`;
+    const shareData = {
+      title: `We are Hiring: ${job.title} | PIGL Careers`,
+      text: `Polaris Integrated & GeoSolutions Limited (PIGL) is hiring a ${job.title} in ${job.location}. Apply now!`,
+      url: shareUrl
+    };
+
+    if (navigator.share && /mobile|android|iphone|ipad/i.test(navigator.userAgent)) {
+      navigator.share(shareData).catch(() => {
+        navigator.clipboard.writeText(shareUrl);
+        setShareToast('Share link copied to clipboard!');
+        setTimeout(() => setShareToast(null), 3000);
+      });
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        setShareToast('Share link copied to clipboard! Social platforms will show the flyer graphic in the preview.');
+        setTimeout(() => setShareToast(null), 3500);
+      });
+    }
+  };
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -200,35 +239,167 @@ const Careers: React.FC = () => {
           </div>
 
           {jobs && jobs.length > 0 ? (
-            <div className="space-y-4 mb-12">
-              {jobs.map((job) => (
-                <div
-                  key={job.id}
-                  className="p-6 bg-white border border-slate-200 hover:border-slate-300 transition-all shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-xs">
-                      <span className="font-bold text-emerald-800 uppercase tracking-wider">
-                        {job.department}
-                      </span>
-                      <span className="text-slate-400">•</span>
-                      <span className="text-slate-500 font-medium">{job.location}</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900">{job.title}</h3>
-                    <p className="text-xs text-slate-600 max-w-xl line-clamp-2">{job.description}</p>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      setSelectedJob({ id: job.id, title: job.title });
-                      setIsFormModalOpen(true);
-                    }}
-                    className="px-5 py-2.5 bg-emerald-900 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shrink-0"
+            <div className="space-y-6 mb-12">
+              {jobs.map((job) => {
+                const isExpanded = expandedJobId === job.id;
+                return (
+                  <div
+                    key={job.id}
+                    id={job.id}
+                    className={`bg-white border transition-all duration-300 shadow-xs overflow-hidden ${
+                      isExpanded ? 'border-emerald-700 ring-2 ring-emerald-700/20 shadow-md' : 'border-slate-200 hover:border-slate-300'
+                    }`}
                   >
-                    Apply Now →
-                  </button>
-                </div>
-              ))}
+                    <div className="p-6 sm:p-8 flex flex-col md:flex-row gap-6 items-start">
+                      {/* Attached Flyer Preview Thumbnail */}
+                      {job.image_url ? (
+                        <div
+                          onClick={() => setFlyerModalImage({ url: job.image_url!, title: job.title })}
+                          className="relative w-full md:w-44 shrink-0 aspect-4/5 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shadow-xs cursor-pointer group"
+                        >
+                          <img
+                            src={job.image_url}
+                            alt={`${job.title} Hiring Flyer`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="px-2.5 py-1 bg-white/90 text-slate-950 text-xs font-black uppercase tracking-wider rounded-md shadow-md">
+                              Zoom Flyer
+                            </span>
+                          </div>
+                          <div className="absolute bottom-2 left-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-950/80 text-white backdrop-blur-xs text-center truncate">
+                            Official Flyer Attached
+                          </div>
+                        </div>
+                      ) : null}
+
+                      {/* Job Header & Overview */}
+                      <div className="flex-1 min-w-0 space-y-3">
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          <span className="font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200">
+                            {job.department}
+                          </span>
+                          <span className="text-slate-500 font-semibold flex items-center gap-1">
+                            📍 {job.location}
+                          </span>
+                          <span className="text-slate-400">•</span>
+                          <span className="text-slate-500 font-medium">
+                            💼 {job.type}
+                          </span>
+                          <span className="text-slate-400">•</span>
+                          <span className="text-slate-500 font-medium">
+                            ⏳ {job.experience_level}
+                          </span>
+                        </div>
+
+                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          {job.title}
+                        </h3>
+
+                        <p className="text-sm text-slate-600 leading-relaxed font-normal">
+                          {job.description}
+                        </p>
+
+                        {/* Action buttons */}
+                        <div className="pt-2 flex flex-wrap items-center gap-3">
+                          <button
+                            onClick={() => {
+                              setSelectedJob({ id: job.id, title: job.title });
+                              setIsFormModalOpen(true);
+                            }}
+                            className="px-6 py-2.5 bg-emerald-900 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-xs cursor-pointer"
+                          >
+                            Apply Now →
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setExpandedJobId(isExpanded ? null : job.id)}
+                            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs uppercase tracking-wider transition-colors border border-slate-300 cursor-pointer"
+                          >
+                            {isExpanded ? 'Hide Details ▲' : 'View Full Details & Requirements ▼'}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleShareJob(job)}
+                            className="px-3.5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs uppercase tracking-wider transition-colors border border-slate-300 flex items-center gap-1.5 cursor-pointer"
+                            title="Share job opening (with social flyer preview)"
+                          >
+                            <svg className="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                            </svg>
+                            <span>Share</span>
+                          </button>
+
+                          {job.image_url && (
+                            <button
+                              type="button"
+                              onClick={() => setFlyerModalImage({ url: job.image_url!, title: job.title })}
+                              className="px-3.5 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold text-xs uppercase tracking-wider transition-colors border border-emerald-200 flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <span>View Flyer 🖼️</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Expandable Key Responsibilities & Qualifications */}
+                    {isExpanded && (
+                      <div className="border-t border-slate-200 bg-slate-50/70 p-6 sm:p-8 space-y-6 animate-fadeIn">
+                        {job.responsibilities && job.responsibilities.length > 0 && (
+                          <div className="space-y-2">
+                            <h4 className="text-xs font-black uppercase tracking-wider text-emerald-900">
+                              Key Responsibilities:
+                            </h4>
+                            <ul className="space-y-1.5 text-xs sm:text-sm text-slate-700 list-disc list-inside">
+                              {job.responsibilities.map((resp: string, idx: number) => (
+                                <li key={idx} className="leading-relaxed">
+                                  {resp}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {job.requirements && job.requirements.length > 0 && (
+                          <div className="space-y-2">
+                            <h4 className="text-xs font-black uppercase tracking-wider text-emerald-900">
+                              Qualifications & Requirements:
+                            </h4>
+                            <ul className="space-y-1.5 text-xs sm:text-sm text-slate-700 list-disc list-inside">
+                              {job.requirements.map((req: string, idx: number) => (
+                                <li key={idx} className="leading-relaxed">
+                                  {req}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        <div className="pt-2 flex items-center justify-between">
+                          <button
+                            onClick={() => {
+                              setSelectedJob({ id: job.id, title: job.title });
+                              setIsFormModalOpen(true);
+                            }}
+                            className="px-6 py-2.5 bg-emerald-900 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-xs cursor-pointer"
+                          >
+                            Apply for {job.title} →
+                          </button>
+                          <button
+                            onClick={() => setExpandedJobId(null)}
+                            className="text-xs font-bold text-slate-500 hover:text-slate-800 uppercase cursor-pointer"
+                          >
+                            Collapse ▲
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className="bg-white border border-slate-200 p-12 text-center space-y-6 shadow-sm mb-8">
@@ -499,6 +670,57 @@ const Careers: React.FC = () => {
 
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Full Flyer Lightbox Modal */}
+      {flyerModalImage && (
+        <div 
+          onClick={() => setFlyerModalImage(null)}
+          className="fixed inset-0 z-60 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-w-lg w-full max-h-[90vh] flex flex-col items-center animate-scaleIn"
+          >
+            <div className="w-full flex items-center justify-between pb-3 text-white">
+              <h4 className="text-sm font-bold truncate max-w-xs">{flyerModalImage.title}</h4>
+              <button
+                onClick={() => setFlyerModalImage(null)}
+                className="p-1.5 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full cursor-pointer transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <img
+              src={flyerModalImage.url}
+              alt={flyerModalImage.title}
+              className="max-h-[80vh] w-auto object-contain rounded-2xl shadow-2xl border border-white/10"
+            />
+            <div className="pt-3 w-full flex justify-center">
+              <a
+                href={flyerModalImage.url}
+                download={`${flyerModalImage.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-flyer.jpg`}
+                className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-colors shadow-lg"
+              >
+                Download Flyer Graphic
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share Toast Notification */}
+      {shareToast && (
+        <div className="fixed bottom-6 right-6 z-60 bg-slate-950 text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-emerald-500/40 flex items-center space-x-3 animate-fade-in">
+          <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <p className="text-xs font-bold leading-snug">{shareToast}</p>
         </div>
       )}
     </div>

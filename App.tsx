@@ -354,6 +354,16 @@ const App: React.FC = () => {
     if (currentPath.startsWith('/blog/')) {
       return <BlogPost currentPath={currentPath} />;
     }
+    if (currentPath.startsWith('/careers/')) {
+      const careerId = currentPath.split('/careers/')[1]?.replace(/\/$/, '');
+      if (careerId && typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.pathname = '/careers';
+        url.searchParams.set('job', careerId);
+        window.history.replaceState(null, '', url.toString());
+      }
+      return <Careers />;
+    }
     switch (currentPath) {
       case '/':
         return <Home />;

@@ -455,76 +455,194 @@ const FALLBACK_TEAM_MEMBERS: CMSTeamMember[] = TEAM.map((member, idx) => ({
 
 const FALLBACK_JOBS: JobOpening[] = [
   {
-    id: 'job-1',
-    title: 'Senior Geotechnical / CPT Engineer',
-    department: 'Ground Intelligence',
-    location: 'Port Harcourt, Rivers State',
+    id: 'job-digital-asset-manager',
+    title: 'Digital Asset Manager',
+    department: 'Digital Intelligence & Marketing',
+    location: 'Port Harcourt (On-site)',
     type: 'Full-time',
-    experience_level: '5+ Years',
-    description: 'Lead onshore and swamp hydraulic cone penetration testing (CPTu), deep soil boring campaigns, foundation engineering, and laboratory data synthesis.',
+    experience_level: '3+ Years',
+    description: 'We are seeking a creative, organised and results-driven Digital Asset Manager to oversee and manage the company\'s digital presence across multiple platforms. The successful candidate will be responsible for managing social media channels, maintaining the corporate website, implementing SEO strategies, coordinating content distribution and supporting digital marketing initiatives to strengthen brand visibility and engagement.',
     requirements: [
-      'B.Eng / M.Sc in Civil / Geotechnical Engineering or Geology (COREN / COMEG registered)',
-      'Minimum 5 years active field experience with 20-tonne CPT rigs, pontoon drilling units, and soil mechanics',
-      'Proficiency with Plaxis, GeoStudio, or gINT geotechnical software',
-      'Strong HSSE compliance record in oilfield operating environments'
+      'Relevant experience in digital marketing, social media management, website administration or a related field.',
+      'Demonstrable knowledge of social media management and digital content strategies.',
+      'Experience managing websites and updating web content.',
+      'Understanding of SEO principles and digital marketing practices.',
+      'Strong written communication, organisation and analytical skills.',
+      'Ability to manage multiple digital platforms and meet deadlines.'
     ],
     responsibilities: [
-      'Supervise in-situ soil investigation, CPTu data logging, and borehole drilling',
-      'Perform bearing capacity, settlement, and slope stability calculations for energy structures',
-      'Prepare comprehensive, client-ready geotechnical engineering reports',
-      'Interface directly with client engineering teams and statutory regulators'
+      'Manage and maintain the company\'s social media platforms and develop content strategies.',
+      'Maintain and update corporate website content, functionality and user experience.',
+      'Implement search engine optimisation (SEO) strategies and conduct keyword research.',
+      'Coordinate publication and distribution of digital content ensuring brand consistency.',
+      'Support planning and execution of digital marketing campaigns and monitor performance.'
     ],
     status: 'active',
     display_order: 1,
-    created_at: '2026-01-15T08:00:00Z'
+    image_url: '/assets/careers/digital-asset-manager.jpg',
+    created_at: '2026-11-17T08:00:00Z'
   },
   {
-    id: 'job-2',
-    title: '3D Reality Capture & Laser Scanning Surveyor',
-    department: 'Digital Intelligence',
-    location: 'Lagos / Niger Delta Field Deployments',
+    id: 'job-hydrographic-surveyor',
+    title: 'Hydrographic Surveyor',
+    department: 'Marine & Coastal Intelligence',
+    location: 'Port Harcourt (On-site)',
     type: 'Full-time',
     experience_level: '3+ Years',
-    description: 'Deploy high-definition 3D laser scanners (Leica RTC360), perform point-cloud registration, and deliver As-Built BIM / CAD digital twins for brownfield facilities.',
+    description: 'We are hiring a Hydrographic Surveyor to plan and execute hydrographic survey operations in swamp, coastal and offshore environments. The successful candidate will acquire, validate and process bathymetric and positioning data, prepare charts, maps and reports that meet client and regulatory standards, and support dredging and construction activities with accurate seabed and underwater feature information.',
     requirements: [
-      'B.Sc / HND in Surveying & Geoinformatics, Mechanical, or Civil Engineering',
-      'Hands-on expertise with Leica Cyclone, Register 360, Autodesk Plant 3D, and Revit',
-      'Experience in brownfield oil and gas facilities, offshore platforms, and refinery piping',
-      'Valid BOSIET / OSP offshore certifications is an advantage'
+      'Strong competence in hydrographic surveying, including bathymetric surveys, positioning and modern survey software and instruments.',
+      'Experience supporting dredging and marine construction activities through accurate seabed characterisation and survey control.',
+      'Proficiency in data acquisition using hydrographic, geophysical and positioning systems.',
+      'Skills in data processing, including cleaning, validating and interpreting survey data, and generating charts, maps and digital deliverables.',
+      'Practical background in land surveying and geospatial measurements, including coordinate systems, datums and basic geomatics principles.',
+      'Bachelor\'s degree or equivalent in Surveying, Geomatics, Geophysics, Civil/Marine Engineering or a related technical discipline.',
+      'Familiarity with relevant hydrographic standards and guidelines, including IHO standards.',
+      'Experience working in swamp, coastal or offshore environments.'
     ],
     responsibilities: [
-      'Execute high-density terrestrial and mobile laser scanning on client sites',
-      'Process, register, and clean multi-station point-cloud datasets with sub-millimeter precision',
-      'Extract intelligent 3D CAD piping, structural steel, and equipment models',
-      'Perform dimensional control and clash detection analysis for pre-fabrication spools'
+      'Plan and execute hydrographic survey operations in swamp, coastal and offshore environments.',
+      'Handle mobilisation, calibration and operation of survey equipment and sensors.',
+      'Acquire, validate and process bathymetric and positioning data.',
+      'Clean, validate and interpret survey data to generate charts, maps and digital deliverables.',
+      'Prepare charts, maps and reports that meet client and regulatory standards.',
+      'Support dredging and construction activities with accurate seabed and underwater feature information.',
+      'Collaborate with project engineers, geophysicists and other field teams to ensure data quality and HSE compliance.'
     ],
     status: 'active',
     display_order: 2,
-    created_at: '2026-02-01T08:00:00Z'
+    image_url: '/assets/careers/hydrographic-surveyor.jpg',
+    created_at: '2026-11-17T08:00:00Z'
   },
   {
-    id: 'job-3',
-    title: 'Marine & Metocean Systems Specialist',
-    department: 'Offshore Intelligence',
-    location: 'Port Harcourt / Offshore Bonny',
+    id: 'job-project-surveyor',
+    title: 'Project Surveyor',
+    department: 'Geospatial & Geomatics',
+    location: 'Port Harcourt (On-site)',
     type: 'Full-time',
     experience_level: '4+ Years',
-    description: 'Operate, calibrate, and maintain oceanographic observation buoys, wave telemetry stations, meteorological loggers, and hydrographic survey equipment.',
+    description: 'We are seeking an experienced Project Surveyor to plan, coordinate and execute land, swamp and offshore surveying activities in support of geophysical, geotechnical, pipeline, civil and asset integrity projects. The successful candidate will ensure accurate positioning and mapping for project deliverables, prepare survey reports and drawings, and maintain data integrity in line with company quality standards.',
     requirements: [
-      'Degree in Oceanography, Marine Science, Electronic Engineering, or Marine Geophysics',
-      'Experience with oceanographic sensors (ADCP, CTD, wave sensors, telemetry units)',
-      'Familiarity with marine navigation, satellite data transmission, and solar power systems',
-      'Valid Offshore Safety Permit (OSP) and BOSIET certification'
+      'Strong technical surveying skills, including land and engineering surveying, geospatial data collection and GNSS/GPS operation.',
+      'Familiarity with geomatics and mapping workflows.',
+      'Proficiency in surveying and design software, including AutoCAD or similar CAD tools, GIS platforms and survey data processing applications.',
+      'Experience supporting projects in the energy or infrastructure sectors, ideally across swamp, land and offshore environments.',
+      'Understanding of project management fundamentals, including fieldwork planning, resource coordination and meeting project timelines.',
+      'Knowledge of HSE principles and safe field operations.',
+      'Excellent analytical, numerical and problem-solving abilities.',
+      'Effective communication and teamwork skills.',
+      'Bachelor\'s degree or equivalent in Surveying, Geomatics or a related discipline.'
     ],
     responsibilities: [
-      'Deploy and service oceanographic telemetry buoys and coastal weather stations',
-      'Monitor real-time marine data streams and validate oceanographic observations',
-      'Troubleshoot sensor arrays, marine telemetry transmitters, and mooring assemblies',
-      'Produce technical metocean summaries for offshore operational safety'
+      'Plan, coordinate and execute land, swamp and offshore surveying activities.',
+      'Prepare survey plans and ensure accurate positioning and mapping for project deliverables.',
+      'Collect and validate field data, operating and supervising the use of survey instruments and GNSS equipment.',
+      'Prepare survey reports and drawings, maintaining data integrity in line with company quality standards.',
+      'Collaborate with project managers, engineers and field teams, and interface with clients when required.',
+      'Support HSE compliance, promote safe field operations, and assist in training and mentoring junior team members.'
     ],
     status: 'active',
     display_order: 3,
-    created_at: '2026-02-10T08:00:00Z'
+    image_url: '/assets/careers/project-surveyor.jpg',
+    created_at: '2026-11-17T08:00:00Z'
+  },
+  {
+    id: 'job-geophysical-surveyor',
+    title: 'Geophysical Surveyor',
+    department: 'Geophysical Exploration',
+    location: 'Port Harcourt (On-site)',
+    type: 'Full-time',
+    experience_level: '3+ Years',
+    description: 'We are hiring a Geophysical Surveyor to plan, execute and supervise geophysical surveys across swamp, land and offshore project sites in support of energy and infrastructure projects. The successful candidate will acquire high-quality field data, ensure adherence to safety and quality standards, and deliver clear technical reports and maps.',
+    requirements: [
+      'Strong geophysical surveying skills, including experience with seismic, magnetic, gravity, resistivity or other near-surface geophysical methods.',
+      'Practical experience in field data acquisition and quality control.',
+      'Competence in data processing and interpretation using relevant geophysical software tools.',
+      'Ability to produce clear maps, profiles and technical documentation.',
+      'Knowledge of survey design, positioning systems and integration with geomatics/GIS.',
+      'Basic understanding of UAV mapping and related spatial data workflows.',
+      'Sound understanding of HSE principles and field operations in swamp, land and offshore environments.',
+      'Excellent analytical, problem-solving and report-writing skills.',
+      'Bachelor\'s degree in Geophysics, Geology, Surveying, Earth Sciences or a closely related discipline.',
+      'Relevant professional certifications and proven experience in geophysical fieldwork within the energy or infrastructure sectors.'
+    ],
+    responsibilities: [
+      'Plan, execute and supervise geophysical surveys across swamp, land and offshore project sites.',
+      'Handle survey design and field mobilisation.',
+      'Operate and maintain geophysical instruments, acquiring high-quality field data with strict quality control.',
+      'Carry out preliminary interpretation and prepare technical reports, maps and profiles.',
+      'Assist in integrating geophysical results with geotechnical and environmental data.',
+      'Collaborate closely with project engineers, geoscientists and geomatics teams.',
+      'Comply with HSSE procedures and support training and mentoring of junior field staff.'
+    ],
+    status: 'active',
+    display_order: 4,
+    image_url: '/assets/careers/geophysical-surveyor.jpg',
+    created_at: '2026-11-17T08:00:00Z'
+  },
+  {
+    id: 'job-data-processor-marine-survey',
+    title: 'Data Processor – Marine Survey',
+    department: 'Marine Survey & Data Processing',
+    location: 'Port Harcourt (On-site)',
+    type: 'Full-time',
+    experience_level: '2+ Years',
+    description: 'We are seeking a detail-oriented Data Processor for Marine Survey to process, validate and interpret marine geophysical and geospatial data collected during offshore and nearshore survey operations. The successful candidate will generate accurate charts, maps and reports for internal teams and client deliverables, ensuring data consistency, adherence to applicable standards and timely delivery.',
+    requirements: [
+      'Strong data handling and data entry skills, with attention to detail and accuracy when processing large datasets.',
+      'Effective communication and collaboration skills to interface with project teams and support client deliverables.',
+      'Proficiency in Computer-Aided Design (CAD) tools for generating and editing survey drawings, maps and technical documentation.',
+      'Basic understanding of construction and marine project workflows.',
+      'Relevant experience in marine, geophysical or geospatial data processing, preferably within the energy or offshore sector.',
+      'Competence with survey and GIS software, including hydrographic processing tools and GIS platforms.',
+      'Strong analytical and problem-solving abilities with dedication to meeting deadlines.',
+      'Diploma or degree in Geosciences, Geomatics, Engineering, Surveying or a related technical discipline.'
+    ],
+    responsibilities: [
+      'Import raw survey data and perform rigorous quality control checks.',
+      'Apply corrections and process marine geophysical and geospatial data.',
+      'Validate and interpret survey data to generate accurate charts, maps and reports.',
+      'Work closely with surveyors, engineers and project managers to ensure consistency and timely delivery.',
+      'Support preparation of client-facing deliverables and documentation.',
+      'Maintain data management systems and contribute to continuous improvement of processing workflows.'
+    ],
+    status: 'active',
+    display_order: 5,
+    image_url: '/assets/careers/data-processor-marine-survey.jpg',
+    created_at: '2026-11-17T08:00:00Z'
+  },
+  {
+    id: 'job-project-manager',
+    title: 'Project Manager',
+    department: 'Project Management & Operations',
+    location: 'Port Harcourt (On-site)',
+    type: 'Full-time',
+    experience_level: '5+ Years',
+    description: 'We are hiring a Project Manager to oversee the planning, execution, monitoring and completion of engineering and geosolutions projects, ensuring alignment with client requirements, safety standards and quality benchmarks. The successful candidate will coordinate multidisciplinary teams, manage project schedules and budgets, and handle resource allocation across swamp, land and offshore environments.',
+    requirements: [
+      'Strong project management skills, including project planning, execution, monitoring and stakeholder coordination.',
+      'Experience in expediting and working as an Expeditor to ensure timely procurement and delivery of project materials and services.',
+      'Proficiency in inspection activities, including quality control, vendor inspection and compliance with engineering standards.',
+      'Capabilities in logistics management, including transportation, warehousing and field support across varied terrains.',
+      'Bachelor\'s degree in Engineering, Project Management or a related technical discipline. PMP or PRINCE2 is an advantage.',
+      'Demonstrated experience managing projects in the energy, engineering or geospatial services sectors, preferably in swamp, land or offshore environments.',
+      'Solid understanding of HSSE standards, quality assurance frameworks and ISO-compliant procedures.',
+      'Excellent communication, leadership and problem-solving skills.',
+      'Proficiency in project management software and MS Office tools for scheduling, reporting and documentation.',
+      'Ability to work on-site in Port Harcourt and travel to field locations as required.'
+    ],
+    responsibilities: [
+      'Oversee planning, execution, monitoring and completion of engineering and geosolutions projects.',
+      'Manage project schedules, budgets and resource allocation across swamp, land and offshore environments.',
+      'Coordinate multidisciplinary teams and liaise closely with expediting, logistics, inspection and technical personnel.',
+      'Lead stakeholder communication, prepare progress reports, mitigate risks and solve operational challenges.',
+      'Ensure strict compliance with project specifications, quality benchmarks and HSSE procedures.',
+      'Support continuous improvement initiatives and contribute to strategic planning for corporate growth.'
+    ],
+    status: 'active',
+    display_order: 6,
+    image_url: '/assets/careers/project-manager.jpg',
+    created_at: '2026-11-17T08:00:00Z'
   }
 ];
 
@@ -3325,14 +3443,33 @@ export const useTestimonials = (adminMode = false) => {
 // ==============================================================================
 // 10. CAREERS & JOB OPENINGS HOOK
 // ==============================================================================
+export const parseJobImageFromDescription = (description?: string): string => {
+  if (!description) return '';
+  const match = description.match(/<!--\s*pigl_job_image:\s*([^\s>]+)\s*-->/);
+  return match ? match[1] : '';
+};
+
+export const enrichJobWithImage = (j: JobOpening): JobOpening => {
+  const extracted = parseJobImageFromDescription(j.description);
+  const cleanDesc = (j.description || '').replace(/\s*<!--\s*pigl_job_image:\s*[\s\S]*?-->\s*$/g, '').trim();
+  return {
+    ...j,
+    description: cleanDesc,
+    image_url: j.image_url || extracted || ''
+  };
+};
+
 export const getStoredJobs = (): JobOpening[] => {
   try {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY_JOBS);
-    if (saved) return JSON.parse(saved);
+    if (saved) {
+      const parsed: JobOpening[] = JSON.parse(saved);
+      return parsed.map(enrichJobWithImage);
+    }
   } catch (e) {
     console.warn('Failed to load local jobs', e);
   }
-  return FALLBACK_JOBS;
+  return FALLBACK_JOBS.map(enrichJobWithImage);
 };
 
 export const saveStoredJobs = (jobs: JobOpening[]) => {
@@ -3367,7 +3504,7 @@ export const useJobOpenings = (adminMode = false) => {
       if (error) throw error;
 
       if (data && data.length > 0) {
-        setJobs(data as JobOpening[]);
+        setJobs((data as JobOpening[]).map(enrichJobWithImage));
       } else {
         const local = getStoredJobs();
         setJobs(adminMode ? local : local.filter(j => j.status === 'active'));
@@ -3389,28 +3526,42 @@ export const useJobOpenings = (adminMode = false) => {
     const isNew = !job.id;
     const now = new Date().toISOString();
 
+    const rawDesc = (job.description || '').replace(/\s*<!--\s*pigl_job_image:\s*[\s\S]*?-->\s*$/g, '').trim();
+    const imageUrl = job.image_url || '';
+    const descWithImage = imageUrl ? `${rawDesc}\n\n<!-- pigl_job_image: ${imageUrl} -->` : rawDesc;
+
     const payload: JobOpening = {
       id: job.id || `job-${Date.now()}`,
       title: job.title,
       department: job.department,
-      location: job.location || 'Port Harcourt / Lagos, Nigeria',
+      location: job.location || 'Port Harcourt (On-site)',
       type: job.type || 'Full-time',
       experience_level: job.experience_level || '3+ Years',
-      description: job.description || '',
+      description: rawDesc,
       requirements: job.requirements || [],
       responsibilities: job.responsibilities || [],
       status: job.status || 'active',
       display_order: job.display_order || 1,
+      image_url: imageUrl,
       created_at: job.created_at || now
     };
 
     if (client) {
       try {
-        if (isNew) {
-          await client.from('job_openings').insert([payload]);
-        } else {
-          await client.from('job_openings').update(payload).eq('id', payload.id);
-        }
+        const dbPayload: any = {
+          id: payload.id,
+          title: payload.title,
+          department: payload.department,
+          location: payload.location,
+          type: payload.type,
+          experience_level: payload.experience_level,
+          description: descWithImage,
+          requirements: payload.requirements,
+          responsibilities: payload.responsibilities,
+          status: payload.status,
+          display_order: payload.display_order
+        };
+        await client.from('job_openings').upsert(dbPayload);
       } catch (err) {
         console.warn('Supabase job save error:', err);
       }

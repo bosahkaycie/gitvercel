@@ -253,6 +253,7 @@ export interface JobOpening {
   responsibilities: string[];
   status: 'active' | 'closed' | 'draft';
   display_order: number;
+  image_url?: string;
   created_at?: string;
 }
 

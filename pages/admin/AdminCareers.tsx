@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { JobApplication, JobOpening } from '../../types';
 import {
   IconCareers,
@@ -11,7 +11,11 @@ import {
   IconClose,
   IconFileText,
   IconPhone,
-  IconMail
+  IconMail,
+  IconUpload,
+  IconCopy,
+  IconShare,
+  IconEye
 } from '../../components/admin/AdminIcons';
 
 interface AdminCareersProps {
@@ -64,6 +68,11 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
   const [jobReqsStr, setJobReqsStr] = useState('');
   const [jobRespStr, setJobRespStr] = useState('');
   const [jobStatus, setJobStatus] = useState<'active' | 'closed' | 'draft'>('active');
+  const [jobImage, setJobImage] = useState<string>('');
+  const [imageInputMode, setImageInputMode] = useState<'upload' | 'url'>('upload');
+  const [copiedJobId, setCopiedJobId] = useState<string | null>(null);
+  const [previewFlyerUrl, setPreviewFlyerUrl] = useState<string | null>(null);
+  const jobFileInputRef = useRef<HTMLInputElement>(null);
 
   const isDark = theme === 'dark';
   const handleUpdateStatus = onUpdateApplicationStatus || onUpdateAppStatus || (async () => {});
@@ -91,17 +100,47 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
     setUpdatingApp(false);
   };
 
+  // Local Image Upload from device storage
+  const handleJobImageFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file (PNG, JPG, JPEG, WEBP).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        setJobImage(dataUrl);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCopyJobShareLink = (jobId: string) => {
+    const shareUrl = `https://polarisigl.com/careers?job=${encodeURIComponent(jobId)}`;
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setCopiedJobId(jobId);
+      setTimeout(() => setCopiedJobId(null), 2500);
+    });
+  };
+
   const openCreateJobModal = () => {
     setEditingJob(null);
     setJobTitle('');
     setJobDept('Ground Intelligence');
-    setJobLocation('Port Harcourt, Rivers State');
+    setJobLocation('Port Harcourt (On-site)');
     setJobType('Full-time');
     setJobExp('3+ Years');
     setJobDesc('');
     setJobReqsStr('');
     setJobRespStr('');
     setJobStatus('active');
+    setJobImage('');
+    setImageInputMode('upload');
     setIsJobModalOpen(true);
   };
 
@@ -116,6 +155,8 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
     setJobReqsStr(job.requirements.join('\n'));
     setJobRespStr(job.responsibilities.join('\n'));
     setJobStatus(job.status);
+    setJobImage(job.image_url || '');
+    setImageInputMode(job.image_url && job.image_url.startsWith('data:') ? 'upload' : 'url');
     setIsJobModalOpen(true);
   };
 
@@ -136,7 +177,8 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
       description: jobDesc,
       requirements,
       responsibilities,
-      status: jobStatus
+      status: jobStatus,
+      image_url: jobImage
     });
 
     setIsJobModalOpen(false);
@@ -396,6 +438,34 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
               }`}
             >
               <div className="space-y-3">
+                {/* Flyer graphic thumbnail */}
+                {job.image_url ? (
+                  <div className="relative w-full aspect-4/5 rounded-xl overflow-hidden bg-slate-950/20 border border-slate-200 dark:border-slate-800 group">
+                    <img
+                      src={job.image_url}
+                      alt={job.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setPreviewFlyerUrl(job.image_url!)}
+                        className="px-3 py-1.5 bg-white/90 hover:bg-white text-slate-900 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-md cursor-pointer"
+                      >
+                        <IconEye className="w-3.5 h-3.5" />
+                        <span>View Flyer</span>
+                      </button>
+                    </div>
+                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-950/80 text-white backdrop-blur-xs">
+                      Flyer Attached
+                    </span>
+                  </div>
+                ) : (
+                  <div className="w-full py-4 px-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 text-center text-xs text-slate-400">
+                    No flyer graphic attached
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
                     {job.department}
@@ -422,25 +492,43 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                 </p>
               </div>
 
-              <div className={`pt-4 mt-4 border-t flex items-center justify-between ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
-                <button
-                  onClick={() => openEditJobModal(job)}
-                  className={`inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                    isDark 
-                      ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border border-emerald-800/50' 
-                      : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border border-emerald-200'
-                  }`}
-                >
-                  <IconEdit className="w-3.5 h-3.5" />
-                  <span>Edit Role</span>
-                </button>
+              <div className={`pt-4 mt-4 border-t flex items-center justify-between gap-2 ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => openEditJobModal(job)}
+                    className={`inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                      isDark 
+                        ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border border-emerald-800/50' 
+                        : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border border-emerald-200'
+                    }`}
+                  >
+                    <IconEdit className="w-3.5 h-3.5" />
+                    <span>Edit</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleCopyJobShareLink(job.id)}
+                    className={`inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors border cursor-pointer ${
+                      copiedJobId === job.id
+                        ? 'bg-emerald-600 text-white border-emerald-600'
+                        : isDark
+                          ? 'bg-slate-800 text-slate-300 hover:text-white border-slate-700'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'
+                    }`}
+                    title="Copy shareable link with flyer preview"
+                  >
+                    {copiedJobId === job.id ? <IconCheck className="w-3.5 h-3.5" /> : <IconShare className="w-3.5 h-3.5" />}
+                    <span>{copiedJobId === job.id ? 'Copied!' : 'Share'}</span>
+                  </button>
+                </div>
+
                 <button
                   onClick={() => {
                     if (confirm(`Delete vacancy "${job.title}"?`)) {
                       onDeleteJob(job.id);
                     }
                   }}
-                  className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-rose-500 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg text-xs font-bold transition-colors"
+                  className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-rose-500 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg text-xs font-bold transition-colors cursor-pointer"
                 >
                   <IconTrash className="w-3.5 h-3.5" />
                   <span>Remove</span>
@@ -667,6 +755,168 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                 </div>
               </div>
 
+              {/* Job Flyer / Promotional Graphic from Local Storage or URL */}
+              <div className="space-y-2 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
+                <div className="flex items-center justify-between">
+                  <label className={`block text-xs font-bold uppercase ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
+                    Job Flyer / Promotional Graphic
+                  </label>
+                  <div className="flex items-center space-x-1 bg-slate-200/70 dark:bg-slate-800 p-0.5 rounded-lg">
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode('upload')}
+                      className={`px-2 py-0.5 text-[11px] font-bold rounded-md transition-all cursor-pointer ${
+                        imageInputMode === 'upload'
+                          ? 'bg-white dark:bg-emerald-600 text-slate-900 dark:text-white shadow-xs'
+                          : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      Local File
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageInputMode('url')}
+                      className={`px-2 py-0.5 text-[11px] font-bold rounded-md transition-all cursor-pointer ${
+                        imageInputMode === 'url'
+                          ? 'bg-white dark:bg-emerald-600 text-slate-900 dark:text-white shadow-xs'
+                          : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      Presets / URL
+                    </button>
+                  </div>
+                </div>
+
+                {imageInputMode === 'upload' ? (
+                  <div>
+                    <input
+                      ref={jobFileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleJobImageFile}
+                      className="hidden"
+                    />
+
+                    {jobImage ? (
+                      <div className="relative rounded-xl border p-3 flex items-center space-x-3 bg-emerald-500/5 border-emerald-500/30">
+                        <img
+                          src={jobImage}
+                          alt="Job flyer preview"
+                          className="w-14 h-18 object-cover rounded-lg border border-emerald-500/40 shadow-xs"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                            Flyer attached from storage
+                          </p>
+                          <p className={`text-[11px] truncate mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                            {jobImage.startsWith('data:') ? 'Local storage image file' : jobImage}
+                          </p>
+                          <div className="flex items-center space-x-2 mt-2">
+                            <button
+                              type="button"
+                              onClick={() => jobFileInputRef.current?.click()}
+                              className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
+                            >
+                              Choose Different File
+                            </button>
+                            <span className="text-slate-400">•</span>
+                            <button
+                              type="button"
+                              onClick={() => setJobImage('')}
+                              className="text-[11px] font-bold text-rose-500 hover:underline cursor-pointer"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => jobFileInputRef.current?.click()}
+                        className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors ${
+                          isDark
+                            ? 'border-slate-700 hover:border-emerald-500 bg-slate-950/40 hover:bg-slate-950/70'
+                            : 'border-slate-300 hover:border-emerald-600 bg-white hover:bg-emerald-50/30'
+                        }`}
+                      >
+                        <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center mb-1.5">
+                          <IconUpload className="w-4 h-4" />
+                        </div>
+                        <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                          Upload flyer image from local storage
+                        </p>
+                        <p className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                          PNG, JPG, JPEG, or WEBP (used in job listing & link previews)
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={jobImage}
+                      onChange={(e) => setJobImage(e.target.value)}
+                      placeholder="e.g. /assets/careers/project-surveyor.jpg or https://..."
+                      className={`w-full px-3 py-2 border rounded-xl font-mono text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+                        isDark ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-400 focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-950 placeholder:text-slate-400 focus:border-emerald-600 shadow-2xs'
+                      }`}
+                    />
+                    
+                    {/* Official Presets */}
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      <span className={`text-[10px] font-bold uppercase self-center mr-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                        PIGL Flyers:
+                      </span>
+                      {[
+                        { label: 'Digital Asset Mgr', path: '/assets/careers/digital-asset-manager.jpg' },
+                        { label: 'Hydrographic', path: '/assets/careers/hydrographic-surveyor.jpg' },
+                        { label: 'Project Surveyor', path: '/assets/careers/project-surveyor.jpg' },
+                        { label: 'Geophysical', path: '/assets/careers/geophysical-surveyor.jpg' },
+                        { label: 'Data Processor', path: '/assets/careers/data-processor-marine-survey.jpg' },
+                        { label: 'Project Mgr', path: '/assets/careers/project-manager.jpg' }
+                      ].map((preset) => (
+                        <button
+                          key={preset.path}
+                          type="button"
+                          onClick={() => setJobImage(preset.path)}
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors border cursor-pointer ${
+                            jobImage === preset.path
+                              ? 'bg-emerald-600 text-white border-emerald-600'
+                              : isDark
+                                ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                          }`}
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {jobImage && (
+                      <div className="mt-2 flex items-center space-x-3 p-2 border rounded-lg border-emerald-500/30 bg-emerald-500/5">
+                        <img
+                          src={jobImage}
+                          alt="Flyer preview"
+                          className="w-10 h-14 object-cover rounded border border-emerald-500/40"
+                          onError={(e) => ((e.target as HTMLElement).style.display = 'none')}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 truncate">{jobImage}</p>
+                          <button
+                            type="button"
+                            onClick={() => setJobImage('')}
+                            className="text-[10px] font-bold text-rose-500 hover:underline mt-0.5 cursor-pointer"
+                          >
+                            Clear flyer
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <div>
                 <label className={`block text-xs font-bold uppercase mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>Role Overview</label>
                 <textarea
@@ -721,6 +971,25 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Flyer Image Preview Lightbox Modal */}
+      {previewFlyerUrl && (
+        <div className="fixed inset-0 z-60 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="relative max-w-lg w-full max-h-[90vh] flex flex-col items-center">
+            <button
+              onClick={() => setPreviewFlyerUrl(null)}
+              className="absolute -top-12 right-0 p-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full cursor-pointer transition-colors"
+            >
+              <IconClose className="w-6 h-6" />
+            </button>
+            <img
+              src={previewFlyerUrl}
+              alt="Hiring Flyer"
+              className="max-h-[85vh] w-auto object-contain rounded-2xl shadow-2xl border border-white/10"
+            />
           </div>
         </div>
       )}
