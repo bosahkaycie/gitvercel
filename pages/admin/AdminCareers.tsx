@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { JobApplication, JobOpening } from '../../types';
+import { useSiteSettings } from '../../hooks/useSupabaseData';
 import {
   IconCareers,
   IconPlus,
@@ -77,6 +78,30 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
   const isDark = theme === 'dark';
   const handleUpdateStatus = onUpdateApplicationStatus || onUpdateAppStatus || (async () => {});
   const handleDeleteApplication = onDeleteApplication || onDeleteApp || (async () => {});
+
+  const { settings, saveSettings } = useSiteSettings();
+  const [isTogglingGeneralApp, setIsTogglingGeneralApp] = useState(false);
+  const [toggleToast, setToggleToast] = useState<string | null>(null);
+
+  const generalAppEnabled = settings?.enable_general_application !== false;
+
+  const handleToggleGeneralApp = async () => {
+    setIsTogglingGeneralApp(true);
+    const nextState = !generalAppEnabled;
+    try {
+      await saveSettings({ enable_general_application: nextState });
+      setToggleToast(
+        nextState
+          ? 'General Talent Network Submission turned ON (visible on Careers page)'
+          : 'General Talent Network Submission turned OFF (hidden from Careers page)'
+      );
+      setTimeout(() => setToggleToast(null), 3500);
+    } catch (e) {
+      console.error('Failed to toggle general application:', e);
+    } finally {
+      setIsTogglingGeneralApp(false);
+    }
+  };
 
   const filteredApps = applications.filter(app => {
     const matchesStatus = statusFilter === 'All' || app.status === statusFilter;
@@ -268,6 +293,62 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
               <span>Post New Vacancy</span>
             </button>
           )}
+        </div>
+      </div>
+
+      {/* Toast Notification */}
+      {toggleToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-emerald-950 border border-emerald-500/40 text-emerald-200 px-5 py-3 rounded-xl shadow-2xl text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-fadeIn">
+          <IconCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>{toggleToast}</span>
+        </div>
+      )}
+
+      {/* General Application Toggle Switch Banner */}
+      <div className={`p-4 sm:p-5 rounded-2xl border shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors ${
+        isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
+      }`}>
+        <div className="flex items-start sm:items-center space-x-3.5">
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+            generalAppEnabled
+              ? isDark ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+              : isDark ? 'bg-slate-800 text-slate-400 border border-slate-700' : 'bg-slate-100 text-slate-500 border border-slate-200'
+          }`}>
+            <IconFileText className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-sm font-bold tracking-tight">General Talent Network Application</h3>
+              <span className={`px-2 py-0.5 rounded text-[11px] font-black uppercase tracking-wider ${
+                generalAppEnabled
+                  ? isDark ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/50' : 'bg-emerald-100 text-emerald-900'
+                  : isDark ? 'bg-amber-950/80 text-amber-300 border border-amber-800/50' : 'bg-amber-100 text-amber-900'
+              }`}>
+                {generalAppEnabled ? 'Active / Visible' : 'Off / Hidden'}
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 max-w-2xl">
+              {generalAppEnabled
+                ? 'The General Talent Network Submission card is currently visible at the bottom of the careers page.'
+                : 'Turned off. Candidates will focus exclusively on active listed job postings.'}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-3 shrink-0 self-end md:self-center pt-2 md:pt-0">
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={generalAppEnabled}
+              onChange={handleToggleGeneralApp}
+              disabled={isTogglingGeneralApp}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+          </label>
+          <span className="text-xs font-bold text-slate-700 dark:text-slate-300 select-none">
+            {generalAppEnabled ? 'Enabled' : 'Disabled'}
+          </span>
         </div>
       </div>
 

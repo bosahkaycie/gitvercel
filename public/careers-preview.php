@@ -164,6 +164,46 @@ $fallbackJobs = [
         'experience_level' => '5+ Years',
         'description' => 'We are hiring a Project Manager to oversee the planning, execution, monitoring and completion of engineering and geosolutions projects.',
         'image_url' => 'https://polarisigl.com/assets/careers/project-manager.jpg'
+    ],
+    'job-pipeline-facilities-project-engineer' => [
+        'id' => 'job-pipeline-facilities-project-engineer',
+        'title' => 'Pipeline & Facilities Project Engineer',
+        'department' => 'Pipeline & Facility Construction',
+        'location' => 'Port Harcourt (On-site)',
+        'type' => 'Full-time',
+        'experience_level' => '4+ Years',
+        'description' => 'We are hiring a Pipeline & Facilities Project Engineer to plan, coordinate, and oversee pipeline and facility construction activities.',
+        'image_url' => 'https://polarisigl.com/assets/careers/pipeline-facilities-project-engineer.jpg'
+    ],
+    'pipeline-facilities-project-engineer' => [
+        'id' => 'job-pipeline-facilities-project-engineer',
+        'title' => 'Pipeline & Facilities Project Engineer',
+        'department' => 'Pipeline & Facility Construction',
+        'location' => 'Port Harcourt (On-site)',
+        'type' => 'Full-time',
+        'experience_level' => '4+ Years',
+        'description' => 'We are hiring a Pipeline & Facilities Project Engineer to plan, coordinate, and oversee pipeline and facility construction activities.',
+        'image_url' => 'https://polarisigl.com/assets/careers/pipeline-facilities-project-engineer.jpg'
+    ],
+    'job-civil-engineer-geotechnical' => [
+        'id' => 'job-civil-engineer-geotechnical',
+        'title' => 'Civil Engineer – Geotechnical',
+        'department' => 'Civil & Geotechnical Engineering',
+        'location' => 'Port Harcourt (On-site)',
+        'type' => 'Full-time',
+        'experience_level' => '3+ Years',
+        'description' => 'We are hiring a Civil Engineer – Geotechnical to plan, execute, and supervise geotechnical investigations for civil and energy projects.',
+        'image_url' => 'https://polarisigl.com/assets/careers/civil-engineer-geotechnical.jpg'
+    ],
+    'civil-engineer-geotechnical' => [
+        'id' => 'job-civil-engineer-geotechnical',
+        'title' => 'Civil Engineer – Geotechnical',
+        'department' => 'Civil & Geotechnical Engineering',
+        'location' => 'Port Harcourt (On-site)',
+        'type' => 'Full-time',
+        'experience_level' => '3+ Years',
+        'description' => 'We are hiring a Civil Engineer – Geotechnical to plan, execute, and supervise geotechnical investigations for civil and energy projects.',
+        'image_url' => 'https://polarisigl.com/assets/careers/civil-engineer-geotechnical.jpg'
     ]
 ];
 

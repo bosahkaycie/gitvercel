@@ -311,6 +311,7 @@ export interface SiteSettings {
   stat_completed_projects?: string;
   stat_client_satisfaction?: string;
   hero_slide_interval?: number;
+  enable_general_application?: boolean;
   maintenance_mode?: boolean;
   maintenance_title?: string;
   maintenance_message?: string;

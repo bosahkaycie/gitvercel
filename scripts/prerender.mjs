@@ -359,6 +359,38 @@ const routes = [
     `
   },
   {
+    path: '/careers/job-pipeline-facilities-project-engineer',
+    title: 'Pipeline & Facilities Project Engineer | PIGL Careers Nigeria',
+    description: 'We are hiring a Pipeline & Facilities Project Engineer to plan, coordinate, and oversee pipeline and facility construction activities. Port Harcourt on-site role.',
+    badge: 'Active Vacancy',
+    h1: 'Pipeline & Facilities Project Engineer',
+    intro: 'Location: Port Harcourt (On-site) • Employment Type: Full-time • Experience: 4+ Years',
+    sectionsHtml: `
+      <section style="margin-bottom: 2rem;">
+        <h2 style="color: #34d399; font-size: 1.4rem;">About the Role</h2>
+        <p style="color: #cbd5e1; line-height: 1.7;">
+          Oversee pipeline and facility construction activities, coordinate with field teams and contractors, and ensure quality, cost, and timelines are managed effectively.
+        </p>
+      </section>
+    `
+  },
+  {
+    path: '/careers/job-civil-engineer-geotechnical',
+    title: 'Civil Engineer – Geotechnical | PIGL Careers Nigeria',
+    description: 'We are hiring a Civil Engineer – Geotechnical to plan, execute, and supervise geotechnical investigations for civil and energy projects. Port Harcourt on-site role.',
+    badge: 'Active Vacancy',
+    h1: 'Civil Engineer – Geotechnical',
+    intro: 'Location: Port Harcourt (On-site) • Employment Type: Full-time • Experience: 3+ Years',
+    sectionsHtml: `
+      <section style="margin-bottom: 2rem;">
+        <h2 style="color: #34d399; font-size: 1.4rem;">About the Role</h2>
+        <p style="color: #cbd5e1; line-height: 1.7;">
+          Plan, execute, and supervise geotechnical investigations, interpret field and lab data, and provide sound engineering recommendations for foundations and earthworks.
+        </p>
+      </section>
+    `
+  },
+  {
     path: '/hsse',
     title: 'HSSEQ Standards & ISO Certifications | PIGL Safety Governance',
     description: 'Health, Safety, Security, Environment, and Quality (HSSEQ) governance at PIGL. Certified to ISO 9001:2015 and ISO 45001:2018 with over 500,000+ safe man-hours and zero Lost Time Injuries (LTI) across all onshore and offshore campaigns.',

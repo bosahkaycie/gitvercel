@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useJobOpenings, submitJobApplication, usePageHeaders } from '../hooks/useSupabaseData';
+import { useJobOpenings, submitJobApplication, usePageHeaders, useSiteSettings } from '../hooks/useSupabaseData';
 import EngineerImg from '../assets/teaching.jpeg';
 import CareersBg from '../assets/inspiring_next_gen.jpeg';
 import ReflectiveEnergyLine from '../components/ReflectiveEnergyLine';
 
 const Careers: React.FC = () => {
   const { jobs, loading: jobsLoading } = useJobOpenings();
+  const { settings } = useSiteSettings();
   const { getPageHeader } = usePageHeaders();
   const pageHeader = getPageHeader('careers');
   const breadcrumbImage = pageHeader.effective_image || CareersBg;
+  const showGeneralApplication = settings?.enable_general_application !== false;
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<{ id?: string; title?: string } | null>(null);
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', coverLetter: '' });
@@ -350,24 +352,26 @@ const Careers: React.FC = () => {
             </div>
           )}
 
-          {/* General Talent Network Card */}
-          <div className="p-8 md:p-12 bg-white border border-slate-200 text-center shadow-sm rounded-xl max-w-3xl mx-auto">
-            <h3 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">General Talent Network Submission</h3>
-            <p className="text-slate-600 mb-6 font-normal text-sm max-w-lg mx-auto leading-relaxed">
-              Don't see an exact match? Send your CV directly to our engineering desk for consideration in surveying, geophysics, marine operations, and reality capture.
-            </p>
-            <div className="flex justify-center">
-              <button 
-                onClick={() => {
-                  setSelectedJob(null);
-                  setIsFormModalOpen(true);
-                }}
-                className="inline-flex items-center justify-center px-8 py-3.5 bg-emerald-950 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-800 transition-colors rounded shadow-xs cursor-pointer"
-              >
-                Submit General CV <span className="ml-2">→</span>
-              </button>
+          {/* General Talent Network Card (Controlled by Admin Toggle) */}
+          {showGeneralApplication && (
+            <div className="p-8 md:p-12 bg-white border border-slate-200 text-center shadow-sm rounded-xl max-w-3xl mx-auto">
+              <h3 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">General Talent Network Submission</h3>
+              <p className="text-slate-600 mb-6 font-normal text-sm max-w-lg mx-auto leading-relaxed">
+                Don't see an exact match? Send your CV directly to our engineering desk for consideration in surveying, geophysics, marine operations, and reality capture.
+              </p>
+              <div className="flex justify-center">
+                <button 
+                  onClick={() => {
+                    setSelectedJob(null);
+                    setIsFormModalOpen(true);
+                  }}
+                  className="inline-flex items-center justify-center px-8 py-3.5 bg-emerald-950 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-800 transition-colors rounded shadow-xs cursor-pointer"
+                >
+                  Submit General CV <span className="ml-2">→</span>
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 

@@ -643,6 +643,80 @@ const FALLBACK_JOBS: JobOpening[] = [
     display_order: 6,
     image_url: '/assets/careers/project-manager.jpg',
     created_at: '2026-11-17T08:00:00Z'
+  },
+  {
+    id: 'job-pipeline-facilities-project-engineer',
+    title: 'Pipeline & Facilities Project Engineer',
+    department: 'Pipeline & Facility Construction',
+    location: 'Port Harcourt (On-site)',
+    type: 'Full-time',
+    experience_level: '4+ Years',
+    description: 'We are hiring a Pipeline & Facilities Project Engineer to plan, coordinate, and oversee pipeline and facility construction activities, ensuring alignment with project specifications, safety standards, and regulatory requirements. The successful candidate will work with field teams and contractors, monitor construction progress, and ensure quality, cost, and timelines are managed effectively.',
+    requirements: [
+      'Strong Project Engineering and Project Management skills, including experience in pipeline and facility construction.',
+      'Project Planning skills, including the ability to develop schedules, allocate resources, and track progress against milestones.',
+      'Effective communication skills, with the ability to interact clearly with multidisciplinary teams, contractors, and clients.',
+      'Electrical Engineering knowledge relevant to pipeline and facility systems, or experience in a related engineering discipline.',
+      'Bachelor\'s degree in Engineering (e.g., Civil, Mechanical, Electrical, or a related field) from an accredited institution.',
+      'Relevant experience in the energy or oil and gas sector, particularly in field based or construction focused roles.',
+      'Solid understanding of HSE standards, quality assurance practices, and applicable industry codes and regulations.',
+      'Proficiency in engineering and project management tools (e.g., CAD, scheduling software, MS Office) and strong analytical skills.',
+      'Ability to work in challenging environments, demonstrate accountability, and maintain high safety and performance standards.'
+    ],
+    responsibilities: [
+      'Plan, coordinate, and oversee pipeline and facility construction activities.',
+      'Prepare work plans and schedules, allocate resources, and track progress against milestones.',
+      'Coordinate with field teams, contractors, and other project stakeholders.',
+      'Review engineering designs and drawings to ensure alignment with project specifications.',
+      'Support technical problem-solving and provide engineering guidance on site.',
+      'Contribute to risk assessments and continuous improvement in construction methods and project delivery.',
+      'Conduct site inspections to monitor construction progress, quality, and compliance.',
+      'Ensure work is carried out in line with safety standards, quality assurance practices, and applicable industry codes and regulations.',
+      'Facilitate communication between engineering, procurement, HSE, and operations teams.',
+      'Prepare project reports and updates on progress, challenges, and next steps.',
+      'Support commissioning and handover activities.',
+      'Ensure proper documentation and smooth transition to operations.'
+    ],
+    status: 'active',
+    display_order: 7,
+    image_url: '/assets/careers/pipeline-facilities-project-engineer.jpg',
+    created_at: '2026-11-18T08:00:00Z'
+  },
+  {
+    id: 'job-civil-engineer-geotechnical',
+    title: 'Civil Engineer – Geotechnical',
+    department: 'Civil & Geotechnical Engineering',
+    location: 'Port Harcourt (On-site)',
+    type: 'Full-time',
+    experience_level: '3+ Years',
+    description: 'We are hiring a Civil Engineer – Geotechnical to plan, execute, and supervise geotechnical investigations for civil and energy related projects, including soil and rock sampling, in-situ testing, and foundation assessments. The successful candidate will provide sound engineering recommendations for foundations, earthworks, and ground improvement, and work closely with multidisciplinary teams to ensure design integrity, safety, and quality.',
+    requirements: [
+      'Civil Engineering and Civil Engineering Design skills for planning, analysing, and delivering safe, efficient geotechnical and infrastructure solutions.',
+      'Proficiency in Computer Aided Design (CAD) tools to develop drawings, models, and detailed engineering documentation.',
+      'Land Surveying skills to support site investigations, data acquisition, and accurate ground modelling for geotechnical assessments.',
+      'Strong communication skills to collaborate with multidisciplinary teams, prepare clear reports, and engage with clients and stakeholders.',
+      'Bachelor\'s degree in Civil Engineering or a related discipline; geotechnical specialisation or relevant postgraduate training is an advantage.',
+      'Experience in geotechnical investigations, foundation engineering, and construction projects, preferably within the energy or infrastructure sectors.',
+      'Knowledge of relevant standards, codes, and safety practices for civil and geotechnical engineering in field and site environments.',
+      'Ability to work on-site in varying terrain and conditions, demonstrating attention to detail, problem-solving capability, and commitment to safety and quality.'
+    ],
+    responsibilities: [
+      'Plan, execute, and supervise geotechnical investigations for civil and energy related projects.',
+      'Carry out soil and rock sampling, in-situ testing, and foundation assessments.',
+      'Interpret laboratory and field data to inform engineering decisions.',
+      'Prepare engineering designs and technical reports.',
+      'Provide recommendations for foundations, earthworks, and ground improvement.',
+      'Maintain clear and accurate engineering documentation.',
+      'Participate in site inspections to ensure design integrity and compliance with safety and quality standards.',
+      'Coordinate with land survey and geomatics personnel for site investigations and accurate ground modelling.',
+      'Collaborate with multidisciplinary teams throughout the project lifecycle.',
+      'Contribute to project planning and support tender documentation.',
+      'Maintain clear communication with project managers and clients.'
+    ],
+    status: 'active',
+    display_order: 8,
+    image_url: '/assets/careers/civil-engineer-geotechnical.jpg',
+    created_at: '2026-11-18T08:00:00Z'
   }
 ];
 
@@ -695,6 +769,7 @@ const FALLBACK_SETTINGS: SiteSettings = {
   stat_completed_projects: '120+',
   stat_client_satisfaction: '99.4%',
   hero_slide_interval: 10,
+  enable_general_application: true,
   maintenance_mode: false,
   maintenance_title: 'Website Undergoing Scheduled Systems Update',
   maintenance_message: 'Our corporate digital portal is currently undergoing scheduled engineering maintenance and infrastructure updates. All field operations, offshore surveying, and client project execution continue at full capacity.',
@@ -3464,7 +3539,10 @@ export const getStoredJobs = (): JobOpening[] => {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY_JOBS);
     if (saved) {
       const parsed: JobOpening[] = JSON.parse(saved);
-      return parsed.map(enrichJobWithImage);
+      const parsedIds = new Set(parsed.map(j => j.id));
+      const missingFallbacks = FALLBACK_JOBS.filter(fj => !parsedIds.has(fj.id));
+      const combined = [...parsed, ...missingFallbacks];
+      return combined.map(enrichJobWithImage);
     }
   } catch (e) {
     console.warn('Failed to load local jobs', e);
