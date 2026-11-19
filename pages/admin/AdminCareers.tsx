@@ -16,7 +16,11 @@ import {
   IconUpload,
   IconCopy,
   IconShare,
-  IconEye
+  IconEye,
+  IconChevronDown,
+  IconChevronRight,
+  IconExternal,
+  IconUsers
 } from '../../components/admin/AdminIcons';
 
 interface AdminCareersProps {
@@ -51,6 +55,12 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
   const [activeTab, setActiveTab] = useState<'applications' | 'openings'>('applications');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('All');
+
+  // Grouping & Sorting state for Applications
+  const [appsViewMode, setAppsViewMode] = useState<'grouped' | 'table'>('grouped');
+  const [selectedPostingFilter, setSelectedPostingFilter] = useState<string>('All');
+  const [postingSort, setPostingSort] = useState<'most_applicants' | 'default' | 'title_asc'>('most_applicants');
+  const [collapsedPostings, setCollapsedPostings] = useState<Record<string, boolean>>({});
   
   // Selected Application Modal / Drawer
   const [selectedApp, setSelectedApp] = useState<JobApplication | null>(null);
@@ -103,13 +113,71 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
     }
   };
 
-  const filteredApps = applications.filter(app => {
+  // Match application to job opening by ID or Title
+  const matchJobForApp = (app: JobApplication): JobOpening | undefined => {
+    if (app.job_id) {
+      const byId = jobs.find(
+        (j) => j.id === app.job_id || j.id.toLowerCase() === app.job_id?.toLowerCase()
+      );
+      if (byId) return byId;
+    }
+    if (app.job_title) {
+      const raw = app.job_title.toLowerCase().trim();
+      const byTitle = jobs.find((j) => {
+        const jTitle = j.title.toLowerCase().trim();
+        return (
+          jTitle === raw ||
+          raw.includes(jTitle) ||
+          jTitle.includes(raw) ||
+          jTitle.replace(/[^a-z0-9]/g, '') === raw.replace(/[^a-z0-9]/g, '')
+        );
+      });
+      if (byTitle) return byTitle;
+    }
+    return undefined;
+  };
+
+  const getPostingAppCount = (jobId: string) =>
+    applications.filter((a) => matchJobForApp(a)?.id === jobId).length;
+  const generalAppCount = applications.filter((a) => !matchJobForApp(a)).length;
+
+  const toggleCollapsePosting = (jobId: string) => {
+    setCollapsedPostings((prev) => ({
+      ...prev,
+      [jobId]: !prev[jobId]
+    }));
+  };
+
+  const expandAllPostings = () => {
+    setCollapsedPostings({});
+  };
+
+  const collapseAllPostings = () => {
+    const allCollapsed: Record<string, boolean> = { general: true };
+    jobs.forEach((j) => {
+      allCollapsed[j.id] = true;
+    });
+    setCollapsedPostings(allCollapsed);
+  };
+
+  const filteredApps = applications.filter((app) => {
+    const matchedJob = matchJobForApp(app);
+    const matchesPosting =
+      selectedPostingFilter === 'All'
+        ? true
+        : selectedPostingFilter === 'general'
+        ? !matchedJob
+        : matchedJob?.id === selectedPostingFilter;
+
     const matchesStatus = statusFilter === 'All' || app.status === statusFilter;
     const matchesSearch =
       app.applicant_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       app.applicant_email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (app.job_title && app.job_title.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesStatus && matchesSearch;
+      (app.applicant_phone && app.applicant_phone.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (app.job_title && app.job_title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (matchedJob && matchedJob.title.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    return matchesPosting && matchesStatus && matchesSearch;
   });
 
   const handleOpenAppModal = (app: JobApplication) => {
@@ -354,157 +422,789 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
 
       {/* Applications View */}
       {activeTab === 'applications' && (
-        <div className="space-y-4">
-          {/* Filter toolbar */}
-          <div className={`p-4 rounded-2xl border shadow-xs flex flex-col sm:flex-row gap-4 items-center justify-between transition-colors ${
-            isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
-          }`}>
-            <div className="relative w-full sm:w-84">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500 dark:text-slate-400">
-                <IconSearch className="w-4 h-4" />
+        <div className="space-y-5">
+          {/* Active Job Postings Horizontal Filter Chips */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs px-1">
+              <span className={`font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                Filter by Vacancy Posting:
               </span>
-              <input
-                type="text"
-                placeholder="Search candidate name, email, or role..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all ${
-                  isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-500'
-                }`}
-              />
+              <span className="text-slate-400 font-mono text-[11px]">
+                {applications.length} Total Applications Recorded
+              </span>
             </div>
 
-            <div className="flex items-center space-x-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-              {['All', 'new', 'shortlisted', 'interviewed', 'hired', 'rejected'].map((st) => (
+            <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-thin">
+              <button
+                type="button"
+                onClick={() => setSelectedPostingFilter('All')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center space-x-2 border cursor-pointer ${
+                  selectedPostingFilter === 'All'
+                    ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
+                    : isDark ? 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <span>All Postings</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                  selectedPostingFilter === 'All'
+                    ? 'bg-emerald-900 text-emerald-100'
+                    : isDark ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'
+                }`}>
+                  {applications.length}
+                </span>
+              </button>
+
+              {jobs.map((job) => {
+                const count = getPostingAppCount(job.id);
+                const isSelected = selectedPostingFilter === job.id;
+                return (
+                  <button
+                    key={job.id}
+                    type="button"
+                    onClick={() => setSelectedPostingFilter(job.id)}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center space-x-2 border cursor-pointer ${
+                      isSelected
+                        ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
+                        : isDark ? 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span className="truncate max-w-[220px]">{job.title}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                      count > 0 
+                        ? (isSelected ? 'bg-emerald-900 text-emerald-100' : 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300/60 dark:border-emerald-800/50') 
+                        : (isSelected ? 'bg-emerald-900 text-emerald-200' : isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600')
+                    }`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+
+              <button
+                type="button"
+                onClick={() => setSelectedPostingFilter('general')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center space-x-2 border cursor-pointer ${
+                  selectedPostingFilter === 'general'
+                    ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
+                    : isDark ? 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <span>General Submissions</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                  selectedPostingFilter === 'general'
+                    ? 'bg-emerald-900 text-emerald-100'
+                    : isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600'
+                }`}>
+                  {generalAppCount}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Filter Toolbar & View Mode Switcher */}
+          <div className={`p-4 rounded-2xl border shadow-xs flex flex-col lg:flex-row gap-4 items-center justify-between transition-colors ${
+            isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
+          }`}>
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+              <div className="relative w-full sm:w-80">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500 dark:text-slate-400">
+                  <IconSearch className="w-4 h-4" />
+                </span>
+                <input
+                  type="text"
+                  placeholder="Search candidate name, email, phone, or role..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className={`w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all ${
+                    isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-500'
+                  }`}
+                />
+              </div>
+
+              {/* Status Filter Buttons */}
+              <div className="flex items-center space-x-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+                {['All', 'new', 'shortlisted', 'interviewed', 'hired', 'rejected'].map((st) => (
+                  <button
+                    key={st}
+                    onClick={() => setStatusFilter(st)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize whitespace-nowrap transition-all cursor-pointer ${
+                      statusFilter === st
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    {st}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* View Mode Switcher */}
+            <div className="flex items-center space-x-2 shrink-0 self-end lg:self-center">
+              <div className={`p-1 rounded-xl border flex items-center space-x-1 ${
+                isDark ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-100 border-slate-200'
+              }`}>
                 <button
-                  key={st}
-                  onClick={() => setStatusFilter(st)}
-                  className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold capitalize whitespace-nowrap transition-all ${
-                    statusFilter === st
-                      ? 'bg-emerald-600 text-white shadow-xs'
-                      : isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
+                  type="button"
+                  onClick={() => setAppsViewMode('grouped')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
+                    appsViewMode === 'grouped'
+                      ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  title="Group applications into actively listed job postings"
+                >
+                  <IconCareers className="w-3.5 h-3.5" />
+                  <span>Grouped by Role</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAppsViewMode('table')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
+                    appsViewMode === 'table'
+                      ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  title="View flat table of all candidate submissions"
+                >
+                  <IconFileText className="w-3.5 h-3.5" />
+                  <span>All Table</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Group Sorting & Bulk Controls (Only in Grouped Mode) */}
+          {appsViewMode === 'grouped' && (
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs px-1">
+              <div className="flex items-center space-x-2.5">
+                <span className={`font-semibold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Sort Vacancy Groups:
+                </span>
+                <select
+                  value={postingSort}
+                  onChange={(e) => setPostingSort(e.target.value as any)}
+                  className={`px-3 py-1.5 rounded-xl border font-bold text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer ${
+                    isDark ? 'bg-slate-900 border-slate-700 text-slate-200' : 'bg-white border-slate-200 text-slate-800'
                   }`}
                 >
-                  {st}
-                </button>
-              ))}
-            </div>
-          </div>
+                  <option value="most_applicants">Most Candidates First</option>
+                  <option value="title_asc">Alphabetical (A - Z)</option>
+                  <option value="default">Default Listing Order</option>
+                </select>
+              </div>
 
-          {/* Applications Table */}
-          <div className={`border rounded-2xl shadow-xs overflow-hidden transition-colors ${
-            isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
-          }`}>
-            {appsLoading || loading ? (
-              <div className="p-12 text-center text-slate-400 text-sm font-medium">
-                <svg className="animate-spin h-6 w-6 text-emerald-500 mx-auto mb-2" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                Loading applicant submissions...
+              <div className="flex items-center space-x-3 text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={expandAllPostings}
+                  className="text-slate-500 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors cursor-pointer"
+                >
+                  Expand All Groups
+                </button>
+                <span className="text-slate-300 dark:text-slate-700">•</span>
+                <button
+                  type="button"
+                  onClick={collapseAllPostings}
+                  className="text-slate-500 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors cursor-pointer"
+                >
+                  Collapse All Groups
+                </button>
               </div>
-            ) : filteredApps.length === 0 ? (
-              <div className="p-12 text-center text-slate-400 text-sm font-medium">
-                No candidate applications match your current filters.
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs sm:text-sm">
-                  <thead className={`border-b text-xs font-bold uppercase tracking-wider ${
-                    isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
-                  }`}>
-                    <tr>
-                      <th className="py-3.5 px-4 sm:px-5">Candidate</th>
-                      <th className="py-3.5 px-4 sm:px-5">Applied Role</th>
-                      <th className="py-3.5 px-4 sm:px-5">Date</th>
-                      <th className="py-3.5 px-4 sm:px-5">Status</th>
-                      <th className="py-3.5 px-4 sm:px-5">Resume</th>
-                      <th className="py-3.5 px-4 sm:px-5 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className={`divide-y ${isDark ? 'divide-slate-800 text-slate-200' : 'divide-slate-100 text-slate-800'}`}>
-                    {filteredApps.map((app) => (
-                      <tr key={app.id} className={`transition-colors ${isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/80'}`}>
-                        <td className="py-4 px-4 sm:px-5">
-                          <div>
-                            <div className={`font-bold text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                              {app.applicant_name}
+            </div>
+          )}
+
+          {/* Applications Content: Loading / Grouped View / Table View */}
+          {appsLoading || loading ? (
+            <div className={`border rounded-2xl p-12 text-center text-slate-400 text-sm font-medium ${
+              isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
+            }`}>
+              <svg className="animate-spin h-6 w-6 text-emerald-500 mx-auto mb-2" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              Loading applicant submissions...
+            </div>
+          ) : appsViewMode === 'table' ? (
+            /* Flat Table of All Filtered Applications */
+            <div className={`border rounded-2xl shadow-xs overflow-hidden transition-colors ${
+              isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
+            }`}>
+              {filteredApps.length === 0 ? (
+                <div className="p-12 text-center text-slate-400 text-sm font-medium">
+                  No candidate applications match your current filters.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs sm:text-sm">
+                    <thead className={`border-b text-xs font-bold uppercase tracking-wider ${
+                      isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
+                    }`}>
+                      <tr>
+                        <th className="py-3.5 px-4 sm:px-5">Candidate</th>
+                        <th className="py-3.5 px-4 sm:px-5">Applied Role</th>
+                        <th className="py-3.5 px-4 sm:px-5">Date</th>
+                        <th className="py-3.5 px-4 sm:px-5">Status</th>
+                        <th className="py-3.5 px-4 sm:px-5">Resume</th>
+                        <th className="py-3.5 px-4 sm:px-5 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className={`divide-y ${isDark ? 'divide-slate-800 text-slate-200' : 'divide-slate-100 text-slate-800'}`}>
+                      {filteredApps.map((app) => (
+                        <tr key={app.id} className={`transition-colors ${isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/80'}`}>
+                          <td className="py-4 px-4 sm:px-5">
+                            <div>
+                              <div className={`font-bold text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                {app.applicant_name}
+                              </div>
+                              <div className={`text-xs font-mono flex items-center space-x-2 mt-0.5 font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                <span>{app.applicant_email}</span>
+                                <span>•</span>
+                                <span>{app.applicant_phone}</span>
+                              </div>
                             </div>
-                            <div className={`text-xs font-mono flex items-center space-x-2 mt-0.5 font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                              <span>{app.applicant_email}</span>
+                          </td>
+
+                          <td className={`py-4 px-4 sm:px-5 font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                            {app.job_title || 'General Engineering Application'}
+                          </td>
+
+                          <td className={`py-4 px-4 sm:px-5 whitespace-nowrap font-mono text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                            {new Date(app.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </td>
+
+                          <td className="py-4 px-4 sm:px-5">
+                            <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase border ${
+                              app.status === 'new'
+                                ? 'bg-blue-100 text-blue-900 dark:bg-blue-950/80 dark:text-blue-300 border-blue-300/60 dark:border-blue-700/50'
+                                : app.status === 'shortlisted'
+                                ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/80 dark:text-purple-300 border-purple-300/60 dark:border-purple-700/50'
+                                : app.status === 'interviewed'
+                                ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300/60 dark:border-amber-700/50'
+                                : app.status === 'hired'
+                                ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300/60 dark:border-emerald-700/50'
+                                : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
+                            }`}>
+                              {app.status}
+                            </span>
+                          </td>
+
+                          <td className="py-4 px-4 sm:px-5">
+                            <a
+                              href={app.resume_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                                isDark 
+                                  ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50' 
+                                  : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200'
+                              }`}
+                            >
+                              <IconDownload className="w-3.5 h-3.5" />
+                              <span>Download CV</span>
+                            </a>
+                          </td>
+
+                          <td className="py-4 px-4 sm:px-5 text-right space-x-2 whitespace-nowrap">
+                            <button
+                              onClick={() => handleOpenAppModal(app)}
+                              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                                isDark ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700' : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
+                              }`}
+                            >
+                              Review & Status
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (confirm(`Remove application from ${app.applicant_name}?`)) {
+                                  handleDeleteApplication(app.id);
+                                }
+                              }}
+                              className="px-2.5 py-1.5 text-xs font-bold text-rose-600 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg transition-colors border border-rose-200 dark:border-rose-900/40 cursor-pointer"
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Grouped View by Actively Listed Job Postings */
+            <div className="space-y-6">
+              {/* Actively Listed Job Groups */}
+              {(() => {
+                const targetJobs = jobs.filter((j) => {
+                  if (selectedPostingFilter === 'general') return false;
+                  if (selectedPostingFilter === 'All') return true;
+                  return j.id === selectedPostingFilter;
+                });
+
+                const sortedJobs = [...targetJobs].sort((a, b) => {
+                  if (postingSort === 'most_applicants') {
+                    const diff = getPostingAppCount(b.id) - getPostingAppCount(a.id);
+                    if (diff !== 0) return diff;
+                    return a.title.localeCompare(b.title);
+                  }
+                  if (postingSort === 'title_asc') {
+                    return a.title.localeCompare(b.title);
+                  }
+                  return (a.display_order ?? 0) - (b.display_order ?? 0);
+                });
+
+                return sortedJobs.map((job) => {
+                  const jobApps = filteredApps.filter((a) => matchJobForApp(a)?.id === job.id);
+                  const totalPostingApps = getPostingAppCount(job.id);
+                  const isCollapsed = !!collapsedPostings[job.id];
+
+                  // Count breakdown
+                  const newCount = jobApps.filter((a) => a.status === 'new').length;
+                  const shortlistedCount = jobApps.filter((a) => a.status === 'shortlisted').length;
+                  const interviewedCount = jobApps.filter((a) => a.status === 'interviewed').length;
+                  const hiredCount = jobApps.filter((a) => a.status === 'hired').length;
+
+                  return (
+                    <div
+                      key={job.id}
+                      className={`border rounded-2xl shadow-xs overflow-hidden transition-all ${
+                        isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
+                      }`}
+                    >
+                      {/* Job Header Card */}
+                      <div
+                        onClick={() => toggleCollapsePosting(job.id)}
+                        className={`p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer transition-colors ${
+                          isDark ? 'hover:bg-slate-850/50' : 'hover:bg-slate-50/70'
+                        }`}
+                      >
+                        <div className="flex items-start sm:items-center space-x-3.5 min-w-0">
+                          {job.image_url ? (
+                            <img
+                              src={job.image_url}
+                              alt={job.title}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPreviewFlyerUrl(job.image_url!);
+                              }}
+                              className="w-12 h-14 object-cover rounded-xl border border-slate-200 dark:border-slate-800 shrink-0 cursor-pointer hover:scale-105 transition-transform"
+                              title="Click to zoom hiring flyer"
+                            />
+                          ) : (
+                            <div className={`w-12 h-14 rounded-xl flex items-center justify-center shrink-0 border ${
+                              isDark ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-slate-100 text-slate-500 border-slate-200'
+                            }`}>
+                              <IconCareers className="w-5 h-5" />
+                            </div>
+                          )}
+
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className={`font-black text-sm sm:text-base leading-snug truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                {job.title}
+                              </h3>
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider border ${
+                                job.status === 'active'
+                                  ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300/60 dark:border-emerald-700/50'
+                                  : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
+                              }`}>
+                                {job.status}
+                              </span>
+
+                              {/* Total Applicant Count Badge */}
+                              <span className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-bold border ${
+                                totalPostingApps > 0
+                                  ? 'bg-emerald-950/90 text-emerald-300 border-emerald-700/70'
+                                  : isDark ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-slate-100 text-slate-600 border-slate-200'
+                              }`}>
+                                {totalPostingApps} {totalPostingApps === 1 ? 'Candidate' : 'Candidates'}
+                              </span>
+                            </div>
+
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-2 font-medium">
+                              <span>🏢 {job.department}</span>
                               <span>•</span>
-                              <span>{app.applicant_phone}</span>
+                              <span>📍 {job.location}</span>
+                              <span>•</span>
+                              <span>💼 {job.type}</span>
                             </div>
                           </div>
-                        </td>
+                        </div>
 
-                        <td className={`py-4 px-4 sm:px-5 font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
-                          {app.job_title || 'General Engineering Application'}
-                        </td>
+                        {/* Card Right Actions */}
+                        <div
+                          className="flex items-center space-x-2 shrink-0 self-end md:self-center pt-2 md:pt-0"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => handleCopyJobShareLink(job.id)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors flex items-center gap-1.5 cursor-pointer ${
+                              copiedJobId === job.id
+                                ? 'bg-emerald-600 text-white border-emerald-600'
+                                : isDark
+                                  ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                            }`}
+                            title="Copy direct link to this vacancy"
+                          >
+                            <IconShare className="w-3.5 h-3.5" />
+                            <span>{copiedJobId === job.id ? 'Copied Link!' : 'Share Role'}</span>
+                          </button>
 
-                        <td className={`py-4 px-4 sm:px-5 whitespace-nowrap font-mono text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                          {new Date(app.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                        </td>
-
-                        <td className="py-4 px-4 sm:px-5">
-                          <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase border ${
-                            app.status === 'new'
-                              ? 'bg-blue-100 text-blue-900 dark:bg-blue-950/80 dark:text-blue-300 border-blue-300/60 dark:border-blue-700/50'
-                              : app.status === 'shortlisted'
-                              ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/80 dark:text-purple-300 border-purple-300/60 dark:border-purple-700/50'
-                              : app.status === 'interviewed'
-                              ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300/60 dark:border-amber-700/50'
-                              : app.status === 'hired'
-                              ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300/60 dark:border-emerald-700/50'
-                              : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
-                          }`}>
-                            {app.status}
-                          </span>
-                        </td>
-
-                        <td className="py-4 px-4 sm:px-5">
                           <a
-                            href={app.resume_url}
+                            href={`/careers/${job.id}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
-                              isDark 
-                                ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50' 
-                                : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200'
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors flex items-center gap-1.5 cursor-pointer ${
+                              isDark
+                                ? 'bg-slate-800 hover:bg-slate-700 text-emerald-400 border-slate-700'
+                                : 'bg-white hover:bg-slate-50 text-emerald-700 border-slate-200'
                             }`}
+                            title="Open live public position page in new tab"
                           >
-                            <IconDownload className="w-3.5 h-3.5" />
-                            <span>Download CV</span>
+                            <IconExternal className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">View Public Page</span>
                           </a>
-                        </td>
 
-                        <td className="py-4 px-4 sm:px-5 text-right space-x-2 whitespace-nowrap">
                           <button
-                            onClick={() => handleOpenAppModal(app)}
-                            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${
-                              isDark ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700' : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
+                            type="button"
+                            onClick={() => toggleCollapsePosting(job.id)}
+                            className={`p-1.5 rounded-lg border text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer ${
+                              isDark ? 'border-slate-700 bg-slate-800/80' : 'border-slate-200 bg-white'
                             }`}
+                            title={isCollapsed ? 'Expand candidate list' : 'Collapse candidate list'}
                           >
-                            Review & Status
+                            <IconChevronDown
+                              className={`w-4 h-4 transition-transform duration-200 ${
+                                isCollapsed ? '-rotate-90' : 'rotate-0'
+                              }`}
+                            />
                           </button>
-                          <button
-                            onClick={() => {
-                              if (confirm(`Remove application from ${app.applicant_name}?`)) {
-                                handleDeleteApplication(app.id);
-                              }
-                            }}
-                            className="px-2.5 py-1.5 text-xs font-bold text-rose-600 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg transition-colors border border-rose-200 dark:border-rose-900/40"
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+                        </div>
+                      </div>
+
+                      {/* Expanded Section: Candidates breakdown and table */}
+                      {!isCollapsed && (
+                        <div className={`border-t ${isDark ? 'border-slate-800' : 'border-slate-200/80'}`}>
+                          {/* Status Breakdown Bar if candidates exist */}
+                          {totalPostingApps > 0 && (
+                            <div className={`px-4 sm:px-5 py-2.5 text-xs flex flex-wrap items-center gap-2 border-b ${
+                              isDark ? 'bg-slate-950/40 border-slate-800/80 text-slate-400' : 'bg-slate-50/70 border-slate-100 text-slate-600'
+                            }`}>
+                              <span className="font-semibold uppercase tracking-wider text-[11px]">Pipeline Status:</span>
+                              {newCount > 0 && (
+                                <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-300">
+                                  {newCount} New
+                                </span>
+                              )}
+                              {shortlistedCount > 0 && (
+                                <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-purple-100 text-purple-900 dark:bg-purple-950 dark:text-purple-300">
+                                  {shortlistedCount} Shortlisted
+                                </span>
+                              )}
+                              {interviewedCount > 0 && (
+                                <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300">
+                                  {interviewedCount} Interviewed
+                                </span>
+                              )}
+                              {hiredCount > 0 && (
+                                <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300">
+                                  {hiredCount} Hired
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {jobApps.length === 0 ? (
+                            totalPostingApps === 0 ? (
+                              <div className="p-8 text-center text-slate-400 text-xs sm:text-sm">
+                                <p className="font-medium">No candidates have applied for this vacancy yet.</p>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyJobShareLink(job.id)}
+                                  className="mt-3 px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold inline-flex items-center gap-1.5 shadow-xs cursor-pointer transition-colors"
+                                >
+                                  <IconShare className="w-3.5 h-3.5" />
+                                  <span>Copy Share Link to Announce Vacancy</span>
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="p-8 text-center text-slate-400 text-xs sm:text-sm font-medium">
+                                No candidates for this role match your current search/status filter.
+                              </div>
+                            )
+                          ) : (
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-left text-xs sm:text-sm">
+                                <thead className={`border-b text-xs font-bold uppercase tracking-wider ${
+                                  isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
+                                }`}>
+                                  <tr>
+                                    <th className="py-3 px-4 sm:px-5">Candidate</th>
+                                    <th className="py-3 px-4 sm:px-5">Date</th>
+                                    <th className="py-3 px-4 sm:px-5">Status</th>
+                                    <th className="py-3 px-4 sm:px-5">Resume</th>
+                                    <th className="py-3 px-4 sm:px-5 text-right">Actions</th>
+                                  </tr>
+                                </thead>
+                                <tbody className={`divide-y ${isDark ? 'divide-slate-800 text-slate-200' : 'divide-slate-100 text-slate-800'}`}>
+                                  {jobApps.map((app) => (
+                                    <tr key={app.id} className={`transition-colors ${isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/80'}`}>
+                                      <td className="py-3.5 px-4 sm:px-5">
+                                        <div>
+                                          <div className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                            {app.applicant_name}
+                                          </div>
+                                          <div className={`text-xs font-mono flex items-center space-x-2 mt-0.5 font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                            <span>{app.applicant_email}</span>
+                                            <span>•</span>
+                                            <span>{app.applicant_phone}</span>
+                                          </div>
+                                        </div>
+                                      </td>
+
+                                      <td className={`py-3.5 px-4 sm:px-5 whitespace-nowrap font-mono text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                        {new Date(app.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                      </td>
+
+                                      <td className="py-3.5 px-4 sm:px-5">
+                                        <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase border ${
+                                          app.status === 'new'
+                                            ? 'bg-blue-100 text-blue-900 dark:bg-blue-950/80 dark:text-blue-300 border-blue-300/60 dark:border-blue-700/50'
+                                            : app.status === 'shortlisted'
+                                            ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/80 dark:text-purple-300 border-purple-300/60 dark:border-purple-700/50'
+                                            : app.status === 'interviewed'
+                                            ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300/60 dark:border-amber-700/50'
+                                            : app.status === 'hired'
+                                            ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300/60 dark:border-emerald-700/50'
+                                            : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
+                                        }`}>
+                                          {app.status}
+                                        </span>
+                                      </td>
+
+                                      <td className="py-3.5 px-4 sm:px-5">
+                                        <a
+                                          href={app.resume_url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                                            isDark 
+                                              ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50' 
+                                              : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200'
+                                          }`}
+                                        >
+                                          <IconDownload className="w-3.5 h-3.5" />
+                                          <span>Download CV</span>
+                                        </a>
+                                      </td>
+
+                                      <td className="py-3.5 px-4 sm:px-5 text-right space-x-2 whitespace-nowrap">
+                                        <button
+                                          onClick={() => handleOpenAppModal(app)}
+                                          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                                            isDark ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700' : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
+                                          }`}
+                                        >
+                                          Review & Status
+                                        </button>
+                                        <button
+                                          onClick={() => {
+                                            if (confirm(`Remove application from ${app.applicant_name}?`)) {
+                                              handleDeleteApplication(app.id);
+                                            }
+                                          }}
+                                          className="px-2.5 py-1.5 text-xs font-bold text-rose-600 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg transition-colors border border-rose-200 dark:border-rose-900/40 cursor-pointer"
+                                        >
+                                          Delete
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                });
+              })()}
+
+              {/* General Talent Network Submissions Section */}
+              {(selectedPostingFilter === 'All' || selectedPostingFilter === 'general') && (() => {
+                const generalApps = filteredApps.filter((a) => !matchJobForApp(a));
+                const totalGeneral = generalAppCount;
+                const isCollapsed = !!collapsedPostings['general'];
+
+                return (
+                  <div
+                    className={`border rounded-2xl shadow-xs overflow-hidden transition-all ${
+                      isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
+                    }`}
+                  >
+                    <div
+                      onClick={() => toggleCollapsePosting('general')}
+                      className={`p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer transition-colors ${
+                        isDark ? 'hover:bg-slate-850/50' : 'hover:bg-slate-50/70'
+                      }`}
+                    >
+                      <div className="flex items-start sm:items-center space-x-3.5 min-w-0">
+                        <div className={`w-12 h-14 rounded-xl flex items-center justify-center shrink-0 border ${
+                          isDark ? 'bg-blue-950/80 text-blue-400 border-blue-800/60' : 'bg-blue-50 text-blue-700 border-blue-200'
+                        }`}>
+                          <IconFileText className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className={`font-black text-sm sm:text-base leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                              General Talent Network Submissions
+                            </h3>
+                            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-300 border border-blue-300/60 dark:border-blue-800/50">
+                              {totalGeneral} {totalGeneral === 1 ? 'Candidate' : 'Candidates'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            Spontaneous applications and candidates submitted without a specific active vacancy link.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-2 shrink-0 self-end md:self-center" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          type="button"
+                          onClick={() => toggleCollapsePosting('general')}
+                          className={`p-1.5 rounded-lg border text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer ${
+                            isDark ? 'border-slate-700 bg-slate-800/80' : 'border-slate-200 bg-white'
+                          }`}
+                          title={isCollapsed ? 'Expand candidate list' : 'Collapse candidate list'}
+                        >
+                          <IconChevronDown
+                            className={`w-4 h-4 transition-transform duration-200 ${
+                              isCollapsed ? '-rotate-90' : 'rotate-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+
+                    {!isCollapsed && (
+                      <div className={`border-t ${isDark ? 'border-slate-800' : 'border-slate-200/80'}`}>
+                        {generalApps.length === 0 ? (
+                          <div className="p-8 text-center text-slate-400 text-xs sm:text-sm font-medium">
+                            {totalGeneral === 0
+                              ? 'No general talent network applications have been submitted yet.'
+                              : 'No general applications match your current search/status filter.'}
+                          </div>
+                        ) : (
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-left text-xs sm:text-sm">
+                              <thead className={`border-b text-xs font-bold uppercase tracking-wider ${
+                                isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
+                              }`}>
+                                <tr>
+                                  <th className="py-3 px-4 sm:px-5">Candidate</th>
+                                  <th className="py-3 px-4 sm:px-5">Specified Role/Specialty</th>
+                                  <th className="py-3 px-4 sm:px-5">Date</th>
+                                  <th className="py-3 px-4 sm:px-5">Status</th>
+                                  <th className="py-3 px-4 sm:px-5">Resume</th>
+                                  <th className="py-3 px-4 sm:px-5 text-right">Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody className={`divide-y ${isDark ? 'divide-slate-800 text-slate-200' : 'divide-slate-100 text-slate-800'}`}>
+                                {generalApps.map((app) => (
+                                  <tr key={app.id} className={`transition-colors ${isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/80'}`}>
+                                    <td className="py-3.5 px-4 sm:px-5">
+                                      <div>
+                                        <div className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                                          {app.applicant_name}
+                                        </div>
+                                        <div className={`text-xs font-mono flex items-center space-x-2 mt-0.5 font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                          <span>{app.applicant_email}</span>
+                                          <span>•</span>
+                                          <span>{app.applicant_phone}</span>
+                                        </div>
+                                      </div>
+                                    </td>
+
+                                    <td className={`py-3.5 px-4 sm:px-5 font-bold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                                      {app.job_title || 'General Engineering Application'}
+                                    </td>
+
+                                    <td className={`py-3.5 px-4 sm:px-5 whitespace-nowrap font-mono text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                                      {new Date(app.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                    </td>
+
+                                    <td className="py-3.5 px-4 sm:px-5">
+                                      <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase border ${
+                                        app.status === 'new'
+                                          ? 'bg-blue-100 text-blue-900 dark:bg-blue-950/80 dark:text-blue-300 border-blue-300/60 dark:border-blue-700/50'
+                                          : app.status === 'shortlisted'
+                                          ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/80 dark:text-purple-300 border-purple-300/60 dark:border-purple-700/50'
+                                          : app.status === 'interviewed'
+                                          ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300/60 dark:border-amber-700/50'
+                                          : app.status === 'hired'
+                                          ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300/60 dark:border-emerald-700/50'
+                                          : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
+                                      }`}>
+                                        {app.status}
+                                      </span>
+                                    </td>
+
+                                    <td className="py-3.5 px-4 sm:px-5">
+                                      <a
+                                        href={app.resume_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                                          isDark 
+                                            ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50' 
+                                            : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200'
+                                        }`}
+                                      >
+                                        <IconDownload className="w-3.5 h-3.5" />
+                                        <span>Download CV</span>
+                                      </a>
+                                    </td>
+
+                                    <td className="py-3.5 px-4 sm:px-5 text-right space-x-2 whitespace-nowrap">
+                                      <button
+                                        onClick={() => handleOpenAppModal(app)}
+                                        className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                                          isDark ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700' : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
+                                        }`}
+                                      >
+                                        Review & Status
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          if (confirm(`Remove application from ${app.applicant_name}?`)) {
+                                            handleDeleteApplication(app.id);
+                                          }
+                                        }}
+                                        className="px-2.5 py-1.5 text-xs font-bold text-rose-600 hover:text-white hover:bg-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:hover:bg-rose-800 rounded-lg transition-colors border border-rose-200 dark:border-rose-900/40 cursor-pointer"
+                                      >
+                                        Delete
+                                      </button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
         </div>
       )}
 

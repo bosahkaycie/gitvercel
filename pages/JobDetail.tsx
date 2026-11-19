@@ -495,132 +495,185 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
 
       {/* Application Modal */}
       {isFormModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 animate-fade-in">
-          <div className="relative w-full max-w-md bg-white shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[95vh] rounded-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 sm:p-6 lg:p-8 overflow-y-auto animate-fade-in">
+          <div className="relative w-full max-w-lg md:max-w-3xl lg:max-w-4xl bg-white shadow-2xl overflow-hidden border border-slate-200/80 flex flex-col max-h-[92vh] rounded-3xl my-auto">
             {/* Modal Header */}
-            <div className="relative h-28 flex flex-col justify-end p-5 text-white overflow-hidden">
+            <div className="relative p-6 sm:p-8 flex flex-col justify-end text-white overflow-hidden shrink-0">
               <img
                 src={EngineerImg}
                 alt="PIGL Recruitment"
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/85 to-slate-950/40"></div>
 
-              <div className="relative z-10">
-                <h3 className="text-lg font-black tracking-tight">Apply: {job.title}</h3>
-                <p className="text-slate-200 text-xs mt-0.5 font-medium">Polaris Integrated & GeoSolutions Limited</p>
+              <div className="relative z-10 space-y-1.5 pr-10">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-3 py-1 bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 text-[11px] font-bold uppercase tracking-wider rounded-full backdrop-blur-xs flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Official Job Application
+                  </span>
+                  <span className="text-slate-300 text-xs font-semibold">📍 {job.location}</span>
+                  <span className="text-slate-500 text-xs">•</span>
+                  <span className="text-slate-300 text-xs font-semibold">💼 {job.type}</span>
+                </div>
+
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight leading-tight">
+                  {job.title}
+                </h3>
+                <p className="text-slate-300 text-xs sm:text-sm font-medium">
+                  Polaris Integrated &amp; GeoSolutions Limited • Engineering Desk
+                </p>
               </div>
 
               <button
                 onClick={() => setIsFormModalOpen(false)}
-                className="absolute top-4 right-4 z-20 text-white/80 hover:text-white bg-slate-900/40 p-1.5 rounded-full backdrop-blur-sm cursor-pointer"
+                className="absolute top-5 right-5 z-20 text-white/80 hover:text-white bg-slate-900/60 hover:bg-slate-900 p-2.5 rounded-full backdrop-blur-md transition-colors border border-white/10 cursor-pointer shadow-lg"
+                aria-label="Close modal"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 overflow-y-auto flex-1">
+            <div className="p-6 sm:p-8 overflow-y-auto flex-1">
               {status === 'idle' && (
-                <form onSubmit={handleFormSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Engr. Chigozie Okoro"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm rounded-xl focus:bg-white focus:border-emerald-600 focus:outline-none transition-all font-medium"
-                    />
-                  </div>
+                <form onSubmit={handleFormSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                    {/* Left Column: Personal info */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                          Full Name *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Engr. Chigozie Okoro"
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm rounded-xl focus:bg-white focus:border-emerald-600 focus:outline-none transition-all font-medium"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="e.g. chigozie.okoro@example.com"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm rounded-xl focus:bg-white focus:border-emerald-600 focus:outline-none transition-all font-medium"
-                    />
-                  </div>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                          Email Address *
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          placeholder="e.g. chigozie.okoro@example.com"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm rounded-xl focus:bg-white focus:border-emerald-600 focus:outline-none transition-all font-medium"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="e.g. +234 803 123 4567"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm rounded-xl focus:bg-white focus:border-emerald-600 focus:outline-none transition-all font-medium"
-                    />
-                  </div>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                          Phone Number *
+                        </label>
+                        <input
+                          type="tel"
+                          required
+                          placeholder="e.g. +234 803 123 4567"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm rounded-xl focus:bg-white focus:border-emerald-600 focus:outline-none transition-all font-medium"
+                        />
+                      </div>
+                    </div>
 
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                      Cover Letter / Professional Summary
-                    </label>
-                    <textarea
-                      rows={3}
-                      placeholder="Brief overview of your qualifications and experience relevant to this role..."
-                      value={formData.coverLetter}
-                      onChange={(e) => setFormData({ ...formData, coverLetter: e.target.value })}
-                      className="w-full p-3 bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm rounded-xl focus:bg-white focus:border-emerald-600 focus:outline-none transition-all leading-relaxed"
-                    ></textarea>
-                  </div>
-
-                  {/* CV Upload Dropzone */}
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                      Attach CV / Resume (PDF or DOCX) *
-                    </label>
-                    <div
-                      onDragEnter={handleDrag}
-                      onDragLeave={handleDrag}
-                      onDragOver={handleDrag}
-                      onDrop={handleDrop}
-                      className={`border-2 border-dashed rounded-xl p-4 text-center transition-all ${
-                        dragActive ? 'border-emerald-600 bg-emerald-50' : 'border-slate-300 bg-slate-50 hover:bg-slate-100'
-                      }`}
-                    >
-                      <input
-                        type="file"
-                        id="resume-upload"
-                        accept=".pdf,.doc,.docx"
-                        onChange={handleFileChange}
-                        className="hidden"
-                      />
-                      <label htmlFor="resume-upload" className="cursor-pointer">
-                        <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto mb-1.5">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                          </svg>
-                        </div>
-                        <p className="text-xs font-bold text-slate-800">
-                          {resumeFile ? resumeFile.name : 'Click to select or drag and drop your CV'}
-                        </p>
-                        <p className="text-[10px] text-slate-500 mt-0.5">Maximum file size: 10MB</p>
+                    {/* Right Column: Cover Letter */}
+                    <div className="flex flex-col">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                        Cover Letter / Professional Summary
                       </label>
+                      <textarea
+                        rows={7}
+                        placeholder="Provide a brief overview of your background, experience with field operations or engineering equipment, and why you are a great fit for this position..."
+                        value={formData.coverLetter}
+                        onChange={(e) => setFormData({ ...formData, coverLetter: e.target.value })}
+                        className="w-full flex-1 p-4 bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm rounded-xl focus:bg-white focus:border-emerald-600 focus:outline-none transition-all leading-relaxed resize-none"
+                      ></textarea>
+                    </div>
+
+                    {/* Full Width: CV Upload Dropzone */}
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                        Attach CV / Resume (PDF or DOCX) *
+                      </label>
+                      <div
+                        onDragEnter={handleDrag}
+                        onDragLeave={handleDrag}
+                        onDragOver={handleDrag}
+                        onDrop={handleDrop}
+                        className={`border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center transition-all ${
+                          dragActive
+                            ? 'border-emerald-600 bg-emerald-50/70'
+                            : resumeFile
+                            ? 'border-emerald-500 bg-emerald-50/30'
+                            : 'border-slate-300 bg-slate-50/70 hover:bg-slate-100/80 hover:border-slate-400'
+                        }`}
+                      >
+                        <input
+                          type="file"
+                          id="resume-upload"
+                          accept=".pdf,.doc,.docx"
+                          onChange={handleFileChange}
+                          className="hidden"
+                        />
+                        <label htmlFor="resume-upload" className="cursor-pointer block">
+                          {resumeFile ? (
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                              </div>
+                              <div className="text-center sm:text-left">
+                                <p className="text-sm font-bold text-slate-900 truncate max-w-xs sm:max-w-md">
+                                  {resumeFile.name}
+                                </p>
+                                <p className="text-xs text-emerald-700 font-medium mt-0.5">
+                                  ✓ File selected ({(resumeFile.size / (1024 * 1024)).toFixed(2)} MB) • Click to replace
+                                </p>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto mb-2">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                              </div>
+                              <p className="text-sm font-bold text-slate-800">
+                                Click to select or drag and drop your CV
+                              </p>
+                              <p className="text-xs text-slate-500">
+                                Supported formats: PDF, DOCX, DOC • Maximum size: 10MB
+                              </p>
+                            </div>
+                          )}
+                        </label>
+                      </div>
                     </div>
                   </div>
 
-                  <button
-                    type="submit"
-                    className="w-full py-3 bg-emerald-950 hover:bg-emerald-800 text-white font-black text-xs uppercase tracking-widest transition-colors shadow-md mt-2 cursor-pointer"
-                  >
-                    Submit Application
-                  </button>
+                  <div className="pt-2 space-y-2">
+                    <button
+                      type="submit"
+                      className="w-full py-4 bg-emerald-950 hover:bg-emerald-800 text-white font-black text-xs sm:text-sm uppercase tracking-widest transition-all rounded-xl shadow-lg cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <span>Submit Application for {job.title}</span>
+                      <span>→</span>
+                    </button>
+                    <p className="text-center text-[11px] text-slate-400 flex items-center justify-center gap-1.5 font-medium">
+                      <span>🔒</span> Transmitted directly to Polaris Integrated Engineering Recruitment Desk • Confidential
+                    </p>
+                  </div>
                 </form>
               )}
 
