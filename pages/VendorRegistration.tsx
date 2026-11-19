@@ -28,10 +28,15 @@ const NIGERIAN_BANKS = [
 ];
 
 const SERVICE_NATURE_OPTIONS = [
-  'Consultancy',
+  'General Procurement & Equipment Supplies',
+  'Consultancy & Professional Services',
   'Engineering / Technical',
-  'Survey / Geoscience',
-  'Logistics / Support Services',
+  'Survey / Geoscience & Marine Operations',
+  'Logistics / Support & Marine Vessels',
+  'Civil Works, Fabrication & Construction',
+  'IT, Telecommunications & Digital Infrastructure',
+  'Safety / PPE / HSSEQ Services',
+  'Facility Maintenance & Office Supplies',
   'Other (specify)'
 ];
 
@@ -56,7 +61,7 @@ const VendorRegistration: React.FC = () => {
     registered_address: '',
     operational_address: '',
     is_operational_same_as_registered: true,
-    nature_of_services: ['Survey / Geoscience'] as string[],
+    nature_of_services: [] as string[],
     nature_of_services_other: '',
 
     // Section B
@@ -515,7 +520,7 @@ const VendorRegistration: React.FC = () => {
                     required
                     value={formData.vendor_legal_name}
                     onChange={(e) => setFormData({ ...formData, vendor_legal_name: e.target.value })}
-                    placeholder="e.g. Apex Marine & Geotechnical Services Nigeria Limited"
+                    placeholder="Enter official registered company / business name"
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-emerald-700 focus:bg-white transition-all"
                   />
                 </div>
@@ -1020,7 +1025,7 @@ const VendorRegistration: React.FC = () => {
                     required
                     value={formData.contact_name}
                     onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })}
-                    placeholder="e.g. Engr. Kenneth Nwachukwu"
+                    placeholder="Full name of contact person"
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-emerald-700"
                   />
                 </div>
@@ -1035,7 +1040,7 @@ const VendorRegistration: React.FC = () => {
                     required
                     value={formData.contact_designation}
                     onChange={(e) => setFormData({ ...formData, contact_designation: e.target.value })}
-                    placeholder="e.g. Managing Director / Finance Manager"
+                    placeholder="e.g. Managing Director, Manager, or Representative"
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-emerald-700"
                   />
                 </div>
@@ -1050,7 +1055,7 @@ const VendorRegistration: React.FC = () => {
                     required
                     value={formData.contact_phone}
                     onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
-                    placeholder="e.g. +234 803 456 7890"
+                    placeholder="+234 800 000 0000"
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-emerald-700"
                   />
                 </div>
@@ -1065,7 +1070,7 @@ const VendorRegistration: React.FC = () => {
                     required
                     value={formData.contact_email}
                     onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
-                    placeholder="e.g. k.nwachukwu@apexgeospatial.ng"
+                    placeholder="official@yourcompany.com"
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-emerald-700"
                   />
                 </div>
@@ -1141,7 +1146,7 @@ const VendorRegistration: React.FC = () => {
                   required
                   value={formData.representative_name}
                   onChange={(e) => setFormData({ ...formData, representative_name: e.target.value })}
-                  placeholder="e.g. Engr. Kenneth Nwachukwu"
+                  placeholder="Full legal name of authorized representative"
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-emerald-700"
                 />
               </div>

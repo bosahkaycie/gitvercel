@@ -90,15 +90,19 @@ export const NIGERIAN_BANK_GROUPS = [
 export const ALL_NIGERIAN_BANKS = NIGERIAN_BANK_GROUPS.flatMap(g => g.banks);
 
 const SERVICE_CATEGORIES = [
-  'Survey / Geoscience & Offshore Bathymetry',
-  '3D Reality Capture & Digital Twins',
-  'Geotechnical Drilling & CPT Testing',
-  'Pipeline Inspection & Non-Destructive Testing (NDT)',
-  'Produced Water Treatment & Environmental',
-  'Logistics, Marine Vessels & Heavy Equipment',
-  'Civil Works & Structural Fabrication',
-  'Process Automation & Instrumentation',
+  'General Procurement & Equipment Supplies',
+  'Survey, Geoscience & Marine Solutions',
+  'Civil Works, Fabrication & Construction',
   'Engineering & Technical Consultancy',
+  'Geotechnical Drilling & Subsurface Testing',
+  'Pipeline Inspection, Maintenance & NDT',
+  'Produced Water Treatment & Environmental Services',
+  'Logistics, Marine Vessels & Heavy Haulage',
+  'Process Automation, Electrical & Instrumentation',
+  'IT, Telecommunications & Digital Infrastructure',
+  'Safety Products, PPE & HSSEQ Services',
+  'Facility Maintenance, Janitorial & Office Supplies',
+  'Professional, Legal, Financial & Advisory Services',
   'Other Specialist Supply / Service'
 ];
 
@@ -135,7 +139,7 @@ export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
     registered_address: '',
     operational_address: '',
     is_operational_same: true,
-    nature_of_services: ['Survey / Geoscience & Offshore Bathymetry'] as string[],
+    nature_of_services: [] as string[],
     nature_of_services_other: '',
 
     // Contact
@@ -534,7 +538,7 @@ export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
                         registered_address: '',
                         operational_address: '',
                         is_operational_same: true,
-                        nature_of_services: ['Survey / Geoscience & Offshore Bathymetry'],
+                        nature_of_services: [],
                         nature_of_services_other: '',
                         contact_name: '',
                         contact_designation: '',
@@ -596,7 +600,7 @@ export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
                         required
                         value={formData.vendor_legal_name}
                         onChange={(e) => setFormData({ ...formData, vendor_legal_name: e.target.value })}
-                        placeholder="e.g. Geodynamic Marine & Subsurface Engineering Ltd"
+                        placeholder="Enter registered corporate or business name"
                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 transition-all font-medium"
                       />
                     </div>
@@ -624,7 +628,7 @@ export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
                         required
                         value={formData.rc_bn_number}
                         onChange={(e) => setFormData({ ...formData, rc_bn_number: e.target.value })}
-                        placeholder="e.g. RC 1849204"
+                        placeholder="e.g. RC 1849204 or BN 2849102"
                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 transition-all font-mono font-medium"
                       />
                     </div>
@@ -650,17 +654,23 @@ export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
                         required
                         value={formData.registered_address}
                         onChange={(e) => setFormData({ ...formData, registered_address: e.target.value })}
-                        placeholder="Plot number, Street, City, State"
+                        placeholder="Office / plot number, street, city, state"
                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 transition-all font-medium"
                       />
                     </div>
                   </div>
 
                   {/* Core Capabilities Selection */}
-                  <div className="pt-2">
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                      Core Supply & Service Capabilities <span className="text-rose-500">*</span>
-                    </label>
+                  <div className="pt-2 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Core Supply & Service Capabilities <span className="text-rose-500">*</span>
+                      </label>
+                      <span className="text-[11px] text-slate-500 font-medium">
+                        (Select all applicable categories that match your company's offerings)
+                      </span>
+                    </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                       {SERVICE_CATEGORIES.map((cat) => {
                         const isSelected = formData.nature_of_services.includes(cat);
@@ -669,7 +679,7 @@ export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
                             type="button"
                             key={cat}
                             onClick={() => handleServiceCategoryToggle(cat)}
-                            className={`p-3 rounded-xl border text-left text-xs font-semibold transition-all flex items-center justify-between ${
+                            className={`p-3 rounded-xl border text-left text-xs font-semibold transition-all flex items-center justify-between cursor-pointer ${
                               isSelected
                                 ? 'bg-emerald-50 border-emerald-500 text-emerald-950 shadow-xs'
                                 : 'bg-slate-50/70 border-slate-200 text-slate-700 hover:border-slate-300'
@@ -689,6 +699,23 @@ export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
                         );
                       })}
                     </div>
+
+                    {/* Open field for custom / other capabilities */}
+                    {(formData.nature_of_services.includes('Other Specialist Supply / Service') || formData.nature_of_services_other) && (
+                      <div className="pt-2 animate-fadeIn">
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                          Specify Other Specialist Supply / Service Details <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required={formData.nature_of_services.includes('Other Specialist Supply / Service')}
+                          value={formData.nature_of_services_other}
+                          onChange={(e) => setFormData({ ...formData, nature_of_services_other: e.target.value })}
+                          placeholder="Describe your specific products, supplies, or services provided..."
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 transition-all font-medium"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -716,7 +743,7 @@ export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
                         required
                         value={formData.contact_name}
                         onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })}
-                        placeholder="e.g. Engr. Tariere Briggs"
+                        placeholder="Full name of corporate contact person"
                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 transition-all font-medium"
                       />
                     </div>
@@ -729,7 +756,7 @@ export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
                         type="text"
                         value={formData.contact_designation}
                         onChange={(e) => setFormData({ ...formData, contact_designation: e.target.value })}
-                        placeholder="e.g. Managing Director / Business Lead"
+                        placeholder="e.g. Managing Director, Procurement Manager, etc."
                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 transition-all font-medium"
                       />
                     </div>
@@ -743,7 +770,7 @@ export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
                         required
                         value={formData.contact_email}
                         onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
-                        placeholder="procurement@company.ng"
+                        placeholder="official@yourcompany.com"
                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 transition-all font-medium"
                       />
                     </div>
@@ -757,7 +784,7 @@ export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
                         required
                         value={formData.contact_phone}
                         onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
-                        placeholder="+234 803 123 4567"
+                        placeholder="+234 800 000 0000"
                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 transition-all font-mono font-medium"
                       />
                     </div>
@@ -973,7 +1000,7 @@ export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
                         required
                         value={formData.representative_name}
                         onChange={(e) => setFormData({ ...formData, representative_name: e.target.value })}
-                        placeholder={formData.contact_name || 'e.g. Engr. Tariere Briggs'}
+                        placeholder={formData.contact_name || 'Full legal name of authorized representative'}
                         className="w-full max-w-md px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 transition-all font-medium"
                       />
                     </div>
@@ -1068,7 +1095,7 @@ export const VendorHub: React.FC<VendorHubProps> = ({ initialTab }) => {
                     required
                     value={identInput}
                     onChange={(e) => setIdentInput(e.target.value)}
-                    placeholder="tariere@company.ng or 24819402"
+                    placeholder="Registered email address, TIN, or RC/BN"
                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 transition-all"
                   />
                 </div>
