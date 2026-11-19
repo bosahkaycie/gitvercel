@@ -18,7 +18,10 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', coverLetter: '' });
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [coverLetterFile, setCoverLetterFile] = useState<File | null>(null);
+  const [coverLetterMode, setCoverLetterMode] = useState<'type' | 'upload'>('type');
   const [dragActive, setDragActive] = useState(false);
+  const [clDragActive, setClDragActive] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [submissionPhase, setSubmissionPhase] = useState('');
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -100,6 +103,33 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
     }
   };
 
+  const handleCoverLetterFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const extension = file.name.split('.').pop()?.toLowerCase();
+      if (['pdf', 'doc', 'docx'].includes(extension || '') && file.size <= 10 * 1024 * 1024) {
+        setCoverLetterFile(file);
+      } else {
+        alert('Please upload a valid PDF or Word document under 10MB.');
+      }
+    }
+  };
+
+  const handleClDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setClDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      const extension = file.name.split('.').pop()?.toLowerCase();
+      if (['pdf', 'doc', 'docx'].includes(extension || '') && file.size <= 10 * 1024 * 1024) {
+        setCoverLetterFile(file);
+      } else {
+        alert('Please upload a valid PDF or Word document under 10MB.');
+      }
+    }
+  };
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resumeFile) {
@@ -113,7 +143,7 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
 
     try {
       setUploadProgress(35);
-      setSubmissionPhase('Uploading CV document...');
+      setSubmissionPhase('Uploading CV and candidate credentials...');
       await new Promise((r) => setTimeout(r, 600));
 
       setUploadProgress(70);
@@ -126,7 +156,8 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
         applicant_email: formData.email,
         applicant_phone: formData.phone,
         resume_file: resumeFile,
-        cover_letter: formData.coverLetter
+        cover_letter: formData.coverLetter,
+        cover_letter_file: coverLetterFile || undefined
       });
 
       if (!result.success) {
@@ -586,18 +617,139 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
                       </div>
                     </div>
 
-                    {/* Right Column: Cover Letter */}
-                    <div className="flex flex-col">
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                        Cover Letter / Professional Summary
-                      </label>
-                      <textarea
-                        rows={7}
-                        placeholder="Provide a brief overview of your background, experience with field operations or engineering equipment, and why you are a great fit for this position..."
-                        value={formData.coverLetter}
-                        onChange={(e) => setFormData({ ...formData, coverLetter: e.target.value })}
-                        className="w-full flex-1 p-4 bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm rounded-xl focus:bg-white focus:border-emerald-600 focus:outline-none transition-all leading-relaxed resize-none"
-                      ></textarea>
+                    {/* Right Column: Cover Letter (Type or Upload) */}
+                    <div className="flex flex-col space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                          Cover Letter (Optional)
+                        </label>
+                        <div className="flex items-center space-x-1">
+                          <button
+                            type="button"
+                            onClick={() => setCoverLetterMode('type')}
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                              coverLetterMode === 'type'
+                                ? 'bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-2xs'
+                                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                            }`}
+                          >
+                            ✍️ Type Text
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setCoverLetterMode('upload')}
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                              coverLetterMode === 'upload'
+                                ? 'bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-2xs'
+                                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                            }`}
+                          >
+                            📎 Upload File {coverLetterFile && '✓'}
+                          </button>
+                        </div>
+                      </div>
+
+                      {coverLetterMode === 'type' ? (
+                        <div className="flex-1 flex flex-col space-y-2">
+                          {coverLetterFile && (
+                            <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between text-xs">
+                              <span className="font-bold text-emerald-900 truncate">
+                                📎 Attached: {coverLetterFile.name}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setCoverLetterFile(null)}
+                                className="text-rose-600 font-bold hover:underline ml-2 shrink-0 cursor-pointer text-[11px]"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          )}
+                          <textarea
+                            rows={coverLetterFile ? 5 : 7}
+                            placeholder="Provide a brief overview of your background, experience with field operations or engineering equipment, and why you are a great fit for this position..."
+                            value={formData.coverLetter}
+                            onChange={(e) => setFormData({ ...formData, coverLetter: e.target.value })}
+                            className="w-full flex-1 p-3.5 bg-slate-50 border border-slate-200 text-slate-900 text-xs sm:text-sm rounded-xl focus:bg-white focus:border-emerald-600 focus:outline-none transition-all leading-relaxed resize-none font-normal"
+                          />
+                          <div className="flex items-center justify-between text-[11px] text-slate-400">
+                            <span>Have a ready document?</span>
+                            <button
+                              type="button"
+                              onClick={() => setCoverLetterMode('upload')}
+                              className="font-bold text-emerald-700 hover:underline cursor-pointer"
+                            >
+                              Upload Cover Letter PDF/DOCX →
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex-1 flex flex-col justify-between space-y-3">
+                          <div
+                            onDragEnter={(e) => { e.preventDefault(); setClDragActive(true); }}
+                            onDragOver={(e) => { e.preventDefault(); setClDragActive(true); }}
+                            onDragLeave={(e) => { e.preventDefault(); setClDragActive(false); }}
+                            onDrop={handleClDrop}
+                            className={`border-2 border-dashed rounded-2xl p-5 sm:p-6 text-center transition-all ${
+                              clDragActive
+                                ? 'border-emerald-600 bg-emerald-50/70'
+                                : coverLetterFile
+                                ? 'border-emerald-500 bg-emerald-50/30'
+                                : 'border-slate-300 bg-slate-50/70 hover:bg-slate-100/80 hover:border-slate-400'
+                            }`}
+                          >
+                            <input
+                              type="file"
+                              id="cl-upload-detail"
+                              accept=".pdf,.doc,.docx"
+                              onChange={handleCoverLetterFileChange}
+                              className="hidden"
+                            />
+                            <label htmlFor="cl-upload-detail" className="cursor-pointer block">
+                              {coverLetterFile ? (
+                                <div className="space-y-2">
+                                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto">
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                  </div>
+                                  <p className="text-xs sm:text-sm font-bold text-slate-900 truncate max-w-xs mx-auto">
+                                    {coverLetterFile.name}
+                                  </p>
+                                  <p className="text-[11px] text-emerald-700 font-medium">
+                                    ✓ Document attached ({(coverLetterFile.size / (1024 * 1024)).toFixed(2)} MB) • Click to replace
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="space-y-1.5 py-2">
+                                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto mb-1">
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                    </svg>
+                                  </div>
+                                  <p className="text-xs sm:text-sm font-bold text-slate-800">
+                                    Click or drag & drop your Cover Letter file
+                                  </p>
+                                  <p className="text-[11px] text-slate-500">
+                                    PDF, DOCX, DOC • Maximum size: 10MB
+                                  </p>
+                                </div>
+                              )}
+                            </label>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[11px] text-slate-400">
+                            <span>Prefer to write text?</span>
+                            <button
+                              type="button"
+                              onClick={() => setCoverLetterMode('type')}
+                              className="font-bold text-emerald-700 hover:underline cursor-pointer"
+                            >
+                              ← Type Cover Letter Instead
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Full Width: CV Upload Dropzone */}

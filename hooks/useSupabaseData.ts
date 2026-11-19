@@ -3705,6 +3705,17 @@ export const saveStoredApplications = (apps: JobApplication[]) => {
   }
 };
 
+export function extractCoverLetterMeta(rawCoverLetter?: string): { coverLetterUrl?: string; coverLetterText: string } {
+  if (!rawCoverLetter) return { coverLetterText: '' };
+  const match = rawCoverLetter.match(/<!-- pigl_cover_letter_file:\s*(https?:\/\/[^\s>]+)\s*-->/);
+  if (match) {
+    const coverLetterUrl = match[1];
+    const coverLetterText = rawCoverLetter.replace(/<!-- pigl_cover_letter_file:\s*https?:\/\/[^\s>]+\s*-->\s*/, '').trim();
+    return { coverLetterUrl, coverLetterText };
+  }
+  return { coverLetterText: rawCoverLetter };
+}
+
 export const useJobApplications = () => {
   const [applications, setApplications] = useState<JobApplication[]>(getStoredApplications());
   const [loading, setLoading] = useState<boolean>(true);
@@ -3726,7 +3737,15 @@ export const useJobApplications = () => {
 
       if (error) throw error;
       if (data && data.length > 0) {
-        setApplications(data as JobApplication[]);
+        const enriched = (data as JobApplication[]).map(a => {
+          const { coverLetterUrl, coverLetterText } = extractCoverLetterMeta(a.cover_letter);
+          return {
+            ...a,
+            cover_letter: coverLetterText,
+            cover_letter_url: a.cover_letter_url || coverLetterUrl
+          };
+        });
+        setApplications(enriched);
       } else {
         setApplications(getStoredApplications());
       }
@@ -3786,12 +3805,17 @@ export const submitJobApplication = async (data: {
   job_id?: string;
   job_title?: string;
   cover_letter?: string;
+  cover_letter_url?: string;
+  cover_letter_file?: File;
   resume_url?: string;
   resume_file?: File;
 }): Promise<{ success: boolean; error?: string }> => {
   let fileUrl = data.resume_url || '/assets/PIGL COMPANY PROFILE.pdf';
+  let coverLetterUrl = data.cover_letter_url;
 
   const client = getSupabaseClient();
+
+  // 1. Upload CV / Resume
   if (client && data.resume_file) {
     try {
       const fileExt = data.resume_file.name.split('.').pop();
@@ -3811,7 +3835,33 @@ export const submitJobApplication = async (data: {
     }
   }
 
-  const newApp: JobApplication = {
+  // 2. Upload Cover Letter Document if provided
+  if (client && data.cover_letter_file) {
+    try {
+      const clExt = data.cover_letter_file.name.split('.').pop();
+      const clFileName = `${Date.now()}-cover-letter-${data.name.replace(/[^a-zA-Z0-9]/g, '_')}.${clExt}`;
+      const { error: clUploadErr } = await client.storage.from('resumes').upload(clFileName, data.cover_letter_file, {
+        cacheControl: '3600',
+        upsert: true
+      });
+      if (!clUploadErr) {
+        const { data: clPublicData } = client.storage.from('resumes').getPublicUrl(clFileName);
+        if (clPublicData?.publicUrl) {
+          coverLetterUrl = clPublicData.publicUrl;
+        }
+      }
+    } catch (err) {
+      console.warn('Cover letter upload note:', err);
+    }
+  }
+
+  // Combine cover letter URL and text cleanly
+  let combinedCoverLetter = data.cover_letter || '';
+  if (coverLetterUrl) {
+    combinedCoverLetter = `<!-- pigl_cover_letter_file: ${coverLetterUrl} -->${combinedCoverLetter ? '\n\n' + combinedCoverLetter : ''}`;
+  }
+
+  const dbPayload = {
     id: `app-${Date.now()}`,
     job_id: data.job_id,
     job_title: data.job_title || 'General Application',
@@ -3819,14 +3869,20 @@ export const submitJobApplication = async (data: {
     applicant_email: data.email,
     applicant_phone: data.phone,
     resume_url: fileUrl,
-    cover_letter: data.cover_letter,
-    status: 'new',
+    cover_letter: combinedCoverLetter || null,
+    status: 'new' as const,
     created_at: new Date().toISOString()
+  };
+
+  const newApp: JobApplication = {
+    ...dbPayload,
+    cover_letter: combinedCoverLetter,
+    cover_letter_url: coverLetterUrl
   };
 
   if (client) {
     try {
-      await client.from('job_applications').insert([newApp]);
+      await client.from('job_applications').insert([dbPayload]);
     } catch (err) {
       console.warn('Job application db insert fallback:', err);
     }

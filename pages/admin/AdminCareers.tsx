@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { JobApplication, JobOpening } from '../../types';
-import { useSiteSettings } from '../../hooks/useSupabaseData';
+import { useSiteSettings, extractCoverLetterMeta } from '../../hooks/useSupabaseData';
 import {
   IconCareers,
   IconPlus,
@@ -278,17 +278,24 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
   };
 
   const exportApplicationsToCSV = () => {
-    const headers = ['Applicant Name', 'Email', 'Phone', 'Role Applied For', 'Status', 'Applied Date', 'Resume URL', 'Notes'];
-    const rows = applications.map(a => [
-      `"${a.applicant_name}"`,
-      `"${a.applicant_email}"`,
-      `"${a.applicant_phone}"`,
-      `"${a.job_title || 'General Application'}"`,
-      `"${a.status}"`,
-      `"${new Date(a.created_at).toLocaleDateString('en-GB')}"`,
-      `"${a.resume_url}"`,
-      `"${(a.notes || '').replace(/"/g, '""')}"`
-    ]);
+    const headers = ['Applicant Name', 'Email', 'Phone', 'Role Applied For', 'Status', 'Applied Date', 'Resume URL', 'Cover Letter File URL', 'Cover Letter Text', 'Notes'];
+    const rows = applications.map(a => {
+      const { coverLetterUrl, coverLetterText } = extractCoverLetterMeta(a.cover_letter);
+      const attachedClUrl = a.cover_letter_url || coverLetterUrl || '';
+      const clText = coverLetterText || (!attachedClUrl ? a.cover_letter || '' : '');
+      return [
+        `"${a.applicant_name}"`,
+        `"${a.applicant_email}"`,
+        `"${a.applicant_phone}"`,
+        `"${a.job_title || 'General Application'}"`,
+        `"${a.status}"`,
+        `"${new Date(a.created_at).toLocaleDateString('en-GB')}"`,
+        `"${a.resume_url}"`,
+        `"${attachedClUrl}"`,
+        `"${clText.replace(/"/g, '""')}"`,
+        `"${(a.notes || '').replace(/"/g, '""')}"`
+      ];
+    });
 
     const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -646,12 +653,15 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                         <th className="py-3.5 px-4 sm:px-5">Applied Role</th>
                         <th className="py-3.5 px-4 sm:px-5">Date</th>
                         <th className="py-3.5 px-4 sm:px-5">Status</th>
-                        <th className="py-3.5 px-4 sm:px-5">Resume</th>
+                        <th className="py-3.5 px-4 sm:px-5">Documents</th>
                         <th className="py-3.5 px-4 sm:px-5 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className={`divide-y ${isDark ? 'divide-slate-800 text-slate-200' : 'divide-slate-100 text-slate-800'}`}>
-                      {filteredApps.map((app) => (
+                      {filteredApps.map((app) => {
+                        const { coverLetterUrl } = extractCoverLetterMeta(app.cover_letter);
+                        const attachedClUrl = app.cover_letter_url || coverLetterUrl;
+                        return (
                         <tr key={app.id} className={`transition-colors ${isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/80'}`}>
                           <td className="py-4 px-4 sm:px-5">
                             <div>
@@ -691,19 +701,38 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                           </td>
 
                           <td className="py-4 px-4 sm:px-5">
-                            <a
-                              href={app.resume_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
-                                isDark 
-                                  ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50' 
-                                  : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200'
-                              }`}
-                            >
-                              <IconDownload className="w-3.5 h-3.5" />
-                              <span>Download CV</span>
-                            </a>
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5">
+                              <a
+                                href={app.resume_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                                  isDark 
+                                    ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50' 
+                                    : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200'
+                                }`}
+                                title="Download candidate CV / Resume"
+                              >
+                                <IconDownload className="w-3.5 h-3.5" />
+                                <span>CV</span>
+                              </a>
+                              {attachedClUrl && (
+                                <a
+                                  href={attachedClUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                                    isDark 
+                                      ? 'bg-purple-950/80 hover:bg-purple-800 text-purple-300 border-purple-800/50' 
+                                      : 'bg-purple-50 hover:bg-purple-700 text-purple-800 hover:text-white border-purple-200'
+                                  }`}
+                                  title="Download attached cover letter document"
+                                >
+                                  <IconDownload className="w-3.5 h-3.5" />
+                                  <span>Cover Letter</span>
+                                </a>
+                              )}
+                            </div>
                           </td>
 
                           <td className="py-4 px-4 sm:px-5 text-right space-x-2 whitespace-nowrap">
@@ -727,7 +756,8 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                             </button>
                           </td>
                         </tr>
-                      ))}
+                      );
+                    })}
                     </tbody>
                   </table>
                 </div>
@@ -947,12 +977,15 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                     <th className="py-3 px-4 sm:px-5">Candidate</th>
                                     <th className="py-3 px-4 sm:px-5">Date</th>
                                     <th className="py-3 px-4 sm:px-5">Status</th>
-                                    <th className="py-3 px-4 sm:px-5">Resume</th>
+                                    <th className="py-3 px-4 sm:px-5">Documents</th>
                                     <th className="py-3 px-4 sm:px-5 text-right">Actions</th>
                                   </tr>
                                 </thead>
                                 <tbody className={`divide-y ${isDark ? 'divide-slate-800 text-slate-200' : 'divide-slate-100 text-slate-800'}`}>
-                                  {jobApps.map((app) => (
+                                  {jobApps.map((app) => {
+                                    const { coverLetterUrl } = extractCoverLetterMeta(app.cover_letter);
+                                    const attachedClUrl = app.cover_letter_url || coverLetterUrl;
+                                    return (
                                     <tr key={app.id} className={`transition-colors ${isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/80'}`}>
                                       <td className="py-3.5 px-4 sm:px-5">
                                         <div>
@@ -988,19 +1021,38 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                       </td>
 
                                       <td className="py-3.5 px-4 sm:px-5">
-                                        <a
-                                          href={app.resume_url}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
-                                            isDark 
-                                              ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50' 
-                                              : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200'
-                                          }`}
-                                        >
-                                          <IconDownload className="w-3.5 h-3.5" />
-                                          <span>Download CV</span>
-                                        </a>
+                                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5">
+                                          <a
+                                            href={app.resume_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                                              isDark 
+                                                ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50' 
+                                                : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200'
+                                            }`}
+                                            title="Download candidate CV / Resume"
+                                          >
+                                            <IconDownload className="w-3.5 h-3.5" />
+                                            <span>CV</span>
+                                          </a>
+                                          {attachedClUrl && (
+                                            <a
+                                              href={attachedClUrl}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                                                isDark 
+                                                  ? 'bg-purple-950/80 hover:bg-purple-800 text-purple-300 border-purple-800/50' 
+                                                  : 'bg-purple-50 hover:bg-purple-700 text-purple-800 hover:text-white border-purple-200'
+                                              }`}
+                                              title="Download attached cover letter document"
+                                            >
+                                              <IconDownload className="w-3.5 h-3.5" />
+                                              <span>Cover Letter</span>
+                                            </a>
+                                          )}
+                                        </div>
                                       </td>
 
                                       <td className="py-3.5 px-4 sm:px-5 text-right space-x-2 whitespace-nowrap">
@@ -1024,7 +1076,8 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                         </button>
                                       </td>
                                     </tr>
-                                  ))}
+                                  );
+                                })}
                                 </tbody>
                               </table>
                             </div>
@@ -1112,12 +1165,15 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                   <th className="py-3 px-4 sm:px-5">Specified Role/Specialty</th>
                                   <th className="py-3 px-4 sm:px-5">Date</th>
                                   <th className="py-3 px-4 sm:px-5">Status</th>
-                                  <th className="py-3 px-4 sm:px-5">Resume</th>
+                                  <th className="py-3 px-4 sm:px-5">Documents</th>
                                   <th className="py-3 px-4 sm:px-5 text-right">Actions</th>
                                 </tr>
                               </thead>
                               <tbody className={`divide-y ${isDark ? 'divide-slate-800 text-slate-200' : 'divide-slate-100 text-slate-800'}`}>
-                                {generalApps.map((app) => (
+                                {generalApps.map((app) => {
+                                  const { coverLetterUrl } = extractCoverLetterMeta(app.cover_letter);
+                                  const attachedClUrl = app.cover_letter_url || coverLetterUrl;
+                                  return (
                                   <tr key={app.id} className={`transition-colors ${isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/80'}`}>
                                     <td className="py-3.5 px-4 sm:px-5">
                                       <div>
@@ -1157,19 +1213,38 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                     </td>
 
                                     <td className="py-3.5 px-4 sm:px-5">
-                                      <a
-                                        href={app.resume_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
-                                          isDark 
-                                            ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50' 
-                                            : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200'
-                                        }`}
-                                      >
-                                        <IconDownload className="w-3.5 h-3.5" />
-                                        <span>Download CV</span>
-                                      </a>
+                                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5">
+                                        <a
+                                          href={app.resume_url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                                            isDark 
+                                              ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50' 
+                                              : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200'
+                                          }`}
+                                          title="Download candidate CV / Resume"
+                                        >
+                                          <IconDownload className="w-3.5 h-3.5" />
+                                          <span>CV</span>
+                                        </a>
+                                        {attachedClUrl && (
+                                          <a
+                                            href={attachedClUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                                              isDark 
+                                                ? 'bg-purple-950/80 hover:bg-purple-800 text-purple-300 border-purple-800/50' 
+                                                : 'bg-purple-50 hover:bg-purple-700 text-purple-800 hover:text-white border-purple-200'
+                                            }`}
+                                            title="Download attached cover letter document"
+                                          >
+                                            <IconDownload className="w-3.5 h-3.5" />
+                                            <span>Cover Letter</span>
+                                          </a>
+                                        )}
+                                      </div>
                                     </td>
 
                                     <td className="py-3.5 px-4 sm:px-5 text-right space-x-2 whitespace-nowrap">
@@ -1193,7 +1268,8 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                       </button>
                                     </td>
                                   </tr>
-                                ))}
+                                );
+                              })}
                               </tbody>
                             </table>
                           </div>
@@ -1372,16 +1448,62 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                 </div>
               </div>
 
-              {selectedApp.cover_letter && (
-                <div>
-                  <span className={`font-bold block mb-1.5 text-xs uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Cover Note / Introduction</span>
-                  <p className={`p-4 rounded-xl leading-relaxed border ${
-                    isDark ? 'bg-slate-800/80 border-slate-700 text-slate-100' : 'bg-slate-50 border-slate-200 text-slate-900 font-medium'
-                  }`}>
-                    {selectedApp.cover_letter}
-                  </p>
-                </div>
-              )}
+              {/* Cover Letter Note and/or Attached Document */}
+              {(() => {
+                const { coverLetterUrl, coverLetterText } = extractCoverLetterMeta(selectedApp.cover_letter);
+                const attachedFileUrl = selectedApp.cover_letter_url || coverLetterUrl;
+                const displayText = coverLetterText || (!attachedFileUrl ? selectedApp.cover_letter : '');
+
+                if (!displayText && !attachedFileUrl) return null;
+
+                return (
+                  <div className="space-y-3">
+                    <span className={`font-bold block text-xs uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Cover Letter / Candidate Statement</span>
+                    {attachedFileUrl && (
+                      <div className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                        isDark ? 'bg-purple-950/40 border-purple-800/60' : 'bg-purple-50/70 border-purple-200'
+                      }`}>
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs ${
+                            isDark ? 'bg-purple-900 text-purple-200' : 'bg-purple-100 text-purple-700'
+                          }`}>
+                            DOC
+                          </div>
+                          <div>
+                            <div className={`font-bold text-xs sm:text-sm ${isDark ? 'text-purple-200' : 'text-purple-900'}`}>
+                              Attached Cover Letter Document
+                            </div>
+                            <div className={`text-xs ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>
+                              Uploaded directly by candidate
+                            </div>
+                          </div>
+                        </div>
+                        <a
+                          href={attachedFileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center space-x-1.5 px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg shadow-xs text-xs uppercase tracking-wider transition-colors"
+                        >
+                          <IconDownload className="w-3.5 h-3.5" />
+                          <span>Download Document</span>
+                        </a>
+                      </div>
+                    )}
+                    {displayText && (
+                      <div>
+                        {attachedFileUrl && (
+                          <span className={`font-bold block mb-1 text-2xs uppercase tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>Typed Note</span>
+                        )}
+                        <p className={`p-4 rounded-xl leading-relaxed whitespace-pre-line border ${
+                          isDark ? 'bg-slate-800/80 border-slate-700 text-slate-100' : 'bg-slate-50 border-slate-200 text-slate-900 font-medium'
+                        }`}>
+                          {displayText}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               <div>
                 <span className={`font-bold block mb-1.5 text-xs uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Recruiter & Interview Notes</span>
@@ -1417,16 +1539,33 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                 </div>
               </div>
 
-              <div className={`pt-4 border-t flex items-center justify-between ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
-                <a
-                  href={selectedApp.resume_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-xs text-xs uppercase tracking-wider"
-                >
-                  <IconDownload className="w-4 h-4" />
-                  <span>Download Attached Resume</span>
-                </a>
+              <div className={`pt-4 border-t flex flex-wrap items-center justify-between gap-3 ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
+                <div className="flex flex-wrap items-center gap-2">
+                  <a
+                    href={selectedApp.resume_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center space-x-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-xs text-xs uppercase tracking-wider"
+                  >
+                    <IconDownload className="w-4 h-4" />
+                    <span>Download CV</span>
+                  </a>
+                  {(() => {
+                    const clUrl = selectedApp.cover_letter_url || extractCoverLetterMeta(selectedApp.cover_letter).coverLetterUrl;
+                    if (!clUrl) return null;
+                    return (
+                      <a
+                        href={clUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center space-x-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl shadow-xs text-xs uppercase tracking-wider"
+                      >
+                        <IconDownload className="w-4 h-4" />
+                        <span>Download Cover Letter</span>
+                      </a>
+                    );
+                  })()}
+                </div>
                 <button
                   type="button"
                   onClick={() => setSelectedApp(null)}

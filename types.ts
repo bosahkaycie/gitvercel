@@ -266,6 +266,7 @@ export interface JobApplication {
   applicant_phone: string;
   resume_url: string;
   cover_letter?: string;
+  cover_letter_url?: string;
   status: 'new' | 'shortlisted' | 'interviewed' | 'rejected' | 'hired';
   notes?: string;
   created_at: string;
