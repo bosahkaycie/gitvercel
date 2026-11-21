@@ -45,7 +45,7 @@ import {
   useEmailSubscribers,
   useFollowUpEmails
 } from '../../hooks/useSupabaseData';
-import { IconMenu, IconSun, IconMoon, IconExternal, IconUserCircle, IconSettings, IconLogout, IconChevronDown } from '../../components/admin/AdminIcons';
+import { IconMenu, IconSun, IconMoon, IconExternal, IconUserCircle, IconSettings, IconLogout, IconChevronDown, IconShield } from '../../components/admin/AdminIcons';
 import AdminNotificationCenter from '../../components/admin/AdminNotificationCenter';
 
 const AdminLayout: React.FC = () => {
@@ -171,7 +171,7 @@ const AdminLayout: React.FC = () => {
   const { teamMembers, loading: teamLoading, saveTeamMember, deleteTeamMember, importTeamMembers } = useTeamMembers(true);
   const { vendors, loading: vendorsLoading, reviewApplication, deleteVendor } = useVendorApplications();
   const { jobs, loading: jobsLoading, saveJob, deleteJob } = useJobOpenings(true);
-  const { applications, loading: appsLoading, updateApplicationStatus, deleteApplication } = useJobApplications();
+  const { applications, loading: appsLoading, reload: reloadApplications, updateApplicationStatus, deleteApplication } = useJobApplications();
   const { posts, loading: blogsLoading, savePost, deletePost } = useBlogPosts(undefined, true);
   const { sliders, loading: slidersLoading, saveSlider, deleteSlider, resetSliders } = useSliders(true);
   const { videos, loading: videosLoading, saveVideo, deleteVideo } = useVideos(true);

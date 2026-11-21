@@ -40,8 +40,8 @@ interface AdminCareersProps {
 }
 
 const AdminCareers: React.FC<AdminCareersProps> = ({
-  applications,
-  jobs,
+  applications = [],
+  jobs = [],
   loading = false,
   appsLoading = false,
   jobsLoading = false,
@@ -129,17 +129,22 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
     }
   };
 
+  const safeApps = Array.isArray(applications) ? applications : [];
+  const safeJobs = Array.isArray(jobs) ? jobs : [];
+
   // Match application to job opening by ID or Title
   const matchJobForApp = (app: JobApplication): JobOpening | undefined => {
+    if (!app) return undefined;
     if (app.job_id) {
-      const byId = jobs.find(
-        (j) => j.id === app.job_id || j.id.toLowerCase() === app.job_id?.toLowerCase()
+      const byId = safeJobs.find(
+        (j) => j && (j.id === app.job_id || j.id?.toLowerCase() === app.job_id?.toLowerCase())
       );
       if (byId) return byId;
     }
     if (app.job_title) {
       const raw = app.job_title.toLowerCase().trim();
-      const byTitle = jobs.find((j) => {
+      const byTitle = safeJobs.find((j) => {
+        if (!j || !j.title) return false;
         const jTitle = j.title.toLowerCase().trim();
         return (
           jTitle === raw ||
@@ -154,8 +159,8 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
   };
 
   const getPostingAppCount = (jobId: string) =>
-    applications.filter((a) => matchJobForApp(a)?.id === jobId).length;
-  const generalAppCount = applications.filter((a) => !matchJobForApp(a)).length;
+    safeApps.filter((a) => matchJobForApp(a)?.id === jobId).length;
+  const generalAppCount = safeApps.filter((a) => !matchJobForApp(a)).length;
 
   const toggleCollapsePosting = (jobId: string) => {
     setCollapsedPostings((prev) => ({
@@ -170,13 +175,14 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
 
   const collapseAllPostings = () => {
     const allCollapsed: Record<string, boolean> = { general: true };
-    jobs.forEach((j) => {
-      allCollapsed[j.id] = true;
+    safeJobs.forEach((j) => {
+      if (j?.id) allCollapsed[j.id] = true;
     });
     setCollapsedPostings(allCollapsed);
   };
 
-  const filteredApps = applications.filter((app) => {
+  const filteredApps = safeApps.filter((app) => {
+    if (!app) return false;
     const matchedJob = matchJobForApp(app);
     const matchesPosting =
       selectedPostingFilter === 'All'
@@ -186,14 +192,16 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
         : matchedJob?.id === selectedPostingFilter;
 
     const matchesStatus = statusFilter === 'All' || app.status === statusFilter;
+    const q = searchQuery.toLowerCase().trim();
     const matchesSearch =
-      app.applicant_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.applicant_email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (app.applicant_phone && app.applicant_phone.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (app.job_title && app.job_title.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (matchedJob && matchedJob.title.toLowerCase().includes(searchQuery.toLowerCase()));
+      !q ||
+      (app.applicant_name && app.applicant_name.toLowerCase().includes(q)) ||
+      (app.applicant_email && app.applicant_email.toLowerCase().includes(q)) ||
+      (app.applicant_phone && app.applicant_phone.toLowerCase().includes(q)) ||
+      (app.job_title && app.job_title.toLowerCase().includes(q)) ||
+      (matchedJob && matchedJob.title && matchedJob.title.toLowerCase().includes(q));
 
-    return matchesPosting && matchesStatus && matchesSearch;
+    return matchesPosting && matchesStatus && Boolean(matchesSearch);
   });
 
   const handleOpenAppModal = (app: JobApplication) => {
@@ -295,18 +303,19 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
 
   const exportApplicationsToCSV = () => {
     const headers = ['Applicant Name', 'Email', 'Phone', 'Role Applied For', 'Status', 'Applied Date', 'Resume URL', 'Cover Letter File URL', 'Cover Letter Text', 'Notes'];
-    const rows = applications.map(a => {
+    const rows = safeApps.map(a => {
       const { coverLetterUrl, coverLetterText } = extractCoverLetterMeta(a.cover_letter);
       const attachedClUrl = a.cover_letter_url || coverLetterUrl || '';
       const clText = coverLetterText || (!attachedClUrl ? a.cover_letter || '' : '');
+      const dateStr = a.created_at ? new Date(a.created_at).toLocaleDateString('en-GB') : '';
       return [
-        `"${a.applicant_name}"`,
-        `"${a.applicant_email}"`,
-        `"${a.applicant_phone}"`,
-        `"${a.job_title || 'General Application'}"`,
-        `"${a.status}"`,
-        `"${new Date(a.created_at).toLocaleDateString('en-GB')}"`,
-        `"${a.resume_url}"`,
+        `"${(a.applicant_name || '').replace(/"/g, '""')}"`,
+        `"${(a.applicant_email || '').replace(/"/g, '""')}"`,
+        `"${(a.applicant_phone || '').replace(/"/g, '""')}"`,
+        `"${(a.job_title || 'General Application').replace(/"/g, '""')}"`,
+        `"${a.status || 'new'}"`,
+        `"${dateStr}"`,
+        `"${a.resume_url || ''}"`,
         `"${attachedClUrl}"`,
         `"${clText.replace(/"/g, '""')}"`,
         `"${(a.notes || '').replace(/"/g, '""')}"`

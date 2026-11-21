@@ -120,6 +120,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   render() {
     if (this.state.hasError) {
+      const isChunkError =
+        this.state.error?.name === 'ChunkLoadError' ||
+        this.state.error?.message?.includes('Failed to fetch dynamically imported module') ||
+        this.state.error?.message?.includes('dynamically imported module') ||
+        this.state.error?.message?.includes('loading chunk');
+
+      const isDashboardPath = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+
       return (
         <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 text-center">
           <div className="max-w-md bg-slate-900 border border-slate-800 p-8 rounded-lg shadow-2xl">
@@ -128,9 +136,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Updating Engineering Portal</h2>
+            <h2 className="text-xl font-bold text-white mb-2">
+              {isChunkError ? 'Updating Engineering Portal' : 'Engineering Portal Notice'}
+            </h2>
             <p className="text-sm text-slate-400 mb-6">
-              A new version of the website has been deployed. Please reload to display the updated content.
+              {isChunkError
+                ? 'A new version of the website has been deployed. Please reload to display the updated content.'
+                : 'An unexpected issue occurred while rendering this view. Please try reloading or returning to the dashboard.'}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
@@ -157,12 +169,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                 onClick={() => {
                   if (typeof window !== 'undefined') {
                     window.sessionStorage.clear();
-                    window.location.replace('/?_v=' + Date.now());
+                    const dest = isDashboardPath ? '/admin' : '/';
+                    window.location.replace(dest + '?_v=' + Date.now());
                   }
                 }}
                 className="px-6 py-2.5 border border-slate-700 hover:border-slate-500 text-slate-300 font-bold text-xs uppercase tracking-wider rounded transition-colors cursor-pointer"
               >
-                Return Home
+                {isDashboardPath ? 'Return to Admin' : 'Return Home'}
               </button>
             </div>
           </div>
