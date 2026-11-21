@@ -73,6 +73,26 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     return { hasError: true, error };
   }
 
+  componentDidMount() {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('popstate', this.handleReset);
+      window.addEventListener('pushstate-changed', this.handleReset);
+    }
+  }
+
+  componentWillUnmount() {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('popstate', this.handleReset);
+      window.removeEventListener('pushstate-changed', this.handleReset);
+    }
+  }
+
+  handleReset = () => {
+    if (this.state.hasError) {
+      this.setState({ hasError: false, error: undefined });
+    }
+  };
+
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('ErrorBoundary caught:', error, errorInfo);
     const isChunkError =
@@ -83,9 +103,17 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
     if (isChunkError && typeof window !== 'undefined') {
       const reloadKey = 'pigl_eb_retry_' + window.location.pathname;
-      if (!window.sessionStorage.getItem(reloadKey)) {
-        window.sessionStorage.setItem(reloadKey, 'true');
-        window.location.reload();
+      const retries = parseInt(window.sessionStorage.getItem(reloadKey) || '0', 10);
+      if (retries < 2) {
+        window.sessionStorage.setItem(reloadKey, (retries + 1).toString());
+        try {
+          if ('caches' in window) {
+            caches.keys().then((names) => names.forEach((n) => caches.delete(n)));
+          }
+        } catch (e) {}
+        const url = new URL(window.location.href);
+        url.searchParams.set('_v', Date.now().toString());
+        window.location.replace(url.toString());
       }
     }
   }
@@ -106,22 +134,36 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
+                type="button"
                 onClick={() => {
                   if (typeof window !== 'undefined') {
                     window.sessionStorage.clear();
-                    window.location.reload();
+                    try {
+                      if ('caches' in window) {
+                        caches.keys().then((names) => names.forEach((n) => caches.delete(n)));
+                      }
+                    } catch (e) {}
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('_v', Date.now().toString());
+                    window.location.replace(url.toString());
                   }
                 }}
                 className="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider rounded transition-colors cursor-pointer"
               >
                 Reload Page
               </button>
-              <a
-                href="/"
-                className="px-6 py-2.5 border border-slate-700 hover:border-slate-500 text-slate-300 font-bold text-xs uppercase tracking-wider rounded transition-colors"
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.sessionStorage.clear();
+                    window.location.replace('/?_v=' + Date.now());
+                  }
+                }}
+                className="px-6 py-2.5 border border-slate-700 hover:border-slate-500 text-slate-300 font-bold text-xs uppercase tracking-wider rounded transition-colors cursor-pointer"
               >
                 Return Home
-              </a>
+              </button>
             </div>
           </div>
         </div>

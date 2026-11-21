@@ -356,6 +356,8 @@ $html = str_replace('</head>', $jsonLdScript . "\n</head>", $html);
 
 // 8. Output Response
 header('Content-Type: text/html; charset=UTF-8');
-header('Cache-Control: public, max-age=300, stale-while-revalidate=600');
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
 echo $html;
 exit();
