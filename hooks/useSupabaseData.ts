@@ -3745,6 +3745,7 @@ export const useJobApplications = () => {
             cover_letter_url: a.cover_letter_url || coverLetterUrl
           };
         });
+        saveStoredApplications(enriched);
         setApplications(enriched);
       } else {
         setApplications(getStoredApplications());
