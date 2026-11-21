@@ -152,6 +152,9 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
       const result = await submitJobApplication({
         job_id: job?.id,
         job_title: job?.title || 'General Engineering Role',
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
         applicant_name: formData.name,
         applicant_email: formData.email,
         applicant_phone: formData.phone,

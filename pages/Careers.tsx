@@ -137,6 +137,9 @@ const Careers: React.FC = () => {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
+        applicant_name: formData.name,
+        applicant_email: formData.email,
+        applicant_phone: formData.phone,
         job_id: selectedJob?.id,
         job_title: selectedJob?.title || 'General Application',
         cover_letter: formData.coverLetter,
@@ -144,19 +147,17 @@ const Careers: React.FC = () => {
         resume_file: resumeFile
       });
 
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to submit application');
+      }
+
       setUploadProgress(70);
       setSubmissionPhase('Registering candidate credentials...');
       await new Promise(r => setTimeout(r, 200));
 
       setUploadProgress(100);
       setSubmissionPhase('Application successfully received.');
-
-      if (result.success) {
-        setStatus('success');
-      } else {
-        setStatus('error');
-        setErrorMessage(result.error || 'Failed to submit application. Please try again.');
-      }
+      setStatus('success');
     } catch (err: any) {
       console.error(err);
       setStatus('error');

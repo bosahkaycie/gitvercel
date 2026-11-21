@@ -3799,9 +3799,12 @@ export const useJobApplications = () => {
 };
 
 export const submitJobApplication = async (data: {
-  name: string;
-  email: string;
-  phone: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  applicant_name?: string;
+  applicant_email?: string;
+  applicant_phone?: string;
   job_id?: string;
   job_title?: string;
   cover_letter?: string;
@@ -3810,6 +3813,18 @@ export const submitJobApplication = async (data: {
   resume_url?: string;
   resume_file?: File;
 }): Promise<{ success: boolean; error?: string }> => {
+  const applicantName = (data.name || data.applicant_name || '').trim();
+  const applicantEmail = (data.email || data.applicant_email || '').trim();
+  const applicantPhone = (data.phone || data.applicant_phone || '').trim();
+
+  if (!applicantName) {
+    return { success: false, error: 'Full candidate name is required.' };
+  }
+  if (!applicantEmail) {
+    return { success: false, error: 'Valid email address is required.' };
+  }
+
+  const safeName = (applicantName || 'candidate').replace(/[^a-zA-Z0-9]/g, '_');
   let fileUrl = data.resume_url || '/assets/PIGL COMPANY PROFILE.pdf';
   let coverLetterUrl = data.cover_letter_url;
 
@@ -3818,8 +3833,8 @@ export const submitJobApplication = async (data: {
   // 1. Upload CV / Resume
   if (client && data.resume_file) {
     try {
-      const fileExt = data.resume_file.name.split('.').pop();
-      const fileName = `${Date.now()}-${data.name.replace(/[^a-zA-Z0-9]/g, '_')}.${fileExt}`;
+      const fileExt = data.resume_file.name.split('.').pop() || 'pdf';
+      const fileName = `${Date.now()}-${safeName}.${fileExt}`;
       const { error: uploadErr } = await client.storage.from('resumes').upload(fileName, data.resume_file, {
         cacheControl: '3600',
         upsert: true
@@ -3829,6 +3844,8 @@ export const submitJobApplication = async (data: {
         if (publicData?.publicUrl) {
           fileUrl = publicData.publicUrl;
         }
+      } else {
+        console.warn('Resume upload warning:', uploadErr);
       }
     } catch (err) {
       console.warn('Resume upload note:', err);
@@ -3838,8 +3855,8 @@ export const submitJobApplication = async (data: {
   // 2. Upload Cover Letter Document if provided
   if (client && data.cover_letter_file) {
     try {
-      const clExt = data.cover_letter_file.name.split('.').pop();
-      const clFileName = `${Date.now()}-cover-letter-${data.name.replace(/[^a-zA-Z0-9]/g, '_')}.${clExt}`;
+      const clExt = data.cover_letter_file.name.split('.').pop() || 'pdf';
+      const clFileName = `${Date.now()}-cover-letter-${safeName}.${clExt}`;
       const { error: clUploadErr } = await client.storage.from('resumes').upload(clFileName, data.cover_letter_file, {
         cacheControl: '3600',
         upsert: true
@@ -3849,6 +3866,8 @@ export const submitJobApplication = async (data: {
         if (clPublicData?.publicUrl) {
           coverLetterUrl = clPublicData.publicUrl;
         }
+      } else {
+        console.warn('Cover letter storage upload error:', clUploadErr);
       }
     } catch (err) {
       console.warn('Cover letter upload note:', err);
@@ -3863,11 +3882,11 @@ export const submitJobApplication = async (data: {
 
   const dbPayload = {
     id: `app-${Date.now()}`,
-    job_id: data.job_id,
+    job_id: data.job_id || null,
     job_title: data.job_title || 'General Application',
-    applicant_name: data.name,
-    applicant_email: data.email,
-    applicant_phone: data.phone,
+    applicant_name: applicantName,
+    applicant_email: applicantEmail,
+    applicant_phone: applicantPhone,
     resume_url: fileUrl,
     cover_letter: combinedCoverLetter || null,
     status: 'new' as const,
@@ -3882,9 +3901,14 @@ export const submitJobApplication = async (data: {
 
   if (client) {
     try {
-      await client.from('job_applications').insert([dbPayload]);
-    } catch (err) {
-      console.warn('Job application db insert fallback:', err);
+      const { error: insertErr } = await client.from('job_applications').insert([dbPayload]);
+      if (insertErr) {
+        console.error('Job application db insert error:', insertErr);
+        return { success: false, error: insertErr.message || 'Database error occurred while recording application.' };
+      }
+    } catch (err: any) {
+      console.error('Job application db insert fallback:', err);
+      return { success: false, error: err?.message || 'Failed to submit application to database.' };
     }
   }
 

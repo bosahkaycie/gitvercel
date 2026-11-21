@@ -468,6 +468,7 @@ const AdminLayout: React.FC = () => {
             onDeleteJob={deleteJob}
             applications={applications}
             appsLoading={appsLoading}
+            onRefreshApplications={reloadApplications}
             onUpdateApplicationStatus={updateApplicationStatus}
             onDeleteApplication={deleteApplication}
             theme={theme}

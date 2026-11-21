@@ -29,6 +29,7 @@ interface AdminCareersProps {
   loading?: boolean;
   appsLoading?: boolean;
   jobsLoading?: boolean;
+  onRefreshApplications?: () => void | Promise<any>;
   onUpdateApplicationStatus?: (id: string, status: JobApplication['status'], notes?: string) => Promise<any>;
   onUpdateAppStatus?: (id: string, status: JobApplication['status'], notes?: string) => Promise<any>;
   onDeleteApplication?: (id: string) => Promise<any>;
@@ -44,6 +45,7 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
   loading = false,
   appsLoading = false,
   jobsLoading = false,
+  onRefreshApplications,
   onUpdateApplicationStatus,
   onUpdateAppStatus,
   onDeleteApplication,
@@ -55,6 +57,20 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
   const [activeTab, setActiveTab] = useState<'applications' | 'openings'>('applications');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    if (onRefreshApplications) {
+      setIsRefreshing(true);
+      try {
+        await onRefreshApplications();
+        setToggleToast('Live applications refreshed from database');
+        setTimeout(() => setToggleToast(null), 3000);
+      } finally {
+        setIsRefreshing(false);
+      }
+    }
+  };
 
   // Grouping & Sorting state for Applications
   const [appsViewMode, setAppsViewMode] = useState<'grouped' | 'table'>('grouped');
@@ -348,17 +364,35 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
           </button>
         </div>
 
-        <div className="flex items-center space-x-3 pb-3 sm:pb-0">
+        <div className="flex items-center space-x-2.5 pb-3 sm:pb-0">
           {activeTab === 'applications' ? (
-            <button
-              onClick={exportApplicationsToCSV}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 border shadow-xs cursor-pointer ${
-                isDark ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              <IconDownload className="w-4 h-4" />
-              <span>Export CSV</span>
-            </button>
+            <>
+              {onRefreshApplications && (
+                <button
+                  type="button"
+                  onClick={handleRefresh}
+                  disabled={isRefreshing || appsLoading}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 border shadow-xs cursor-pointer ${
+                    isDark ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
+                  }`}
+                  title="Fetch fresh applications from live database"
+                >
+                  <svg className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-400' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+                </button>
+              )}
+              <button
+                onClick={exportApplicationsToCSV}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 border shadow-xs cursor-pointer ${
+                  isDark ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                <IconDownload className="w-4 h-4" />
+                <span>Export CSV</span>
+              </button>
+            </>
           ) : (
             <button
               onClick={openCreateJobModal}
@@ -430,6 +464,29 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
       {/* Applications View */}
       {activeTab === 'applications' && (
         <div className="space-y-5">
+          {/* Quick Metrics Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className={`p-4 rounded-2xl border shadow-2xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Live Submissions</div>
+              <div className="text-xl sm:text-2xl font-black mt-1 text-emerald-500">{applications.length}</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">Recorded in Supabase database</div>
+            </div>
+            <div className={`p-4 rounded-2xl border shadow-2xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Direct Vacancies</div>
+              <div className="text-xl sm:text-2xl font-black mt-1 text-blue-500">{applications.length - generalAppCount}</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">Applied to active roles</div>
+            </div>
+            <div className={`p-4 rounded-2xl border shadow-2xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">General Talent Pool</div>
+              <div className="text-xl sm:text-2xl font-black mt-1 text-purple-500">{generalAppCount}</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">Spontaneous applications</div>
+            </div>
+            <div className={`p-4 rounded-2xl border shadow-2xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">New / Unreviewed</div>
+              <div className="text-xl sm:text-2xl font-black mt-1 text-amber-500">{applications.filter(a => a.status === 'new').length}</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">Candidates awaiting action</div>
+            </div>
+          </div>
           {/* Active Job Postings Horizontal Filter Chips */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs px-1">
