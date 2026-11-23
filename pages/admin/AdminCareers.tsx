@@ -33,8 +33,8 @@ interface AdminCareersProps {
   appsLoading?: boolean;
   jobsLoading?: boolean;
   onRefreshApplications?: () => void | Promise<any>;
-  onUpdateApplicationStatus?: (id: string, status: JobApplication['status'], notes?: string) => Promise<any>;
-  onUpdateAppStatus?: (id: string, status: JobApplication['status'], notes?: string) => Promise<any>;
+  onUpdateApplicationStatus?: (id: string, status: JobApplication['status'], notes?: string, extraFields?: Partial<JobApplication>) => Promise<any>;
+  onUpdateAppStatus?: (id: string, status: JobApplication['status'], notes?: string, extraFields?: Partial<JobApplication>) => Promise<any>;
   onDeleteApplication?: (id: string) => Promise<any>;
   onDeleteApp?: (id: string) => Promise<any>;
   onSaveJob: (job: Partial<JobOpening> & { title: string; department: string }) => Promise<any>;
@@ -107,6 +107,79 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
   const [copiedJobId, setCopiedJobId] = useState<string | null>(null);
   const [previewFlyerUrl, setPreviewFlyerUrl] = useState<string | null>(null);
   const jobFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Supabase Quota Notice & Candidate Direct Outreach Modal
+  const [quotaModalData, setQuotaModalData] = useState<{
+    app: JobApplication;
+    docType: 'resume' | 'cover_letter';
+  } | null>(null);
+  const [replacingCv, setReplacingCv] = useState(false);
+  const [replaceCvToast, setReplaceCvToast] = useState<string | null>(null);
+  const replaceCvInputRef = useRef<HTMLInputElement>(null);
+
+  const getCleanPhone = (phone?: string) => {
+    if (!phone) return '';
+    let digits = phone.replace(/[^0-9]/g, '');
+    if (digits.startsWith('0') && digits.length === 11) {
+      digits = '234' + digits.slice(1);
+    }
+    return digits;
+  };
+
+  const handleViewDocument = (e: React.MouseEvent, app: JobApplication, docType: 'resume' | 'cover_letter') => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = docType === 'resume'
+      ? app.resume_url
+      : (app.cover_letter_url || extractCoverLetterMeta(app.cover_letter).coverLetterUrl);
+
+    if (!url) return;
+
+    // Check if the document link is hosted on Supabase (which is currently quota-restricted)
+    const isSupabase = url.includes('supabase.co');
+    if (isSupabase) {
+      setQuotaModalData({ app, docType });
+      return;
+    }
+
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleReplaceCvUpload = async (file: File) => {
+    if (!quotaModalData) return;
+    setReplacingCv(true);
+    try {
+      const fileExt = file.name.split('.').pop() || 'pdf';
+      const cleanName = `${Date.now()}_cv_${(quotaModalData.app.applicant_name || 'candidate').replace(/[^a-zA-Z0-9]/g, '_')}.${fileExt}`;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('filename', cleanName);
+      formData.append('bucket', 'resumes');
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if (data && data.success && (data.url || data.relative_url)) {
+        const newUrl = data.url || data.relative_url;
+        const updateFn = onUpdateApplicationStatus || onUpdateAppStatus;
+        if (updateFn) {
+          await updateFn(quotaModalData.app.id, quotaModalData.app.status, quotaModalData.app.notes, { resume_url: newUrl });
+        }
+        setReplaceCvToast('Replacement CV uploaded directly to Hostinger server storage!');
+        setTimeout(() => setReplaceCvToast(null), 4000);
+        setQuotaModalData({
+          ...quotaModalData,
+          app: { ...quotaModalData.app, resume_url: newUrl }
+        });
+      }
+    } catch (err) {
+      console.error('Failed to upload replacement CV:', err);
+    } finally {
+      setReplacingCv(false);
+    }
+  };
 
   const isDark = theme === 'dark';
   const handleUpdateStatus = onUpdateApplicationStatus || onUpdateAppStatus || (async () => {});
@@ -551,6 +624,39 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
       {/* Applications View */}
       {activeTab === 'applications' && (
         <div className="space-y-5">
+          {/* Supabase Storage Bandwidth Quota Notice */}
+          <div className={`p-4 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs transition-colors ${
+            isDark ? 'bg-amber-950/25 border-amber-800/40 text-amber-200' : 'bg-amber-50/90 border-amber-200 text-amber-900'
+          }`}>
+            <div className="flex items-start space-x-3">
+              <div className="p-2 rounded-xl bg-amber-500/20 text-amber-500 shrink-0 mt-0.5">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-bold text-slate-900 dark:text-white">
+                  Supabase Storage Cached Egress Cap Active (Project: jbldpfvceacfonkzzhig)
+                </p>
+                <p className="mt-0.5 text-slate-600 dark:text-slate-300 leading-relaxed">
+                  Supabase has restricted egress on project files (HTTP 402). Click any candidate's <strong>CV</strong> button below to view their direct WhatsApp, call, or email details for immediate evaluation, or upgrade your plan in Supabase Billing to restore all file downloads.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2 shrink-0">
+              <a
+                href="https://supabase.com/dashboard/project/jbldpfvceacfonkzzhig/settings/billing"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl transition-all shadow-xs flex items-center space-x-1.5 cursor-pointer text-xs"
+              >
+                <span>Supabase Billing</span>
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </div>
+          </div>
           {/* Quick Metrics Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <div className={`p-4 rounded-2xl border shadow-2xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
@@ -846,35 +952,33 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
 
                           <td className="py-4 px-4 sm:px-5">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5">
-                              <a
-                                href={app.resume_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                              <button
+                                type="button"
+                                onClick={(e) => handleViewDocument(e, app, 'resume')}
+                                className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border cursor-pointer ${
                                   isDark 
                                     ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50' 
                                     : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200'
                                 }`}
-                                title="Download candidate CV / Resume"
+                                title="Download or view candidate CV / Resume"
                               >
                                 <IconDownload className="w-3.5 h-3.5" />
                                 <span>CV</span>
-                              </a>
+                              </button>
                               {attachedClUrl && (
-                                <a
-                                  href={attachedClUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                                <button
+                                  type="button"
+                                  onClick={(e) => handleViewDocument(e, app, 'cover_letter')}
+                                  className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border cursor-pointer ${
                                     isDark 
                                       ? 'bg-purple-950/80 hover:bg-purple-800 text-purple-300 border-purple-800/50' 
                                       : 'bg-purple-50 hover:bg-purple-700 text-purple-800 hover:text-white border-purple-200'
                                   }`}
-                                  title="Download attached cover letter document"
+                                  title="Download or view attached cover letter document"
                                 >
                                   <IconDownload className="w-3.5 h-3.5" />
                                   <span>Cover Letter</span>
-                                </a>
+                                </button>
                               )}
                             </div>
                           </td>
@@ -1166,35 +1270,33 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
 
                                       <td className="py-3.5 px-4 sm:px-5">
                                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5">
-                                          <a
-                                            href={app.resume_url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                                          <button
+                                            type="button"
+                                            onClick={(e) => handleViewDocument(e, app, "resume")}
+                                            className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border cursor-pointer ${
                                               isDark 
-                                                ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50' 
-                                                : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200'
+                                                ? "bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50" 
+                                                : "bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200"
                                             }`}
-                                            title="Download candidate CV / Resume"
+                                            title="Download or view candidate CV / Resume"
                                           >
                                             <IconDownload className="w-3.5 h-3.5" />
                                             <span>CV</span>
-                                          </a>
+                                          </button>
                                           {attachedClUrl && (
-                                            <a
-                                              href={attachedClUrl}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                                            <button
+                                              type="button"
+                                              onClick={(e) => handleViewDocument(e, app, "cover_letter")}
+                                              className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border cursor-pointer ${
                                                 isDark 
-                                                  ? 'bg-purple-950/80 hover:bg-purple-800 text-purple-300 border-purple-800/50' 
-                                                  : 'bg-purple-50 hover:bg-purple-700 text-purple-800 hover:text-white border-purple-200'
+                                                  ? "bg-purple-950/80 hover:bg-purple-800 text-purple-300 border-purple-800/50" 
+                                                  : "bg-purple-50 hover:bg-purple-700 text-purple-800 hover:text-white border-purple-200"
                                               }`}
-                                              title="Download attached cover letter document"
+                                              title="Download or view attached cover letter document"
                                             >
                                               <IconDownload className="w-3.5 h-3.5" />
                                               <span>Cover Letter</span>
-                                            </a>
+                                            </button>
                                           )}
                                         </div>
                                       </td>
@@ -1358,35 +1460,33 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
 
                                     <td className="py-3.5 px-4 sm:px-5">
                                       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5">
-                                        <a
-                                          href={app.resume_url}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                                        <button
+                                          type="button"
+                                          onClick={(e) => handleViewDocument(e, app, "resume")}
+                                          className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border cursor-pointer ${
                                             isDark 
-                                              ? 'bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50' 
-                                              : 'bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200'
+                                              ? "bg-emerald-950/80 hover:bg-emerald-800 text-emerald-300 border-emerald-800/50" 
+                                              : "bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white border-emerald-200"
                                           }`}
-                                          title="Download candidate CV / Resume"
+                                          title="Download or view candidate CV / Resume"
                                         >
                                           <IconDownload className="w-3.5 h-3.5" />
                                           <span>CV</span>
-                                        </a>
+                                        </button>
                                         {attachedClUrl && (
-                                          <a
-                                            href={attachedClUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border ${
+                                          <button
+                                            type="button"
+                                            onClick={(e) => handleViewDocument(e, app, "cover_letter")}
+                                            className={`inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors border cursor-pointer ${
                                               isDark 
-                                                ? 'bg-purple-950/80 hover:bg-purple-800 text-purple-300 border-purple-800/50' 
-                                                : 'bg-purple-50 hover:bg-purple-700 text-purple-800 hover:text-white border-purple-200'
+                                                ? "bg-purple-950/80 hover:bg-purple-800 text-purple-300 border-purple-800/50" 
+                                                : "bg-purple-50 hover:bg-purple-700 text-purple-800 hover:text-white border-purple-200"
                                             }`}
-                                            title="Download attached cover letter document"
+                                            title="Download or view attached cover letter document"
                                           >
                                             <IconDownload className="w-3.5 h-3.5" />
                                             <span>Cover Letter</span>
-                                          </a>
+                                          </button>
                                         )}
                                       </div>
                                     </td>
@@ -1712,28 +1812,26 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
 
               <div className={`pt-4 border-t flex flex-wrap items-center justify-between gap-3 ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
                 <div className="flex flex-wrap items-center gap-2">
-                  <a
-                    href={selectedApp.resume_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center space-x-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-xs text-xs uppercase tracking-wider"
+                  <button
+                    type="button"
+                    onClick={(e) => handleViewDocument(e, selectedApp, "resume")}
+                    className="inline-flex items-center space-x-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-xs text-xs uppercase tracking-wider cursor-pointer"
                   >
                     <IconDownload className="w-4 h-4" />
                     <span>Download CV</span>
-                  </a>
+                  </button>
                   {(() => {
                     const clUrl = selectedApp.cover_letter_url || extractCoverLetterMeta(selectedApp.cover_letter).coverLetterUrl;
                     if (!clUrl) return null;
                     return (
-                      <a
-                        href={clUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center space-x-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl shadow-xs text-xs uppercase tracking-wider"
+                      <button
+                        type="button"
+                        onClick={(e) => handleViewDocument(e, selectedApp, "cover_letter")}
+                        className="inline-flex items-center space-x-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl shadow-xs text-xs uppercase tracking-wider cursor-pointer"
                       >
                         <IconDownload className="w-4 h-4" />
                         <span>Download Cover Letter</span>
-                      </a>
+                      </button>
                     );
                   })()}
                 </div>
@@ -2484,6 +2582,234 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                 type="button"
                 onClick={() => setIsStatsModalOpen(false)}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Flyer Image Preview Lightbox Modal */}
+      {/* Supabase Quota Notice & Candidate Direct Outreach Modal */}
+      {quotaModalData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className={`relative w-full max-w-xl rounded-2xl shadow-2xl border flex flex-col max-h-[92vh] overflow-hidden ${
+            isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
+          }`}>
+            {/* Header */}
+            <div className={`p-5 sm:p-6 border-b flex items-start justify-between gap-4 ${
+              isDark ? 'border-slate-800 bg-slate-950/40' : 'border-slate-100 bg-slate-50/80'
+            }`}>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0 border border-amber-500/20">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
+                    Candidate CV & Storage Quota
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    {quotaModalData.docType === 'resume' ? 'Curriculum Vitae / Resume' : 'Cover Letter Attachment'} for {quotaModalData.app.applicant_name}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setQuotaModalData(null)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-lg transition-colors cursor-pointer"
+              >
+                <IconClose className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Content Body */}
+            <div className="p-5 sm:p-6 space-y-5 overflow-y-auto">
+              {/* Quota Explanation Banner */}
+              <div className={`p-4 rounded-xl border text-xs leading-relaxed ${
+                isDark ? 'bg-amber-950/30 border-amber-800/40 text-amber-200' : 'bg-amber-50 border-amber-200 text-amber-900'
+              }`}>
+                <div className="flex items-center space-x-2 font-bold mb-1">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                  <span>Supabase Monthly Egress Cap Active (HTTP 402)</span>
+                </div>
+                <p>
+                  This file is hosted on Supabase Storage (<code>jbldpfvceacfonkzzhig.supabase.co</code>). The Supabase organization has reached its monthly Free Tier cached egress limit (1 GB / 5 GB). Cloudflare is temporarily restricting file downloads until the project plan is upgraded or the spend cap is adjusted in Supabase Billing.
+                </p>
+              </div>
+
+              {/* Immediate Candidate Direct Outreach Card */}
+              <div className={`p-4 sm:p-5 rounded-xl border space-y-3.5 ${
+                isDark ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                    Direct Candidate Outreach (No Delay)
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    Role: <strong className="text-slate-700 dark:text-slate-300">{quotaModalData.app.job_title}</strong>
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  {/* Phone & WhatsApp */}
+                  <div className={`p-3 rounded-lg border flex flex-col justify-between gap-2 ${
+                    isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                  }`}>
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase font-bold block">Phone Number</span>
+                      <span className="font-semibold text-slate-900 dark:text-white">
+                        {quotaModalData.app.applicant_phone || 'Not provided'}
+                      </span>
+                    </div>
+                    {quotaModalData.app.applicant_phone && (
+                      <div className="flex items-center gap-1.5 pt-1">
+                        <a
+                          href={`tel:${quotaModalData.app.applicant_phone}`}
+                          className="px-2.5 py-1 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-md text-[11px] transition-colors"
+                        >
+                          📞 Call
+                        </a>
+                        <a
+                          href={`https://wa.me/${getCleanPhone(quotaModalData.app.applicant_phone)}?text=${encodeURIComponent(`Hello ${quotaModalData.app.applicant_name}, this is Polaris Integrated & GeoSolutions regarding your application for the ${quotaModalData.app.job_title} role.`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-md text-[11px] transition-colors"
+                        >
+                          💬 WhatsApp
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Email */}
+                  <div className={`p-3 rounded-lg border flex flex-col justify-between gap-2 ${
+                    isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                  }`}>
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase font-bold block">Email Address</span>
+                      <span className="font-semibold text-slate-900 dark:text-white truncate block" title={quotaModalData.app.applicant_email}>
+                        {quotaModalData.app.applicant_email}
+                      </span>
+                    </div>
+                    {quotaModalData.app.applicant_email && (
+                      <div className="pt-1">
+                        <a
+                          href={`mailto:${quotaModalData.app.applicant_email}?subject=${encodeURIComponent(`Polaris Job Application - ${quotaModalData.app.job_title}`)}&body=${encodeURIComponent(`Dear ${quotaModalData.app.applicant_name},\n\nWe received your application for the position of ${quotaModalData.app.job_title} at Polaris Integrated & GeoSolutions.\n\nCould you please email us your updated CV/Resume document so our technical review committee can proceed with your evaluation?\n\nBest regards,\nPIGL Recruitment Team`)}`}
+                          className="inline-block px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-md text-[11px] transition-colors"
+                        >
+                          ✉️ Request CV via Email
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Resolution Options */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-900 dark:text-white">Admin Resolution Actions</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {/* Open Supabase Billing */}
+                  <a
+                    href="https://supabase.com/dashboard/project/jbldpfvceacfonkzzhig/settings/billing"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex flex-col items-start gap-1 transition-all shadow-xs"
+                  >
+                    <span className="flex items-center gap-1.5 text-xs font-black">
+                      <span>Unlock Supabase Billing</span>
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </span>
+                    <span className="text-[11px] font-normal text-emerald-100 leading-tight">
+                      Click 'Upgrade plan' or change spend cap to restore all 37 CV downloads instantly.
+                    </span>
+                  </a>
+
+                  {/* Try Opening Supabase File Anyway */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = quotaModalData.docType === 'resume'
+                        ? quotaModalData.app.resume_url
+                        : (quotaModalData.app.cover_letter_url || extractCoverLetterMeta(quotaModalData.app.cover_letter).coverLetterUrl);
+                      if (url) window.open(url, '_blank', 'noopener,noreferrer');
+                    }}
+                    className={`p-3.5 rounded-xl border text-left flex flex-col items-start gap-1 transition-all cursor-pointer ${
+                      isDark ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200' : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800'
+                    }`}
+                  >
+                    <span className="text-xs font-bold flex items-center gap-1.5">
+                      <span>Open File Link in Tab</span>
+                      <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
+                      Opens direct link in case billing was just resolved or restrictions reset.
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Upload Replacement CV to Hostinger */}
+              <div className={`p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs ${
+                isDark ? 'bg-slate-950/40 border-slate-800' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div>
+                  <span className="font-bold text-slate-900 dark:text-white block">
+                    Received CV from candidate directly?
+                  </span>
+                  <span className="text-slate-500 dark:text-slate-400 text-[11px]">
+                    Upload it here to store permanently on Hostinger server disk with zero bandwidth caps.
+                  </span>
+                  {replaceCvToast && (
+                    <span className="text-emerald-500 font-bold text-[11px] block mt-1">
+                      ✓ {replaceCvToast}
+                    </span>
+                  )}
+                </div>
+                <div className="shrink-0">
+                  <input
+                    ref={replaceCvInputRef}
+                    type="file"
+                    accept=".pdf,.docx,.doc"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleReplaceCvUpload(file);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    disabled={replacingCv}
+                    onClick={() => replaceCvInputRef.current?.click()}
+                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    {replacingCv ? 'Uploading...' : 'Upload to Hostinger'}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className={`p-4 border-t flex items-center justify-between gap-3 ${
+              isDark ? 'border-slate-800 bg-slate-950/50' : 'border-slate-100 bg-slate-50'
+            }`}>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                All newly submitted applications now save directly to Hostinger server storage.
+              </span>
+              <button
+                type="button"
+                onClick={() => setQuotaModalData(null)}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
               >
                 Close
               </button>
