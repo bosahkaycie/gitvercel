@@ -20,7 +20,10 @@ import {
   IconChevronDown,
   IconChevronRight,
   IconExternal,
-  IconUsers
+  IconUsers,
+  IconPieChart,
+  IconTrendingUp,
+  IconFilter
 } from '../../components/admin/AdminIcons';
 
 interface AdminCareersProps {
@@ -85,6 +88,10 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
 
   // Job Opening Modal
   const [isJobModalOpen, setIsJobModalOpen] = useState(false);
+  // Positions & Applicant Statistics Pop-up Modal
+  const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
+  const [statsViewFilter, setStatsViewFilter] = useState<'open_only' | 'all'>('open_only');
+  const [statsSearchQuery, setStatsSearchQuery] = useState('');
   const [editingJob, setEditingJob] = useState<JobOpening | null>(null);
   const [jobTitle, setJobTitle] = useState('');
   const [jobDept, setJobDept] = useState('Ground Intelligence');
@@ -161,6 +168,30 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
   const getPostingAppCount = (jobId: string) =>
     safeApps.filter((a) => matchJobForApp(a)?.id === jobId).length;
   const generalAppCount = safeApps.filter((a) => !matchJobForApp(a)).length;
+
+  const openPublishedJobs = safeJobs.filter((j) => j && j.status === 'active');
+  const activeVacancyApplicantsCount = safeApps.filter((a) => {
+    const job = matchJobForApp(a);
+    return Boolean(job && job.status === 'active');
+  }).length;
+
+  const getJobDetailStats = (jobId: string) => {
+    const jobApps = safeApps.filter((a) => matchJobForApp(a)?.id === jobId);
+    return {
+      total: jobApps.length,
+      newCount: jobApps.filter((a) => !a.status || a.status === 'New').length,
+      shortlistedCount: jobApps.filter((a) => a.status === 'Shortlisted').length,
+      interviewedCount: jobApps.filter((a) => a.status === 'Interviewed').length,
+      hiredCount: jobApps.filter((a) => a.status === 'Hired').length,
+      rejectedCount: jobApps.filter((a) => a.status === 'Rejected').length
+    };
+  };
+
+  const handleSelectPostingFromStats = (jobId: string) => {
+    setSelectedPostingFilter(jobId);
+    setActiveTab('applications');
+    setIsStatsModalOpen(false);
+  };
 
   const toggleCollapsePosting = (jobId: string) => {
     setCollapsedPostings((prev) => ({
@@ -394,6 +425,20 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
         <div className="flex items-center space-x-2.5 pb-3 sm:pb-0">
           {activeTab === 'applications' ? (
             <>
+              <button
+                type="button"
+                onClick={() => setIsStatsModalOpen(true)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 border shadow-xs cursor-pointer ${
+                  isDark
+                    ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700 hover:border-emerald-500/50'
+                    : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-emerald-600/50'
+                }`}
+                title="View Statistics for Open / Published Positions"
+              >
+                <IconPieChart className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>Position Stats</span>
+              </button>
+
               {onRefreshApplications && (
                 <button
                   type="button"
@@ -421,13 +466,28 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
               </button>
             </>
           ) : (
-            <button
-              onClick={openCreateJobModal}
-              className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 cursor-pointer"
-            >
-              <IconPlus className="w-4 h-4" />
-              <span>Post New Vacancy</span>
-            </button>
+            <div className="flex items-center space-x-2.5">
+              <button
+                type="button"
+                onClick={() => setIsStatsModalOpen(true)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 border shadow-xs cursor-pointer ${
+                  isDark
+                    ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700 hover:border-emerald-500/50'
+                    : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-emerald-600/50'
+                }`}
+                title="View Statistics for Open / Published Positions"
+              >
+                <IconPieChart className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>Position Stats</span>
+              </button>
+              <button
+                onClick={openCreateJobModal}
+                className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all flex items-center space-x-2 cursor-pointer"
+              >
+                <IconPlus className="w-4 h-4" />
+                <span>Post New Vacancy</span>
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -2046,6 +2106,388 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Open Positions & Applicant Statistics Pop-up Modal */}
+      {isStatsModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className={`rounded-2xl shadow-2xl border w-full max-w-3xl overflow-hidden animate-scaleIn max-h-[92vh] flex flex-col ${
+            isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 bg-slate-950 text-white flex items-center justify-between border-b border-slate-800 shrink-0">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                  <IconPieChart className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                    Open Positions &amp; Applicant Statistics
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">
+                      Live
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Real-time applicant distribution across active and published engineering openings.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsStatsModalOpen(false)}
+                className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+                aria-label="Close modal"
+              >
+                <IconClose className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Subheader / Quick Controls */}
+            <div className={`px-5 py-3 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0 ${
+              isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}>
+              {/* Segmented Filter */}
+              <div className="flex items-center space-x-1.5 p-1 rounded-xl border text-xs font-semibold shrink-0 bg-slate-100 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700">
+                <button
+                  type="button"
+                  onClick={() => setStatsViewFilter('open_only')}
+                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                    statsViewFilter === 'open_only'
+                      ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 font-bold shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  Open / Published ({openPublishedJobs.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStatsViewFilter('all')}
+                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                    statsViewFilter === 'all'
+                      ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 font-bold shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  All Positions ({safeJobs.length})
+                </button>
+              </div>
+
+              {/* Search Inside Stats */}
+              <div className="relative flex-1 max-w-xs">
+                <IconSearch className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={statsSearchQuery}
+                  onChange={(e) => setStatsSearchQuery(e.target.value)}
+                  placeholder="Filter positions by title..."
+                  className={`w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+                    isDark
+                      ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
+                      : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                  }`}
+                />
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 sm:p-6 overflow-y-auto space-y-5">
+              {/* Top KPI Metrics Row */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className={`p-3.5 rounded-xl border ${
+                  isDark ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Open Vacancies
+                  </div>
+                  <div className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1 font-mono">
+                    {openPublishedJobs.length}
+                  </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">
+                    Active &amp; published
+                  </div>
+                </div>
+
+                <div className={`p-3.5 rounded-xl border ${
+                  isDark ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Direct Applicants
+                  </div>
+                  <div className="text-xl font-black text-blue-600 dark:text-blue-400 mt-1 font-mono">
+                    {activeVacancyApplicantsCount}
+                  </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">
+                    Targeted active roles
+                  </div>
+                </div>
+
+                <div className={`p-3.5 rounded-xl border ${
+                  isDark ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    General Talent
+                  </div>
+                  <div className="text-xl font-black text-amber-600 dark:text-amber-400 mt-1 font-mono">
+                    {generalAppCount}
+                  </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">
+                    Spontaneous submissions
+                  </div>
+                </div>
+
+                <div className={`p-3.5 rounded-xl border ${
+                  isDark ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Total Submissions
+                  </div>
+                  <div className="text-xl font-black text-slate-800 dark:text-white mt-1 font-mono">
+                    {safeApps.length}
+                  </div>
+                  <div className="text-[10px] text-slate-400 mt-0.5">
+                    Recorded in database
+                  </div>
+                </div>
+              </div>
+
+              {/* Positions List */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    {statsViewFilter === 'open_only' ? 'Active Published Vacancies' : 'All Configured Vacancies'} ({(statsViewFilter === 'open_only' ? openPublishedJobs : safeJobs).length})
+                  </h4>
+                  <span className="text-[11px] text-slate-400">
+                    Sorted by applicant volume
+                  </span>
+                </div>
+
+                {(statsViewFilter === 'open_only' ? openPublishedJobs : safeJobs).length === 0 ? (
+                  <div className={`p-8 text-center rounded-xl border ${
+                    isDark ? 'bg-slate-800/40 border-slate-800 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-500'
+                  }`}>
+                    No positions found matching your criteria.
+                  </div>
+                ) : (
+                  (statsViewFilter === 'open_only' ? openPublishedJobs : safeJobs)
+                    .filter((job) => {
+                      if (!statsSearchQuery.trim()) return true;
+                      const q = statsSearchQuery.toLowerCase().trim();
+                      return (
+                        job.title?.toLowerCase().includes(q) ||
+                        job.department?.toLowerCase().includes(q) ||
+                        job.location?.toLowerCase().includes(q)
+                      );
+                    })
+                    .sort((a, b) => getPostingAppCount(b.id) - getPostingAppCount(a.id))
+                    .map((job) => {
+                      const count = getPostingAppCount(job.id);
+                      const stats = getJobDetailStats(job.id);
+                      const pctOfTotal = safeApps.length > 0 ? Math.round((count / safeApps.length) * 100) : 0;
+                      const isOpen = job.status === 'active';
+
+                      return (
+                        <div
+                          key={job.id}
+                          className={`p-4 rounded-xl border transition-all ${
+                            isDark
+                              ? 'bg-slate-800/50 hover:bg-slate-800 border-slate-700/80'
+                              : 'bg-white hover:bg-slate-50/80 border-slate-200 shadow-2xs'
+                          }`}
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h5 className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                                  {job.title}
+                                </h5>
+                                <span
+                                  className={`px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase border ${
+                                    isOpen
+                                      ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700'
+                                  }`}
+                                >
+                                  {isOpen ? 'Active / Open' : 'Closed / Disabled'}
+                                </span>
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                                  isDark ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-600'
+                                }`}>
+                                  {job.type || 'Full-time'}
+                                </span>
+                              </div>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5 flex-wrap">
+                                <span>{job.department}</span>
+                                <span>&bull;</span>
+                                <span>{job.location}</span>
+                                <span>&bull;</span>
+                                <span>{job.experience_level || '3+ Years'}</span>
+                              </p>
+                            </div>
+
+                            {/* Applicant Big Counter Badge */}
+                            <div className="flex items-center gap-3 shrink-0">
+                              <div className="text-right">
+                                <div className="flex items-baseline justify-end gap-1.5">
+                                  <span className={`text-xl font-black font-mono ${
+                                    count > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'
+                                  }`}>
+                                    {count}
+                                  </span>
+                                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                    {count === 1 ? 'Applicant' : 'Applicants'}
+                                  </span>
+                                </div>
+                                <div className="text-[10px] text-slate-400">
+                                  {pctOfTotal}% of all candidate submissions
+                                </div>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => handleSelectPostingFromStats(job.id)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center space-x-1 cursor-pointer ${
+                                  count > 0
+                                    ? isDark
+                                      ? 'bg-emerald-950/70 border-emerald-700/80 text-emerald-300 hover:bg-emerald-900'
+                                      : 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100'
+                                    : isDark
+                                    ? 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
+                                    : 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200'
+                                }`}
+                                title="View applications for this position"
+                              >
+                                <span>View</span>
+                                <IconChevronRight className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Progress fill bar */}
+                          <div className="mt-3">
+                            <div className={`w-full h-1.5 rounded-full overflow-hidden ${
+                              isDark ? 'bg-slate-700/60' : 'bg-slate-100'
+                            }`}>
+                              <div
+                                className={`h-full rounded-full transition-all duration-500 ${
+                                  count > 0 ? 'bg-emerald-500' : 'bg-transparent'
+                                }`}
+                                style={{ width: `${Math.min(100, Math.max(count > 0 ? 8 : 0, pctOfTotal))}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Pipeline Breakdown Pills */}
+                          {count > 0 && (
+                            <div className="mt-2.5 pt-2.5 border-t border-slate-200/60 dark:border-slate-700/50 flex items-center gap-2 flex-wrap text-[11px]">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pipeline:</span>
+                              <span className="px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900 font-semibold">
+                                New: {stats.newCount}
+                              </span>
+                              {stats.shortlistedCount > 0 && (
+                                <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900 font-semibold">
+                                  Shortlisted: {stats.shortlistedCount}
+                                </span>
+                              )}
+                              {stats.interviewedCount > 0 && (
+                                <span className="px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-900 font-semibold">
+                                  Interviewed: {stats.interviewedCount}
+                                </span>
+                              )}
+                              {stats.hiredCount > 0 && (
+                                <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900 font-semibold">
+                                  Hired: {stats.hiredCount}
+                                </span>
+                              )}
+                              {stats.rejectedCount > 0 && (
+                                <span className="px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900 font-semibold">
+                                  Rejected: {stats.rejectedCount}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                )}
+
+                {/* General Talent Network Card */}
+                <div
+                  className={`p-4 rounded-xl border transition-all ${
+                    isDark
+                      ? 'bg-slate-800/30 border-dashed border-slate-700'
+                      : 'bg-slate-50/70 border-dashed border-slate-300'
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h5 className="font-bold text-sm text-slate-900 dark:text-white">
+                          General Talent Network (Spontaneous Applications)
+                        </h5>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${
+                          generalAppEnabled
+                            ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-300 dark:border-slate-700'
+                        }`}>
+                          {generalAppEnabled ? 'Intake Active' : 'Intake Disabled'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        Candidates submitted through the spontaneous open inquiry form without selecting a specific opening.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="text-right">
+                        <div className="flex items-baseline justify-end gap-1.5">
+                          <span className="text-xl font-black font-mono text-amber-600 dark:text-amber-400">
+                            {generalAppCount}
+                          </span>
+                          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                            Applicants
+                          </span>
+                        </div>
+                        <div className="text-[10px] text-slate-400">
+                          {safeApps.length > 0 ? Math.round((generalAppCount / safeApps.length) * 100) : 0}% of all submissions
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSelectPostingFromStats('general')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center space-x-1 cursor-pointer ${
+                          isDark
+                            ? 'bg-amber-950/70 border-amber-800 text-amber-300 hover:bg-amber-900'
+                            : 'bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100'
+                        }`}
+                        title="View general applicants"
+                      >
+                        <span>View</span>
+                        <IconChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className={`p-4 sm:p-5 border-t flex items-center justify-between shrink-0 ${
+              isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}>
+              <div className="text-xs text-slate-500 dark:text-slate-400">
+                Total: <strong className="text-slate-800 dark:text-slate-200">{openPublishedJobs.length}</strong> open positions &bull; <strong className="text-slate-800 dark:text-slate-200">{safeApps.length}</strong> total submissions
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsStatsModalOpen(false)}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
