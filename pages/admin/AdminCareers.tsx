@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { JobApplication, JobOpening } from '../../types';
 import { useSiteSettings, extractCoverLetterMeta } from '../../hooks/useSupabaseData';
 import { downloadApplicationsZip, DownloadProgress } from '../../utils/cvDownloader';
+import { ApplicantEmailDrawer } from '../../components/admin/ApplicantEmailDrawer';
 import {
   IconCareers,
   IconPlus,
@@ -211,6 +212,22 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
   const [downloadModalTitle, setDownloadModalTitle] = useState('');
   const [isDownloadMenuOpen, setIsDownloadMenuOpen] = useState(false);
   const downloadMenuRef = useRef<HTMLDivElement>(null);
+
+  // Applicant Email Communication Drawer State (Option C: Slide-Over Panel)
+  const [emailDrawerApps, setEmailDrawerApps] = useState<JobApplication[]>([]);
+  const [isEmailDrawerOpen, setIsEmailDrawerOpen] = useState(false);
+
+  const handleOpenEmailForCandidate = (app: JobApplication) => {
+    setEmailDrawerApps([app]);
+    setIsEmailDrawerOpen(true);
+  };
+
+  const handleOpenEmailForSelected = () => {
+    const selectedApps = safeApps.filter((a) => selectedAppIds.has(a.id));
+    if (selectedApps.length === 0) return;
+    setEmailDrawerApps(selectedApps);
+    setIsEmailDrawerOpen(true);
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -1247,6 +1264,19 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
 
                           <td className="py-4 px-4 sm:px-5 text-right space-x-2 whitespace-nowrap">
                             <button
+                              type="button"
+                              onClick={() => handleOpenEmailForCandidate(app)}
+                              className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition-all border inline-flex items-center space-x-1 cursor-pointer ${
+                                isDark
+                                  ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300 hover:bg-emerald-900'
+                                  : 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100 shadow-2xs'
+                              }`}
+                              title={`Send email to ${app.applicant_name}`}
+                            >
+                              <IconMail className="w-3.5 h-3.5" />
+                              <span className="hidden xl:inline">Email</span>
+                            </button>
+                            <button
                               onClick={() => handleOpenAppModal(app)}
                               className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                                 isDark ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700' : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
@@ -1623,6 +1653,19 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
 
                                       <td className="py-3.5 px-4 sm:px-5 text-right space-x-2 whitespace-nowrap">
                                         <button
+                                          type="button"
+                                          onClick={() => handleOpenEmailForCandidate(app)}
+                                          className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition-all border inline-flex items-center space-x-1 cursor-pointer ${
+                                            isDark
+                                              ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300 hover:bg-emerald-900'
+                                              : 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100 shadow-2xs'
+                                          }`}
+                                          title={`Send email to ${app.applicant_name}`}
+                                        >
+                                          <IconMail className="w-3.5 h-3.5" />
+                                          <span className="hidden xl:inline">Email</span>
+                                        </button>
+                                        <button
                                           onClick={() => handleOpenAppModal(app)}
                                           className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
                                             isDark ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700' : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
@@ -1871,6 +1914,19 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                     </td>
 
                                     <td className="py-3.5 px-4 sm:px-5 text-right space-x-2 whitespace-nowrap">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleOpenEmailForCandidate(app)}
+                                        className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition-all border inline-flex items-center space-x-1 cursor-pointer ${
+                                          isDark
+                                            ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300 hover:bg-emerald-900'
+                                            : 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100 shadow-2xs'
+                                        }`}
+                                        title={`Send email to ${app.applicant_name}`}
+                                      >
+                                        <IconMail className="w-3.5 h-3.5" />
+                                        <span className="hidden xl:inline">Email</span>
+                                      </button>
                                       <button
                                         onClick={() => handleOpenAppModal(app)}
                                         className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
@@ -2191,6 +2247,18 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
 
               <div className={`pt-4 border-t flex flex-wrap items-center justify-between gap-3 ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
                 <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const app = selectedApp;
+                      setSelectedApp(null);
+                      handleOpenEmailForCandidate(app);
+                    }}
+                    className="inline-flex items-center space-x-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-xs text-xs uppercase tracking-wider cursor-pointer transition-all"
+                  >
+                    <IconMail className="w-4 h-4" />
+                    <span>Email Candidate</span>
+                  </button>
                   <a
                     href={selectedApp.resume_url}
                     target="_blank"
@@ -3086,6 +3154,18 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
               <span>Download CVs ({selectedAppIds.size})</span>
             </button>
 
+            {/* Email Selected Candidates */}
+            <button
+              type="button"
+              disabled={isBulkUpdating}
+              onClick={handleOpenEmailForSelected}
+              className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all shadow-sm cursor-pointer disabled:opacity-50"
+              title="Compose and send personalized emails to all selected candidates"
+            >
+              <IconMail className="w-3.5 h-3.5" />
+              <span>Email ({selectedAppIds.size})</span>
+            </button>
+
             {/* Delete Selected */}
             <button
               type="button"
@@ -3237,6 +3317,26 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
           </div>
         </div>
       )}
+
+      {/* Candidate Communication Slide-Over Drawer (Option C) */}
+      <ApplicantEmailDrawer
+        isOpen={isEmailDrawerOpen}
+        onClose={() => setIsEmailDrawerOpen(false)}
+        applications={emailDrawerApps}
+        onStatusUpdated={async (ids, newStatus) => {
+          if (onBulkUpdateApplicationStatus) {
+            await onBulkUpdateApplicationStatus(ids, newStatus);
+          } else {
+            await Promise.all(ids.map((id) => handleUpdateStatus(id, newStatus)));
+          }
+          setBulkActionToast({
+            message: `Updated status for ${ids.length} candidate${ids.length > 1 ? 's' : ''} to "${newStatus}".`,
+            type: 'success',
+          });
+          setTimeout(() => setBulkActionToast(null), 4000);
+        }}
+        isDark={isDark}
+      />
     </div>
   );
 };
