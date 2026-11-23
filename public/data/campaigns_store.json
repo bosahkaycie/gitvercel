@@ -1,0 +1,1932 @@
+{
+  "campaigns": [
+    {
+      "id": "nape-2026",
+      "name": "NAPE 2026 Annual International Conference & Exhibition",
+      "slug": "nape-2026",
+      "description": "42nd Annual International Conference & Exhibition of the Nigerian Association of Petroleum Explorationists (NAPE) - PIGL Exhibition Stand & Technical Scoping.",
+      "category": "Conference",
+      "eventName": "NAPE 2026",
+      "eventLocation": "Eko Hotel & Suites, Victoria Island, Lagos, Nigeria",
+      "eventStartDate": "2026-11-08",
+      "eventEndDate": "2026-11-12",
+      "campaignStartDate": "2026-11-01",
+      "campaignClosingDate": "2026-11-30",
+      "coverImageUrl": "/assets/pigl_conference_keynote.jpg",
+      "logoImageUrl": "/assets/LOGO.png",
+      "assignedFormId": "form-nape-2026",
+      "status": "active",
+      "publicVisibility": true,
+      "assignedStaff": [
+        "admin@polarisigl.com",
+        "bd@polarisigl.com",
+        "hello@polarisigl.com"
+      ],
+      "introductionText": "Welcome to the Polaris Integrated & GeoSolutions Limited (PIGL) NAPE 2026 engagement portal. Connect with our engineering directors and technical specialists to explore precision solutions across our four operating divisions.",
+      "confirmationMessage": "Thank you for connecting with Polaris Integrated & GeoSolutions Limited (PIGL) at NAPE 2026. Our senior engineering scoping team has received your technical brief and will be in touch shortly.",
+      "termsAndPrivacyText": "Polaris Integrated & GeoSolutions Limited respects your privacy and is committed to protecting your personal data in accordance with the Nigeria Data Protection Act (NDPA). Information provided is used solely for technical follow-up and authorized engineering collaboration.",
+      "createdBy": "admin@polarisigl.com",
+      "createdAt": "2026-11-01T00:00:00Z",
+      "updatedAt": "2026-11-23T12:12:01.203Z"
+    },
+    {
+      "id": "nog-energy-week-2027",
+      "name": "Nigeria Oil & Gas (NOG) Energy Week 2027",
+      "slug": "nog-energy-week-2027",
+      "description": "Official PIGL Exhibition Booth & Executive Stakeholder Engagement at the ICC Abuja.",
+      "category": "Conference",
+      "eventName": "NOG Energy Week 2027",
+      "eventLocation": "International Conference Centre (ICC), Abuja, Nigeria",
+      "eventStartDate": "2027-06-28",
+      "eventEndDate": "2027-07-02",
+      "campaignStartDate": "2026-11-01",
+      "campaignClosingDate": "2027-07-15",
+      "coverImageUrl": "/assets/pigl_conference_keynote.jpg",
+      "logoImageUrl": "/assets/LOGO.png",
+      "assignedFormId": "form-nog-2027",
+      "status": "active",
+      "publicVisibility": true,
+      "assignedStaff": [
+        "admin@polarisigl.com",
+        "bd@polarisigl.com"
+      ],
+      "introductionText": "Welcome to the Polaris Integrated & GeoSolutions Limited (PIGL) engagement portal. Connect with our engineering directors and technical specialists to explore precision solutions across our four operating divisions.",
+      "confirmationMessage": "Thank you for connecting with Polaris Integrated & GeoSolutions Limited (PIGL). Our senior engineering scoping team has received your technical brief and will be in touch shortly.",
+      "termsAndPrivacyText": "Polaris Integrated & GeoSolutions Limited respects your privacy and is committed to protecting your personal data in accordance with the Nigeria Data Protection Act (NDPA). Information provided is used solely for technical follow-up and authorized engineering collaboration.",
+      "createdBy": "admin@polarisigl.com",
+      "createdAt": "2026-11-01T00:00:00Z",
+      "updatedAt": "2026-11-23T12:12:01.207Z"
+    }
+  ],
+  "forms": [
+    {
+      "id": "form-nape-2026",
+      "campaignId": "nape-2026",
+      "title": "NAPE 2026 Technical Scoping & Delegate Intake Form",
+      "description": "Official delegate engagement and engineering consultation inquiry form for NAPE 2026.",
+      "activeVersion": 1,
+      "versions": [
+        {
+          "id": "v1-nape-2026",
+          "versionNumber": 1,
+          "createdAt": "2026-11-01T00:00:00Z",
+          "fields": [
+            {
+              "id": "full_name",
+              "type": "short_text",
+              "label": "Full Name",
+              "required": true,
+              "order": 1,
+              "placeholder": "e.g. Engr. Oladipo Adeleke"
+            },
+            {
+              "id": "email",
+              "type": "email",
+              "label": "Corporate / Official Email Address",
+              "required": true,
+              "order": 2,
+              "placeholder": "e.g. name@energyfirm.com"
+            },
+            {
+              "id": "phone",
+              "type": "phone",
+              "label": "Phone / WhatsApp Number",
+              "required": false,
+              "order": 3,
+              "placeholder": "+234 803 000 0000"
+            },
+            {
+              "id": "company",
+              "type": "short_text",
+              "label": "Company / Operating Organisation",
+              "required": true,
+              "order": 4,
+              "placeholder": "e.g. Shell, NNPC Ltd, Chevron, TotalEnergies, Seplat"
+            },
+            {
+              "id": "job_title",
+              "type": "short_text",
+              "label": "Job Title / Designation",
+              "required": false,
+              "order": 5,
+              "placeholder": "e.g. Executive Director, Lead Project Engineer"
+            },
+            {
+              "id": "service_divisions",
+              "type": "checkbox",
+              "label": "PIGL Operating Divisions of Interest",
+              "required": false,
+              "order": 6,
+              "options": [
+                {
+                  "id": "opt_geo",
+                  "label": "Geosolutions & Engineering (CPT, 3D Laser Scanning, Geotechnical)",
+                  "value": "Geosolutions & Engineering"
+                },
+                {
+                  "id": "opt_marine",
+                  "label": "Metocean & Marine Solutions (Hydrographic, Metocean, Sub-bottom)",
+                  "value": "Metocean & Marine Solutions"
+                },
+                {
+                  "id": "opt_const",
+                  "label": "Integrated Construction (Swamp Pipelines, Structural Works)",
+                  "value": "Integrated Construction"
+                },
+                {
+                  "id": "opt_ind",
+                  "label": "Industrial Solutions (Cathodic Protection, NDT Asset Integrity)",
+                  "value": "Industrial Solutions"
+                }
+              ]
+            },
+            {
+              "id": "custom_inquiry_scope",
+              "type": "long_text",
+              "label": "Custom Technical Requirements / Scope of Inquiry",
+              "description": "Provide details on your project timeline, asset location, or specific requirements.",
+              "placeholder": "Describe your project scope...",
+              "required": false,
+              "order": 7
+            },
+            {
+              "id": "is_student",
+              "type": "checkbox",
+              "label": "Attending as Student / Youth Corps Member",
+              "required": false,
+              "order": 8
+            },
+            {
+              "id": "consent_ndpa",
+              "type": "consent",
+              "label": "I consent to Polaris Integrated & GeoSolutions Limited contacting me regarding this inquiry in accordance with the Nigeria Data Protection Act (NDPA).",
+              "required": true,
+              "order": 9
+            }
+          ]
+        }
+      ],
+      "createdAt": "2026-11-01T00:00:00Z",
+      "updatedAt": "2026-11-23T12:12:01.207Z"
+    },
+    {
+      "id": "form-nog-2027",
+      "campaignId": "nog-energy-week-2027",
+      "title": "PIGL Technical Scoping & Executive Engagement Form",
+      "description": "Please provide your contact details and operational interests so we can connect you with the appropriate technical division head.",
+      "activeVersion": 1,
+      "versions": [
+        {
+          "id": "v1-nog-2027",
+          "versionNumber": 1,
+          "createdAt": "2026-11-01T00:00:00Z",
+          "fields": [
+            {
+              "id": "f_full_name",
+              "type": "short_text",
+              "label": "Full Name",
+              "placeholder": "Engr. / Dr. / Mr. / Ms. Full Name",
+              "required": true,
+              "order": 1
+            },
+            {
+              "id": "f_email",
+              "type": "email",
+              "label": "Official Corporate Email",
+              "placeholder": "name@company.com",
+              "required": true,
+              "order": 2
+            },
+            {
+              "id": "f_phone",
+              "type": "phone",
+              "label": "Telephone / Mobile Number",
+              "placeholder": "+234 800 000 0000",
+              "required": false,
+              "order": 3
+            },
+            {
+              "id": "f_company",
+              "type": "short_text",
+              "label": "Company / Organization",
+              "placeholder": "e.g. Shell, NNPC Ltd, Chevron, TotalEnergies",
+              "required": true,
+              "order": 4
+            },
+            {
+              "id": "f_job_title",
+              "type": "short_text",
+              "label": "Designation / Job Title",
+              "placeholder": "e.g. Managing Director, Lead Project Engineer",
+              "required": false,
+              "order": 5
+            },
+            {
+              "id": "f_divisions",
+              "type": "checkbox",
+              "label": "PIGL Operating Divisions",
+              "required": true,
+              "options": [
+                {
+                  "id": "geo",
+                  "label": "Geosolutions & Engineering Services (CPT, Geotechnical, 3D Reality Capture, Geomatics)",
+                  "value": "Geosolutions & Engineering"
+                },
+                {
+                  "id": "met",
+                  "label": "Metocean & Marine Solutions (Hydrographic, Metocean, Sub-bottom Profiling, Rig Positioning)",
+                  "value": "Metocean & Marine Solutions"
+                },
+                {
+                  "id": "con",
+                  "label": "Integrated Construction Services (Swamp Pipeline, Structural Fabrication, Civil Works)",
+                  "value": "Integrated Construction"
+                },
+                {
+                  "id": "ind",
+                  "label": "Industrial Solutions (Cathodic Protection, NDT Asset Integrity, Valve Servicing, Water Treatment)",
+                  "value": "Industrial Solutions"
+                }
+              ],
+              "order": 6
+            },
+            {
+              "id": "f_scope",
+              "type": "long_text",
+              "label": "Project Scope / Technical Requirement Summary",
+              "placeholder": "Briefly describe your asset location, terrain, timeline...",
+              "required": false,
+              "order": 7
+            },
+            {
+              "id": "f_consent",
+              "type": "consent",
+              "label": "I consent to Polaris Integrated & GeoSolutions Limited processing my contact details for professional technical consultation.",
+              "required": true,
+              "order": 8
+            }
+          ]
+        }
+      ],
+      "createdAt": "2026-11-01T00:00:00Z",
+      "updatedAt": "2026-11-23T12:12:01.207Z"
+    }
+  ],
+  "submissions": [
+    {
+      "id": "sub-nape-01",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Engr. Farouk Ahmed",
+      "visitorEmail": "f.ahmed@nmdpra.gov.ng",
+      "visitorPhone": "+234 803 310 9921",
+      "visitorCompany": "NMDPRA",
+      "visitorJobTitle": "Authority Chief Executive (ACE)",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Engr. Farouk Ahmed",
+        "email": "f.ahmed@nmdpra.gov.ng",
+        "phone": "+234 803 310 9921",
+        "company": "NMDPRA",
+        "job_title": "Authority Chief Executive (ACE)",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Industrial Solutions",
+          "Integrated Construction"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Visited PIGL stand at NAPE 2026. Discussed midstream/downstream regulatory compliance, pipeline integrity and 20-Ton CPT ground investigations.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-1",
+          "author": "Stand Staff",
+          "content": "Visited PIGL stand at NAPE 2026. Discussed midstream/downstream regulatory compliance, pipeline integrity and 20-Ton CPT ground investigations.",
+          "createdAt": "2026-11-09T02:49:06Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-09T02:49:06Z",
+      "updatedAt": "2026-11-09T02:49:06Z"
+    },
+    {
+      "id": "sub-nape-02",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Senator Heineken Lokpobiri",
+      "visitorEmail": "h.lokpobiri@petroleumresources.gov.ng",
+      "visitorPhone": "+234 802 222 7800",
+      "visitorCompany": "Federal Ministry of Petroleum Resources (Oil)",
+      "visitorJobTitle": "Honourable Minister of State for Petroleum Resources",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Senator Heineken Lokpobiri",
+        "email": "h.lokpobiri@petroleumresources.gov.ng",
+        "phone": "+234 802 222 7800",
+        "company": "Federal Ministry of Petroleum Resources (Oil)",
+        "job_title": "Honourable Minister of State for Petroleum Resources",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Metocean & Marine Solutions",
+          "Integrated Construction",
+          "Industrial Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Executive ministerial visit to PIGL exhibition booth. Commended indigenous Nigerian engineering capacity in offshore geotechnical & marine survey.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-2",
+          "author": "Stand Staff",
+          "content": "Executive ministerial visit to PIGL exhibition booth. Commended indigenous Nigerian engineering capacity in offshore geotechnical & marine survey.",
+          "createdAt": "2026-11-09T03:16:47Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-09T03:16:47Z",
+      "updatedAt": "2026-11-09T03:16:47Z"
+    },
+    {
+      "id": "sub-nape-03",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Engr. Gbenga Komolafe",
+      "visitorEmail": "g.komolafe@nuprc.gov.ng",
+      "visitorPhone": "+234 803 400 3867",
+      "visitorCompany": "Nigerian Upstream Petroleum Regulatory Commission (NUPRC)",
+      "visitorJobTitle": "Commission Chief Executive (CCE)",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Engr. Gbenga Komolafe",
+        "email": "g.komolafe@nuprc.gov.ng",
+        "phone": "+234 803 400 3867",
+        "company": "Nigerian Upstream Petroleum Regulatory Commission (NUPRC)",
+        "job_title": "Commission Chief Executive (CCE)",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Metocean & Marine Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "NUPRC leadership engagement. Metocean buoy deployments and shallow geophysical survey capabilities.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-3",
+          "author": "Stand Staff",
+          "content": "NUPRC leadership engagement. Metocean buoy deployments and shallow geophysical survey capabilities.",
+          "createdAt": "2026-11-09T03:26:44Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-09T03:26:44Z",
+      "updatedAt": "2026-11-09T03:26:44Z"
+    },
+    {
+      "id": "sub-nape-04",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Chief Timipre Sylva",
+      "visitorEmail": "timipre.sylva@oilandgas.ng",
+      "visitorPhone": "+234 803 555 9600",
+      "visitorCompany": "Niger Delta Petroleum & Gas Consult",
+      "visitorJobTitle": "Principal Consultant / Former Minister of State",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Chief Timipre Sylva",
+        "email": "timipre.sylva@oilandgas.ng",
+        "phone": "+234 803 555 9600",
+        "company": "Niger Delta Petroleum & Gas Consult",
+        "job_title": "Principal Consultant / Former Minister of State",
+        "service_divisions": [
+          "Integrated Construction",
+          "Industrial Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Discussed Niger Delta swamp pipeline construction and integrity management.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-4",
+          "author": "Stand Staff",
+          "content": "Discussed Niger Delta swamp pipeline construction and integrity management.",
+          "createdAt": "2026-11-09T03:28:20Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-09T03:28:20Z",
+      "updatedAt": "2026-11-09T03:28:20Z"
+    },
+    {
+      "id": "sub-nape-05",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Godwin Joy",
+      "visitorEmail": "joy@polarisigl.com",
+      "visitorPhone": "+234 803 762 1190",
+      "visitorCompany": "Polaris Integrated & Geosolutions Ltd",
+      "visitorJobTitle": "Corporate Relations & Logistics",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Godwin Joy",
+        "email": "joy@polarisigl.com",
+        "phone": "+234 803 762 1190",
+        "company": "Polaris Integrated & Geosolutions Ltd",
+        "job_title": "Corporate Relations & Logistics",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Metocean & Marine Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Internal stand operations & VIP delegate coordination.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-5",
+          "author": "Stand Staff",
+          "content": "Internal stand operations & VIP delegate coordination.",
+          "createdAt": "2026-11-09T11:02:07Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-09T11:02:07Z",
+      "updatedAt": "2026-11-09T11:02:07Z"
+    },
+    {
+      "id": "sub-nape-06",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Osazee Destiny",
+      "visitorEmail": "osazeedestiny2004@gmail.com",
+      "visitorPhone": "+234 814 550 2004",
+      "visitorCompany": "National Youth Service Corps (NYSC)",
+      "visitorJobTitle": "Graduate Geoscientist / Corps Member",
+      "isStudent": true,
+      "formData": {
+        "full_name": "Osazee Destiny",
+        "email": "osazeedestiny2004@gmail.com",
+        "phone": "+234 814 550 2004",
+        "company": "National Youth Service Corps (NYSC)",
+        "job_title": "Graduate Geoscientist / Corps Member",
+        "service_divisions": [
+          "Geosolutions & Engineering"
+        ],
+        "is_student": true,
+        "custom_inquiry_scope": "Graduate delegate interested in geotechnical field training and career placement.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-6",
+          "author": "Stand Staff",
+          "content": "Graduate delegate interested in geotechnical field training and career placement.",
+          "createdAt": "2026-11-09T14:52:21Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-09T14:52:21Z",
+      "updatedAt": "2026-11-09T14:52:21Z"
+    },
+    {
+      "id": "sub-nape-07",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Oluwakayode Adebanjo",
+      "visitorEmail": "adebanjooluwakayode77@gmail.com",
+      "visitorPhone": "+234 806 771 2345",
+      "visitorCompany": "Obafemi Awolowo University (OAU)",
+      "visitorJobTitle": "Student Geologist",
+      "isStudent": true,
+      "formData": {
+        "full_name": "Oluwakayode Adebanjo",
+        "email": "adebanjooluwakayode77@gmail.com",
+        "phone": "+234 806 771 2345",
+        "company": "Obafemi Awolowo University (OAU)",
+        "job_title": "Student Geologist",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Metocean & Marine Solutions"
+        ],
+        "is_student": true,
+        "custom_inquiry_scope": "Student delegate registration. Inquired about graduate internship and industrial attachments.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-7",
+          "author": "Stand Staff",
+          "content": "Student delegate registration. Inquired about graduate internship and industrial attachments.",
+          "createdAt": "2026-11-09T15:05:23Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-09T15:05:23Z",
+      "updatedAt": "2026-11-09T15:05:23Z"
+    },
+    {
+      "id": "sub-nape-08",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Edwin Nnakudo",
+      "visitorEmail": "info@wellcleanoilfieldservices.com",
+      "visitorPhone": "+234 803 911 4455",
+      "visitorCompany": "WellClean Oilfield Services Limited",
+      "visitorJobTitle": "Managing Director / Operations Lead",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Edwin Nnakudo",
+        "email": "info@wellcleanoilfieldservices.com",
+        "phone": "+234 803 911 4455",
+        "company": "WellClean Oilfield Services Limited",
+        "job_title": "Managing Director / Operations Lead",
+        "service_divisions": [
+          "Industrial Solutions",
+          "Integrated Construction"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Inquired regarding offshore valve maintenance, NDT non-destructive testing, and pipeline flushing.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-8",
+          "author": "Stand Staff",
+          "content": "Inquired regarding offshore valve maintenance, NDT non-destructive testing, and pipeline flushing.",
+          "createdAt": "2026-11-10T09:05:28Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T09:05:28Z",
+      "updatedAt": "2026-11-10T09:05:28Z"
+    },
+    {
+      "id": "sub-nape-09",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Thierry Grandin",
+      "visitorEmail": "thierry.grandin@gowell.energy",
+      "visitorPhone": "+33 6 12 34 56 78",
+      "visitorCompany": "Gowell Energy",
+      "visitorJobTitle": "Technical Director",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Thierry Grandin",
+        "email": "thierry.grandin@gowell.energy",
+        "phone": "+33 6 12 34 56 78",
+        "company": "Gowell Energy",
+        "job_title": "Technical Director",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Industrial Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Discussed wireline / well logging synergy and downhole geophysical instrumentation.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-9",
+          "author": "Stand Staff",
+          "content": "Discussed wireline / well logging synergy and downhole geophysical instrumentation.",
+          "createdAt": "2026-11-10T09:08:54Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T09:08:54Z",
+      "updatedAt": "2026-11-10T09:08:54Z"
+    },
+    {
+      "id": "sub-nape-10",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Martin Smith",
+      "visitorEmail": "martin.smith@petro-vision.com",
+      "visitorPhone": "+44 7700 900077",
+      "visitorCompany": "Petrovision Energy Services",
+      "visitorJobTitle": "Senior Reservoir Geophysicist",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Martin Smith",
+        "email": "martin.smith@petro-vision.com",
+        "phone": "+44 7700 900077",
+        "company": "Petrovision Energy Services",
+        "job_title": "Senior Reservoir Geophysicist",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Metocean & Marine Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Discussed high-resolution 3D laser scanning for offshore brownfield asset integrity.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-10",
+          "author": "Stand Staff",
+          "content": "Discussed high-resolution 3D laser scanning for offshore brownfield asset integrity.",
+          "createdAt": "2026-11-10T09:28:45Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T09:28:45Z",
+      "updatedAt": "2026-11-10T09:28:45Z"
+    },
+    {
+      "id": "sub-nape-11",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Eke Azuka Stanley",
+      "visitorEmail": "stanley.eke.azuka@mease-energy.com",
+      "visitorPhone": "+234 802 334 1189",
+      "visitorCompany": "Mease Energy",
+      "visitorJobTitle": "Commercial & BD Manager",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Eke Azuka Stanley",
+        "email": "stanley.eke.azuka@mease-energy.com",
+        "phone": "+234 802 334 1189",
+        "company": "Mease Energy",
+        "job_title": "Commercial & BD Manager",
+        "service_divisions": [
+          "Integrated Construction",
+          "Metocean & Marine Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Discussed joint venture partnership on upcoming marginal field development.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-11",
+          "author": "Stand Staff",
+          "content": "Discussed joint venture partnership on upcoming marginal field development.",
+          "createdAt": "2026-11-10T09:32:12Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T09:32:12Z",
+      "updatedAt": "2026-11-10T09:32:12Z"
+    },
+    {
+      "id": "sub-nape-12",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Folarin Lajumoke",
+      "visitorEmail": "folarin.lajumoke@buagroup.com",
+      "visitorPhone": "+234 803 777 9900",
+      "visitorCompany": "Damas Petrochemicals & Refinery (BUA Group)",
+      "visitorJobTitle": "Lead Project Engineer",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Folarin Lajumoke",
+        "email": "folarin.lajumoke@buagroup.com",
+        "phone": "+234 803 777 9900",
+        "company": "Damas Petrochemicals & Refinery (BUA Group)",
+        "job_title": "Lead Project Engineer",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Integrated Construction",
+          "Industrial Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Refinery infrastructure foundation testing and 20-Ton CPT soil investigation requirements.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-12",
+          "author": "Stand Staff",
+          "content": "Refinery infrastructure foundation testing and 20-Ton CPT soil investigation requirements.",
+          "createdAt": "2026-11-10T09:35:56Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T09:35:56Z",
+      "updatedAt": "2026-11-10T09:35:56Z"
+    },
+    {
+      "id": "sub-nape-13",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Akinola O.",
+      "visitorEmail": "akin.obex@gmail.com",
+      "visitorPhone": "+234 805 112 3344",
+      "visitorCompany": "Chevron Nigeria Limited",
+      "visitorJobTitle": "Offshore Facilities Engineer",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Akinola O.",
+        "email": "akin.obex@gmail.com",
+        "phone": "+234 805 112 3344",
+        "company": "Chevron Nigeria Limited",
+        "job_title": "Offshore Facilities Engineer",
+        "service_divisions": [
+          "Metocean & Marine Solutions",
+          "Industrial Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Interested in bathymetric survey and cathodic protection inspection for Escravos operations.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-13",
+          "author": "Stand Staff",
+          "content": "Interested in bathymetric survey and cathodic protection inspection for Escravos operations.",
+          "createdAt": "2026-11-10T09:38:28Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T09:38:28Z",
+      "updatedAt": "2026-11-10T09:38:28Z"
+    },
+    {
+      "id": "sub-nape-14",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Dr. Abubakar",
+      "visitorEmail": "AAbubakar6@slb.com",
+      "visitorPhone": "+234 803 667 8899",
+      "visitorCompany": "SLB (Schlumberger)",
+      "visitorJobTitle": "Principal Geoscientist",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Dr. Abubakar",
+        "email": "AAbubakar6@slb.com",
+        "phone": "+234 803 667 8899",
+        "company": "SLB (Schlumberger)",
+        "job_title": "Principal Geoscientist",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Metocean & Marine Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Collaborative discussion regarding digital twin mapping and seismic geohazard assessments.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-14",
+          "author": "Stand Staff",
+          "content": "Collaborative discussion regarding digital twin mapping and seismic geohazard assessments.",
+          "createdAt": "2026-11-10T09:43:51Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T09:43:51Z",
+      "updatedAt": "2026-11-10T09:43:51Z"
+    },
+    {
+      "id": "sub-nape-15",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Ibrahim Kado Muhad",
+      "visitorEmail": "ibrahimkado02@gmail.com",
+      "visitorPhone": "+234 803 445 6677",
+      "visitorCompany": "DIBIJ Integrated Services",
+      "visitorJobTitle": "Field Operations Specialist",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Ibrahim Kado Muhad",
+        "email": "ibrahimkado02@gmail.com",
+        "phone": "+234 803 445 6677",
+        "company": "DIBIJ Integrated Services",
+        "job_title": "Field Operations Specialist",
+        "service_divisions": [
+          "Integrated Construction"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Equipment leasing and pontoon drilling barge mobilization.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-15",
+          "author": "Stand Staff",
+          "content": "Equipment leasing and pontoon drilling barge mobilization.",
+          "createdAt": "2026-11-10T09:47:37Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T09:47:37Z",
+      "updatedAt": "2026-11-10T09:47:37Z"
+    },
+    {
+      "id": "sub-nape-16",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Idris Taiwo",
+      "visitorEmail": "itaiwo@oandoplc.com",
+      "visitorPhone": "+234 802 889 0011",
+      "visitorCompany": "Oando Plc",
+      "visitorJobTitle": "Asset Integrity Engineer",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Idris Taiwo",
+        "email": "itaiwo@oandoplc.com",
+        "phone": "+234 802 889 0011",
+        "company": "Oando Plc",
+        "job_title": "Asset Integrity Engineer",
+        "service_divisions": [
+          "Industrial Solutions",
+          "Geosolutions & Engineering"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Asset integrity survey and ultrasonic thickness testing for flow stations.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-16",
+          "author": "Stand Staff",
+          "content": "Asset integrity survey and ultrasonic thickness testing for flow stations.",
+          "createdAt": "2026-11-10T10:07:07Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T10:07:07Z",
+      "updatedAt": "2026-11-10T10:07:07Z"
+    },
+    {
+      "id": "sub-nape-17",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Shedrack Ideh",
+      "visitorEmail": "shedrackideh@gmail.com",
+      "visitorPhone": "+234 813 224 5566",
+      "visitorCompany": "Federal University of Petroleum Resources Effurun (FUPRE)",
+      "visitorJobTitle": "Petroleum Engineering Researcher",
+      "isStudent": true,
+      "formData": {
+        "full_name": "Shedrack Ideh",
+        "email": "shedrackideh@gmail.com",
+        "phone": "+234 813 224 5566",
+        "company": "Federal University of Petroleum Resources Effurun (FUPRE)",
+        "job_title": "Petroleum Engineering Researcher",
+        "service_divisions": [
+          "Geosolutions & Engineering"
+        ],
+        "is_student": true,
+        "custom_inquiry_scope": "Student delegate. Interested in geotechnical instrumentation and technical publications.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-17",
+          "author": "Stand Staff",
+          "content": "Student delegate. Interested in geotechnical instrumentation and technical publications.",
+          "createdAt": "2026-11-10T11:45:18Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T11:45:18Z",
+      "updatedAt": "2026-11-10T11:45:18Z"
+    },
+    {
+      "id": "sub-nape-18",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Grace Ogbole",
+      "visitorEmail": "graceogbole12@gmail.com",
+      "visitorPhone": "+234 816 778 9900",
+      "visitorCompany": "Federal University of Lafia",
+      "visitorJobTitle": "Geology Student Delegate",
+      "isStudent": true,
+      "formData": {
+        "full_name": "Grace Ogbole",
+        "email": "graceogbole12@gmail.com",
+        "phone": "+234 816 778 9900",
+        "company": "Federal University of Lafia",
+        "job_title": "Geology Student Delegate",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Metocean & Marine Solutions"
+        ],
+        "is_student": true,
+        "custom_inquiry_scope": "Student delegate at NAPE. Applied for student technical mentorship program.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-18",
+          "author": "Stand Staff",
+          "content": "Student delegate at NAPE. Applied for student technical mentorship program.",
+          "createdAt": "2026-11-10T11:45:45Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T11:45:45Z",
+      "updatedAt": "2026-11-10T11:45:45Z"
+    },
+    {
+      "id": "sub-nape-19",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Daniil Bogoedov",
+      "visitorEmail": "d.bogoedov@geoplat.com",
+      "visitorPhone": "+971 50 123 4567",
+      "visitorCompany": "Geoplat AI",
+      "visitorJobTitle": "AI Solutions Architect",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Daniil Bogoedov",
+        "email": "d.bogoedov@geoplat.com",
+        "phone": "+971 50 123 4567",
+        "company": "Geoplat AI",
+        "job_title": "AI Solutions Architect",
+        "service_divisions": [
+          "Geosolutions & Engineering"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Discussed machine learning automation for automated borehole lithology classification.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-19",
+          "author": "Stand Staff",
+          "content": "Discussed machine learning automation for automated borehole lithology classification.",
+          "createdAt": "2026-11-10T11:58:07Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T11:58:07Z",
+      "updatedAt": "2026-11-10T11:58:07Z"
+    },
+    {
+      "id": "sub-nape-20",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Tioluwani Faminu",
+      "visitorEmail": "faminutioluwani@gmail.com",
+      "visitorPhone": "+234 803 119 8877",
+      "visitorCompany": "First Exploration & Petroleum Development Company (FIRST E&P)",
+      "visitorJobTitle": "Subsurface Geoscientist",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Tioluwani Faminu",
+        "email": "faminutioluwani@gmail.com",
+        "phone": "+234 803 119 8877",
+        "company": "First Exploration & Petroleum Development Company (FIRST E&P)",
+        "job_title": "Subsurface Geoscientist",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Metocean & Marine Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Offshore shallow hazards and geotechnical seabed investigations for OML 83/85.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-20",
+          "author": "Stand Staff",
+          "content": "Offshore shallow hazards and geotechnical seabed investigations for OML 83/85.",
+          "createdAt": "2026-11-10T11:59:08Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T11:59:08Z",
+      "updatedAt": "2026-11-10T11:59:08Z"
+    },
+    {
+      "id": "sub-nape-21",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Helen Sunday",
+      "visitorEmail": "Helen.sunday@freightlinerlogistics.com",
+      "visitorPhone": "+234 802 445 6678",
+      "visitorCompany": "Freightliner Logistics Services Limited",
+      "visitorJobTitle": "Logistics Coordinator",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Helen Sunday",
+        "email": "Helen.sunday@freightlinerlogistics.com",
+        "phone": "+234 802 445 6678",
+        "company": "Freightliner Logistics Services Limited",
+        "job_title": "Logistics Coordinator",
+        "service_divisions": [
+          "Integrated Construction",
+          "Metocean & Marine Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Marine equipment transport, port clearance, and support vessel chartering.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-21",
+          "author": "Stand Staff",
+          "content": "Marine equipment transport, port clearance, and support vessel chartering.",
+          "createdAt": "2026-11-10T12:04:28Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T12:04:28Z",
+      "updatedAt": "2026-11-10T12:04:28Z"
+    },
+    {
+      "id": "sub-nape-22",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Chioma Onwudinjo",
+      "visitorEmail": "chiomaonwudinjo7@gmail.com",
+      "visitorPhone": "+234 803 556 7789",
+      "visitorCompany": "Yemodel Company Limited",
+      "visitorJobTitle": "Procurement Specialist",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Chioma Onwudinjo",
+        "email": "chiomaonwudinjo7@gmail.com",
+        "phone": "+234 803 556 7789",
+        "company": "Yemodel Company Limited",
+        "job_title": "Procurement Specialist",
+        "service_divisions": [
+          "Industrial Solutions",
+          "Integrated Construction"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Registered as prospective vendor/subcontractor for civil and industrial maintenance.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-22",
+          "author": "Stand Staff",
+          "content": "Registered as prospective vendor/subcontractor for civil and industrial maintenance.",
+          "createdAt": "2026-11-10T12:10:45Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T12:10:45Z",
+      "updatedAt": "2026-11-10T12:10:45Z"
+    },
+    {
+      "id": "sub-nape-23",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Anthony Ifediora",
+      "visitorEmail": "anthony.ifediora@matrixenergygroup.com",
+      "visitorPhone": "+234 803 998 7766",
+      "visitorCompany": "Matrix Energy Group",
+      "visitorJobTitle": "Downstream Operations Engineer",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Anthony Ifediora",
+        "email": "anthony.ifediora@matrixenergygroup.com",
+        "phone": "+234 803 998 7766",
+        "company": "Matrix Energy Group",
+        "job_title": "Downstream Operations Engineer",
+        "service_divisions": [
+          "Integrated Construction",
+          "Industrial Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Terminal tank farm asset integrity and pipeline right-of-way topographic survey.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-23",
+          "author": "Stand Staff",
+          "content": "Terminal tank farm asset integrity and pipeline right-of-way topographic survey.",
+          "createdAt": "2026-11-10T12:32:42Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T12:32:42Z",
+      "updatedAt": "2026-11-10T12:32:42Z"
+    },
+    {
+      "id": "sub-nape-24",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Joseph Cookey",
+      "visitorEmail": "cookey.j.a@nuprc.gov.ng",
+      "visitorPhone": "+234 803 332 1100",
+      "visitorCompany": "NNPC Group / NUPRC",
+      "visitorJobTitle": "Senior Regulatory Inspector",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Joseph Cookey",
+        "email": "cookey.j.a@nuprc.gov.ng",
+        "phone": "+234 803 332 1100",
+        "company": "NNPC Group / NUPRC",
+        "job_title": "Senior Regulatory Inspector",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Industrial Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Upstream compliance, geotechnical site assessment certifications, and environmental impact reporting.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-24",
+          "author": "Stand Staff",
+          "content": "Upstream compliance, geotechnical site assessment certifications, and environmental impact reporting.",
+          "createdAt": "2026-11-10T12:38:07Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T12:38:07Z",
+      "updatedAt": "2026-11-10T12:38:07Z"
+    },
+    {
+      "id": "sub-nape-25",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Adeola Ibigbemi",
+      "visitorEmail": "adeolaibigbemi@mode3.tech",
+      "visitorPhone": "+234 802 776 5544",
+      "visitorCompany": "MODE3 Technologies",
+      "visitorJobTitle": "Chief Technology Officer",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Adeola Ibigbemi",
+        "email": "adeolaibigbemi@mode3.tech",
+        "phone": "+234 802 776 5544",
+        "company": "MODE3 Technologies",
+        "job_title": "Chief Technology Officer",
+        "service_divisions": [
+          "Geosolutions & Engineering"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Discussed IoT sensors for real-time geotechnical slope and embankment monitoring.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-25",
+          "author": "Stand Staff",
+          "content": "Discussed IoT sensors for real-time geotechnical slope and embankment monitoring.",
+          "createdAt": "2026-11-10T12:44:10Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T12:44:10Z",
+      "updatedAt": "2026-11-10T12:44:10Z"
+    },
+    {
+      "id": "sub-nape-26",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Chidi Okonkwo",
+      "visitorEmail": "chidi.student@unilag.edu.ng",
+      "visitorPhone": "+234 812 345 6789",
+      "visitorCompany": "University of Lagos (UNILAG)",
+      "visitorJobTitle": "Geoscience Student Delegate",
+      "isStudent": true,
+      "formData": {
+        "full_name": "Chidi Okonkwo",
+        "email": "chidi.student@unilag.edu.ng",
+        "phone": "+234 812 345 6789",
+        "company": "University of Lagos (UNILAG)",
+        "job_title": "Geoscience Student Delegate",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Metocean & Marine Solutions"
+        ],
+        "is_student": true,
+        "custom_inquiry_scope": "Student attendee. Inquired about PIGL university outreach and student paper contest.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-26",
+          "author": "Stand Staff",
+          "content": "Student attendee. Inquired about PIGL university outreach and student paper contest.",
+          "createdAt": "2026-11-10T12:44:32Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T12:44:32Z",
+      "updatedAt": "2026-11-10T12:44:32Z"
+    },
+    {
+      "id": "sub-nape-27",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Amina Bello",
+      "visitorEmail": "amina.bello@futo.edu.ng",
+      "visitorPhone": "+234 810 987 6543",
+      "visitorCompany": "Federal University of Technology Owerri (FUTO)",
+      "visitorJobTitle": "Geology & Geophysics Student Delegate",
+      "isStudent": true,
+      "formData": {
+        "full_name": "Amina Bello",
+        "email": "amina.bello@futo.edu.ng",
+        "phone": "+234 810 987 6543",
+        "company": "Federal University of Technology Owerri (FUTO)",
+        "job_title": "Geology & Geophysics Student Delegate",
+        "service_divisions": [
+          "Geosolutions & Engineering"
+        ],
+        "is_student": true,
+        "custom_inquiry_scope": "Student delegate. Registered for NAPE student program and technical visit.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-27",
+          "author": "Stand Staff",
+          "content": "Student delegate. Registered for NAPE student program and technical visit.",
+          "createdAt": "2026-11-10T12:44:43Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T12:44:43Z",
+      "updatedAt": "2026-11-10T12:44:43Z"
+    },
+    {
+      "id": "sub-nape-28",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Olabisi Oyindamola",
+      "visitorEmail": "olabisiaish@gmail.com",
+      "visitorPhone": "+234 809 112 2334",
+      "visitorCompany": "Kwara State University",
+      "visitorJobTitle": "Geosciences Student",
+      "isStudent": true,
+      "formData": {
+        "full_name": "Olabisi Oyindamola",
+        "email": "olabisiaish@gmail.com",
+        "phone": "+234 809 112 2334",
+        "company": "Kwara State University",
+        "job_title": "Geosciences Student",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Metocean & Marine Solutions"
+        ],
+        "is_student": true,
+        "custom_inquiry_scope": "Student delegate at exhibition booth. Inquired about industrial attachment.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-28",
+          "author": "Stand Staff",
+          "content": "Student delegate at exhibition booth. Inquired about industrial attachment.",
+          "createdAt": "2026-11-10T12:50:46Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-10T12:50:46Z",
+      "updatedAt": "2026-11-10T12:50:46Z"
+    },
+    {
+      "id": "sub-nape-29",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Tariq Alhassan",
+      "visitorEmail": "tariq.alhassan@aramco.com",
+      "visitorPhone": "+966 50 123 4567",
+      "visitorCompany": "Saudi Aramco",
+      "visitorJobTitle": "Senior Reservoir Specialist",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Tariq Alhassan",
+        "email": "tariq.alhassan@aramco.com",
+        "phone": "+966 50 123 4567",
+        "company": "Saudi Aramco",
+        "job_title": "Senior Reservoir Specialist",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Metocean & Marine Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "International delegate. Discussed regional offshore geomatics and deepwater seabed mapping.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-29",
+          "author": "Stand Staff",
+          "content": "International delegate. Discussed regional offshore geomatics and deepwater seabed mapping.",
+          "createdAt": "2026-11-09T02:03:26Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-09T02:03:26Z",
+      "updatedAt": "2026-11-09T02:03:26Z"
+    },
+    {
+      "id": "sub-nape-30",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "S. Briggs",
+      "visitorEmail": "s.briggs@totalenergies.com",
+      "visitorPhone": "+234 803 999 1234",
+      "visitorCompany": "TotalEnergies EP Nigeria",
+      "visitorJobTitle": "Lead Geotechnical Engineer",
+      "isStudent": false,
+      "formData": {
+        "full_name": "S. Briggs",
+        "email": "s.briggs@totalenergies.com",
+        "phone": "+234 803 999 1234",
+        "company": "TotalEnergies EP Nigeria",
+        "job_title": "Lead Geotechnical Engineer",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Metocean & Marine Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Deepwater geotechnical pontoon drilling and shallow gas hazard analysis.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-30",
+          "author": "Stand Staff",
+          "content": "Deepwater geotechnical pontoon drilling and shallow gas hazard analysis.",
+          "createdAt": "2026-11-09T01:39:52Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-09T01:39:52Z",
+      "updatedAt": "2026-11-09T01:39:52Z"
+    },
+    {
+      "id": "sub-nape-31",
+      "campaignId": "nape-2026",
+      "campaignSlug": "nape-2026",
+      "formId": "form-nape-2026",
+      "formVersionId": "v1-nape-2026",
+      "source": "booth_capture",
+      "visitorName": "Onyekachukwu Bosah",
+      "visitorEmail": "bosahkc@gmail.com",
+      "visitorPhone": "+234 813 326 2617",
+      "visitorCompany": "WorketiQs Technologies Limited",
+      "visitorJobTitle": "Managing Partner / Solutions Architect",
+      "isStudent": false,
+      "formData": {
+        "full_name": "Onyekachukwu Bosah",
+        "email": "bosahkc@gmail.com",
+        "phone": "+234 813 326 2617",
+        "company": "WorketiQs Technologies Limited",
+        "job_title": "Managing Partner / Solutions Architect",
+        "service_divisions": [
+          "Geosolutions & Engineering",
+          "Metocean & Marine Solutions",
+          "Integrated Construction",
+          "Industrial Solutions"
+        ],
+        "is_student": false,
+        "custom_inquiry_scope": "Digital lead capture portal deployment and booth engagement check.",
+        "consent_ndpa": true
+      },
+      "assignedStaff": "admin@polarisigl.com",
+      "followUpStatus": "new",
+      "notes": [
+        {
+          "id": "note-31",
+          "author": "Stand Staff",
+          "content": "Digital lead capture portal deployment and booth engagement check.",
+          "createdAt": "2026-11-09T02:25:36Z"
+        }
+      ],
+      "consentGiven": true,
+      "createdAt": "2026-11-09T02:25:36Z",
+      "updatedAt": "2026-11-09T02:25:36Z"
+    }
+  ],
+  "emailTemplates": [
+    {
+      "id": "email-tmpl-nape-2026",
+      "campaignId": "nape-2026",
+      "templateType": "visitor_acknowledgement",
+      "senderName": "Polaris Integrated & GeoSolutions Limited (PIGL)",
+      "senderEmail": "hello@polarisigl.com",
+      "replyTo": "info@polarisigl.com",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "bodyHtml": "\n<div style=\"font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;\">\n  <div style=\"background-color: #0f172a; padding: 28px 32px; text-align: left; border-bottom: 3px solid #059669;\">\n    <h1 style=\"color: #ffffff; font-size: 20px; margin: 0; font-weight: 700; letter-spacing: -0.5px;\">POLARIS INTEGRATED &amp; GEOSOLUTIONS</h1>\n    <p style=\"color: #34d399; font-size: 11px; margin: 4px 0 0; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;\">Technical Engagement Desk • NAPE 2026</p>\n  </div>\n  <div style=\"padding: 32px; color: #334155; line-height: 1.6; font-size: 15px;\">\n    <p style=\"margin-top: 0; font-size: 16px; color: #0f172a;\">Dear <strong>{{first_name}}</strong>,</p>\n    <p>Thank you for visiting the <strong>Polaris Integrated &amp; GeoSolutions Limited (PIGL)</strong> exhibition booth at <strong>NAPE 2026</strong> in Lagos, Nigeria.</p>\n    <p>We appreciated the opportunity to connect with you and discuss your organization's engineering and operational requirements. Our technical leadership team has logged your submission (Reference: <code>{{submission_id}}</code>) and assigned it to the appropriate division specialists.</p>\n    <div style=\"background-color: #f8fafc; border-left: 4px solid #059669; padding: 16px 20px; margin: 24px 0; border-radius: 0 6px 6px 0;\">\n      <p style=\"margin: 0; font-size: 13px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;\">PIGL Operating Divisions</p>\n      <ul style=\"margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: #475569;\">\n        <li><strong>Geosolutions &amp; Engineering Services:</strong> 20-Ton CPT, Geotechnical Pontoon Drilling, 3D Laser Scanning.</li>\n        <li><strong>Metocean &amp; Marine Solutions:</strong> Multibeam Bathymetry, Oceanographic Buoys, Shallow Geophysical.</li>\n        <li><strong>Integrated Construction Services:</strong> Swamp Flowline Laying, River Crossing, Structural Fabrication.</li>\n        <li><strong>Industrial Solutions:</strong> Asset Integrity NDT, Cathodic Protection, Skid Maintenance.</li>\n      </ul>\n    </div>\n    <p>Should you require immediate technical documentation or an engineering capability presentation, please feel free to reply directly to this email or reach us at <a href=\"mailto:info@polarisigl.com\" style=\"color: #059669; text-decoration: none; font-weight: 600;\">info@polarisigl.com</a>.</p>\n    <p style=\"margin-bottom: 0;\">Warm regards,</p>\n    <p style=\"margin-top: 4px; font-weight: 700; color: #0f172a;\">\n      Corporate Engagement &amp; Business Development Team<br/>\n      <span style=\"font-weight: 400; font-size: 13px; color: #64748b;\">Polaris Integrated &amp; GeoSolutions Limited</span>\n    </p>\n  </div>\n  <div style=\"background-color: #f1f5f9; padding: 20px 32px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b;\">\n    <p style=\"margin: 0;\">&copy; 2026 Polaris Integrated &amp; GeoSolutions Limited. All rights reserved.</p>\n    <p style=\"margin: 4px 0 0;\">Plot 12, Commercial Area, Port Harcourt &amp; Victoria Island, Lagos, Nigeria.</p>\n  </div>\n</div>\n    ",
+      "bodyText": "Dear {{first_name}},\n\nThank you for visiting the Polaris Integrated & GeoSolutions Limited (PIGL) exhibition booth at NAPE 2026.\n\nWe appreciate the opportunity to connect with you and learn more about your operational interests. Our team looks forward to staying in touch.\n\nBest regards,\nPolaris Integrated & GeoSolutions Limited (PIGL)\ninfo@polarisigl.com | https://polarisigl.com",
+      "enabled": true,
+      "internalRecipients": [
+        "admin@polarisigl.com",
+        "bd@polarisigl.com",
+        "info@polarisigl.com",
+        "worketiqs@gmail.com"
+      ],
+      "createdAt": "2026-11-01T00:00:00Z",
+      "updatedAt": "2026-11-23T12:12:01.207Z"
+    },
+    {
+      "id": "email-tmpl-nog-2027",
+      "campaignId": "nog-energy-week-2027",
+      "templateType": "visitor_acknowledgement",
+      "senderName": "Polaris Integrated & GeoSolutions Limited (PIGL)",
+      "senderEmail": "bd@polarisigl.com",
+      "replyTo": "info@polarisigl.com",
+      "subject": "Thank You for Connecting with PIGL at {{event_name}}",
+      "bodyHtml": "<p>Dear {{first_name}},</p><p>Thank you for visiting the PIGL booth at {{event_name}}.</p>",
+      "bodyText": "Dear {{first_name}},\n\nThank you for visiting the PIGL booth at {{event_name}}.",
+      "enabled": true,
+      "internalRecipients": [
+        "admin@polarisigl.com",
+        "bd@polarisigl.com"
+      ],
+      "createdAt": "2026-11-01T00:00:00Z",
+      "updatedAt": "2026-11-23T12:12:01.207Z"
+    }
+  ],
+  "emailLogs": [
+    {
+      "id": "log-1",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-01",
+      "recipient": "f.ahmed@nmdpra.gov.ng",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-09T02:49:06Z"
+    },
+    {
+      "id": "log-2",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-02",
+      "recipient": "h.lokpobiri@petroleumresources.gov.ng",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-09T03:16:47Z"
+    },
+    {
+      "id": "log-3",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-03",
+      "recipient": "g.komolafe@nuprc.gov.ng",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-09T03:26:44Z"
+    },
+    {
+      "id": "log-4",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-04",
+      "recipient": "timipre.sylva@oilandgas.ng",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-09T03:28:20Z"
+    },
+    {
+      "id": "log-5",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-05",
+      "recipient": "joy@polarisigl.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-09T11:02:07Z"
+    },
+    {
+      "id": "log-6",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-06",
+      "recipient": "osazeedestiny2004@gmail.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-09T14:52:21Z"
+    },
+    {
+      "id": "log-7",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-07",
+      "recipient": "adebanjooluwakayode77@gmail.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-09T15:05:23Z"
+    },
+    {
+      "id": "log-8",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-08",
+      "recipient": "info@wellcleanoilfieldservices.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T09:05:28Z"
+    },
+    {
+      "id": "log-9",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-09",
+      "recipient": "thierry.grandin@gowell.energy",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T09:08:54Z"
+    },
+    {
+      "id": "log-10",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-10",
+      "recipient": "martin.smith@petro-vision.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T09:28:45Z"
+    },
+    {
+      "id": "log-11",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-11",
+      "recipient": "stanley.eke.azuka@mease-energy.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T09:32:12Z"
+    },
+    {
+      "id": "log-12",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-12",
+      "recipient": "folarin.lajumoke@buagroup.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T09:35:56Z"
+    },
+    {
+      "id": "log-13",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-13",
+      "recipient": "akin.obex@gmail.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T09:38:28Z"
+    },
+    {
+      "id": "log-14",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-14",
+      "recipient": "AAbubakar6@slb.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T09:43:51Z"
+    },
+    {
+      "id": "log-15",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-15",
+      "recipient": "ibrahimkado02@gmail.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T09:47:37Z"
+    },
+    {
+      "id": "log-16",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-16",
+      "recipient": "itaiwo@oandoplc.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T10:07:07Z"
+    },
+    {
+      "id": "log-17",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-17",
+      "recipient": "shedrackideh@gmail.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T11:45:18Z"
+    },
+    {
+      "id": "log-18",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-18",
+      "recipient": "graceogbole12@gmail.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T11:45:45Z"
+    },
+    {
+      "id": "log-19",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-19",
+      "recipient": "d.bogoedov@geoplat.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T11:58:07Z"
+    },
+    {
+      "id": "log-20",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-20",
+      "recipient": "faminutioluwani@gmail.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T11:59:08Z"
+    },
+    {
+      "id": "log-21",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-21",
+      "recipient": "Helen.sunday@freightlinerlogistics.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T12:04:28Z"
+    },
+    {
+      "id": "log-22",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-22",
+      "recipient": "chiomaonwudinjo7@gmail.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T12:10:45Z"
+    },
+    {
+      "id": "log-23",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-23",
+      "recipient": "anthony.ifediora@matrixenergygroup.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T12:32:42Z"
+    },
+    {
+      "id": "log-24",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-24",
+      "recipient": "cookey.j.a@nuprc.gov.ng",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T12:38:07Z"
+    },
+    {
+      "id": "log-25",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-25",
+      "recipient": "adeolaibigbemi@mode3.tech",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T12:44:10Z"
+    },
+    {
+      "id": "log-26",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-26",
+      "recipient": "chidi.student@unilag.edu.ng",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T12:44:32Z"
+    },
+    {
+      "id": "log-27",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-27",
+      "recipient": "amina.bello@futo.edu.ng",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T12:44:43Z"
+    },
+    {
+      "id": "log-28",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-28",
+      "recipient": "olabisiaish@gmail.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-10T12:50:46Z"
+    },
+    {
+      "id": "log-29",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-29",
+      "recipient": "tariq.alhassan@aramco.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-09T02:03:26Z"
+    },
+    {
+      "id": "log-30",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-30",
+      "recipient": "s.briggs@totalenergies.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-09T01:39:52Z"
+    },
+    {
+      "id": "log-31",
+      "campaignId": "nape-2026",
+      "submissionId": "sub-nape-31",
+      "recipient": "bosahkc@gmail.com",
+      "emailType": "visitor_acknowledgement",
+      "subject": "Thank You for Connecting with PIGL at NAPE 2026 😊",
+      "status": "sent",
+      "attempts": 1,
+      "sentAt": "2026-11-09T02:25:36Z"
+    }
+  ],
+  "updatedAt": "2026-11-23T12:12:01.208Z"
+}

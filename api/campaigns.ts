@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
+import fs from 'fs';
+import path from 'path';
 import {
   Campaign,
   CampaignForm,
@@ -44,6 +46,27 @@ async function loadStore(supabase: any): Promise<CampaignStoreData> {
     updatedAt: new Date().toISOString()
   };
 
+  // 1. Check local seed file
+  try {
+    const localStorePath = path.resolve(process.cwd(), 'public/data/campaigns_store.json');
+    if (fs.existsSync(localStorePath)) {
+      const raw = fs.readFileSync(localStorePath, 'utf8');
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.campaigns) && parsed.campaigns.length > 0) {
+        return {
+          campaigns: parsed.campaigns,
+          forms: Array.isArray(parsed.forms) ? parsed.forms : [INITIAL_SAMPLE_FORM],
+          submissions: Array.isArray(parsed.submissions) ? parsed.submissions : [],
+          emailTemplates: Array.isArray(parsed.emailTemplates) ? parsed.emailTemplates : [INITIAL_SAMPLE_EMAIL_TEMPLATE],
+          emailLogs: Array.isArray(parsed.emailLogs) ? parsed.emailLogs : [],
+          updatedAt: parsed.updatedAt || new Date().toISOString()
+        };
+      }
+    }
+  } catch (e) {
+    // Continue to Supabase
+  }
+
   if (!supabase) return initialData;
 
   try {
@@ -61,24 +84,32 @@ async function loadStore(supabase: any): Promise<CampaignStoreData> {
       };
     }
   } catch (err) {
-    console.warn('Could not load campaign store from Supabase storage, using initial fallback:', err);
+    console.warn('Could not load campaign store from Supabase storage, using fallback:', err);
   }
 
   return initialData;
 }
 
 async function saveStore(supabase: any, store: CampaignStoreData): Promise<boolean> {
-  if (!supabase) return false;
+  store.updatedAt = new Date().toISOString();
+  let localOk = false;
+
   try {
-    store.updatedAt = new Date().toISOString();
+    const localStorePath = path.resolve(process.cwd(), 'public/data/campaigns_store.json');
+    fs.writeFileSync(localStorePath, JSON.stringify(store, null, 2), 'utf8');
+    localOk = true;
+  } catch (e) {}
+
+  if (!supabase) return localOk;
+  try {
     const { error } = await supabase.storage.from('media').upload(STORAGE_PATH, JSON.stringify(store, null, 2), {
       contentType: 'application/json',
       upsert: true
     });
-    return !error;
+    return !error || localOk;
   } catch (err) {
     console.error('Failed to save campaign store to Supabase storage:', err);
-    return false;
+    return localOk;
   }
 }
 
@@ -217,6 +248,13 @@ export default async function handler(req: any, res: any) {
       return res.status(200).json({
         success: true,
         campaigns: store.campaigns
+      });
+    }
+
+    if (action === 'getAllSubmissions' || action === 'allSubmissions') {
+      return res.status(200).json({
+        success: true,
+        submissions: store.submissions || []
       });
     }
 

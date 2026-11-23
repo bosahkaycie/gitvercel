@@ -1,7 +1,7 @@
 // server.ts
 import http from "http";
-import fs from "fs";
-import path from "path";
+import fs2 from "fs";
+import path2 from "path";
 import zlib from "zlib";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
@@ -1240,20 +1240,20 @@ async function handler8(req, res) {
   if (req.method === "POST") {
     try {
       const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
-      const { action = "delete", storageBucket = "media", bucket, path: path2 } = body;
+      const { action = "delete", storageBucket = "media", bucket, path: path3 } = body;
       if (action === "delete") {
-        if (!path2) {
+        if (!path3) {
           return res.status(400).json({ success: false, error: "Missing path to delete" });
         }
         const effectiveBucket = storageBucket || (bucket === "videos" ? "media" : bucket) || "media";
-        const { error: delErr } = await supabase.storage.from(effectiveBucket).remove([path2]);
+        const { error: delErr } = await supabase.storage.from(effectiveBucket).remove([path3]);
         if (delErr) {
           console.error("Supabase storage delete error:", delErr);
           return res.status(500).json({ success: false, error: delErr.message });
         }
         return res.status(200).json({
           success: true,
-          message: `File "${path2}" permanently deleted from ${effectiveBucket} storage.`
+          message: `File "${path3}" permanently deleted from ${effectiveBucket} storage.`
         });
       }
       return res.status(400).json({ success: false, error: `Unsupported action: ${action}` });
@@ -1654,6 +1654,8 @@ async function handler10(req, res) {
 
 // api/campaigns.ts
 import { createClient as createClient10 } from "@supabase/supabase-js";
+import fs from "fs";
+import path from "path";
 
 // constants/campaignDefaults.ts
 var INITIAL_SAMPLE_CAMPAIGN = {
@@ -1877,6 +1879,24 @@ async function loadStore(supabase) {
     emailLogs: [],
     updatedAt: (/* @__PURE__ */ new Date()).toISOString()
   };
+  try {
+    const localStorePath = path.resolve(process.cwd(), "public/data/campaigns_store.json");
+    if (fs.existsSync(localStorePath)) {
+      const raw = fs.readFileSync(localStorePath, "utf8");
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.campaigns) && parsed.campaigns.length > 0) {
+        return {
+          campaigns: parsed.campaigns,
+          forms: Array.isArray(parsed.forms) ? parsed.forms : [INITIAL_SAMPLE_FORM],
+          submissions: Array.isArray(parsed.submissions) ? parsed.submissions : [],
+          emailTemplates: Array.isArray(parsed.emailTemplates) ? parsed.emailTemplates : [INITIAL_SAMPLE_EMAIL_TEMPLATE],
+          emailLogs: Array.isArray(parsed.emailLogs) ? parsed.emailLogs : [],
+          updatedAt: parsed.updatedAt || (/* @__PURE__ */ new Date()).toISOString()
+        };
+      }
+    }
+  } catch (e) {
+  }
   if (!supabase) return initialData;
   try {
     const { data, error } = await supabase.storage.from("media").download(STORAGE_PATH3);
@@ -1893,22 +1913,29 @@ async function loadStore(supabase) {
       };
     }
   } catch (err) {
-    console.warn("Could not load campaign store from Supabase storage, using initial fallback:", err);
+    console.warn("Could not load campaign store from Supabase storage, using fallback:", err);
   }
   return initialData;
 }
 async function saveStore(supabase, store) {
-  if (!supabase) return false;
+  store.updatedAt = (/* @__PURE__ */ new Date()).toISOString();
+  let localOk = false;
   try {
-    store.updatedAt = (/* @__PURE__ */ new Date()).toISOString();
+    const localStorePath = path.resolve(process.cwd(), "public/data/campaigns_store.json");
+    fs.writeFileSync(localStorePath, JSON.stringify(store, null, 2), "utf8");
+    localOk = true;
+  } catch (e) {
+  }
+  if (!supabase) return localOk;
+  try {
     const { error } = await supabase.storage.from("media").upload(STORAGE_PATH3, JSON.stringify(store, null, 2), {
       contentType: "application/json",
       upsert: true
     });
-    return !error;
+    return !error || localOk;
   } catch (err) {
     console.error("Failed to save campaign store to Supabase storage:", err);
-    return false;
+    return localOk;
   }
 }
 function replacePlaceholders(template, data) {
@@ -2038,6 +2065,12 @@ Polaris Integrated & GeoSolutions Limited (PIGL)`,
       return res.status(200).json({
         success: true,
         campaigns: store.campaigns
+      });
+    }
+    if (action === "getAllSubmissions" || action === "allSubmissions") {
+      return res.status(200).json({
+        success: true,
+        submissions: store.submissions || []
       });
     }
     if (action === "getBySlug") {
@@ -2498,8 +2531,8 @@ Polaris Integrated & GeoSolutions Limited (PIGL)`,
 // server.ts
 dotenv.config();
 var __filename = fileURLToPath(import.meta.url);
-var __dirname = path.dirname(__filename);
-var DIST_DIR = path.resolve(__dirname, "dist");
+var __dirname = path2.dirname(__filename);
+var DIST_DIR = path2.resolve(__dirname, "dist");
 var PORT = Number(process.env.PORT) || 3e3;
 var HOST = process.env.HOST || "0.0.0.0";
 var MIME_TYPES = {
@@ -2616,28 +2649,28 @@ var server = http.createServer(async (req, res) => {
       return wrappedRes.status(500).json({ success: false, error: apiErr.message || "Internal Server Error" });
     }
   }
-  let filePath = path.join(DIST_DIR, pathname);
-  if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
-    filePath = path.join(filePath, "index.html");
+  let filePath = path2.join(DIST_DIR, pathname);
+  if (fs2.existsSync(filePath) && fs2.statSync(filePath).isDirectory()) {
+    filePath = path2.join(filePath, "index.html");
   }
-  if (!fs.existsSync(filePath)) {
-    const candidateHtml = path.join(DIST_DIR, `${pathname}.html`);
-    const candidateDirHtml = path.join(DIST_DIR, pathname, "index.html");
-    if (fs.existsSync(candidateHtml)) {
+  if (!fs2.existsSync(filePath)) {
+    const candidateHtml = path2.join(DIST_DIR, `${pathname}.html`);
+    const candidateDirHtml = path2.join(DIST_DIR, pathname, "index.html");
+    if (fs2.existsSync(candidateHtml)) {
       filePath = candidateHtml;
-    } else if (fs.existsSync(candidateDirHtml)) {
+    } else if (fs2.existsSync(candidateDirHtml)) {
       filePath = candidateDirHtml;
     } else {
-      filePath = path.join(DIST_DIR, "index.html");
+      filePath = path2.join(DIST_DIR, "index.html");
     }
   }
-  if (!fs.existsSync(filePath)) {
+  if (!fs2.existsSync(filePath)) {
     res.statusCode = 404;
     res.setHeader("Content-Type", "text/plain");
     res.end("Not Found");
     return;
   }
-  const ext = path.extname(filePath).toLowerCase();
+  const ext = path2.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || "application/octet-stream";
   res.setHeader("Content-Type", contentType);
   if (pathname.startsWith("/assets/")) {
@@ -2648,19 +2681,19 @@ var server = http.createServer(async (req, res) => {
     res.setHeader("Cache-Control", "public, max-age=86400");
   }
   const acceptEncoding = req.headers["accept-encoding"] || "";
-  const stat = fs.statSync(filePath);
+  const stat = fs2.statSync(filePath);
   const shouldCompress = stat.size > 1024 && (contentType.startsWith("text/") || contentType.startsWith("application/javascript") || contentType.startsWith("application/json") || contentType.startsWith("image/svg+xml"));
   if (shouldCompress && acceptEncoding.includes("gzip")) {
     res.setHeader("Content-Encoding", "gzip");
     res.removeHeader("Content-Length");
-    fs.createReadStream(filePath).pipe(zlib.createGzip()).pipe(res);
+    fs2.createReadStream(filePath).pipe(zlib.createGzip()).pipe(res);
   } else if (shouldCompress && acceptEncoding.includes("deflate")) {
     res.setHeader("Content-Encoding", "deflate");
     res.removeHeader("Content-Length");
-    fs.createReadStream(filePath).pipe(zlib.createDeflate()).pipe(res);
+    fs2.createReadStream(filePath).pipe(zlib.createDeflate()).pipe(res);
   } else {
     res.setHeader("Content-Length", stat.size);
-    fs.createReadStream(filePath).pipe(res);
+    fs2.createReadStream(filePath).pipe(res);
   }
 });
 server.listen(PORT, HOST, () => {

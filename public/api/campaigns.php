@@ -22,8 +22,33 @@ $supabase_url = getenv('VITE_SUPABASE_URL') ?: 'https://jbldpfvceacfonkzzhig.sup
 $supabase_key = getenv('SUPABASE_SERVICE_ROLE_KEY') ?: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpibGRwZnZjZWFjZm9ua3p6aGlnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MzcwNDQzOSwiZXhwIjoyMTA5MjgwNDM5fQ.-QdwJyGzzER_sLPqPCNIm3nSMYeJ1hHRCkBcFIN_NPk';
 $storage_file = 'config/campaigns_store.json';
 
-// Helper to download store from Supabase storage
+// Local high-availability persistent storage on Hostinger
+$data_dir = dirname(__DIR__) . '/data';
+if (!is_dir($data_dir)) {
+    @mkdir($data_dir, 0755, true);
+}
+$local_storage_file = $data_dir . '/campaigns_store.json';
+
+// Helper to download store from local disk with Supabase sync fallback
 function getCampaignStore($supabase_url, $supabase_key, $storage_file) {
+    global $local_storage_file;
+
+    // 1. Primary: Load from Hostinger persistent local disk
+    if (file_exists($local_storage_file) && is_readable($local_storage_file)) {
+        $local_content = @file_get_contents($local_storage_file);
+        if (!empty($local_content)) {
+            $local_json = json_decode($local_content, true);
+            if ($local_json && is_array($local_json) && !empty($local_json['campaigns'])) {
+                if (!isset($local_json['forms'])) $local_json['forms'] = [];
+                if (!isset($local_json['submissions'])) $local_json['submissions'] = [];
+                if (!isset($local_json['emailTemplates'])) $local_json['emailTemplates'] = [];
+                if (!isset($local_json['emailLogs'])) $local_json['emailLogs'] = [];
+                return $local_json;
+            }
+        }
+    }
+
+    // 2. Secondary: Attempt to download from Supabase storage if local file not yet seeded
     $url = rtrim($supabase_url, '/') . '/storage/v1/object/media/' . $storage_file;
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -31,7 +56,7 @@ function getCampaignStore($supabase_url, $supabase_key, $storage_file) {
         'apikey: ' . $supabase_key,
         'Authorization: Bearer ' . $supabase_key
     ]);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 6);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 4);
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
@@ -44,6 +69,9 @@ function getCampaignStore($supabase_url, $supabase_key, $storage_file) {
             if (!isset($json['submissions'])) $json['submissions'] = [];
             if (!isset($json['emailTemplates'])) $json['emailTemplates'] = [];
             if (!isset($json['emailLogs'])) $json['emailLogs'] = [];
+            
+            // Cache locally for future instant loads
+            @file_put_contents($local_storage_file, json_encode($json, JSON_PRETTY_PRINT), LOCK_EX);
             return $json;
         }
     }
@@ -59,11 +87,20 @@ function getCampaignStore($supabase_url, $supabase_key, $storage_file) {
     ];
 }
 
-// Helper to save store to Supabase storage
+// Helper to save store to local disk with secondary Supabase cloud backup
 function saveCampaignStore($supabase_url, $supabase_key, $storage_file, $store) {
+    global $local_storage_file;
     $store['updatedAt'] = date('c');
     $payload = json_encode($store, JSON_PRETTY_PRINT);
 
+    // 1. Guaranteed atomic local write to Hostinger disk
+    $local_saved = false;
+    if (!empty($local_storage_file)) {
+        $bytes = @file_put_contents($local_storage_file, $payload, LOCK_EX);
+        $local_saved = ($bytes !== false);
+    }
+
+    // 2. Secondary: Non-blocking attempt to backup to Supabase storage
     $url = rtrim($supabase_url, '/') . '/storage/v1/object/media/' . $storage_file;
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
@@ -75,12 +112,12 @@ function saveCampaignStore($supabase_url, $supabase_key, $storage_file, $store) 
         'Content-Type: application/json',
         'x-upsert: true'
     ]);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 8);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 4);
     $res = curl_exec($ch);
     $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-    return ($code >= 200 && $code < 300);
+    return $local_saved || ($code >= 200 && $code < 300);
 }
 
 // Standard approved default form fields for newly created campaigns
@@ -379,6 +416,15 @@ if ($action === 'list') {
     }
 
     echo json_encode(['success' => true, 'campaigns' => $store['campaigns'] ?: []]);
+    exit();
+}
+
+// 1b. GET: All Submissions across all campaigns
+if ($action === 'getAllSubmissions' || $action === 'allSubmissions') {
+    echo json_encode([
+        'success' => true,
+        'submissions' => $store['submissions'] ?: []
+    ]);
     exit();
 }
 

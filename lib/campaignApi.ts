@@ -61,13 +61,25 @@ async function fetchApi(action: string, options: RequestInit = {}): Promise<any>
 export async function getCampaigns(): Promise<Campaign[]> {
   try {
     const data = await fetchApi('list');
-    if (data?.success && Array.isArray(data.campaigns)) {
+    if (data?.success && Array.isArray(data.campaigns) && data.campaigns.length > 0) {
       return data.campaigns;
     }
-    return [];
-  } catch {
-    return [];
+  } catch (e) {
+    console.warn('API getCampaigns failed, falling back to static store:', e);
   }
+
+  // Guaranteed static store fallback
+  try {
+    const staticRes = await fetch(`/data/campaigns_store.json?_t=${Date.now()}`);
+    if (staticRes.ok) {
+      const staticData = await staticRes.json();
+      if (staticData?.campaigns && Array.isArray(staticData.campaigns) && staticData.campaigns.length > 0) {
+        return staticData.campaigns;
+      }
+    }
+  } catch (e) {}
+
+  return [INITIAL_SAMPLE_CAMPAIGN];
 }
 
 export async function getCampaignBySlug(slug: string): Promise<{ campaign: Campaign; form: CampaignForm | null }> {
@@ -79,10 +91,24 @@ export async function getCampaignBySlug(slug: string): Promise<{ campaign: Campa
         form: data.form || null
       };
     }
-    throw new Error(data?.error || 'Campaign not found');
   } catch (err: any) {
-    throw err;
+    console.warn('API getCampaignBySlug failed, trying static fallback:', err);
   }
+
+  // Static fallback
+  try {
+    const staticRes = await fetch(`/data/campaigns_store.json?_t=${Date.now()}`);
+    if (staticRes.ok) {
+      const staticData = await staticRes.json();
+      const campaign = staticData?.campaigns?.find((c: any) => c.slug === slug || c.id === slug);
+      if (campaign) {
+        const form = staticData?.forms?.find((f: any) => f.campaignId === campaign.id || f.id === campaign.assignedFormId) || null;
+        return { campaign, form };
+      }
+    }
+  } catch (e) {}
+
+  throw new Error('Campaign not found');
 }
 
 export async function getCampaignDetails(id: string): Promise<{
@@ -103,10 +129,33 @@ export async function getCampaignDetails(id: string): Promise<{
         emailLogs: data.emailLogs || []
       };
     }
-    throw new Error(data?.error || 'Campaign details not found');
   } catch (err: any) {
-    throw err;
+    console.warn('API getCampaignDetails failed, trying static fallback:', err);
   }
+
+  // Static fallback
+  try {
+    const staticRes = await fetch(`/data/campaigns_store.json?_t=${Date.now()}`);
+    if (staticRes.ok) {
+      const staticData = await staticRes.json();
+      const campaign = staticData?.campaigns?.find((c: any) => c.id === id || c.slug === id);
+      if (campaign) {
+        const form = staticData?.forms?.find((f: any) => f.campaignId === campaign.id || f.id === campaign.assignedFormId) || null;
+        const emailTemplate = staticData?.emailTemplates?.find((t: any) => t.campaignId === campaign.id) || null;
+        const subs = (staticData?.submissions || []).filter((s: any) => s.campaignId === campaign.id);
+        const logs = (staticData?.emailLogs || []).filter((l: any) => l.campaignId === campaign.id);
+        return {
+          campaign,
+          form,
+          emailTemplate,
+          submissions: subs,
+          emailLogs: logs
+        };
+      }
+    }
+  } catch (e) {}
+
+  throw new Error('Campaign details not found');
 }
 
 export async function getCampaignStats(): Promise<CampaignStatsSummary> {
@@ -115,34 +164,71 @@ export async function getCampaignStats(): Promise<CampaignStatsSummary> {
     if (data?.success && data.stats) {
       return data.stats;
     }
-    return {
-      totalCampaigns: 0,
-      activeCampaigns: 0,
-      draftCampaigns: 0,
-      completedCampaigns: 0,
-      totalSubmissions: 0,
-      publicSubmissions: 0,
-      boothSubmissions: 0,
-      totalEmailsSent: 0,
-      totalEmailsFailed: 0,
-      recentSubmissions: [],
-      recentCampaigns: []
-    };
-  } catch {
-    return {
-      totalCampaigns: 0,
-      activeCampaigns: 0,
-      draftCampaigns: 0,
-      completedCampaigns: 0,
-      totalSubmissions: 0,
-      publicSubmissions: 0,
-      boothSubmissions: 0,
-      totalEmailsSent: 0,
-      totalEmailsFailed: 0,
-      recentSubmissions: [],
-      recentCampaigns: []
-    };
+  } catch (e) {
+    console.warn('API getCampaignStats failed, falling back to static store calculation:', e);
   }
+
+  // Static fallback calculation
+  try {
+    const staticRes = await fetch(`/data/campaigns_store.json?_t=${Date.now()}`);
+    if (staticRes.ok) {
+      const store = await staticRes.json();
+      const campaigns = store.campaigns || [];
+      const submissions = store.submissions || [];
+      const emailLogs = store.emailLogs || [];
+
+      let active = 0;
+      let draft = 0;
+      let completed = 0;
+      campaigns.forEach((c: any) => {
+        if (c.status === 'active') active++;
+        else if (c.status === 'draft') draft++;
+        else completed++;
+      });
+
+      let boothSubs = 0;
+      let publicSubs = 0;
+      submissions.forEach((s: any) => {
+        if (s.source === 'booth_capture') boothSubs++;
+        else publicSubs++;
+      });
+
+      let sent = 0;
+      let failed = 0;
+      emailLogs.forEach((l: any) => {
+        if (l.status === 'sent') sent++;
+        else if (l.status === 'failed') failed++;
+      });
+
+      return {
+        totalCampaigns: campaigns.length,
+        activeCampaigns: active,
+        draftCampaigns: draft,
+        completedCampaigns: completed,
+        totalSubmissions: submissions.length,
+        publicSubmissions: publicSubs,
+        boothSubmissions: boothSubs,
+        totalEmailsSent: sent,
+        totalEmailsFailed: failed,
+        recentSubmissions: submissions.slice(-10).reverse(),
+        recentCampaigns: campaigns.slice(-5).reverse()
+      };
+    }
+  } catch (e) {}
+
+  return {
+    totalCampaigns: 0,
+    activeCampaigns: 0,
+    draftCampaigns: 0,
+    completedCampaigns: 0,
+    totalSubmissions: 0,
+    publicSubmissions: 0,
+    boothSubmissions: 0,
+    totalEmailsSent: 0,
+    totalEmailsFailed: 0,
+    recentSubmissions: [],
+    recentCampaigns: []
+  };
 }
 
 export async function saveCampaign(campaign: Partial<Campaign>): Promise<Campaign> {
