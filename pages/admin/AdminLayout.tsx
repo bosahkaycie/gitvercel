@@ -171,7 +171,15 @@ const AdminLayout: React.FC = () => {
   const { teamMembers, loading: teamLoading, saveTeamMember, deleteTeamMember, importTeamMembers } = useTeamMembers(true);
   const { vendors, loading: vendorsLoading, reviewApplication, deleteVendor } = useVendorApplications();
   const { jobs, loading: jobsLoading, saveJob, deleteJob } = useJobOpenings(true);
-  const { applications, loading: appsLoading, reload: reloadApplications, updateApplicationStatus, deleteApplication } = useJobApplications();
+  const {
+    applications,
+    loading: appsLoading,
+    reload: reloadApplications,
+    updateApplicationStatus,
+    deleteApplication,
+    bulkUpdateApplicationStatus,
+    bulkDeleteApplications
+  } = useJobApplications();
   const { posts, loading: blogsLoading, savePost, deletePost } = useBlogPosts(undefined, true);
   const { sliders, loading: slidersLoading, saveSlider, deleteSlider, resetSliders } = useSliders(true);
   const { videos, loading: videosLoading, saveVideo, deleteVideo } = useVideos(true);
@@ -471,6 +479,8 @@ const AdminLayout: React.FC = () => {
             onRefreshApplications={reloadApplications}
             onUpdateApplicationStatus={updateApplicationStatus}
             onDeleteApplication={deleteApplication}
+            onBulkUpdateApplicationStatus={bulkUpdateApplicationStatus}
+            onBulkDeleteApplications={bulkDeleteApplications}
             theme={theme}
           />
         );

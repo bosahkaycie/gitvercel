@@ -3876,7 +3876,54 @@ export const useJobApplications = () => {
     setApplications(current);
   };
 
-  return { applications, loading, reload: fetchApplications, updateApplicationStatus, deleteApplication };
+  const bulkUpdateApplicationStatus = async (ids: string[], status: JobApplication['status']) => {
+    if (!ids || ids.length === 0) return;
+    const client = getSupabaseClient();
+    if (client) {
+      try {
+        await client
+          .from('job_applications')
+          .update({ status })
+          .in('id', ids);
+      } catch (err) {
+        console.warn('Supabase bulk application update error:', err);
+      }
+    }
+
+    const idSet = new Set(ids);
+    const current = getStoredApplications().map(a =>
+      idSet.has(a.id) ? { ...a, status } : a
+    );
+    saveStoredApplications(current);
+    setApplications(current);
+  };
+
+  const bulkDeleteApplications = async (ids: string[]) => {
+    if (!ids || ids.length === 0) return;
+    const client = getSupabaseClient();
+    if (client) {
+      try {
+        await client.from('job_applications').delete().in('id', ids);
+      } catch (err) {
+        console.warn('Supabase bulk application delete error:', err);
+      }
+    }
+
+    const idSet = new Set(ids);
+    const current = getStoredApplications().filter(a => !idSet.has(a.id));
+    saveStoredApplications(current);
+    setApplications(current);
+  };
+
+  return {
+    applications,
+    loading,
+    reload: fetchApplications,
+    updateApplicationStatus,
+    deleteApplication,
+    bulkUpdateApplicationStatus,
+    bulkDeleteApplications
+  };
 };
 
 async function uploadApplicantDocument(file: File, prefix: string, safeName: string): Promise<string | null> {

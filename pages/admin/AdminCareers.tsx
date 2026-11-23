@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { JobApplication, JobOpening } from '../../types';
 import { useSiteSettings, extractCoverLetterMeta } from '../../hooks/useSupabaseData';
+import { downloadApplicationsZip, DownloadProgress } from '../../utils/cvDownloader';
 import {
   IconCareers,
   IconPlus,
@@ -9,6 +10,7 @@ import {
   IconSearch,
   IconDownload,
   IconCheck,
+  IconCheckCircle,
   IconClose,
   IconFileText,
   IconPhone,
@@ -37,6 +39,8 @@ interface AdminCareersProps {
   onUpdateAppStatus?: (id: string, status: JobApplication['status'], notes?: string, extraFields?: Partial<JobApplication>) => Promise<any>;
   onDeleteApplication?: (id: string) => Promise<any>;
   onDeleteApp?: (id: string) => Promise<any>;
+  onBulkUpdateApplicationStatus?: (ids: string[], status: JobApplication['status']) => Promise<any>;
+  onBulkDeleteApplications?: (ids: string[]) => Promise<any>;
   onSaveJob: (job: Partial<JobOpening> & { title: string; department: string }) => Promise<any>;
   onDeleteJob: (id: string) => Promise<any>;
   theme?: 'light' | 'dark';
@@ -53,6 +57,8 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
   onUpdateAppStatus,
   onDeleteApplication,
   onDeleteApp,
+  onBulkUpdateApplicationStatus,
+  onBulkDeleteApplications,
   onSaveJob,
   onDeleteJob,
   theme = 'light'
@@ -191,6 +197,177 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
     setSelectedPostingFilter(jobId);
     setActiveTab('applications');
     setIsStatsModalOpen(false);
+  };
+
+  // Bulk Selection & Action State
+  const [selectedAppIds, setSelectedAppIds] = useState<Set<string>>(new Set());
+  const [isBulkUpdating, setIsBulkUpdating] = useState(false);
+  const [bulkActionToast, setBulkActionToast] = useState<{ message: string; type?: 'success' | 'info' | 'error' } | null>(null);
+  const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
+
+  // Bulk CV Download State
+  const [isDownloadingZip, setIsDownloadingZip] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null);
+  const [downloadModalTitle, setDownloadModalTitle] = useState('');
+  const [isDownloadMenuOpen, setIsDownloadMenuOpen] = useState(false);
+  const downloadMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (downloadMenuRef.current && !downloadMenuRef.current.contains(e.target as Node)) {
+        setIsDownloadMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const getAppsForCategory = (categoryId: string): JobApplication[] => {
+    if (categoryId === 'All') return safeApps;
+    if (categoryId === 'general') return safeApps.filter((a) => !matchJobForApp(a));
+    return safeApps.filter((a) => matchJobForApp(a)?.id === categoryId);
+  };
+
+  const getCategoryTitle = (categoryId: string): string => {
+    if (categoryId === 'All') return 'All Positions';
+    if (categoryId === 'general') return 'General Applications';
+    const job = safeJobs.find((j) => j.id === categoryId);
+    return job?.title || 'Position';
+  };
+
+  const handleToggleSelectApp = (id: string) => {
+    setSelectedAppIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleSelectAllVisible = (apps: JobApplication[]) => {
+    const allSelected = apps.length > 0 && apps.every((a) => selectedAppIds.has(a.id));
+    if (allSelected) {
+      setSelectedAppIds((prev) => {
+        const next = new Set(prev);
+        apps.forEach((a) => next.delete(a.id));
+        return next;
+      });
+    } else {
+      setSelectedAppIds((prev) => {
+        const next = new Set(prev);
+        apps.forEach((a) => next.add(a.id));
+        return next;
+      });
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedAppIds(new Set());
+  };
+
+  const handleBulkStatusChange = async (newStatus: JobApplication['status']) => {
+    const ids = Array.from(selectedAppIds);
+    if (ids.length === 0) return;
+
+    setIsBulkUpdating(true);
+    try {
+      if (onBulkUpdateApplicationStatus) {
+        await onBulkUpdateApplicationStatus(ids, newStatus);
+      } else {
+        await Promise.all(ids.map((id) => handleUpdateStatus(id, newStatus)));
+      }
+      setBulkActionToast({
+        message: `Successfully marked ${ids.length} candidate${ids.length > 1 ? 's' : ''} as "${newStatus}"!`,
+        type: 'success'
+      });
+      setTimeout(() => setBulkActionToast(null), 4000);
+      handleClearSelection();
+    } catch (err: any) {
+      console.error('Bulk status update error:', err);
+      setBulkActionToast({ message: 'Failed to complete bulk status update.', type: 'error' });
+      setTimeout(() => setBulkActionToast(null), 4000);
+    } finally {
+      setIsBulkUpdating(false);
+    }
+  };
+
+  const handleExecuteBulkDelete = async () => {
+    const ids = Array.from(selectedAppIds);
+    if (ids.length === 0) return;
+
+    setIsBulkUpdating(true);
+    try {
+      if (onBulkDeleteApplications) {
+        await onBulkDeleteApplications(ids);
+      } else {
+        await Promise.all(ids.map((id) => handleDeleteApplication(id)));
+      }
+      setBulkActionToast({
+        message: `Permanently removed ${ids.length} candidate application${ids.length > 1 ? 's' : ''}.`,
+        type: 'info'
+      });
+      setTimeout(() => setBulkActionToast(null), 4000);
+      handleClearSelection();
+      setIsBulkDeleteModalOpen(false);
+    } catch (err: any) {
+      console.error('Bulk delete error:', err);
+      setBulkActionToast({ message: 'Failed to delete selected applications.', type: 'error' });
+      setTimeout(() => setBulkActionToast(null), 4000);
+    } finally {
+      setIsBulkUpdating(false);
+    }
+  };
+
+  const handleDownloadCVs = async (targetApps: JobApplication[], categoryTitle: string) => {
+    const appsWithCV = targetApps.filter((a) => Boolean(a.resume_url));
+    if (appsWithCV.length === 0) {
+      setBulkActionToast({
+        message: `No candidate CVs found to download for "${categoryTitle}".`,
+        type: 'info'
+      });
+      setTimeout(() => setBulkActionToast(null), 4000);
+      return;
+    }
+
+    setIsDownloadingZip(true);
+    setDownloadModalTitle(categoryTitle);
+    setDownloadProgress({
+      current: 0,
+      total: appsWithCV.length,
+      currentName: 'Connecting to files...',
+      percent: 0
+    });
+
+    try {
+      const result = await downloadApplicationsZip({
+        applications: appsWithCV,
+        zipTitle: `PIGL_CVs_${categoryTitle.replace(/[^a-zA-Z0-9]/g, '_')}`,
+        onProgress: (prog) => {
+          setDownloadProgress(prog);
+        }
+      });
+
+      setBulkActionToast({
+        message: `Downloaded ${result.downloadedCount} CV${result.downloadedCount > 1 ? 's' : ''} in ${result.zipName}!`,
+        type: 'success'
+      });
+      setTimeout(() => setBulkActionToast(null), 5000);
+    } catch (err: any) {
+      console.error('ZIP download error:', err);
+      setBulkActionToast({
+        message: err?.message || 'Failed to generate CVs archive.',
+        type: 'error'
+      });
+      setTimeout(() => setBulkActionToast(null), 5000);
+    } finally {
+      setIsDownloadingZip(false);
+      setDownloadProgress(null);
+    }
+  };
+
+  const handleDownloadSelectedCVs = () => {
+    const selectedApps = safeApps.filter((a) => selectedAppIds.has(a.id));
+    handleDownloadCVs(selectedApps, `${selectedApps.length}_Selected_Candidates`);
   };
 
   const toggleCollapsePosting = (jobId: string) => {
@@ -439,6 +616,139 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                 <span>Position Stats</span>
               </button>
 
+              {/* Bulk CV Downloads Dropdown Menu */}
+              <div className="relative" ref={downloadMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsDownloadMenuOpen((prev) => !prev)}
+                  disabled={isDownloadingZip || safeApps.length === 0}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 border shadow-xs cursor-pointer ${
+                    isDark
+                      ? 'bg-slate-800 border-slate-700 text-white hover:bg-slate-700 hover:border-emerald-500/50'
+                      : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-emerald-600/50'
+                  }`}
+                  title="Download CVs in bulk (All categories or by specific role)"
+                >
+                  <IconDownload className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>Download CVs</span>
+                  <IconChevronDown className={`w-3 h-3 transition-transform ${isDownloadMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isDownloadMenuOpen && (
+                  <div className={`absolute right-0 mt-2 w-80 rounded-2xl shadow-2xl border p-2 z-50 animate-in fade-in zoom-in-95 duration-150 ${
+                    isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
+                  }`}>
+                    <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Bulk CV Archives (ZIP)
+                      </div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Download candidate resumes packaged into compressed ZIP files.
+                      </div>
+                    </div>
+
+                    <div className="py-1">
+                      {/* Option: Download ALL CVs */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsDownloadMenuOpen(false);
+                          handleDownloadCVs(safeApps, 'All_Positions');
+                        }}
+                        className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition-colors cursor-pointer ${
+                          isDark ? 'hover:bg-emerald-950/60 text-emerald-300' : 'hover:bg-emerald-50 text-emerald-800'
+                        }`}
+                      >
+                        <div className="flex items-center space-x-2.5">
+                          <span className="text-base">📦</span>
+                          <div>
+                            <div className="font-bold text-xs">Download All Categories</div>
+                            <div className="text-[10px] font-normal text-slate-400">All candidate submissions combined</div>
+                          </div>
+                        </div>
+                        <span className="font-mono text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-500 font-bold">
+                          {safeApps.filter((a) => a.resume_url).length} CVs
+                        </span>
+                      </button>
+                    </div>
+
+                    <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
+
+                    <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      Download by Category:
+                    </div>
+
+                    <div className="max-h-60 overflow-y-auto py-1 space-y-0.5">
+                      {safeJobs.map((job) => {
+                        const jobApps = safeApps.filter((a) => matchJobForApp(a)?.id === job.id);
+                        const cvCount = jobApps.filter((a) => a.resume_url).length;
+                        return (
+                          <button
+                            key={job.id}
+                            type="button"
+                            disabled={cvCount === 0}
+                            onClick={() => {
+                              setIsDownloadMenuOpen(false);
+                              handleDownloadCVs(jobApps, job.title);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-colors ${
+                              cvCount === 0
+                                ? 'opacity-40 cursor-not-allowed'
+                                : isDark ? 'hover:bg-slate-800 text-slate-200 cursor-pointer' : 'hover:bg-slate-100 text-slate-800 cursor-pointer'
+                            }`}
+                          >
+                            <div className="flex items-center space-x-2 truncate">
+                              <span className="text-xs">📁</span>
+                              <span className="truncate">{job.title}</span>
+                            </div>
+                            <span className={`font-mono text-[11px] px-1.5 py-0.5 rounded font-bold shrink-0 ${
+                              cvCount > 0
+                                ? isDark ? 'bg-slate-800 text-emerald-400' : 'bg-slate-100 text-emerald-700'
+                                : 'text-slate-400'
+                            }`}>
+                              {cvCount} CV{cvCount !== 1 ? 's' : ''}
+                            </span>
+                          </button>
+                        );
+                      })}
+
+                      {/* General Talent Pool */}
+                      {(() => {
+                        const generalApps = safeApps.filter((a) => !matchJobForApp(a));
+                        const generalCvCount = generalApps.filter((a) => a.resume_url).length;
+                        return (
+                          <button
+                            type="button"
+                            disabled={generalCvCount === 0}
+                            onClick={() => {
+                              setIsDownloadMenuOpen(false);
+                              handleDownloadCVs(generalApps, 'General_Applications');
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition-colors ${
+                              generalCvCount === 0
+                                ? 'opacity-40 cursor-not-allowed'
+                                : isDark ? 'hover:bg-slate-800 text-slate-200 cursor-pointer' : 'hover:bg-slate-100 text-slate-800 cursor-pointer'
+                            }`}
+                          >
+                            <div className="flex items-center space-x-2 truncate">
+                              <span className="text-xs">📁</span>
+                              <span className="truncate">General Applications</span>
+                            </div>
+                            <span className={`font-mono text-[11px] px-1.5 py-0.5 rounded font-bold shrink-0 ${
+                              generalCvCount > 0
+                                ? isDark ? 'bg-slate-800 text-amber-400' : 'bg-slate-100 text-amber-700'
+                                : 'text-slate-400'
+                            }`}>
+                              {generalCvCount} CV{generalCvCount !== 1 ? 's' : ''}
+                            </span>
+                          </button>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {onRefreshApplications && (
                 <button
                   type="button"
@@ -576,13 +886,39 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
           </div>
           {/* Active Job Postings Horizontal Filter Chips */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs px-1">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs px-1">
               <span className={`font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                 Filter by Vacancy Posting:
               </span>
-              <span className="text-slate-400 font-mono text-[11px]">
-                {applications.length} Total Applications Recorded
-              </span>
+              <div className="flex items-center space-x-2.5">
+                <span className="text-slate-400 font-mono text-[11px]">
+                  {applications.length} Total Applications Recorded
+                </span>
+                {/* 1-Click Category Download Button */}
+                {(() => {
+                  const catApps = getAppsForCategory(selectedPostingFilter);
+                  const cvCount = catApps.filter((a) => a.resume_url).length;
+                  const catTitle = getCategoryTitle(selectedPostingFilter);
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadCVs(catApps, catTitle)}
+                      disabled={isDownloadingZip || cvCount === 0}
+                      className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 border shadow-2xs ${
+                        cvCount === 0
+                          ? 'opacity-40 cursor-not-allowed border-slate-300 dark:border-slate-700 text-slate-400'
+                          : isDark
+                          ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300 hover:bg-emerald-900/60 cursor-pointer'
+                          : 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100 cursor-pointer'
+                      }`}
+                      title={`Download all CVs for ${catTitle} in a ZIP file`}
+                    >
+                      <IconDownload className="w-3.5 h-3.5" />
+                      <span>Download {selectedPostingFilter === 'All' ? 'All' : catTitle} CVs ({cvCount})</span>
+                    </button>
+                  );
+                })()}
+              </div>
             </div>
 
             <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-thin">
@@ -793,6 +1129,15 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                       isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
                     }`}>
                       <tr>
+                        <th className="py-3.5 px-3 sm:px-4 w-10 text-center">
+                          <input
+                            type="checkbox"
+                            checked={filteredApps.length > 0 && filteredApps.every((a) => selectedAppIds.has(a.id))}
+                            onChange={() => handleSelectAllVisible(filteredApps)}
+                            className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 dark:border-slate-700 cursor-pointer"
+                            title="Select / deselect all visible applications"
+                          />
+                        </th>
                         <th className="py-3.5 px-4 sm:px-5">Candidate</th>
                         <th className="py-3.5 px-4 sm:px-5">Applied Role</th>
                         <th className="py-3.5 px-4 sm:px-5">Date</th>
@@ -805,8 +1150,29 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                       {filteredApps.map((app) => {
                         const { coverLetterUrl } = extractCoverLetterMeta(app.cover_letter);
                         const attachedClUrl = app.cover_letter_url || coverLetterUrl;
+                        const isSelected = selectedAppIds.has(app.id);
                         return (
-                        <tr key={app.id} className={`transition-colors ${isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/80'}`}>
+                        <tr
+                          key={app.id}
+                          className={`transition-colors ${
+                            isSelected
+                              ? isDark
+                                ? 'bg-emerald-950/40 border-l-4 border-l-emerald-500'
+                                : 'bg-emerald-50/80 border-l-4 border-l-emerald-600'
+                              : isDark
+                              ? 'hover:bg-slate-800/50'
+                              : 'hover:bg-slate-50/80'
+                          }`}
+                        >
+                          <td className="py-4 px-3 sm:px-4 text-center">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => handleToggleSelectApp(app.id)}
+                              className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 dark:border-slate-700 cursor-pointer"
+                              title={`Select ${app.applicant_name}`}
+                            />
+                          </td>
                           <td className="py-4 px-4 sm:px-5">
                             <div>
                               <div className={`font-bold text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -1013,6 +1379,23 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                           className="flex items-center space-x-2 shrink-0 self-end md:self-center pt-2 md:pt-0"
                           onClick={(e) => e.stopPropagation()}
                         >
+                          {totalPostingApps > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => handleDownloadCVs(jobApps, job.title)}
+                              disabled={isDownloadingZip}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors flex items-center gap-1.5 cursor-pointer ${
+                                isDark
+                                  ? 'bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-300 border-emerald-800'
+                                  : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                              }`}
+                              title={`Download all CVs for ${job.title} in a ZIP file`}
+                            >
+                              <IconDownload className="w-3.5 h-3.5" />
+                              <span>Download CVs ({jobApps.filter(a => a.resume_url).length})</span>
+                            </button>
+                          )}
+
                           <button
                             type="button"
                             onClick={() => handleCopyJobShareLink(job.id)}
@@ -1090,6 +1473,15 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                   {hiredCount} Hired
                                 </span>
                               )}
+                              {jobApps.length > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleSelectAllVisible(jobApps)}
+                                  className="ml-auto text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+                                >
+                                  <span>{jobApps.every(a => selectedAppIds.has(a.id)) ? 'Deselect Role' : `Select All (${jobApps.length})`}</span>
+                                </button>
+                              )}
                             </div>
                           )}
 
@@ -1118,6 +1510,15 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                   isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
                                 }`}>
                                   <tr>
+                                    <th className="py-3 px-3 sm:px-4 w-10 text-center">
+                                      <input
+                                        type="checkbox"
+                                        checked={jobApps.length > 0 && jobApps.every((a) => selectedAppIds.has(a.id))}
+                                        onChange={() => handleSelectAllVisible(jobApps)}
+                                        className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 dark:border-slate-700 cursor-pointer"
+                                        title="Select / deselect all in this role"
+                                      />
+                                    </th>
                                     <th className="py-3 px-4 sm:px-5">Candidate</th>
                                     <th className="py-3 px-4 sm:px-5">Date</th>
                                     <th className="py-3 px-4 sm:px-5">Status</th>
@@ -1129,8 +1530,29 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                   {jobApps.map((app) => {
                                     const { coverLetterUrl } = extractCoverLetterMeta(app.cover_letter);
                                     const attachedClUrl = app.cover_letter_url || coverLetterUrl;
+                                    const isSelected = selectedAppIds.has(app.id);
                                     return (
-                                    <tr key={app.id} className={`transition-colors ${isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/80'}`}>
+                                    <tr
+                                      key={app.id}
+                                      className={`transition-colors ${
+                                        isSelected
+                                          ? isDark
+                                            ? 'bg-emerald-950/40 border-l-4 border-l-emerald-500'
+                                            : 'bg-emerald-50/80 border-l-4 border-l-emerald-600'
+                                          : isDark
+                                          ? 'hover:bg-slate-800/50'
+                                          : 'hover:bg-slate-50/80'
+                                      }`}
+                                    >
+                                      <td className="py-3.5 px-3 sm:px-4 text-center">
+                                        <input
+                                          type="checkbox"
+                                          checked={isSelected}
+                                          onChange={() => handleToggleSelectApp(app.id)}
+                                          className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 dark:border-slate-700 cursor-pointer"
+                                          title={`Select ${app.applicant_name}`}
+                                        />
+                                      </td>
                                       <td className="py-3.5 px-4 sm:px-5">
                                         <div>
                                           <div className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -1273,6 +1695,33 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                       </div>
 
                       <div className="flex items-center space-x-2 shrink-0 self-end md:self-center" onClick={(e) => e.stopPropagation()}>
+                        {totalGeneral > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadCVs(generalApps, 'General_Applications')}
+                            disabled={isDownloadingZip}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors flex items-center gap-1.5 cursor-pointer ${
+                              isDark
+                                ? 'bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 border-amber-800'
+                                : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200'
+                            }`}
+                            title="Download all General Talent CVs in a ZIP file"
+                          >
+                            <IconDownload className="w-3.5 h-3.5" />
+                            <span>Download CVs ({generalApps.filter((a) => a.resume_url).length})</span>
+                          </button>
+                        )}
+                        {generalApps.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => handleSelectAllVisible(generalApps)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
+                              isDark ? 'border-slate-700 bg-slate-800 text-slate-300' : 'border-slate-200 bg-white text-slate-700'
+                            }`}
+                          >
+                            {generalApps.every((a) => selectedAppIds.has(a.id)) ? 'Deselect All' : `Select All (${generalApps.length})`}
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => toggleCollapsePosting('general')}
@@ -1305,6 +1754,15 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                 isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
                               }`}>
                                 <tr>
+                                  <th className="py-3 px-3 sm:px-4 w-10 text-center">
+                                    <input
+                                      type="checkbox"
+                                      checked={generalApps.length > 0 && generalApps.every((a) => selectedAppIds.has(a.id))}
+                                      onChange={() => handleSelectAllVisible(generalApps)}
+                                      className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 dark:border-slate-700 cursor-pointer"
+                                      title="Select / deselect all in general talent"
+                                    />
+                                  </th>
                                   <th className="py-3 px-4 sm:px-5">Candidate</th>
                                   <th className="py-3 px-4 sm:px-5">Specified Role/Specialty</th>
                                   <th className="py-3 px-4 sm:px-5">Date</th>
@@ -1317,8 +1775,29 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                 {generalApps.map((app) => {
                                   const { coverLetterUrl } = extractCoverLetterMeta(app.cover_letter);
                                   const attachedClUrl = app.cover_letter_url || coverLetterUrl;
+                                  const isSelected = selectedAppIds.has(app.id);
                                   return (
-                                  <tr key={app.id} className={`transition-colors ${isDark ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50/80'}`}>
+                                  <tr
+                                    key={app.id}
+                                    className={`transition-colors ${
+                                      isSelected
+                                        ? isDark
+                                          ? 'bg-emerald-950/40 border-l-4 border-l-emerald-500'
+                                          : 'bg-emerald-50/80 border-l-4 border-l-emerald-600'
+                                        : isDark
+                                        ? 'hover:bg-slate-800/50'
+                                        : 'hover:bg-slate-50/80'
+                                    }`}
+                                  >
+                                    <td className="py-3.5 px-3 sm:px-4 text-center">
+                                      <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        onChange={() => handleToggleSelectApp(app.id)}
+                                        className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 dark:border-slate-700 cursor-pointer"
+                                        title={`Select ${app.applicant_name}`}
+                                      />
+                                    </td>
                                     <td className="py-3.5 px-4 sm:px-5">
                                       <div>
                                         <div className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -2327,7 +2806,7 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                             </div>
 
                             {/* Applicant Big Counter Badge */}
-                            <div className="flex items-center gap-3 shrink-0">
+                            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                               <div className="text-right">
                                 <div className="flex items-baseline justify-end gap-1.5">
                                   <span className={`text-xl font-black font-mono ${
@@ -2343,6 +2822,25 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                   {pctOfTotal}% of all candidate submissions
                                 </div>
                               </div>
+
+                              {count > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDownloadCVs(getAppsForCategory(job.id), job.title);
+                                  }}
+                                  className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center space-x-1 cursor-pointer ${
+                                    isDark
+                                      ? 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700'
+                                      : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100 shadow-2xs'
+                                  }`}
+                                  title={`Download ZIP of all ${count} CVs for ${job.title}`}
+                                >
+                                  <IconDownload className="w-3.5 h-3.5 text-emerald-500" />
+                                  <span>CVs ({count})</span>
+                                </button>
+                              )}
 
                               <button
                                 type="button"
@@ -2439,7 +2937,7 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                       <div className="text-right">
                         <div className="flex items-baseline justify-end gap-1.5">
                           <span className="text-xl font-black font-mono text-amber-600 dark:text-amber-400">
@@ -2453,6 +2951,25 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                           {safeApps.length > 0 ? Math.round((generalAppCount / safeApps.length) * 100) : 0}% of all submissions
                         </div>
                       </div>
+
+                      {generalAppCount > 0 && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownloadCVs(getAppsForCategory('general'), 'General Talent Network');
+                          }}
+                          className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center space-x-1 cursor-pointer ${
+                            isDark
+                              ? 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700'
+                              : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100 shadow-2xs'
+                          }`}
+                          title={`Download ZIP of all ${generalAppCount} CVs for General Talent Network`}
+                        >
+                          <IconDownload className="w-3.5 h-3.5 text-amber-500" />
+                          <span>CVs ({generalAppCount})</span>
+                        </button>
+                      )}
 
                       <button
                         type="button"
@@ -2507,6 +3024,216 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
               alt="Hiring Flyer"
               className="max-h-[85vh] w-auto object-contain rounded-2xl shadow-2xl border border-white/10"
             />
+          </div>
+        </div>
+      )}
+
+      {/* Floating Bulk Actions Bar */}
+      {selectedAppIds.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="bg-slate-900/95 dark:bg-slate-900/95 text-white backdrop-blur-md px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/80 flex items-center gap-3 sm:gap-4 flex-wrap max-w-[95vw]">
+            <div className="flex items-center gap-2 border-r border-slate-700 pr-3 sm:pr-4">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white shadow-xs">
+                {selectedAppIds.size}
+              </span>
+              <span className="text-xs font-bold whitespace-nowrap">
+                {selectedAppIds.size === 1 ? 'Candidate' : 'Candidates'} Selected
+              </span>
+            </div>
+
+            {/* Quick Shortlist Button (Bulk) */}
+            <button
+              type="button"
+              disabled={isBulkUpdating}
+              onClick={() => handleBulkStatusChange('shortlisted')}
+              className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 rounded-xl text-xs font-extrabold flex items-center space-x-1.5 transition-all shadow-md cursor-pointer disabled:opacity-50"
+              title="Shortlist selected candidates in bulk"
+            >
+              <span>⭐</span>
+              <span>Shortlist Selected</span>
+            </button>
+
+            {/* Change Status Dropdown */}
+            <div className="relative group">
+              <select
+                disabled={isBulkUpdating}
+                value=""
+                onChange={(e) => {
+                  if (e.target.value) {
+                    handleBulkStatusChange(e.target.value as JobApplication['status']);
+                  }
+                }}
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer disabled:opacity-50"
+              >
+                <option value="" disabled>Change Status to...</option>
+                <option value="new">Mark as New</option>
+                <option value="shortlisted">⭐ Shortlist</option>
+                <option value="interviewed">🎙️ Interviewed</option>
+                <option value="hired">🎉 Hired</option>
+                <option value="rejected">❌ Rejected</option>
+              </select>
+            </div>
+
+            {/* Download Selected CVs */}
+            <button
+              type="button"
+              disabled={isBulkUpdating || isDownloadingZip}
+              onClick={handleDownloadSelectedCVs}
+              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all shadow-sm cursor-pointer disabled:opacity-50"
+              title="Download ZIP of all selected candidate CVs"
+            >
+              <IconDownload className="w-3.5 h-3.5" />
+              <span>Download CVs ({selectedAppIds.size})</span>
+            </button>
+
+            {/* Delete Selected */}
+            <button
+              type="button"
+              disabled={isBulkUpdating}
+              onClick={() => setIsBulkDeleteModalOpen(true)}
+              className="p-1.5 sm:px-2.5 sm:py-1.5 bg-rose-950/60 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded-xl text-xs font-semibold flex items-center space-x-1 transition-all cursor-pointer disabled:opacity-50"
+              title="Delete selected candidates"
+            >
+              <IconTrash className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Delete</span>
+            </button>
+
+            {/* Deselect All */}
+            <button
+              type="button"
+              onClick={handleClearSelection}
+              className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+              title="Clear selection"
+            >
+              <IconClose className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Confirmation Modal */}
+      {isBulkDeleteModalOpen && (
+        <div className="fixed inset-0 z-60 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className={`max-w-md w-full rounded-2xl p-6 shadow-2xl border ${
+            isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                <IconTrash className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-base text-slate-900 dark:text-white">Delete Selected Candidates</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">This action cannot be undone.</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-6">
+              Are you sure you want to permanently delete <strong className="text-rose-600 dark:text-rose-400">{selectedAppIds.size}</strong> selected applicant submission{selectedAppIds.size > 1 ? 's' : ''}?
+            </p>
+
+            <div className="flex items-center justify-end space-x-3">
+              <button
+                type="button"
+                disabled={isBulkUpdating}
+                onClick={() => setIsBulkDeleteModalOpen(false)}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer border ${
+                  isDark
+                    ? 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700'
+                    : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isBulkUpdating}
+                onClick={handleExecuteBulkDelete}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors shadow-sm cursor-pointer disabled:opacity-50 flex items-center space-x-1.5"
+              >
+                {isBulkUpdating ? (
+                  <span>Deleting...</span>
+                ) : (
+                  <>
+                    <IconTrash className="w-3.5 h-3.5" />
+                    <span>Delete {selectedAppIds.size} {selectedAppIds.size > 1 ? 'Applications' : 'Application'}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ZIP Download Progress Modal */}
+      {isDownloadingZip && downloadProgress && (
+        <div className="fixed inset-0 z-60 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className={`max-w-md w-full rounded-2xl p-6 shadow-2xl border ${
+            isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 animate-bounce">
+                <IconDownload className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-base text-slate-900 dark:text-white truncate">
+                  {downloadModalTitle ? `Packaging CVs: ${downloadModalTitle}` : 'Packaging CV Archive...'}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Compacting and bundling candidate CVs into a clean ZIP...
+                </p>
+              </div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="space-y-2 mb-4">
+              <div className="flex justify-between text-xs font-mono font-bold">
+                <span className="text-slate-600 dark:text-slate-300">
+                  {downloadProgress.current} of {downloadProgress.total} CVs fetched
+                </span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">
+                  {downloadProgress.percent}%
+                </span>
+              </div>
+              <div className={`w-full h-3 rounded-full overflow-hidden ${
+                isDark ? 'bg-slate-800' : 'bg-slate-100'
+              }`}>
+                <div
+                  className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-300 rounded-full"
+                  style={{ width: `${Math.max(4, downloadProgress.percent)}%` }}
+                />
+              </div>
+              {downloadProgress.currentName && (
+                <p className="text-[11px] text-slate-400 truncate">
+                  Processing: <span className="font-semibold text-slate-700 dark:text-slate-300">{downloadProgress.currentName}</span>
+                </p>
+              )}
+            </div>
+
+            <p className="text-[11px] text-slate-400 text-center">
+              Please keep this tab open. Your ZIP download will start automatically once ready.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Action Toast Notification */}
+      {bulkActionToast && (
+        <div className="fixed top-6 right-6 z-60 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className={`px-4 py-3 rounded-xl shadow-2xl border flex items-center space-x-3 ${
+            bulkActionToast.type === 'success'
+              ? 'bg-emerald-950/95 border-emerald-800 text-emerald-200'
+              : bulkActionToast.type === 'error'
+              ? 'bg-rose-950/95 border-rose-800 text-rose-200'
+              : 'bg-slate-900/95 border-slate-700 text-slate-200'
+          }`}>
+            {bulkActionToast.type === 'success' ? (
+              <IconCheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
+            ) : bulkActionToast.type === 'error' ? (
+              <span className="text-rose-400 text-base font-bold">⚠️</span>
+            ) : (
+              <span className="text-blue-400 text-base font-bold">ℹ️</span>
+            )}
+            <p className="text-xs font-semibold">{bulkActionToast.message}</p>
           </div>
         </div>
       )}
