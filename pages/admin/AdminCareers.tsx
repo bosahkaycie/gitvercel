@@ -245,6 +245,24 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
     });
   };
 
+  const handleToggleJobStatus = async (job: JobOpening) => {
+    const nextStatus: 'active' | 'closed' = job.status === 'active' ? 'closed' : 'active';
+    try {
+      await onSaveJob({
+        ...job,
+        status: nextStatus
+      });
+      setToggleToast(
+        nextStatus === 'active'
+          ? `"${job.title}" is now ACTIVE and accepting applications.`
+          : `"${job.title}" is now DISABLED. It displays "Not Accepting Submissions" on the website.`
+      );
+      setTimeout(() => setToggleToast(null), 3500);
+    } catch (err) {
+      console.error('Failed to toggle job status:', err);
+    }
+  };
+
   const openCreateJobModal = () => {
     setEditingJob(null);
     setJobTitle('');
@@ -1363,7 +1381,9 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
               <div className="space-y-3">
                 {/* Flyer graphic thumbnail */}
                 {job.image_url ? (
-                  <div className="relative w-full aspect-4/5 rounded-xl overflow-hidden bg-slate-950/20 border border-slate-200 dark:border-slate-800 group">
+                  <div className={`relative w-full aspect-4/5 rounded-xl overflow-hidden bg-slate-950/20 border border-slate-200 dark:border-slate-800 group ${
+                    job.status !== 'active' ? 'grayscale opacity-75' : ''
+                  }`}>
                     <img
                       src={job.image_url}
                       alt={job.title}
@@ -1379,9 +1399,15 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                         <span>View Flyer</span>
                       </button>
                     </div>
-                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-950/80 text-white backdrop-blur-xs">
-                      Flyer Attached
-                    </span>
+                    {job.status === 'active' ? (
+                      <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-950/80 text-white backdrop-blur-xs">
+                        Flyer Attached
+                      </span>
+                    ) : (
+                      <span className="absolute top-2 left-2 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950 shadow-md">
+                        Not Accepting Submissions
+                      </span>
+                    )}
                   </div>
                 ) : (
                   <div className="w-full py-4 px-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 text-center text-xs text-slate-400">
@@ -1389,17 +1415,23 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                   </div>
                 )}
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
                     {job.department}
                   </span>
-                  <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase border ${
-                    job.status === 'active' 
-                      ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300/60 dark:border-emerald-700/50' 
-                      : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
-                  }`}>
-                    {job.status}
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleJobStatus(job)}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all cursor-pointer ${
+                      job.status === 'active' 
+                        ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700/50 hover:bg-emerald-100' 
+                        : 'bg-amber-50 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300 dark:border-amber-700/50 hover:bg-amber-100'
+                    }`}
+                    title={job.status === 'active' ? 'Click to disable and stop accepting submissions' : 'Click to enable and resume accepting submissions'}
+                  >
+                    <span className={`w-2 h-2 rounded-full ${job.status === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+                    <span>{job.status === 'active' ? 'Active / Open' : 'Disabled (Closed)'}</span>
+                  </button>
                 </div>
 
                 <h3 className={`font-bold text-base sm:text-lg leading-snug ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -1415,8 +1447,21 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                 </p>
               </div>
 
-              <div className={`pt-4 mt-4 border-t flex items-center justify-between gap-2 ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
-                <div className="flex items-center space-x-2">
+              <div className={`pt-4 mt-4 border-t flex flex-wrap items-center justify-between gap-2 ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleJobStatus(job)}
+                    className={`inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                      job.status === 'active'
+                        ? 'bg-amber-50 hover:bg-amber-100 text-amber-900 dark:bg-amber-950/40 dark:text-amber-300 border-amber-300 dark:border-amber-800'
+                        : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
+                    }`}
+                    title={job.status === 'active' ? 'Disable this vacancy so it stops accepting submissions' : 'Activate this vacancy to accept submissions'}
+                  >
+                    <span>{job.status === 'active' ? 'Disable' : 'Enable'}</span>
+                  </button>
+
                   <button
                     onClick={() => openEditJobModal(job)}
                     className={`inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
@@ -1738,6 +1783,50 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                       isDark ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-400 focus:border-emerald-500' : 'bg-white border-slate-300 text-slate-950 placeholder:text-slate-400 focus:border-emerald-600 shadow-2xs'
                     }`}
                   />
+                </div>
+              </div>
+
+              {/* Listing Status: Active vs Disabled */}
+              <div>
+                <label className={`block text-xs font-bold uppercase mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
+                  Listing Status & Availability *
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setJobStatus('active')}
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                      jobStatus === 'active'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-200 ring-2 ring-emerald-500/20'
+                        : isDark ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-600' : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                      <span className="font-bold text-xs uppercase">Active / Accepting CVs</span>
+                    </div>
+                    <p className="text-[11px] opacity-80 mt-1 leading-snug">
+                      Open vacancy. Candidates can apply and submit CVs directly.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setJobStatus('closed')}
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                      jobStatus === 'closed'
+                        ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-500 text-amber-900 dark:text-amber-200 ring-2 ring-amber-500/20'
+                        : isDark ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-600' : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                      <span className="font-bold text-xs uppercase">Disabled / Closed</span>
+                    </div>
+                    <p className="text-[11px] opacity-80 mt-1 leading-snug">
+                      Displays in grayscale with "Not Accepting Submissions".
+                    </p>
+                  </button>
                 </div>
               </div>
 

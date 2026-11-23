@@ -3567,7 +3567,7 @@ export const useJobOpenings = (adminMode = false) => {
     const client = getSupabaseClient();
     if (!client) {
       const local = getStoredJobs();
-      setJobs(adminMode ? local : local.filter(j => j.status === 'active'));
+      setJobs(adminMode ? local : local.filter(j => j.status !== 'draft'));
       setLoading(false);
       return;
     }
@@ -3575,21 +3575,23 @@ export const useJobOpenings = (adminMode = false) => {
     try {
       let query = client.from('job_openings').select('*').order('display_order', { ascending: true });
       if (!adminMode) {
-        query = query.eq('status', 'active');
+        query = query.neq('status', 'draft');
       }
 
       const { data, error } = await query;
       if (error) throw error;
 
       if (data && data.length > 0) {
-        setJobs((data as JobOpening[]).map(enrichJobWithImage));
+        const enriched = (data as JobOpening[]).map(enrichJobWithImage);
+        saveStoredJobs(enriched);
+        setJobs(enriched);
       } else {
         const local = getStoredJobs();
-        setJobs(adminMode ? local : local.filter(j => j.status === 'active'));
+        setJobs(adminMode ? local : local.filter(j => j.status !== 'draft'));
       }
     } catch (err) {
       const local = getStoredJobs();
-      setJobs(adminMode ? local : local.filter(j => j.status === 'active'));
+      setJobs(adminMode ? local : local.filter(j => j.status !== 'draft'));
     } finally {
       setLoading(false);
     }
@@ -3669,7 +3671,18 @@ export const useJobOpenings = (adminMode = false) => {
     await fetchJobs();
   };
 
-  return { jobs, loading, reload: fetchJobs, saveJob, deleteJob };
+  const toggleJobStatus = async (id: string, newStatus?: 'active' | 'closed') => {
+    const current = getStoredJobs();
+    const target = current.find(j => j.id === id);
+    if (!target) return null;
+    const targetStatus = newStatus || (target.status === 'active' ? 'closed' : 'active');
+    return await saveJob({
+      ...target,
+      status: targetStatus
+    });
+  };
+
+  return { jobs, loading, reload: fetchJobs, saveJob, deleteJob, toggleJobStatus };
 };
 
 export const useJobOpening = (idOrSlug: string) => {

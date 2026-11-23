@@ -273,100 +273,149 @@ const Careers: React.FC = () => {
 
           {jobs && jobs.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-              {jobs.map((job) => (
-                <div
-                  key={job.id}
-                  id={job.id}
-                  className="bg-white border border-slate-200 hover:border-emerald-600/50 hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group rounded-xl"
-                >
-                  {/* Featured Hiring Poster Image */}
-                  {job.image_url ? (
-                    <div
-                      onClick={() => setFlyerModalImage({ url: job.image_url!, title: job.title })}
-                      className="relative aspect-4/5 w-full bg-slate-950 overflow-hidden cursor-pointer"
-                      title="Tap to zoom flyer"
-                    >
-                      <img
-                        src={job.image_url}
-                        alt={`${job.title} Hiring Poster`}
-                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 ease-out"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-slate-950/40 transition-colors flex items-center justify-center">
-                        <span className="opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 px-3 py-1.5 bg-slate-900/90 text-white text-xs font-bold uppercase tracking-wider rounded-md backdrop-blur-xs flex items-center gap-1.5 shadow-lg border border-white/10">
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-                          </svg>
-                          Tap to Zoom Flyer
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="aspect-16/9 w-full bg-linear-to-br from-slate-900 via-emerald-950 to-slate-900 flex items-center justify-center p-6 text-center border-b border-slate-200">
-                      <span className="text-white/60 font-mono text-xs uppercase tracking-widest">Polaris Integrated Careers</span>
-                    </div>
-                  )}
+              {jobs.map((job) => {
+                const isClosed = job.status === 'closed';
 
-                  {/* Card Content */}
-                  <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                    <div className="space-y-3">
-                      {/* Metadata Badges: Location, Type, Experience (Redundant department tags removed) */}
-                      <div className="flex flex-wrap items-center gap-2 text-xs">
-                        <span className="inline-flex items-center gap-1 text-slate-700 font-semibold bg-slate-100 px-2.5 py-1 rounded">
-                          <svg className="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          {job.location}
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-slate-700 font-medium bg-slate-100 px-2.5 py-1 rounded">
-                          <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                          </svg>
-                          {job.type}
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-emerald-800 font-medium bg-emerald-50 px-2 py-1 rounded border border-emerald-100">
-                          {job.experience_level}
-                        </span>
-                      </div>
-
-                      <h3 className="text-xl font-black text-slate-900 group-hover:text-emerald-800 transition-colors tracking-tight line-clamp-1">
-                        <a href={`/careers/${encodeURIComponent(job.id)}`}>
-                          {job.title}
-                        </a>
-                      </h3>
-
-                      <p className="text-sm text-slate-600 leading-relaxed font-normal line-clamp-3">
-                        {job.description}
-                      </p>
-                    </div>
-
-                    {/* Card Actions */}
-                    <div className="pt-4 border-t border-slate-100 flex items-center gap-2">
-                      <a
-                        href={`/careers/${encodeURIComponent(job.id)}`}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-900 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-xs rounded cursor-pointer"
+                return (
+                  <div
+                    key={job.id}
+                    id={job.id}
+                    className={`border transition-all duration-300 flex flex-col overflow-hidden group rounded-xl ${
+                      isClosed
+                        ? 'bg-slate-50/90 border-slate-300 hover:border-slate-400 shadow-2xs'
+                        : 'bg-white border-slate-200 hover:border-emerald-600/50 hover:shadow-xl'
+                    }`}
+                  >
+                    {/* Featured Hiring Poster Image */}
+                    {job.image_url ? (
+                      <div
+                        onClick={() => setFlyerModalImage({ url: job.image_url!, title: job.title })}
+                        className={`relative aspect-4/5 w-full bg-slate-950 overflow-hidden cursor-pointer ${
+                          isClosed ? 'grayscale contrast-90 opacity-80' : ''
+                        }`}
+                        title="Tap to zoom flyer"
                       >
-                        <span>View Position & Apply</span>
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                        </svg>
-                      </a>
+                        <img
+                          src={job.image_url}
+                          alt={`${job.title} Hiring Poster`}
+                          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 ease-out"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-slate-950/40 transition-colors flex items-center justify-center">
+                          <span className="opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 px-3 py-1.5 bg-slate-900/90 text-white text-xs font-bold uppercase tracking-wider rounded-md backdrop-blur-xs flex items-center gap-1.5 shadow-lg border border-white/10">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                            </svg>
+                            Tap to Zoom Flyer
+                          </span>
+                        </div>
 
-                      <button
-                        type="button"
-                        onClick={() => handleShareJob(job)}
-                        className="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors border border-slate-200 rounded cursor-pointer"
-                        title="Share opening"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                        </svg>
-                      </button>
+                        {/* Prominent Deactivated / Closed Badge */}
+                        {isClosed && (
+                          <div className="absolute top-3 left-3 px-3 py-1 bg-slate-950/90 text-amber-300 border border-amber-400/50 text-[11px] font-black uppercase tracking-wider rounded-md shadow-lg backdrop-blur-xs flex items-center gap-1.5 z-10">
+                            <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                            Not Accepting Submissions
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className={`aspect-16/9 w-full flex items-center justify-center p-6 text-center border-b border-slate-200 relative ${
+                        isClosed ? 'bg-slate-800' : 'bg-linear-to-br from-slate-900 via-emerald-950 to-slate-900'
+                      }`}>
+                        <span className="text-white/60 font-mono text-xs uppercase tracking-widest">
+                          {isClosed ? 'Listing Deactivated' : 'Polaris Integrated Careers'}
+                        </span>
+                        {isClosed && (
+                          <div className="absolute top-3 left-3 px-2.5 py-0.5 bg-amber-500 text-slate-950 text-[10px] font-black uppercase tracking-wider rounded shadow-sm">
+                            Not Accepting Submissions
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Card Content */}
+                    <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                      <div className="space-y-3">
+                        {/* Metadata Badges: Location, Type, Experience, and Status if closed */}
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          {isClosed && (
+                            <span className="inline-flex items-center gap-1 text-amber-900 font-bold bg-amber-100 px-2.5 py-1 rounded border border-amber-300">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                              Not Accepting Submissions
+                            </span>
+                          )}
+                          <span className="inline-flex items-center gap-1 text-slate-700 font-semibold bg-slate-100 px-2.5 py-1 rounded">
+                            <svg className="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            {job.location}
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-slate-700 font-medium bg-slate-100 px-2.5 py-1 rounded">
+                            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            {job.type}
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-emerald-800 font-medium bg-emerald-50 px-2 py-1 rounded border border-emerald-100">
+                            {job.experience_level}
+                          </span>
+                        </div>
+
+                        <h3 className={`text-xl font-black transition-colors tracking-tight line-clamp-1 ${
+                          isClosed ? 'text-slate-700 group-hover:text-slate-900' : 'text-slate-900 group-hover:text-emerald-800'
+                        }`}>
+                          <a href={`/careers/${encodeURIComponent(job.id)}`}>
+                            {job.title}
+                          </a>
+                        </h3>
+
+                        <p className={`text-sm leading-relaxed font-normal line-clamp-3 ${
+                          isClosed ? 'text-slate-500' : 'text-slate-600'
+                        }`}>
+                          {job.description}
+                        </p>
+                      </div>
+
+                      {/* Card Actions */}
+                      <div className="pt-4 border-t border-slate-100 flex items-center gap-2">
+                        {isClosed ? (
+                          <a
+                            href={`/careers/${encodeURIComponent(job.id)}`}
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs uppercase tracking-wider transition-colors rounded cursor-pointer"
+                          >
+                            <span>View Archived Listing</span>
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                          </a>
+                        ) : (
+                          <a
+                            href={`/careers/${encodeURIComponent(job.id)}`}
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-900 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-xs rounded cursor-pointer"
+                          >
+                            <span>View Position & Apply</span>
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                          </a>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => handleShareJob(job)}
+                          className="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors border border-slate-200 rounded cursor-pointer"
+                          title="Share opening"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="bg-white border border-slate-200 p-12 text-center space-y-6 shadow-sm mb-12 rounded-xl">

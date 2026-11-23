@@ -132,6 +132,10 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isClosed) {
+      alert('Submissions for this position are currently closed.');
+      return;
+    }
     if (!resumeFile) {
       alert('Please attach your CV / Resume before submitting.');
       return;
@@ -180,6 +184,8 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
   const otherJobs = allJobs
     .filter((j) => j.id !== job?.id && j.status === 'active')
     .slice(0, 3);
+
+  const isClosed = job?.status === 'closed';
 
   if (loading) {
     return (
@@ -241,10 +247,17 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
 
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2.5">
-              <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider rounded-full border border-emerald-500/30 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                Active Vacancy
-              </span>
+              {isClosed ? (
+                <span className="px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-bold uppercase tracking-wider rounded-full border border-amber-500/40 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                  Not Accepting Submissions
+                </span>
+              ) : (
+                <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider rounded-full border border-emerald-500/30 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Active Vacancy
+                </span>
+              )}
               <span className="text-xs text-slate-300 font-medium flex items-center gap-1">
                 📍 {job.location}
               </span>
@@ -280,7 +293,22 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           {/* Left Column: Job Description, Responsibilities, Requirements (7 cols on lg, 8 on xl) */}
-          <main className="lg:col-span-7 xl:col-span-8 space-y-10">
+          <main className="lg:col-span-7 xl:col-span-8 space-y-8">
+            {/* Deactivated Notice Banner */}
+            {isClosed && (
+              <div className="bg-amber-50/95 border-l-4 border-amber-500 p-5 rounded-r-2xl shadow-xs space-y-1.5">
+                <div className="flex items-center gap-2 text-amber-950 font-black text-sm uppercase tracking-wide">
+                  <svg className="w-5 h-5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span>Position Deactivated — Not Accepting Submissions</span>
+                </div>
+                <p className="text-xs sm:text-sm text-amber-900 leading-relaxed font-normal">
+                  Candidate applications and CV uploads for this position are currently closed. The role description remains published for reference. To register your profile for upcoming openings, you may explore other active listings or submit your details to our Talent Network.
+                </p>
+              </div>
+            )}
+
             {/* About the Role */}
             <section className="bg-white border border-slate-200/90 rounded-2xl p-7 sm:p-10 shadow-xs space-y-5">
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight border-b border-slate-100 pb-4">
@@ -358,18 +386,37 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
             </section>
 
             {/* Bottom Call to Action Card */}
-            <div className="bg-white border-2 border-emerald-900/20 rounded-2xl p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
-              <div className="space-y-1 text-center sm:text-left">
-                <h3 className="text-xl font-black text-slate-900 tracking-tight">Ready to join our team?</h3>
-                <p className="text-sm text-slate-600">Submit your CV and credentials for immediate review by our recruitment desk.</p>
+            {isClosed ? (
+              <div className="bg-slate-100 border border-slate-300 rounded-2xl p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
+                <div className="space-y-1 text-center sm:text-left">
+                  <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 text-[11px] font-bold uppercase tracking-wider mb-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                    Submission Window Closed
+                  </div>
+                  <h3 className="text-xl font-black text-slate-900 tracking-tight">Applications for this role are currently closed</h3>
+                  <p className="text-sm text-slate-600">This vacancy is retained for archival reference. Explore our careers portal for currently open positions.</p>
+                </div>
+                <a
+                  href="/careers"
+                  className="px-8 py-3.5 bg-emerald-950 hover:bg-emerald-800 text-white font-black text-xs uppercase tracking-widest transition-colors shadow-md shrink-0 text-center"
+                >
+                  Browse Open Vacancies →
+                </a>
               </div>
-              <button
-                onClick={() => setIsFormModalOpen(true)}
-                className="px-8 py-3.5 bg-emerald-950 hover:bg-emerald-800 text-white font-black text-xs uppercase tracking-widest transition-colors shadow-md shrink-0 cursor-pointer"
-              >
-                Apply for this Role →
-              </button>
-            </div>
+            ) : (
+              <div className="bg-white border-2 border-emerald-900/20 rounded-2xl p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+                <div className="space-y-1 text-center sm:text-left">
+                  <h3 className="text-xl font-black text-slate-900 tracking-tight">Ready to join our team?</h3>
+                  <p className="text-sm text-slate-600">Submit your CV and credentials for immediate review by our recruitment desk.</p>
+                </div>
+                <button
+                  onClick={() => setIsFormModalOpen(true)}
+                  className="px-8 py-3.5 bg-emerald-950 hover:bg-emerald-800 text-white font-black text-xs uppercase tracking-widest transition-colors shadow-md shrink-0 cursor-pointer"
+                >
+                  Apply for this Role →
+                </button>
+              </div>
+            )}
           </main>
 
           {/* Right Column: Sticky Sidebar with Intentional Flyer Presentation & Actions */}
@@ -379,7 +426,9 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
               <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-sm">
                 <div
                   onClick={() => setIsFlyerZoomed(true)}
-                  className="relative aspect-4/5 w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shadow-inner cursor-pointer group"
+                  className={`relative aspect-4/5 w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shadow-inner cursor-pointer group ${
+                    isClosed ? 'grayscale contrast-90 opacity-80' : ''
+                  }`}
                   title="Tap to zoom flyer"
                 >
                   <img
@@ -387,6 +436,13 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
                     alt={`${job.title} Official Hiring Graphic`}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
+                  {isClosed && (
+                    <div className="absolute top-3 left-3 z-10">
+                      <span className="px-3 py-1 bg-amber-500/95 text-slate-950 text-[10px] font-black uppercase tracking-wider rounded-md shadow-md">
+                        Not Accepting Submissions
+                      </span>
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <span className="px-3 py-1.5 bg-white/95 text-slate-950 text-xs font-black uppercase tracking-wider rounded-lg shadow-lg">
                       🔍 Tap to Zoom Flyer
@@ -421,21 +477,45 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
                 </div>
                 <div className="flex items-center justify-between py-1.5">
                   <span className="text-slate-500 font-medium">Status</span>
-                  <span className="font-bold text-emerald-700 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    Accepting CVs
-                  </span>
+                  {isClosed ? (
+                    <span className="font-bold text-amber-700 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                      Closed / Inactive
+                    </span>
+                  ) : (
+                    <span className="font-bold text-emerald-700 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                      Accepting CVs
+                    </span>
+                  )}
                 </div>
               </div>
 
               <div className="space-y-2.5 pt-2">
-                <button
-                  onClick={() => setIsFormModalOpen(true)}
-                  className="w-full py-3.5 bg-emerald-950 hover:bg-emerald-800 text-white font-black text-xs uppercase tracking-widest transition-colors shadow-md cursor-pointer flex items-center justify-center space-x-2"
-                >
-                  <span>Apply for this Position</span>
-                  <span>→</span>
-                </button>
+                {isClosed ? (
+                  <>
+                    <button
+                      disabled
+                      className="w-full py-3.5 bg-slate-200 text-slate-500 font-black text-xs uppercase tracking-widest cursor-not-allowed flex items-center justify-center space-x-2 rounded-none border border-slate-300"
+                    >
+                      <span>Not Accepting Submissions</span>
+                    </button>
+                    <a
+                      href="/careers"
+                      className="w-full py-3 bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs uppercase tracking-wider text-center block transition-colors shadow-sm"
+                    >
+                      Browse Open Vacancies →
+                    </a>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setIsFormModalOpen(true)}
+                    className="w-full py-3.5 bg-emerald-950 hover:bg-emerald-800 text-white font-black text-xs uppercase tracking-widest transition-colors shadow-md cursor-pointer flex items-center justify-center space-x-2"
+                  >
+                    <span>Apply for this Position</span>
+                    <span>→</span>
+                  </button>
+                )}
 
                 <button
                   onClick={handleShare}
@@ -542,10 +622,17 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
 
               <div className="relative z-10 space-y-1.5 pr-10">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-3 py-1 bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 text-[11px] font-bold uppercase tracking-wider rounded-full backdrop-blur-xs flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    Official Job Application
-                  </span>
+                  {isClosed ? (
+                    <span className="px-3 py-1 bg-amber-500/25 border border-amber-400/40 text-amber-300 text-[11px] font-bold uppercase tracking-wider rounded-full backdrop-blur-xs flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                      Not Accepting Submissions
+                    </span>
+                  ) : (
+                    <span className="px-3 py-1 bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 text-[11px] font-bold uppercase tracking-wider rounded-full backdrop-blur-xs flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      Official Job Application
+                    </span>
+                  )}
                   <span className="text-slate-300 text-xs font-semibold">📍 {job.location}</span>
                   <span className="text-slate-500 text-xs">•</span>
                   <span className="text-slate-300 text-xs font-semibold">💼 {job.type}</span>
@@ -572,7 +659,34 @@ const JobDetail: React.FC<JobDetailProps> = ({ currentPath }) => {
 
             {/* Modal Body */}
             <div className="p-6 sm:p-8 overflow-y-auto flex-1">
-              {status === 'idle' && (
+              {isClosed && (
+                <div className="text-center py-12 px-4 space-y-4 max-w-md mx-auto">
+                  <div className="w-14 h-14 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto text-2xl font-bold">
+                    ⚠️
+                  </div>
+                  <h4 className="text-xl font-black text-slate-900 tracking-tight">Submissions Closed</h4>
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    This vacancy has been closed by the recruitment desk and is no longer accepting new candidate CVs.
+                  </p>
+                  <div className="pt-3 flex flex-col sm:flex-row gap-3 justify-center">
+                    <a
+                      href="/careers"
+                      className="px-6 py-3 bg-emerald-950 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider text-center transition-colors"
+                    >
+                      Browse Open Positions
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setIsFormModalOpen(false)}
+                      className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {!isClosed && status === 'idle' && (
                 <form onSubmit={handleFormSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
                     {/* Left Column: Personal info */}
