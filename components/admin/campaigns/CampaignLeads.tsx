@@ -56,8 +56,8 @@ export const CampaignLeads: React.FC<CampaignLeadsProps> = ({
     const term = searchTerm.toLowerCase();
     const matchSearch =
       !term ||
-      s.visitorName.toLowerCase().includes(term) ||
-      s.visitorEmail.toLowerCase().includes(term) ||
+      (s.visitorName || '').toLowerCase().includes(term) ||
+      (s.visitorEmail || '').toLowerCase().includes(term) ||
       (s.visitorCompany || '').toLowerCase().includes(term) ||
       (s.visitorPhone || '').toLowerCase().includes(term);
 
@@ -264,7 +264,7 @@ export const CampaignLeads: React.FC<CampaignLeadsProps> = ({
 
                       <td className="px-5 py-3.5">
                         <div className="text-slate-800 dark:text-slate-200">
-                          {sub.visitorEmail}
+                          {sub.visitorEmail || <span className="text-slate-400 italic text-[12px]">No email provided</span>}
                         </div>
                         <div className="text-[11px] text-slate-400">
                           {sub.visitorPhone || '—'}

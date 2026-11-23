@@ -3,6 +3,31 @@ import path from 'path';
 
 const campaigns = [
   {
+    id: 'naice-spe-2026',
+    name: 'NAICE SPE 2026 (Society of Petroleum Engineers)',
+    slug: 'naice-spe-2026',
+    description: 'Society of Petroleum Engineers (SPE) Nigeria Annual International Conference & Exhibition (NAICE 2026) - PIGL Exhibition Stand & Technical Scoping.',
+    category: 'Conference',
+    eventName: 'NAICE SPE 2026',
+    eventLocation: 'Eko Hotel & Suites, Victoria Island, Lagos, Nigeria',
+    eventStartDate: '2026-08-01',
+    eventEndDate: '2026-08-05',
+    campaignStartDate: '2026-08-01',
+    campaignClosingDate: '2026-08-31',
+    coverImageUrl: '/assets/pigl_conference_keynote.jpg',
+    logoImageUrl: '/assets/LOGO.png',
+    assignedFormId: 'form-naice-spe-2026',
+    status: 'active',
+    publicVisibility: true,
+    assignedStaff: ['admin@polarisigl.com', 'bd@polarisigl.com', 'hello@polarisigl.com'],
+    introductionText: 'Welcome to the Polaris Integrated & GeoSolutions Limited (PIGL) NAICE SPE 2026 engagement portal. Connect with our engineering directors and technical specialists to explore precision solutions across our four operating divisions.',
+    confirmationMessage: 'Thank you for connecting with Polaris Integrated & GeoSolutions Limited (PIGL) at NAICE SPE 2026. Our senior engineering scoping team has received your technical brief and will be in touch shortly.',
+    termsAndPrivacyText: 'Polaris Integrated & GeoSolutions Limited respects your privacy and is committed to protecting your personal data in accordance with the Nigeria Data Protection Act (NDPA). Information provided is used solely for technical follow-up and authorized engineering collaboration.',
+    createdBy: 'admin@polarisigl.com',
+    createdAt: '2026-08-01T00:00:00Z',
+    updatedAt: new Date().toISOString()
+  },
+  {
     id: 'nape-2026',
     name: 'NAPE 2026 Annual International Conference & Exhibition',
     slug: 'nape-2026',
@@ -55,6 +80,65 @@ const campaigns = [
 ];
 
 const forms = [
+  {
+    id: 'form-naice-spe-2026',
+    campaignId: 'naice-spe-2026',
+    title: 'NAICE SPE 2026 Technical Scoping & Delegate Intake Form',
+    description: 'Official delegate engagement and engineering consultation inquiry form for NAICE SPE 2026.',
+    activeVersion: 1,
+    versions: [
+      {
+        id: 'v1-naice-spe-2026',
+        versionNumber: 1,
+        createdAt: '2026-08-01T00:00:00Z',
+        fields: [
+          { id: 'full_name', type: 'short_text', label: 'Full Name', required: true, order: 1, placeholder: 'e.g. Engr. Oladipo Adeleke' },
+          { id: 'email', type: 'email', label: 'Corporate / Official Email Address', required: false, order: 2, placeholder: 'e.g. name@energyfirm.com' },
+          { id: 'phone', type: 'phone', label: 'Phone / WhatsApp Number', required: false, order: 3, placeholder: '+234 803 000 0000' },
+          { id: 'company', type: 'short_text', label: 'Company / Operating Organisation', required: true, order: 4, placeholder: 'e.g. NNPC Ltd, Chevron, NCDMB' },
+          { id: 'job_title', type: 'short_text', label: 'Job Title / Designation', required: false, order: 5, placeholder: 'e.g. Lead Project Engineer, Senior Manager' },
+          {
+            id: 'service_divisions',
+            type: 'checkbox',
+            label: 'PIGL Operating Divisions of Interest',
+            required: false,
+            order: 6,
+            options: [
+              { id: 'opt_geo', label: 'Geosolutions & Engineering (CPT, 3D Laser Scanning, Geotechnical)', value: 'Geosolutions & Engineering' },
+              { id: 'opt_marine', label: 'Metocean & Marine Solutions (Hydrographic, Metocean, Sub-bottom)', value: 'Metocean & Marine Solutions' },
+              { id: 'opt_const', label: 'Integrated Construction (Swamp Pipelines, Structural Works)', value: 'Integrated Construction' },
+              { id: 'opt_ind', label: 'Industrial Solutions (Cathodic Protection, NDT Asset Integrity, Water Treatment)', value: 'Industrial Solutions' }
+            ]
+          },
+          {
+            id: 'custom_inquiry_scope',
+            type: 'long_text',
+            label: 'Custom Technical Requirements / Scope of Inquiry',
+            description: 'Provide details on your project timeline, asset location, or specific requirements.',
+            placeholder: 'Describe your project scope...',
+            required: false,
+            order: 7
+          },
+          {
+            id: 'is_student',
+            type: 'checkbox',
+            label: 'Attending as Student / Youth Corps Member',
+            required: false,
+            order: 8
+          },
+          {
+            id: 'consent_ndpa',
+            type: 'consent',
+            label: 'I consent to Polaris Integrated & GeoSolutions Limited contacting me regarding this inquiry in accordance with the Nigeria Data Protection Act (NDPA).',
+            required: true,
+            order: 9
+          }
+        ]
+      }
+    ],
+    createdAt: '2026-08-01T00:00:00Z',
+    updatedAt: new Date().toISOString()
+  },
   {
     id: 'form-nape-2026',
     campaignId: 'nape-2026',
@@ -155,6 +239,52 @@ const forms = [
 ];
 
 const emailTemplates = [
+  {
+    id: 'email-tmpl-naice-spe-2026',
+    campaignId: 'naice-spe-2026',
+    templateType: 'visitor_acknowledgement',
+    senderName: 'Polaris Integrated & GeoSolutions Limited (PIGL)',
+    senderEmail: 'hello@polarisigl.com',
+    replyTo: 'info@polarisigl.com',
+    subject: 'Thank You for Connecting with PIGL at NAICE SPE 2026 😊',
+    bodyHtml: `
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+  <div style="background-color: #0f172a; padding: 28px 32px; text-align: left; border-bottom: 3px solid #059669;">
+    <h1 style="color: #ffffff; font-size: 20px; margin: 0; font-weight: 700; letter-spacing: -0.5px;">POLARIS INTEGRATED &amp; GEOSOLUTIONS</h1>
+    <p style="color: #34d399; font-size: 11px; margin: 4px 0 0; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;">Technical Engagement Desk • NAICE SPE 2026</p>
+  </div>
+  <div style="padding: 32px; color: #334155; line-height: 1.6; font-size: 15px;">
+    <p style="margin-top: 0; font-size: 16px; color: #0f172a;">Dear <strong>{{first_name}}</strong>,</p>
+    <p>Thank you for visiting the <strong>Polaris Integrated &amp; GeoSolutions Limited (PIGL)</strong> exhibition booth at <strong>NAICE SPE 2026</strong> in Lagos, Nigeria.</p>
+    <p>We appreciated the opportunity to connect with you and discuss your organization's engineering and operational requirements. Our technical leadership team has logged your submission (Reference: <code>{{submission_id}}</code>) and assigned it to the appropriate division specialists.</p>
+    <div style="background-color: #f8fafc; border-left: 4px solid #059669; padding: 16px 20px; margin: 24px 0; border-radius: 0 6px 6px 0;">
+      <p style="margin: 0; font-size: 13px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">PIGL Operating Divisions</p>
+      <ul style="margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: #475569;">
+        <li><strong>Geosolutions &amp; Engineering Services:</strong> 20-Ton CPT, Geotechnical Pontoon Drilling, 3D Laser Scanning.</li>
+        <li><strong>Metocean &amp; Marine Solutions:</strong> Multibeam Bathymetry, Oceanographic Buoys, Shallow Geophysical.</li>
+        <li><strong>Integrated Construction Services:</strong> Swamp Flowline Laying, River Crossing, Structural Fabrication.</li>
+        <li><strong>Industrial Solutions:</strong> Asset Integrity NDT, Cathodic Protection, Skid Maintenance, Produced Water Treatment.</li>
+      </ul>
+    </div>
+    <p>Should you require immediate technical documentation or an engineering capability presentation, please feel free to reply directly to this email or reach us at <a href="mailto:info@polarisigl.com" style="color: #059669; text-decoration: none; font-weight: 600;">info@polarisigl.com</a>.</p>
+    <p style="margin-bottom: 0;">Warm regards,</p>
+    <p style="margin-top: 4px; font-weight: 700; color: #0f172a;">
+      Corporate Engagement &amp; Business Development Team<br/>
+      <span style="font-weight: 400; font-size: 13px; color: #64748b;">Polaris Integrated &amp; GeoSolutions Limited</span>
+    </p>
+  </div>
+  <div style="background-color: #f1f5f9; padding: 20px 32px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b;">
+    <p style="margin: 0;">&copy; 2026 Polaris Integrated &amp; GeoSolutions Limited. All rights reserved.</p>
+    <p style="margin: 4px 0 0;">Plot 12, Commercial Area, Port Harcourt &amp; Victoria Island, Lagos, Nigeria.</p>
+  </div>
+</div>
+    `,
+    bodyText: `Dear {{first_name}},\n\nThank you for visiting the Polaris Integrated & GeoSolutions Limited (PIGL) exhibition booth at NAICE SPE 2026.\n\nWe appreciate the opportunity to connect with you and learn more about your operational interests. Our team looks forward to staying in touch.\n\nBest regards,\nPolaris Integrated & GeoSolutions Limited (PIGL)\ninfo@polarisigl.com | https://polarisigl.com`,
+    enabled: true,
+    internalRecipients: ['admin@polarisigl.com', 'bd@polarisigl.com', 'info@polarisigl.com', 'worketiqs@gmail.com'],
+    createdAt: '2026-08-01T00:00:00Z',
+    updatedAt: new Date().toISOString()
+  },
   {
     id: 'email-tmpl-nape-2026',
     campaignId: 'nape-2026',
@@ -624,7 +754,167 @@ const delegatesRaw = [
   }
 ];
 
-const submissions = delegatesRaw.map((d, index) => {
+
+// Helper function to parse CSV with support for quoted strings and newlines
+function parseCsvRecords(text) {
+  const rows = [];
+  let row = [];
+  let cur = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    const next = text[i + 1];
+    
+    if (c === '"') {
+      if (inQuotes && next === '"') {
+        cur += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (c === ',' && !inQuotes) {
+      row.push(cur.trim());
+      cur = '';
+    } else if ((c === '\r' || c === '\n') && !inQuotes) {
+      if (c === '\r' && next === '\n') {
+        i++;
+      }
+      row.push(cur.trim());
+      cur = '';
+      if (row.length > 1 || (row.length === 1 && row[0] !== '')) {
+        rows.push(row);
+      }
+      row = [];
+    } else {
+      cur += c;
+    }
+  }
+  if (cur || row.length > 0) {
+    row.push(cur.trim());
+    if (row.length > 1 || (row.length === 1 && row[0] !== '')) {
+      rows.push(row);
+    }
+  }
+  
+  const headers = rows[0];
+  return rows.slice(1).map(r => {
+    const obj = {};
+    headers.forEach((h, idx) => {
+      obj[h] = r[idx] || '';
+    });
+    return obj;
+  });
+}
+
+// 1. Process 121 Authentic NAICE SPE 2026 leads
+const csvPath = path.resolve('public/data/leads_all.csv');
+let naiceCsvRows = [];
+if (fs.existsSync(csvPath)) {
+  naiceCsvRows = parseCsvRecords(fs.readFileSync(csvPath, 'utf8'));
+} else {
+  console.warn('leads_all.csv not found at:', csvPath);
+}
+
+const naiceSubmissions = naiceCsvRows.map((row, index) => {
+  const subId = `sub-naice-${String(index + 1).padStart(3, '0')}`;
+  
+  // Parse date DD/MM/YYYY into August 2026 ISO
+  const dateStr = row['Date'] || '03/08/2026';
+  const parts = dateStr.split('/');
+  let isoDate = '2026-08-01T10:00:00Z';
+  if (parts.length === 3) {
+    const day = parts[0].padStart(2, '0');
+    const month = parts[1].padStart(2, '0');
+    const year = parts[2];
+    const hour = 9 + Math.floor((index % 8));
+    const minute = (index * 7) % 60;
+    isoDate = `${year}-${month}-${day}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00Z`;
+  }
+
+  const name = row['Full Name'] || 'Conference Delegate';
+  const email = (row['Email Address'] || '').trim();
+  const phone = (row['Phone'] || '').trim();
+  const company = (row['Company'] || '').trim();
+  const designation = (row['Designation'] || '').trim();
+  const rawNotes = (row['Notes'] || '').trim();
+  const owner = (row['Owner (Brought In By)'] || '').trim() || 'PIGL Representative';
+
+  const isStudent = /student/i.test(designation) || /student/i.test(company);
+
+  // Inferred divisions from notes / designation
+  const divisions = [];
+  const textContext = `${designation} ${rawNotes}`.toLowerCase();
+  if (textContext.includes('water') || textContext.includes('effluent') || textContext.includes('treatment')) {
+    divisions.push('Industrial Solutions');
+  }
+  if (textContext.includes('cpt') || textContext.includes('soil') || textContext.includes('geotech') || textContext.includes('scanning') || textContext.includes('laser') || textContext.includes('geoscien') || textContext.includes('reality')) {
+    divisions.push('Geosolutions & Engineering');
+  }
+  if (textContext.includes('piping') || textContext.includes('pipeline') || textContext.includes('swamp') || textContext.includes('flowline') || textContext.includes('fabricat') || textContext.includes('civil')) {
+    divisions.push('Integrated Construction');
+  }
+  if (textContext.includes('marine') || textContext.includes('metocean') || textContext.includes('bathymetr') || textContext.includes('vessel')) {
+    divisions.push('Metocean & Marine Solutions');
+  }
+  if (divisions.length === 0) {
+    divisions.push('Geosolutions & Engineering', 'Industrial Solutions');
+  }
+
+  // Follow-up status based on technical notes
+  let followUpStatus = 'new';
+  if (/priority/i.test(rawNotes) || /booked for/i.test(rawNotes) || /meeting/i.test(rawNotes) || /follow up/i.test(rawNotes)) {
+    followUpStatus = 'in_discussion';
+  } else if (/partner/i.test(rawNotes)) {
+    followUpStatus = 'contacted';
+  }
+
+  const notesList = [];
+  if (rawNotes) {
+    notesList.push({
+      id: `note-naice-${index + 1}`,
+      author: owner,
+      content: rawNotes,
+      createdAt: isoDate
+    });
+  }
+
+  return {
+    id: subId,
+    campaignId: 'naice-spe-2026',
+    campaignSlug: 'naice-spe-2026',
+    formId: 'form-naice-spe-2026',
+    formVersionId: 'v1-naice-spe-2026',
+    source: 'booth_capture',
+    visitorName: name,
+    visitorEmail: email,
+    visitorPhone: phone,
+    visitorCompany: company,
+    visitorJobTitle: designation,
+    isStudent: Boolean(isStudent),
+    formData: {
+      full_name: name,
+      email: email,
+      phone: phone,
+      company: company,
+      job_title: designation,
+      service_divisions: divisions,
+      is_student: Boolean(isStudent),
+      custom_inquiry_scope: rawNotes,
+      owner: owner,
+      consent_ndpa: true
+    },
+    assignedStaff: owner,
+    followUpStatus: followUpStatus,
+    notes: notesList,
+    consentGiven: true,
+    createdAt: isoDate,
+    updatedAt: isoDate
+  };
+});
+
+// 2. Process 31 Authentic NAPE 2026 leads
+const napeSubmissions = delegatesRaw.map((d, index) => {
   return {
     id: d.id,
     campaignId: 'nape-2026',
@@ -653,7 +943,7 @@ const submissions = delegatesRaw.map((d, index) => {
     followUpStatus: 'new',
     notes: [
       {
-        id: `note-${index + 1}`,
+        id: `note-nape-${index + 1}`,
         author: 'Stand Staff',
         content: d.notes,
         createdAt: d.createdAt
@@ -665,19 +955,28 @@ const submissions = delegatesRaw.map((d, index) => {
   };
 });
 
-const emailLogs = submissions.map((sub, index) => {
-  return {
-    id: `log-${index + 1}`,
-    campaignId: sub.campaignId,
-    submissionId: sub.id,
-    recipient: sub.visitorEmail,
-    emailType: 'visitor_acknowledgement',
-    subject: 'Thank You for Connecting with PIGL at NAPE 2026 😊',
-    status: 'sent',
-    attempts: 1,
-    sentAt: sub.createdAt
-  };
+// Combined All Authentic Submissions (121 NAICE + 31 NAPE = 152 total)
+const submissions = [...naiceSubmissions, ...napeSubmissions];
+
+const emailLogs = [];
+submissions.forEach((sub, index) => {
+  if (sub.visitorEmail && sub.visitorEmail.includes('@')) {
+    emailLogs.push({
+      id: `log-${index + 1}`,
+      campaignId: sub.campaignId,
+      submissionId: sub.id,
+      recipient: sub.visitorEmail,
+      emailType: 'visitor_acknowledgement',
+      subject: sub.campaignId === 'naice-spe-2026' 
+        ? 'Thank You for Connecting with PIGL at NAICE SPE 2026 😊'
+        : 'Thank You for Connecting with PIGL at NAPE 2026 😊',
+      status: 'sent',
+      attempts: 1,
+      sentAt: sub.createdAt
+    });
+  }
 });
+
 
 const fullStore = {
   campaigns,

@@ -218,7 +218,7 @@ export const CampaignOverview: React.FC<CampaignOverviewProps> = ({
                     </span>
                   </div>
                   <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5 truncate">
-                    {sub.visitorCompany || 'Direct Delegate'} &bull; {sub.visitorEmail}
+                    {sub.visitorCompany || 'Direct Delegate'}{sub.visitorEmail ? ` • ${sub.visitorEmail}` : ''}
                   </p>
                   <div className="mt-1.5 flex items-center gap-2">
                     <span className="text-[9px] font-bold uppercase tracking-wider bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded text-slate-700 dark:text-slate-300">
