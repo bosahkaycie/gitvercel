@@ -1183,8 +1183,8 @@ const AdminTeam: React.FC<AdminTeamProps> = ({
                           setFormImage(url);
                         }}
                         bucket="media"
-                        label="Upload Photo to Cloud Storage (Supabase)"
-                        helperText="PNG, JPG, WEBP (Max 10MB). Automatically optimised and hosted on high-availability CDN."
+                        label="Upload Team Member Photo"
+                        helperText="PNG, JPG, WEBP. Automatically compressed and optimized for instant loading on the live website."
                         theme={theme}
                       />
                     </div>

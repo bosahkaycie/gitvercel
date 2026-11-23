@@ -120,6 +120,41 @@ function apiDevServerPlugin() {
           return;
         }
 
+        if (url.startsWith('/api/team')) {
+          let bodyStr = '';
+          req.on('data', (chunk: any) => {
+            bodyStr += chunk;
+          });
+          req.on('end', async () => {
+            const wrappedRes: any = res;
+            wrappedRes.status = (statusCode: number) => {
+              res.statusCode = statusCode;
+              return wrappedRes;
+            };
+            wrappedRes.json = (data: any) => {
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify(data));
+              return wrappedRes;
+            };
+
+            const wrappedReq: any = req;
+            try {
+              wrappedReq.body = bodyStr ? JSON.parse(bodyStr) : {};
+            } catch {
+              wrappedReq.body = {};
+            }
+
+            try {
+              const handler = (await import('./api/team')).default;
+              await handler(wrappedReq, wrappedRes);
+            } catch (err: any) {
+              console.error('API /api/team dev middleware error:', err);
+              wrappedRes.status(500).json({ success: false, error: err.message });
+            }
+          });
+          return;
+        }
+
         if (url.startsWith('/api/media')) {
           let bodyStr = '';
           req.on('data', (chunk: any) => {
@@ -403,20 +438,27 @@ export default defineConfig(({ mode }) => {
       apiDevServerPlugin(),
       react(),
       ViteImageOptimizer({
+        test: /\.(jpe?g|png|gif|tiff|webp|svg|avif)$/i,
+        includePublic: true,
+        logStats: true,
+        svg: {
+          multipass: true,
+        },
         png: {
-          quality: 80,
+          quality: 75,
+          compressionLevel: 9,
         },
         jpeg: {
-          quality: 80,
+          quality: 75,
         },
         jpg: {
-          quality: 80,
+          quality: 75,
         },
         webp: {
-          quality: 80,
+          quality: 75,
         },
         avif: {
-          quality: 70,
+          quality: 65,
         },
       }),
     ],

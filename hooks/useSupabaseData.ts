@@ -3200,38 +3200,57 @@ export const useTeamMembers = (adminMode = false) => {
   const fetchTeamMembers = useCallback(async () => {
     if (teamMembers.length === 0) setLoading(true);
     setError(null);
-    const client = getSupabaseClient();
 
-    if (!client) {
-      const local = getStoredTeamMembers();
-      const filtered = adminMode ? local : local.filter(m => m.status === 'active');
-      setTeamMembers(filtered.sort((a, b) => a.display_order - b.display_order));
+    // Tier 1: Try Production Hostinger Team API endpoint (/api/team)
+    let apiFetched = false;
+    try {
+      const response = await fetch('/api/team', {
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.success && Array.isArray(data.team) && data.team.length > 0) {
+          saveStoredTeamMembers(data.team);
+          const filtered = adminMode ? data.team : data.team.filter((m: CMSTeamMember) => m.status === 'active');
+          setTeamMembers(filtered.sort((a: CMSTeamMember, b: CMSTeamMember) => (a.display_order || 0) - (b.display_order || 0)));
+          apiFetched = true;
+        }
+      }
+    } catch (apiErr) {
+      console.warn('/api/team fetch notice, falling back:', apiErr);
+    }
+
+    if (apiFetched) {
       setLoading(false);
       return;
     }
 
-    try {
-      let query = client.from('team_members').select('*').order('display_order', { ascending: true });
-      if (!adminMode) {
-        query = query.eq('status', 'active');
-      }
+    // Tier 2: Try Direct Supabase Query
+    const client = getSupabaseClient();
+    if (client) {
+      try {
+        let query = client.from('team_members').select('*').order('display_order', { ascending: true });
+        if (!adminMode) {
+          query = query.eq('status', 'active');
+        }
 
-      const { data, error: sbError } = await query;
-      if (sbError) throw sbError;
-
-      if (data && data.length > 0) {
-        setTeamMembers(data as CMSTeamMember[]);
-      } else {
-        const local = getStoredTeamMembers();
-        setTeamMembers(adminMode ? local : local.filter(m => m.status === 'active'));
+        const { data, error: sbError } = await query;
+        if (!sbError && data && data.length > 0) {
+          saveStoredTeamMembers(data as CMSTeamMember[]);
+          setTeamMembers(data as CMSTeamMember[]);
+          setLoading(false);
+          return;
+        }
+      } catch (err: any) {
+        console.warn('Supabase team members fetch error, fallback to local:', err);
       }
-    } catch (err: any) {
-      console.warn('Supabase team members fetch error, fallback to local:', err);
-      const local = getStoredTeamMembers();
-      setTeamMembers(adminMode ? local : local.filter(m => m.status === 'active'));
-    } finally {
-      setLoading(false);
     }
+
+    // Tier 3: Local Storage / Authoritative Defaults
+    const local = getStoredTeamMembers();
+    const filtered = adminMode ? local : local.filter(m => m.status === 'active');
+    setTeamMembers(filtered.sort((a, b) => (a.display_order || 0) - (b.display_order || 0)));
+    setLoading(false);
   }, [adminMode, teamMembers.length]);
 
   useEffect(() => {
@@ -3239,7 +3258,6 @@ export const useTeamMembers = (adminMode = false) => {
   }, [fetchTeamMembers]);
 
   const saveTeamMember = async (member: Partial<CMSTeamMember> & { name: string; role: string }) => {
-    const client = getSupabaseClient();
     const current = getStoredTeamMembers();
     const updated: CMSTeamMember = {
       id: member.id || `team-${Date.now()}`,
@@ -3256,44 +3274,73 @@ export const useTeamMembers = (adminMode = false) => {
       updated_at: new Date().toISOString()
     };
 
-    if (client) {
-      try {
-        const { error: saveErr } = await client.from('team_members').upsert(updated);
-        if (saveErr) console.warn('Supabase saveTeamMember error:', saveErr);
-      } catch (err) {
-        console.warn('Failed to upsert team member in Supabase:', err);
-      }
-    }
-
+    // Immediately update local storage and reactive state
     const existingIndex = current.findIndex(m => m.id === updated.id);
     if (existingIndex >= 0) {
       current[existingIndex] = updated;
     } else {
       current.push(updated);
     }
-    current.sort((a, b) => a.display_order - b.display_order);
+    current.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
     saveStoredTeamMembers(current);
-    await fetchTeamMembers();
+    const filteredLocal = adminMode ? current : current.filter(m => m.status === 'active');
+    setTeamMembers([...filteredLocal]);
+
+    // Persist to Server-side /api/team
+    try {
+      await fetch('/api/team', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'save', member: updated })
+      });
+    } catch (apiErr) {
+      console.warn('Persisting team member to /api/team notice:', apiErr);
+    }
+
+    // Optional Supabase cloud mirror
+    const client = getSupabaseClient();
+    if (client) {
+      try {
+        await client.from('team_members').upsert(updated);
+      } catch (err) {
+        console.warn('Notice mirroring team member to Supabase:', err);
+      }
+    }
+
     return updated;
   };
 
   const deleteTeamMember = async (id: string) => {
+    const current = getStoredTeamMembers();
+    const filtered = current.filter(m => m.id !== id);
+    saveStoredTeamMembers(filtered);
+    const filteredLocal = adminMode ? filtered : filtered.filter(m => m.status === 'active');
+    setTeamMembers([...filteredLocal]);
+
+    // Persist delete to Server-side /api/team
+    try {
+      await fetch('/api/team', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', id })
+      });
+    } catch (apiErr) {
+      console.warn('Deleting team member on /api/team notice:', apiErr);
+    }
+
+    // Optional Supabase cloud mirror
     const client = getSupabaseClient();
     if (client) {
       try {
         await client.from('team_members').delete().eq('id', id);
       } catch (err) {
-        console.warn('Failed to delete team member from Supabase:', err);
+        console.warn('Notice deleting team member from Supabase:', err);
       }
     }
-    const filtered = getStoredTeamMembers().filter(m => m.id !== id);
-    saveStoredTeamMembers(filtered);
-    await fetchTeamMembers();
   };
 
   const importTeamMembers = async (newMembers: Array<Partial<CMSTeamMember> & { name: string; role: string }>) => {
     const current = getStoredTeamMembers();
-    const client = getSupabaseClient();
     const prepared: CMSTeamMember[] = newMembers.map((m, idx) => ({
       id: m.id || `team-${Date.now()}-${idx}`,
       name: m.name,
@@ -3309,14 +3356,6 @@ export const useTeamMembers = (adminMode = false) => {
       updated_at: new Date().toISOString()
     }));
 
-    if (client) {
-      try {
-        await client.from('team_members').upsert(prepared);
-      } catch (err) {
-        console.warn('Failed to batch upsert team members in Supabase:', err);
-      }
-    }
-
     const merged = [...current];
     for (const p of prepared) {
       const idx = merged.findIndex(m => m.id === p.id || (m.name.toLowerCase() === p.name.toLowerCase() && m.role.toLowerCase() === p.role.toLowerCase()));
@@ -3326,9 +3365,30 @@ export const useTeamMembers = (adminMode = false) => {
         merged.push(p);
       }
     }
-    merged.sort((a, b) => a.display_order - b.display_order);
+    merged.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
     saveStoredTeamMembers(merged);
-    await fetchTeamMembers();
+    const filteredLocal = adminMode ? merged : merged.filter(m => m.status === 'active');
+    setTeamMembers([...filteredLocal]);
+
+    try {
+      await fetch('/api/team', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'save_all', team: merged })
+      });
+    } catch (apiErr) {
+      console.warn('Batch importing team members to /api/team notice:', apiErr);
+    }
+
+    const client = getSupabaseClient();
+    if (client) {
+      try {
+        await client.from('team_members').upsert(prepared);
+      } catch (err) {
+        console.warn('Notice batch upserting team members to Supabase:', err);
+      }
+    }
+
     return prepared;
   };
 

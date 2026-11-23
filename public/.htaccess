@@ -58,8 +58,8 @@ Options -Indexes
   ExpiresByType video/mp4 "access plus 1 year"
 </IfModule>
 
-# 5. Prevent Stale Browser Caching of HTML while allowing Back/Forward Cache (bfcache)
-<FilesMatch "\.(html|htm)$">
+# 5. Prevent Stale Browser Caching of HTML & Dynamic APIs while allowing Back/Forward Cache (bfcache)
+<FilesMatch "\.(html|htm|php|json)$">
   FileETag None
   <IfModule mod_headers.c>
     Header unset ETag
@@ -120,6 +120,14 @@ Options -Indexes
   RewriteCond %{REQUEST_URI} ^/api/campaigns/?$ [NC]
   RewriteCond %{DOCUMENT_ROOT}/api/campaigns.php -f
   RewriteRule ^api/campaigns/?$ /api/campaigns.php [L,QSA]
+
+  RewriteCond %{REQUEST_URI} ^/api/upload/?$ [NC]
+  RewriteCond %{DOCUMENT_ROOT}/api/upload.php -f
+  RewriteRule ^api/upload/?$ /api/upload.php [L,QSA]
+
+  RewriteCond %{REQUEST_URI} ^/api/team/?$ [NC]
+  RewriteCond %{DOCUMENT_ROOT}/api/team.php -f
+  RewriteRule ^api/team/?$ /api/team.php [L,QSA]
 
   # 7B-2. Explicit Static Bypass for Search Crawlers (Favicon, Manifest, OG Banner, Robots, Sitemap)
   RewriteRule ^(favicon\.ico|favicon-[0-9]+x[0-9]+\.png|favicon\.png|favicon\.svg|icon-[0-9]+\.png|apple-touch-icon\.png|og-image\.(jpg|jpeg|png)|site\.webmanifest|robots\.txt|sitemap\.xml)$ - [L]

@@ -91,10 +91,7 @@ const CountUp: React.FC<{ end: number; duration?: number; suffix?: string }> = (
   return <span ref={elementRef}>{count}{suffix}</span>;
 };
 
-// Robust HTML5 Video Component ensuring compliant autoplay, explicit DOM muting, and lifecycle management
-// Performance Engineering: Only mounts and buffers the video when the slide is actively displayed.
-// When inactive, unmounts the video element to prevent background multi-video buffering.
-// On initial page load, defers video mounting until LCP and critical assets are fully rendered.
+// Robust HTML5 Video Component ensuring compliant instant autoplay, explicit DOM muting, and zero-delay playback
 const HeroSlideVideo: React.FC<{
   src: string;
   isActive: boolean;
@@ -106,7 +103,7 @@ const HeroSlideVideo: React.FC<{
 }> = ({ src, isActive, isHeroVisible, prefersReducedMotion = false, poster, title, isFirst = false }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [shouldMountVideo, setShouldMountVideo] = useState(false);
+  const [shouldMountVideo, setShouldMountVideo] = useState(isActive && isHeroVisible && !prefersReducedMotion);
   const hasPoster = Boolean(poster && poster.trim());
 
   useEffect(() => {
@@ -117,20 +114,15 @@ const HeroSlideVideo: React.FC<{
       return;
     }
 
-    // Save heavy bandwidth on mobile viewports; crisp poster image is displayed instead
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+    // Save heavy bandwidth on small mobile viewports; crisp poster image is displayed instead
+    if (typeof window !== 'undefined' && window.innerWidth < 640) {
       setShouldMountVideo(false);
       return;
     }
 
-    // Defer mounting initial video to ensure 100% LCP priority for the hero poster
-    const mountDelay = isFirst ? 1200 : 250;
-    const timer = setTimeout(() => {
-      setShouldMountVideo(true);
-    }, mountDelay);
-
-    return () => clearTimeout(timer);
-  }, [isActive, isHeroVisible, prefersReducedMotion, isFirst]);
+    // Mount video immediately without artificial delays for instant playback
+    setShouldMountVideo(true);
+  }, [isActive, isHeroVisible, prefersReducedMotion]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -164,6 +156,7 @@ const HeroSlideVideo: React.FC<{
         const handleReady = () => playSafe();
         video.addEventListener('canplay', handleReady, { once: true });
         video.addEventListener('loadeddata', handleReady, { once: true });
+        video.load(); // Kick off immediate buffering
         return () => {
           isSubscribed = false;
           video.removeEventListener('canplay', handleReady);
@@ -185,7 +178,7 @@ const HeroSlideVideo: React.FC<{
         <img
           src={poster}
           alt={title || 'Slide background poster'}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-out ${
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-out ${
             isVideoLoaded && isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'
           }`}
           width="1920"
@@ -206,9 +199,9 @@ const HeroSlideVideo: React.FC<{
           autoPlay
           disablePictureInPicture
           disableRemotePlayback
-          preload="metadata"
+          preload={isActive ? "auto" : "metadata"}
           aria-label={title || 'Slide background video'}
-          className={`w-full h-full object-cover pointer-events-none transition-opacity duration-700 ease-out ${
+          className={`w-full h-full object-cover pointer-events-none transition-opacity duration-500 ease-out ${
             !hasPoster || (isVideoLoaded && isActive) ? 'opacity-100' : 'opacity-0'
           }`}
           onPlaying={() => setIsVideoLoaded(true)}

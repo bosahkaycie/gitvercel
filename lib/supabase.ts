@@ -42,6 +42,8 @@ export interface UploadResult {
   error: string | null;
 }
 
+import { compressImageForUpload } from '../utils/imageCompressor';
+
 // Convert file to Base64 data URL
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -72,21 +74,88 @@ export const uploadMediaFile = async (
     return { url: '', path: '', error: 'Invalid file format. Supported: JPG, PNG, WEBP, SVG, GIF, PDF, MP4, WebM, OGG, MOV.' };
   }
 
+  // Step 1: Client-Side Instant Image Compression (converts oversized photos to WebP under 250KB)
+  let uploadFile = file;
+  if (!isVideo && file.type.startsWith('image/')) {
+    try {
+      uploadFile = await compressImageForUpload(file, {
+        maxWidth: 1600,
+        maxHeight: 1600,
+        quality: 0.84,
+        mimeType: 'image/webp'
+      });
+    } catch (compErr) {
+      console.warn('Image pre-compression notice:', compErr);
+    }
+  }
+
   // Sanitize filename
-  const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+  const cleanName = uploadFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
   const timestamp = Date.now();
   const isVideoBucket = bucket === 'videos';
   const targetBucket = isVideoBucket ? 'media' : bucket;
   const filePath = isVideoBucket ? `videos/${timestamp}_${cleanName}` : `${timestamp}_${cleanName}`;
 
-  const client = getSupabaseClient();
+  // Tier 1: Hostinger Native Media Upload API (/api/upload via multipart FormData)
+  // This saves directly to polarisigl.com/assets/uploads/ with server WebP optimization
+  try {
+    const formData = new FormData();
+    formData.append('file', uploadFile);
+    formData.append('filename', cleanName);
+    formData.append('bucket', targetBucket);
 
-  // Tier 1: Direct Supabase Client Upload (Recommended - fast binary streaming for both small and large media up to 50MB)
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data && data.success && data.url) {
+        return {
+          url: data.url,
+          path: data.relative_url || filePath,
+          error: null
+        };
+      }
+    }
+  } catch (apiErr) {
+    console.warn('/api/upload multipart attempt bypassed, attempting secondary fallback:', apiErr);
+  }
+
+  // Tier 1B: JSON Base64 fallback to /api/upload (if FormData was intercepted)
+  if (uploadFile.size <= 8 * 1024 * 1024) {
+    try {
+      const base64Data = await fileToBase64(uploadFile);
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileBase64: base64Data,
+          filename: cleanName,
+          contentType: uploadFile.type || (isVideo ? 'video/mp4' : 'image/webp'),
+          bucket: targetBucket
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.success && data.url) {
+          return { url: data.url, path: data.relative_url || filePath, error: null };
+        }
+      }
+    } catch (jsonErr) {
+      console.warn('/api/upload json fallback bypassed:', jsonErr);
+    }
+  }
+
+  // Tier 2: Direct Supabase Client Upload (if Supabase is active and unrestricted)
+  const client = getSupabaseClient();
   if (client) {
     try {
       const { data, error } = await client.storage
         .from(targetBucket)
-        .upload(filePath, file, {
+        .upload(filePath, uploadFile, {
           cacheControl: '3600',
           upsert: true,
         });
@@ -100,36 +169,10 @@ export const uploadMediaFile = async (
           return { url: publicUrlData.publicUrl, path: data.path, error: null };
         }
       } else if (error) {
-        console.warn('Direct upload warning, attempting API fallback:', error.message);
+        console.warn('Direct Supabase upload notice:', error.message);
       }
     } catch (directErr) {
-      console.warn('Direct Supabase storage upload notice:', directErr);
-    }
-  }
-
-  // Tier 2: Try Serverless Upload Endpoint (/api/upload) as reliable fallback for files under 4.5MB
-  if (file.size <= 4.5 * 1024 * 1024) {
-    try {
-      const base64Data = await fileToBase64(file);
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fileBase64: base64Data,
-          filename: cleanName,
-          contentType: file.type || (isVideo ? 'video/mp4' : 'image/jpeg'),
-          bucket: targetBucket
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.url) {
-          return { url: data.url, path: data.path || filePath, error: null };
-        }
-      }
-    } catch (apiErr) {
-      console.warn('/api/upload attempt bypassed or failed:', apiErr);
+      console.warn('Direct Supabase storage upload exception:', directErr);
     }
   }
 
@@ -144,10 +187,10 @@ export const uploadMediaFile = async (
   }
 
   try {
-    const fallbackBase64 = await fileToBase64(file);
+    const fallbackBase64 = await fileToBase64(uploadFile);
     return { url: fallbackBase64, path: filePath, error: null };
   } catch (fallbackErr: any) {
-    const objectUrl = URL.createObjectURL(file);
+    const objectUrl = URL.createObjectURL(uploadFile);
     return { url: objectUrl, path: filePath, error: null };
   }
 };
