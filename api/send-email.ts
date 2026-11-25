@@ -70,7 +70,7 @@ export default async function handler(req: any, res: any) {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-    const { action = 'send', to, bcc, cc, replyTo, subject, html, text, config_override, test_email } = body;
+    const { action = 'send', to, from, bcc, cc, replyTo, subject, html, text, config_override, test_email } = body;
 
     const config = getSmtpConfig(config_override);
     const transporter = createTransporter(config);
@@ -147,11 +147,11 @@ export default async function handler(req: any, res: any) {
     }
 
     const mailOptions: SendMailOptions = {
-      from: config.defaultFrom,
+      from: from || config.defaultFrom,
       to: to || undefined,
       bcc: bcc || undefined,
       cc: cc || undefined,
-      replyTo: replyTo || config.user,
+      replyTo: replyTo || (from ? (typeof from === 'string' && from.includes('<') ? from.split('<')[1].replace('>', '').trim() : from) : config.user),
       subject: subject,
       html: html || undefined,
       text: text || undefined,

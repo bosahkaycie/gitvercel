@@ -68,7 +68,7 @@ async function handler(req, res) {
   }
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
-    const { action = "send", to, bcc, cc, replyTo, subject, html, text, config_override, test_email } = body;
+    const { action = "send", to, from, bcc, cc, replyTo, subject, html, text, config_override, test_email } = body;
     const config = getSmtpConfig(config_override);
     const transporter = createTransporter(config);
     if (action === "verify" || action === "test_connection") {
@@ -135,11 +135,11 @@ async function handler(req, res) {
       });
     }
     const mailOptions = {
-      from: config.defaultFrom,
+      from: from || config.defaultFrom,
       to: to || void 0,
       bcc: bcc || void 0,
       cc: cc || void 0,
-      replyTo: replyTo || config.user,
+      replyTo: replyTo || (from ? typeof from === "string" && from.includes("<") ? from.split("<")[1].replace(">", "").trim() : from : config.user),
       subject,
       html: html || void 0,
       text: text || void 0,

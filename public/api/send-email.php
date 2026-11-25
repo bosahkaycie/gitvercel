@@ -54,7 +54,8 @@ $data = json_decode($raw_input, true) ?: [];
 $action = $data['action'] ?? 'send';
 $to = $data['to'] ?? null;
 $bcc = $data['bcc'] ?? null;
-$reply_to = $data['replyTo'] ?? $smtp_user;
+$from = !empty($data['from']) ? $data['from'] : $smtp_from;
+$reply_to = $data['replyTo'] ?? (!empty($data['from']) ? (preg_match('/<([^>]+)>/', $from, $m) ? $m[1] : $from) : $smtp_user);
 $subject = $data['subject'] ?? '';
 $html = $data['html'] ?? '';
 $text = $data['text'] ?? strip_tags($html);
@@ -121,7 +122,7 @@ if (empty($html) && empty($text)) {
 
 // 8. Send Email via Direct SMTP with Fallback
 $send_result = send_via_smtp(
-    $smtp_host, $smtp_port, $smtp_user, $smtp_pass, $smtp_from,
+    $smtp_host, $smtp_port, $smtp_user, $smtp_pass, $from,
     $to, $bcc, $reply_to, $subject, $html, $text
 );
 
@@ -133,7 +134,7 @@ if ($send_result['success']) {
     ]);
 } else {
     // If SMTP fails, try Hostinger local PHP mail() as last-resort fallback
-    $fallback_headers = "From: " . $smtp_from . "\r\n";
+    $fallback_headers = "From: " . $from . "\r\n";
     $fallback_headers .= "Reply-To: " . $reply_to . "\r\n";
     $fallback_headers .= "MIME-Version: 1.0\r\n";
     $fallback_headers .= "Content-Type: text/html; charset=UTF-8\r\n";

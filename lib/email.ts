@@ -3,6 +3,7 @@
 
 export interface SendEmailPayload {
   to?: string | string[];
+  from?: string;
   bcc?: string | string[];
   cc?: string | string[];
   replyTo?: string;

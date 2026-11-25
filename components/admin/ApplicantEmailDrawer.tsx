@@ -83,7 +83,7 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
 
   // Test email state
   const [isSendingTest, setIsSendingTest] = useState(false);
-  const [testEmailAddress, setTestEmailAddress] = useState('hello@polarisigl.com');
+  const [testEmailAddress, setTestEmailAddress] = useState('bosahkc@gmail.com');
   const [showTestInput, setShowTestInput] = useState(false);
 
   // Target status based on template
@@ -195,6 +195,8 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
 
       const res = await sendCorporateEmail({
         to: testEmailAddress.trim(),
+        from: '"Polaris Careers" <career@polarisigl.com>',
+        replyTo: 'career@polarisigl.com',
         subject: `[TEST PREVIEW] ${subject}`,
         html: testHtml,
         text: bodyText,
@@ -255,6 +257,8 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
 
         const res = await sendCorporateEmail({
           to: app.applicant_email,
+          from: '"Polaris Careers" <career@polarisigl.com>',
+          replyTo: 'career@polarisigl.com',
           subject: personalizedSubject,
           html: personalizedHtml,
           text: personalizedBody,
@@ -855,7 +859,7 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                   <span>
-                    Previewing exact corporate transmission as sent from <strong className="text-emerald-600 dark:text-emerald-400">hello@polarisigl.com</strong>
+                    Previewing exact corporate transmission as sent from <strong className="text-emerald-600 dark:text-emerald-400">career@polarisigl.com</strong>
                   </span>
                   <span className="font-mono text-[11px] font-semibold">
                     Recipient: {isBulk ? `${applications.length} Candidates` : primaryApp?.applicant_email}

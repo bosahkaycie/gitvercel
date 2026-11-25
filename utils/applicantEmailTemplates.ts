@@ -365,7 +365,7 @@ export function generateApplicantEmailHtml(params: ApplicantEmailParams): string
               <!-- Corporate Assurance Note -->
               <div style="margin-top: 28px; padding-top: 18px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; line-height: 1.5;">
                 <p style="margin: 0;">
-                  This message is an official corporate transmission from <strong>Polaris Integrated &amp; GeoSolutions Limited (PIGL)</strong>. If you did not apply for this opening or received this email in error, please notify our team immediately at <a href="mailto:hello@polarisigl.com" style="color: #059669; text-decoration: none;">hello@polarisigl.com</a>.
+                  This message is an official corporate transmission from <strong>Polaris Integrated &amp; GeoSolutions Limited (PIGL) Careers Division</strong>. If you did not apply for this opening or received this email in error, please notify our team immediately at <a href="mailto:career@polarisigl.com" style="color: #059669; text-decoration: none;">career@polarisigl.com</a>.
                 </p>
               </div>
             </td>
@@ -379,7 +379,7 @@ export function generateApplicantEmailHtml(params: ApplicantEmailParams): string
               </p>
               <p style="margin: 0 0 8px 0;">
                 #3 Diamond Close, Castle &amp; Green Estate, Off Eneka Link Road, Port Harcourt, Rivers State, Nigeria<br>
-                Tel: +234 809 7081 333 &bull; Email: <a href="mailto:hello@polarisigl.com" style="color: #34d399; text-decoration: none;">hello@polarisigl.com</a> &bull; Web: <a href="https://polarisigl.com" target="_blank" style="color: #34d399; text-decoration: none;">polarisigl.com</a>
+                Tel: +234 809 7081 333 &bull; Email: <a href="mailto:career@polarisigl.com" style="color: #34d399; text-decoration: none;">career@polarisigl.com</a> &bull; Web: <a href="https://polarisigl.com" target="_blank" style="color: #34d399; text-decoration: none;">polarisigl.com</a>
               </p>
               <p style="margin: 0; color: #64748b; font-size: 10.5px;">
                 &copy; ${new Date().getFullYear()} Polaris Integrated &amp; GeoSolutions Limited. All rights reserved.
