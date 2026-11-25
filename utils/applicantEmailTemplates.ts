@@ -168,221 +168,88 @@ Polaris Integrated & GeoSolutions Limited`;
 }
 
 /**
- * Generates an executive, branded, responsive HTML email
+ * Generates an executive, branded, minimal, and content-focused HTML email
  */
 export function generateApplicantEmailHtml(params: ApplicantEmailParams): string {
   const {
     type,
     candidateName,
     jobTitle,
-    interviewDate,
-    interviewTime,
     interviewMode,
     meetingLink,
-    interviewLocation,
-    interviewerNames,
-    specialInstructions,
-    startDate,
-    department,
     customMessage
   } = params;
 
-  const role = jobTitle || 'Career Opportunity';
-  const formattedDate = formatReadableDate(interviewDate);
-  const formattedStartDate = formatReadableDate(startDate);
+  // Email title for head/preview
+  let cleanTitle = 'Application Update';
+  if (type === 'interview') cleanTitle = 'Interview Invitation';
+  else if (type === 'shortlisted') cleanTitle = 'Application Shortlisted';
+  else if (type === 'offer') cleanTitle = 'Offer of Employment';
+  else if (type === 'talent_pool') cleanTitle = 'Application Status Update';
 
-  // Type-specific banner config
-  let bannerTitle = 'Application Update';
-  let bannerSubtitle = role;
-  let bannerBadge = 'Official Notice';
-  let badgeBg = '#10b981';
-
-  if (type === 'interview') {
-    bannerTitle = 'Interview Invitation';
-    bannerBadge = 'Action Required: Confirm Availability';
-    badgeBg = '#10b981';
-  } else if (type === 'shortlisted') {
-    bannerTitle = 'Application Shortlisted';
-    bannerBadge = 'Next Stage Qualification';
-    badgeBg = '#f59e0b';
-  } else if (type === 'offer') {
-    bannerTitle = 'Offer of Employment';
-    bannerBadge = 'Welcome to the Team';
-    badgeBg = '#059669';
-  } else if (type === 'talent_pool') {
-    bannerTitle = 'Application Status Update';
-    bannerBadge = 'Talent Network Archival';
-    badgeBg = '#64748b';
-  }
-
-  // Format the main body paragraphs
+  // Format the body paragraphs cleanly
   const messageText = customMessage || getDefaultMessage(params);
   const formattedParagraphs = messageText
     .split('\n\n')
     .map(p => {
-      // Escape HTML entities
       const escaped = p
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/\n/g, '<br/>');
-      return `<p style="margin: 0 0 16px 0; font-size: 14.5px; line-height: 1.65; color: #334155;">${escaped}</p>`;
+      return `<p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.65; color: #1e293b;">${escaped}</p>`;
     })
     .join('');
 
-  // Structured details box for interviews
-  let detailsBoxHtml = '';
-  if (type === 'interview') {
-    const venueValue = interviewMode === 'virtual'
-      ? (meetingLink 
-          ? `<a href="${meetingLink}" target="_blank" style="color: #059669; font-weight: bold; text-decoration: underline;">${meetingLink}</a>` 
-          : 'Virtual Video Conference (Link to follow)')
-      : (interviewLocation || 'PIGL Operations Base, #3 Diamond Close, Off Eneka Link Road, Port Harcourt');
-
-    detailsBoxHtml = `
-      <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-left: 5px solid #10b981; border-radius: 8px; padding: 18px 20px; margin: 24px 0;">
-        <h4 style="margin: 0 0 12px 0; color: #065f46; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">
-          📅 Interview Schedule & Access Details
-        </h4>
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size: 13.5px; color: #1e293b; border-collapse: collapse;">
-          <tr>
-            <td width="30%" style="padding: 6px 0; color: #64748b; font-weight: 600;">Date:</td>
-            <td width="70%" style="padding: 6px 0; font-weight: 700; color: #0f172a;">${formattedDate || 'To be confirmed'}</td>
-          </tr>
-          <tr>
-            <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Time:</td>
-            <td style="padding: 6px 0; font-weight: 700; color: #0f172a;">${interviewTime || 'To be announced'}</td>
-          </tr>
-          <tr>
-            <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Format:</td>
-            <td style="padding: 6px 0; font-weight: 600; color: #0f172a;">${interviewMode === 'virtual' ? '🎥 Virtual Video Meeting' : '🏢 In-Person Evaluation'}</td>
-          </tr>
-          <tr>
-            <td style="padding: 6px 0; color: #64748b; font-weight: 600; vertical-align: top;">Location / Link:</td>
-            <td style="padding: 6px 0; font-weight: 500; color: #0f172a;">${venueValue}</td>
-          </tr>
-          ${interviewerNames ? `
-          <tr>
-            <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Evaluation Panel:</td>
-            <td style="padding: 6px 0; color: #0f172a;">${interviewerNames}</td>
-          </tr>
-          ` : ''}
-          ${specialInstructions ? `
-          <tr>
-            <td style="padding: 6px 0; color: #64748b; font-weight: 600; vertical-align: top;">Instructions:</td>
-            <td style="padding: 6px 0; color: #0f172a;">${specialInstructions}</td>
-          </tr>
-          ` : ''}
-        </table>
-        ${interviewMode === 'virtual' && meetingLink ? `
-          <div style="margin-top: 16px; text-align: center;">
-            <a href="${meetingLink}" target="_blank" style="display: inline-block; background-color: #059669; color: #ffffff; text-decoration: none; font-weight: 700; font-size: 13px; padding: 10px 24px; border-radius: 6px; box-shadow: 0 2px 4px rgba(5,150,105,0.2);">
-              🔗 Click Here to Join Meeting
-            </a>
-          </div>
-        ` : ''}
-      </div>
-    `;
-  } else if (type === 'offer') {
-    detailsBoxHtml = `
-      <div style="background-color: #ecfdf5; border: 1px solid #a7f3d0; border-left: 5px solid #059669; border-radius: 8px; padding: 18px 20px; margin: 24px 0;">
-        <h4 style="margin: 0 0 10px 0; color: #065f46; font-size: 14px; text-transform: uppercase; font-weight: 700;">
-          🎉 Appointment Summary
-        </h4>
-        <p style="margin: 4px 0; font-size: 13.5px; color: #1e293b;"><strong>Role:</strong> ${role}</p>
-        ${department ? `<p style="margin: 4px 0; font-size: 13.5px; color: #1e293b;"><strong>Department:</strong> ${department}</p>` : ''}
-        ${formattedStartDate ? `<p style="margin: 4px 0; font-size: 13.5px; color: #1e293b;"><strong>Proposed Commencement:</strong> ${formattedStartDate}</p>` : ''}
-      </div>
-    `;
-  }
+  // Optional join button for virtual interviews
+  const actionButtonHtml = (type === 'interview' && interviewMode === 'virtual' && meetingLink) ? `
+    <div style="margin: 20px 0 24px 0;">
+      <a href="${meetingLink}" target="_blank" style="display: inline-block; background-color: #065f46; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 13.5px; padding: 10px 22px; border-radius: 4px;">
+        Join Video Meeting &rarr;
+      </a>
+    </div>
+  ` : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${bannerTitle} - Polaris Integrated & GeoSolutions</title>
+  <title>${cleanTitle} - Polaris Integrated &amp; GeoSolutions</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; color: #334155;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 30px 15px;">
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; color: #1e293b;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 24px 12px;">
     <tr>
       <td align="center">
-        <!-- Main Container -->
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 620px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
+        <!-- Main Card Container -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
           
-          <!-- Header Banner -->
+          <!-- Header Banner: Provided Official Brand Banner -->
           <tr>
-            <td style="background-color: #022c22; padding: 28px 30px; text-align: left; border-bottom: 3px solid #10b981;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td>
-                    <h1 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: 800; letter-spacing: -0.2px;">
-                      Polaris Integrated &amp; GeoSolutions
-                    </h1>
-                    <p style="margin: 4px 0 0 0; color: #6ee7b7; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px;">
-                      Subsurface, Marine &amp; Infrastructure Engineering
-                    </p>
-                  </td>
-                  <td align="right" style="vertical-align: middle;">
-                    <span style="display: inline-block; background-color: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #a7f3d0; font-size: 10.5px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 9999px;">
-                      Careers Portal
-                    </span>
-                  </td>
-                </tr>
-              </table>
+            <td style="padding: 0; line-height: 0; background-color: #ffffff;">
+              <img src="https://polarisigl.com/assets/email-header.jpg" alt="Polaris Integrated &amp; GeoSolutions Ltd" width="600" style="display: block; width: 100%; max-width: 600px; height: auto; border: 0;" />
             </td>
           </tr>
 
-          <!-- Title Bar -->
+          <!-- Email Content Body -->
           <tr>
-            <td style="background-color: #f1f5f9; padding: 16px 30px; border-bottom: 1px solid #e2e8f0;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td>
-                    <h2 style="margin: 0; font-size: 17px; font-weight: 700; color: #0f172a;">
-                      ${bannerTitle}
-                    </h2>
-                    <p style="margin: 2px 0 0 0; font-size: 12px; color: #64748b;">
-                      Position: <strong style="color: #334155;">${role}</strong> &bull; Candidate: <strong style="color: #334155;">${candidateName}</strong>
-                    </p>
-                  </td>
-                  <td align="right" style="vertical-align: middle;">
-                    <span style="display: inline-block; background-color: ${badgeBg}; color: #ffffff; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">
-                      ${bannerBadge}
-                    </span>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Body Content -->
-          <tr>
-            <td style="padding: 30px 30px 20px 30px;">
+            <td style="padding: 32px 32px 28px 32px; font-size: 15px; line-height: 1.65; color: #1e293b;">
               ${formattedParagraphs}
-              ${detailsBoxHtml}
-
-              <!-- Corporate Assurance Note -->
-              <div style="margin-top: 28px; padding-top: 18px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; line-height: 1.5;">
-                <p style="margin: 0;">
-                  This message is an official corporate transmission from <strong>Polaris Integrated &amp; GeoSolutions Limited (PIGL) Careers Division</strong>. If you did not apply for this opening or received this email in error, please notify our team immediately at <a href="mailto:career@polarisigl.com" style="color: #059669; text-decoration: none;">career@polarisigl.com</a>.
-                </p>
-              </div>
+              ${actionButtonHtml}
             </td>
           </tr>
 
-          <!-- Footer -->
+          <!-- Minimal, Clean Footer -->
           <tr>
-            <td style="background-color: #0f172a; padding: 24px 30px; text-align: center; color: #94a3b8; font-size: 11.5px; line-height: 1.6;">
-              <p style="margin: 0 0 8px 0; color: #f1f5f9; font-weight: 700; font-size: 12px;">
+            <td style="padding: 22px 32px; border-top: 1px solid #e2e8f0; background-color: #f8fafc; font-size: 12px; color: #64748b; line-height: 1.6;">
+              <p style="margin: 0 0 4px 0; font-weight: 700; color: #334155;">
                 Polaris Integrated &amp; GeoSolutions Limited (PIGL)
               </p>
-              <p style="margin: 0 0 8px 0;">
-                #3 Diamond Close, Castle &amp; Green Estate, Off Eneka Link Road, Port Harcourt, Rivers State, Nigeria<br>
-                Tel: +234 809 7081 333 &bull; Email: <a href="mailto:career@polarisigl.com" style="color: #34d399; text-decoration: none;">career@polarisigl.com</a> &bull; Web: <a href="https://polarisigl.com" target="_blank" style="color: #34d399; text-decoration: none;">polarisigl.com</a>
+              <p style="margin: 0 0 4px 0;">
+                #3 Diamond Close, Castle &amp; Green Estate, Off Eneka Link Road, Port Harcourt, Rivers State, Nigeria
               </p>
-              <p style="margin: 0; color: #64748b; font-size: 10.5px;">
-                &copy; ${new Date().getFullYear()} Polaris Integrated &amp; GeoSolutions Limited. All rights reserved.
+              <p style="margin: 0;">
+                Phone: +234 809 7081 333 &bull; Email: <a href="mailto:career@polarisigl.com" style="color: #065f46; font-weight: 600; text-decoration: none;">career@polarisigl.com</a> &bull; Web: <a href="https://polarisigl.com" target="_blank" style="color: #065f46; font-weight: 600; text-decoration: none;">polarisigl.com</a>
               </p>
             </td>
           </tr>
