@@ -142,20 +142,28 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
   const renderVenueBadge = (app: JobApplication) => {
     const checkin = venueCheckIns[app.id];
     if (!checkin) return null;
+    const isLate = checkin.punctualityStatus === 'late';
     return (
       <div
-        className="mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-900 dark:bg-emerald-950/90 dark:text-emerald-300 border border-emerald-400/70 dark:border-emerald-700 shadow-2xs"
-        title={`Checked in at venue: ${checkin.checkedInTimeDisplay} (${checkin.checkedInDateDisplay})`}
+        className={`mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-bold border shadow-2xs ${
+          isLate
+            ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/90 dark:text-amber-300 border-amber-400/70 dark:border-amber-700'
+            : 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/90 dark:text-emerald-300 border-emerald-400/70 dark:border-emerald-700'
+        }`}
+        title={`Checked in at venue: ${checkin.checkedInTimeDisplay} (${checkin.checkedInDateDisplay})${checkin.interviewTime ? ` • Scheduled: ${checkin.interviewTime}` : ''}${checkin.punctualityLabel ? ` • ${checkin.punctualityLabel}` : ''}`}
       >
-        <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-        <span>At Venue{checkin.checkedInTimeDisplay ? ` • ${checkin.checkedInTimeDisplay}` : ''}</span>
+        <span className={`inline-block w-2 h-2 rounded-full animate-pulse shrink-0 ${isLate ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+        <span>
+          At Venue{checkin.checkedInTimeDisplay ? ` • ${checkin.checkedInTimeDisplay}` : ''}
+          {checkin.punctualityLabel ? ` (${checkin.punctualityLabel})` : ''}
+        </span>
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
             handleResetVenueCheckIn(app.id, app.applicant_name);
           }}
-          className="ml-0.5 text-emerald-700 dark:text-emerald-400 hover:text-rose-600 dark:hover:text-rose-400 font-black cursor-pointer"
+          className="ml-0.5 opacity-70 hover:opacity-100 hover:text-rose-600 dark:hover:text-rose-400 font-black cursor-pointer"
           title="Clear venue check-in status"
         >
           ×

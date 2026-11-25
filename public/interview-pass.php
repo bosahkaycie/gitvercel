@@ -43,11 +43,66 @@ if (!empty($_GET['d'])) {
 
 $isValid = $candidate['n'] !== '' && $candidate['id'] !== '';
 
+$tz = new DateTimeZone('Africa/Lagos');
+$nowWat = new DateTime('now', $tz);
+$currentTimeDisplay = $nowWat->format('g:i A') . ' WAT';
+
 $formattedDate = $candidate['dt'];
 if ($formattedDate !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $formattedDate)) {
-    $dtObj = DateTime::createFromFormat('Y-m-d', $formattedDate);
+    $dtObj = DateTime::createFromFormat('Y-m-d', $formattedDate, $tz);
     if ($dtObj) {
         $formattedDate = $dtObj->format('l, j F Y');
+    }
+}
+
+// Compute live arrival punctuality against scheduled date & time (WAT)
+$arrivalState = 'neutral'; // early | on_time | late | upcoming | neutral
+$arrivalHeadline = '';
+$arrivalDetail = '';
+
+if ($candidate['dt'] !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $candidate['dt']) && $candidate['tm'] !== '') {
+    if (preg_match('/(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?/i', $candidate['tm'], $m)) {
+        $hour = (int)$m[1];
+        $min  = isset($m[2]) && $m[2] !== '' ? (int)$m[2] : 0;
+        $ampm = isset($m[3]) ? strtoupper($m[3]) : '';
+        if ($ampm === 'PM' && $hour < 12) $hour += 12;
+        if ($ampm === 'AM' && $hour === 12) $hour = 0;
+
+        $sched = DateTime::createFromFormat('Y-m-d H:i', sprintf('%s %02d:%02d', $candidate['dt'], $hour, $min), $tz);
+        if ($sched) {
+            $diffMins = (int)round(($nowWat->getTimestamp() - $sched->getTimestamp()) / 60);
+            if ($nowWat->format('Y-m-d') !== $sched->format('Y-m-d')) {
+                if ($diffMins < 0) {
+                    $days = (int)ceil(abs($diffMins) / 1440);
+                    $arrivalState = 'upcoming';
+                    $arrivalHeadline = 'Scheduled for Another Day';
+                    $arrivalDetail = "Interview is in {$days} day" . ($days > 1 ? 's' : '') . " ({$formattedDate} at {$candidate['tm']})";
+                } else {
+                    $arrivalState = 'late';
+                    $arrivalHeadline = 'Past Scheduled Date';
+                    $arrivalDetail = "Was scheduled for {$formattedDate} at {$candidate['tm']}";
+                }
+            } elseif ($diffMins < -5) {
+                $earlyMins = abs($diffMins);
+                $earlyText = $earlyMins >= 60
+                    ? floor($earlyMins / 60) . ' hr ' . ($earlyMins % 60) . ' min'
+                    : "{$earlyMins} min" . ($earlyMins > 1 ? 's' : '');
+                $arrivalState = 'early';
+                $arrivalHeadline = 'Arrived Early';
+                $arrivalDetail = "{$earlyText} before scheduled interview time";
+            } elseif ($diffMins <= 5) {
+                $arrivalState = 'on_time';
+                $arrivalHeadline = 'On Time';
+                $arrivalDetail = 'Arrived right on schedule';
+            } else {
+                $lateText = $diffMins >= 60
+                    ? floor($diffMins / 60) . ' hr ' . ($diffMins % 60) . ' min'
+                    : "{$diffMins} min" . ($diffMins > 1 ? 's' : '');
+                $arrivalState = 'late';
+                $arrivalHeadline = 'Arrived Late';
+                $arrivalDetail = "{$lateText} after scheduled interview time";
+            }
+        }
     }
 }
 
@@ -260,6 +315,43 @@ $esc = function($str) {
       font-size: 13.5px;
       color: #64748b;
     }
+    .punctuality {
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+    }
+    .punctuality-early {
+      background: #ecfdf5;
+      border-color: #34d399;
+      color: #065f46;
+    }
+    .punctuality-on_time {
+      background: #ecfdf5;
+      border-color: #10b981;
+      color: #065f46;
+    }
+    .punctuality-late {
+      background: #fef2f2;
+      border-color: #f87171;
+      color: #991b1b;
+    }
+    .punctuality-upcoming {
+      background: #eff6ff;
+      border-color: #60a5fa;
+      color: #1e40af;
+    }
+    .punctuality-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+    .punctuality-sub {
+      font-size: 12px;
+      opacity: 0.9;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -302,18 +394,29 @@ $esc = function($str) {
           <h1 class="candidate-name"><?php echo $esc($candidate['n']); ?></h1>
           <p class="position"><?php echo $esc($candidate['r'] ?: 'Interview Candidate'); ?></p>
 
+          <?php if ($arrivalHeadline !== ''): ?>
+          <div id="punctualityBanner" class="punctuality punctuality-<?php echo $esc($arrivalState); ?>">
+            <div class="punctuality-title"><?php echo $esc($arrivalHeadline); ?></div>
+            <div class="punctuality-sub"><?php echo $esc($arrivalDetail); ?></div>
+          </div>
+          <?php endif; ?>
+
           <div class="details">
             <div class="detail-row">
               <span class="detail-label">Position</span>
               <span class="detail-value"><?php echo $esc($candidate['r'] ?: 'Specified Role'); ?></span>
             </div>
             <div class="detail-row">
-              <span class="detail-label">Interview Date</span>
+              <span class="detail-label">Scheduled Date</span>
               <span class="detail-value"><?php echo $esc($formattedDate ?: 'Scheduled'); ?></span>
             </div>
             <div class="detail-row">
-              <span class="detail-label">Interview Time</span>
+              <span class="detail-label">Scheduled Time</span>
               <span class="detail-value"><?php echo $esc($candidate['tm'] ?: 'As Scheduled'); ?></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Current Time</span>
+              <span class="detail-value"><?php echo $esc($currentTimeDisplay); ?></span>
             </div>
           </div>
 
@@ -385,7 +488,8 @@ $esc = function($str) {
         if (checkin) {
           var t = checkin.checkedInTimeDisplay || '';
           var d = checkin.checkedInDateDisplay || '';
-          checkedInMeta.textContent = t ? ('Admitted at ' + t + (d ? ' (' + d + ')' : '')) : 'Recorded on Admin Dashboard';
+          var p = checkin.punctualityLabel ? (' • ' + checkin.punctualityLabel) : '';
+          checkedInMeta.textContent = t ? ('Admitted at ' + t + p + (d ? ' (' + d + ')' : '')) : 'Recorded on Admin Dashboard';
         }
       }
 

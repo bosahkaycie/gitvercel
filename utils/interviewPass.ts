@@ -20,6 +20,8 @@ export interface VenueCheckInRecord {
   checkedInAt: string;
   checkedInTimeDisplay: string;
   checkedInDateDisplay: string;
+  punctualityStatus?: 'early' | 'on_time' | 'late' | 'scheduled';
+  punctualityLabel?: string;
   attendantNote?: string;
 }
 

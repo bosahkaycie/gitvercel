@@ -236,6 +236,48 @@ if ($method === 'POST') {
     $tz = new DateTimeZone('Africa/Lagos');
     $now = new DateTime('now', $tz);
 
+    // Compute punctuality (Early / On Time / Late) against scheduled interviewDate & interviewTime
+    $punctuality_status = 'scheduled';
+    $punctuality_label = '';
+    if ($interview_date !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $interview_date) && $interview_time !== '') {
+        if (preg_match('/(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?/i', $interview_time, $m)) {
+            $hour = (int)$m[1];
+            $min  = isset($m[2]) && $m[2] !== '' ? (int)$m[2] : 0;
+            $ampm = isset($m[3]) ? strtoupper($m[3]) : '';
+            if ($ampm === 'PM' && $hour < 12) $hour += 12;
+            if ($ampm === 'AM' && $hour === 12) $hour = 0;
+
+            $sched = DateTime::createFromFormat('Y-m-d H:i', sprintf('%s %02d:%02d', $interview_date, $hour, $min), $tz);
+            if ($sched) {
+                $diff_mins = (int)round(($now->getTimestamp() - $sched->getTimestamp()) / 60);
+                if ($now->format('Y-m-d') !== $sched->format('Y-m-d')) {
+                    if ($diff_mins < 0) {
+                        $days = (int)ceil(abs($diff_mins) / 1440);
+                        $punctuality_status = 'early';
+                        $punctuality_label = "Scheduled in {$days} day" . ($days > 1 ? 's' : '');
+                    } else {
+                        $punctuality_status = 'late';
+                        $punctuality_label = 'Past Scheduled Date';
+                    }
+                } elseif ($diff_mins < -5) {
+                    $early_mins = abs($diff_mins);
+                    $punctuality_status = 'early';
+                    $punctuality_label = $early_mins >= 60
+                        ? floor($early_mins / 60) . 'h ' . ($early_mins % 60) . 'm early'
+                        : "{$early_mins} min" . ($early_mins > 1 ? 's' : '') . ' early';
+                } elseif ($diff_mins <= 5) {
+                    $punctuality_status = 'on_time';
+                    $punctuality_label = 'On Time';
+                } else {
+                    $punctuality_status = 'late';
+                    $punctuality_label = $diff_mins >= 60
+                        ? floor($diff_mins / 60) . 'h ' . ($diff_mins % 60) . 'm late'
+                        : "{$diff_mins} min" . ($diff_mins > 1 ? 's' : '') . ' late';
+                }
+            }
+        }
+    }
+
     $record = [
         'applicationId' => $app_id,
         'candidateName' => $candidate_name,
@@ -245,6 +287,8 @@ if ($method === 'POST') {
         'checkedInAt' => $now->format(DateTime::ATOM),
         'checkedInTimeDisplay' => $now->format('g:i A') . ' WAT',
         'checkedInDateDisplay' => $now->format('D, j M Y'),
+        'punctualityStatus' => $punctuality_status,
+        'punctualityLabel' => $punctuality_label,
         'attendantNote' => $attendant_note,
     ];
 
