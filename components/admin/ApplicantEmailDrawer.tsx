@@ -104,9 +104,12 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
 
   // Parameters object generator
   const getParams = (app: JobApplication | null): ApplicantEmailParams => {
+    const candidateName = app?.applicant_name
+      ? app.applicant_name
+      : (isBulk ? '{candidate_name}' : 'Candidate');
     return {
       type: emailType,
-      candidateName: app?.applicant_name || (isBulk ? '{Candidate Name}' : 'Candidate'),
+      candidateName,
       candidateEmail: app?.applicant_email || '',
       jobTitle: app?.job_title || 'Engineering Role',
       interviewDate,
@@ -127,9 +130,15 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     if (!isCustomEdited) {
-      const p = getParams(primaryApp);
-      setSubject(getDefaultSubject(emailType, p.jobTitle, p.candidateName));
-      setBodyText(getDefaultMessage(p));
+      if (isBulk) {
+        const p = getParams(null);
+        setSubject(getDefaultSubject(emailType, p.jobTitle, '{candidate_name}'));
+        setBodyText(getDefaultMessage(p));
+      } else {
+        const p = getParams(primaryApp);
+        setSubject(getDefaultSubject(emailType, p.jobTitle, p.candidateName));
+        setBodyText(getDefaultMessage(p));
+      }
     }
   }, [
     emailType,
@@ -143,6 +152,7 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
     startDate,
     department,
     primaryApp,
+    isBulk,
     isOpen,
     isCustomEdited
   ]);
@@ -150,9 +160,15 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
   // Reset custom text if user requests
   const handleResetToTemplate = () => {
     setIsCustomEdited(false);
-    const p = getParams(primaryApp);
-    setSubject(getDefaultSubject(emailType, p.jobTitle, p.candidateName));
-    setBodyText(getDefaultMessage(p));
+    if (isBulk) {
+      const p = getParams(null);
+      setSubject(getDefaultSubject(emailType, p.jobTitle, '{candidate_name}'));
+      setBodyText(getDefaultMessage(p));
+    } else {
+      const p = getParams(primaryApp);
+      setSubject(getDefaultSubject(emailType, p.jobTitle, p.candidateName));
+      setBodyText(getDefaultMessage(p));
+    }
     setToastNotification({ message: 'Reset template to defaults', type: 'info' });
     setTimeout(() => setToastNotification(null), 3000);
   };
@@ -240,20 +256,43 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
         });
 
         // Personalize body and HTML for this specific candidate
-        const candidateParams = getParams(app);
-        // Replace {candidate_name} with actual applicant name if admin left template tags
-        const personalizedBody = bodyText
-          .replace(/\{candidate_name\}/gi, app.applicant_name)
-          .replace(/\{job_title\}/gi, app.job_title || 'Role');
+        const candidateName = app.applicant_name || 'Candidate';
+        const candidateJob = app.job_title || 'Engineering Role';
+        const candidateParams: ApplicantEmailParams = {
+          ...getParams(app),
+          candidateName,
+          candidateEmail: app.applicant_email,
+          jobTitle: candidateJob,
+        };
+
+        // If template was not customized, generate clean message with candidate's actual name
+        let personalizedBody: string;
+        if (!isCustomEdited) {
+          personalizedBody = getDefaultMessage(candidateParams);
+        } else {
+          // If admin customized the text, dynamically replace candidate placeholders
+          personalizedBody = bodyText
+            .replace(/\{candidate_name\}/gi, candidateName)
+            .replace(/\{name\}/gi, candidateName)
+            .replace(/\{job_title\}/gi, candidateJob);
+
+          if (primaryApp?.applicant_name && primaryApp.applicant_name !== candidateName) {
+            personalizedBody = personalizedBody.replace(
+              new RegExp(`\\b${primaryApp.applicant_name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g'),
+              candidateName
+            );
+          }
+        }
 
         const personalizedHtml = generateApplicantEmailHtml({
           ...candidateParams,
           customMessage: personalizedBody,
         });
 
-        const personalizedSubject = subject
-          .replace(/\{candidate_name\}/gi, app.applicant_name)
-          .replace(/\{job_title\}/gi, app.job_title || 'Role');
+        const personalizedSubject = (isCustomEdited ? subject : getDefaultSubject(emailType, candidateJob, candidateName))
+          .replace(/\{candidate_name\}/gi, candidateName)
+          .replace(/\{name\}/gi, candidateName)
+          .replace(/\{job_title\}/gi, candidateJob);
 
         const res = await sendCorporateEmail({
           to: app.applicant_email,
