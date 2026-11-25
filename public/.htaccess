@@ -129,6 +129,14 @@ Options -Indexes
   RewriteCond %{DOCUMENT_ROOT}/api/team.php -f
   RewriteRule ^api/team/?$ /api/team.php [L,QSA]
 
+  RewriteCond %{REQUEST_URI} ^/api/interview-checkin/?$ [NC]
+  RewriteCond %{DOCUMENT_ROOT}/api/interview-checkin.php -f
+  RewriteRule ^api/interview-checkin/?$ /api/interview-checkin.php [L,QSA]
+
+  RewriteCond %{REQUEST_URI} ^/interview-pass/?$ [NC]
+  RewriteCond %{DOCUMENT_ROOT}/interview-pass.php -f
+  RewriteRule ^interview-pass/?$ /interview-pass.php [L,QSA]
+
   # 7B-2. Explicit Static Bypass for Search Crawlers (Favicon, Manifest, OG Banner, Robots, Sitemap)
   RewriteRule ^(favicon\.ico|favicon-[0-9]+x[0-9]+\.png|favicon\.png|favicon\.svg|icon-[0-9]+\.png|apple-touch-icon\.png|og-image\.(jpg|jpeg|png)|site\.webmanifest|robots\.txt|sitemap\.xml)$ - [L]
 

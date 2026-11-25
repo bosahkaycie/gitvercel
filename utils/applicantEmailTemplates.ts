@@ -3,10 +3,13 @@
  * Applicant Email Templates & Corporate HTML Dispatch Formatter
  */
 
+import { buildInterviewQrImageUrl } from './interviewPass';
+
 export type ApplicantEmailType = 'interview' | 'shortlisted' | 'offer' | 'talent_pool' | 'custom';
 
 export interface ApplicantEmailParams {
   type: ApplicantEmailType;
+  applicationId?: string;
   candidateName: string;
   candidateEmail: string;
   jobTitle: string;
@@ -22,6 +25,7 @@ export interface ApplicantEmailParams {
   department?: string;
   customSubject?: string;
   customMessage?: string;
+  includeQrPass?: boolean;
 }
 
 export function formatReadableDate(dateStr?: string): string {
@@ -173,12 +177,19 @@ Polaris Integrated & GeoSolutions Limited`;
 export function generateApplicantEmailHtml(params: ApplicantEmailParams): string {
   const {
     type,
+    applicationId,
     candidateName,
     jobTitle,
+    interviewDate,
+    interviewTime,
     interviewMode,
     meetingLink,
-    customMessage
+    customMessage,
+    includeQrPass = type === 'interview',
   } = params;
+
+  const escapeHtml = (val: string) =>
+    val.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
   // Email title for head/preview
   let cleanTitle = 'Application Update';
@@ -210,6 +221,55 @@ export function generateApplicantEmailHtml(params: ApplicantEmailParams): string
     </div>
   ` : '';
 
+  // Clean, uncluttered Venue Check-In QR Pass (only when enabled on interview invitations)
+  const formattedDate = formatReadableDate(interviewDate);
+  const qrPassHtml = (type === 'interview' && includeQrPass) ? (() => {
+    const qrUrl = buildInterviewQrImageUrl({
+      applicationId: applicationId || 'preview',
+      candidateName: candidateName || 'Candidate',
+      jobTitle: jobTitle || 'Role',
+      interviewDate: interviewDate || '',
+      interviewTime: interviewTime || '',
+    }, 150);
+
+    const scheduleLine = [formattedDate, interviewTime].filter(Boolean).join(' • ') || 'As Scheduled';
+
+    return `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0 6px 0; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+        <tr>
+          <td style="padding: 16px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="116" valign="top" style="padding-right: 16px;">
+                  <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px; display: inline-block; line-height: 0;">
+                    <img src="${qrUrl}" alt="Interview Venue Check-In QR Code" width="104" height="104" style="display: block; width: 104px; height: 104px; border: 0;" />
+                  </div>
+                </td>
+                <td valign="middle" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+                  <p style="margin: 0 0 4px 0; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #065f46;">
+                    Interview Venue Check-In Pass
+                  </p>
+                  <p style="margin: 0 0 3px 0; font-size: 15px; font-weight: 700; color: #0f172a;">
+                    ${escapeHtml(candidateName || 'Candidate')}
+                  </p>
+                  <p style="margin: 0 0 4px 0; font-size: 13px; font-weight: 600; color: #334155;">
+                    ${escapeHtml(jobTitle || 'Role')}
+                  </p>
+                  <p style="margin: 0 0 8px 0; font-size: 12.5px; color: #475569;">
+                    ${escapeHtml(scheduleLine)}
+                  </p>
+                  <p style="margin: 0; font-size: 11.5px; color: #64748b; line-height: 1.45;">
+                    Present this QR code to the attendant at the interview venue upon arrival for quick check-in.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    `;
+  })() : '';
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -236,6 +296,7 @@ export function generateApplicantEmailHtml(params: ApplicantEmailParams): string
             <td style="padding: 32px 32px 28px 32px; font-size: 15px; line-height: 1.65; color: #1e293b;">
               ${formattedParagraphs}
               ${actionButtonHtml}
+              ${qrPassHtml}
             </td>
           </tr>
 

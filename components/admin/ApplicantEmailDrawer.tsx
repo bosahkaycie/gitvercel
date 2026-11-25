@@ -73,6 +73,9 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
   const [bodyText, setBodyText] = useState('');
   const [isCustomEdited, setIsCustomEdited] = useState(false);
 
+  // Venue Check-In QR Pass toggle (for interview invitations)
+  const [includeQrPass, setIncludeQrPass] = useState(true);
+
   // Status sync option
   const [syncStatus, setSyncStatus] = useState(true);
 
@@ -109,6 +112,7 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
       : (isBulk ? '{candidate_name}' : 'Candidate');
     return {
       type: emailType,
+      applicationId: app?.id || 'preview',
       candidateName,
       candidateEmail: app?.applicant_email || '',
       jobTitle: app?.job_title || 'Engineering Role',
@@ -123,6 +127,7 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
       department,
       customSubject: subject,
       customMessage: isCustomEdited ? bodyText : undefined,
+      includeQrPass,
     };
   };
 
@@ -180,7 +185,7 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
       ...p,
       customMessage: bodyText,
     });
-  }, [primaryApp, emailType, interviewDate, interviewTime, interviewMode, meetingLink, interviewLocation, interviewerNames, specialInstructions, startDate, department, bodyText]);
+  }, [primaryApp, emailType, interviewDate, interviewTime, interviewMode, meetingLink, interviewLocation, interviewerNames, specialInstructions, startDate, department, bodyText, includeQrPass]);
 
   // Handle escape key to close
   useEffect(() => {
@@ -723,6 +728,36 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
                               : 'bg-white border-slate-300 text-slate-900'
                           }`}
                         />
+                      </div>
+
+                      {/* Venue Check-In QR Pass Toggle */}
+                      <div className="sm:col-span-2 pt-1">
+                        <label
+                          className={`flex items-start gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors ${
+                            includeQrPass
+                              ? isDark
+                                ? 'bg-emerald-950/40 border-emerald-700/70'
+                                : 'bg-white border-emerald-300'
+                              : isDark
+                              ? 'bg-slate-900/60 border-slate-700'
+                              : 'bg-white/70 border-slate-200'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={includeQrPass}
+                            onChange={(e) => setIncludeQrPass(e.target.checked)}
+                            className="mt-0.5 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 cursor-pointer"
+                          />
+                          <div className="text-xs">
+                            <span className={`font-bold block ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                              Embed Venue Check-In QR Pass
+                            </span>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                              Adds a compact QR pass with candidate name, role &amp; interview time. Scanning at the venue automatically marks the candidate as arrived on the Admin Dashboard.
+                            </span>
+                          </div>
+                        </label>
                       </div>
                     </div>
                   </div>

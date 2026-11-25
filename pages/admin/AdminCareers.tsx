@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { JobApplication, JobOpening } from '../../types';
 import { useSiteSettings, extractCoverLetterMeta } from '../../hooks/useSupabaseData';
 import { downloadApplicationsZip, DownloadProgress } from '../../utils/cvDownloader';
+import { fetchVenueCheckIns, resetVenueCheckIn, VenueCheckInRecord } from '../../utils/interviewPass';
 import { ApplicantEmailDrawer } from '../../components/admin/ApplicantEmailDrawer';
 import {
   IconCareers,
@@ -69,16 +70,72 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Live Venue Check-Ins synced from QR pass scans at the interview venue
+  const [venueCheckIns, setVenueCheckIns] = useState<Record<string, VenueCheckInRecord>>({});
+
+  const loadVenueCheckIns = async () => {
+    const records = await fetchVenueCheckIns();
+    setVenueCheckIns(records);
+  };
+
+  useEffect(() => {
+    loadVenueCheckIns();
+    const interval = setInterval(loadVenueCheckIns, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleResetVenueCheckIn = async (appId: string, candidateName: string) => {
+    const ok = await resetVenueCheckIn(appId);
+    if (ok) {
+      setVenueCheckIns((prev) => {
+        const next = { ...prev };
+        delete next[appId];
+        return next;
+      });
+      setBulkActionToast({
+        message: `Cleared venue check-in status for ${candidateName}.`,
+        type: 'info',
+      });
+      setTimeout(() => setBulkActionToast(null), 3500);
+    }
+  };
+
+  const renderVenueBadge = (app: JobApplication) => {
+    const checkin = venueCheckIns[app.id];
+    if (!checkin) return null;
+    return (
+      <div
+        className="mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-900 dark:bg-emerald-950/90 dark:text-emerald-300 border border-emerald-400/70 dark:border-emerald-700 shadow-2xs"
+        title={`Checked in at venue: ${checkin.checkedInTimeDisplay} (${checkin.checkedInDateDisplay})`}
+      >
+        <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+        <span>At Venue{checkin.checkedInTimeDisplay ? ` • ${checkin.checkedInTimeDisplay}` : ''}</span>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleResetVenueCheckIn(app.id, app.applicant_name);
+          }}
+          className="ml-0.5 text-emerald-700 dark:text-emerald-400 hover:text-rose-600 dark:hover:text-rose-400 font-black cursor-pointer"
+          title="Clear venue check-in status"
+        >
+          ×
+        </button>
+      </div>
+    );
+  };
+
   const handleRefresh = async () => {
-    if (onRefreshApplications) {
-      setIsRefreshing(true);
-      try {
-        await onRefreshApplications();
-        setToggleToast('Live applications refreshed from database');
-        setTimeout(() => setToggleToast(null), 3000);
-      } finally {
-        setIsRefreshing(false);
-      }
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        onRefreshApplications ? onRefreshApplications() : Promise.resolve(),
+        loadVenueCheckIns(),
+      ]);
+      setToggleToast('Live applications & venue check-ins refreshed');
+      setTimeout(() => setToggleToast(null), 3000);
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -416,7 +473,9 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
         ? !matchedJob
         : matchedJob?.id === selectedPostingFilter;
 
-    const matchesStatus = statusFilter === 'All' || app.status === statusFilter;
+    const matchesStatus =
+      statusFilter === 'All' ||
+      (statusFilter === 'at_venue' ? Boolean(venueCheckIns[app.id]) : app.status === statusFilter);
     const q = searchQuery.toLowerCase().trim();
     const matchesSearch =
       !q ||
@@ -1040,6 +1099,30 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                     {st}
                   </button>
                 ))}
+                {(() => {
+                  const checkedInCount = safeApps.filter((a) => Boolean(venueCheckIns[a.id])).length;
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => setStatusFilter('at_venue')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center space-x-1.5 border ${
+                        statusFilter === 'at_venue'
+                          ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
+                          : checkedInCount > 0
+                          ? isDark
+                            ? 'bg-emerald-950/60 border-emerald-700/70 text-emerald-300 hover:bg-emerald-900/60'
+                            : 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100'
+                          : isDark
+                          ? 'border-slate-700 text-slate-400 hover:bg-slate-800'
+                          : 'border-slate-200 text-slate-500 hover:bg-slate-100'
+                      }`}
+                      title="Filter candidates who have been scanned & checked in at the interview venue"
+                    >
+                      <span className={`inline-block w-2 h-2 rounded-full ${checkedInCount > 0 ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'}`} />
+                      <span>At Venue ({checkedInCount})</span>
+                    </button>
+                  );
+                })()}
               </div>
             </div>
 
@@ -1352,19 +1435,22 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                           </td>
 
                           <td className="py-4 px-4 sm:px-5">
-                            <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase border ${
-                              app.status === 'new'
-                                ? 'bg-blue-100 text-blue-900 dark:bg-blue-950/80 dark:text-blue-300 border-blue-300/60 dark:border-blue-700/50'
-                                : app.status === 'shortlisted'
-                                ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/80 dark:text-purple-300 border-purple-300/60 dark:border-purple-700/50'
-                                : app.status === 'interviewed'
-                                ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300/60 dark:border-amber-700/50'
-                                : app.status === 'hired'
-                                ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300/60 dark:border-emerald-700/50'
-                                : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
-                            }`}>
-                              {app.status}
-                            </span>
+                            <div className="flex flex-col items-start">
+                              <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase border ${
+                                app.status === 'new'
+                                  ? 'bg-blue-100 text-blue-900 dark:bg-blue-950/80 dark:text-blue-300 border-blue-300/60 dark:border-blue-700/50'
+                                  : app.status === 'shortlisted'
+                                  ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/80 dark:text-purple-300 border-purple-300/60 dark:border-purple-700/50'
+                                  : app.status === 'interviewed'
+                                  ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300/60 dark:border-amber-700/50'
+                                  : app.status === 'hired'
+                                  ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300/60 dark:border-emerald-700/50'
+                                  : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
+                              }`}>
+                                {app.status}
+                              </span>
+                              {renderVenueBadge(app)}
+                            </div>
                           </td>
 
                           <td className="py-4 px-4 sm:px-5">
@@ -1775,19 +1861,22 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                       </td>
 
                                       <td className="py-3.5 px-4 sm:px-5">
-                                        <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase border ${
-                                          app.status === 'new'
-                                            ? 'bg-blue-100 text-blue-900 dark:bg-blue-950/80 dark:text-blue-300 border-blue-300/60 dark:border-blue-700/50'
-                                            : app.status === 'shortlisted'
-                                            ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/80 dark:text-purple-300 border-purple-300/60 dark:border-purple-700/50'
-                                            : app.status === 'interviewed'
-                                            ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300/60 dark:border-amber-700/50'
-                                            : app.status === 'hired'
-                                            ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300/60 dark:border-emerald-700/50'
-                                            : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
-                                        }`}>
-                                          {app.status}
-                                        </span>
+                                        <div className="flex flex-col items-start">
+                                          <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase border ${
+                                            app.status === 'new'
+                                              ? 'bg-blue-100 text-blue-900 dark:bg-blue-950/80 dark:text-blue-300 border-blue-300/60 dark:border-blue-700/50'
+                                              : app.status === 'shortlisted'
+                                              ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/80 dark:text-purple-300 border-purple-300/60 dark:border-purple-700/50'
+                                              : app.status === 'interviewed'
+                                              ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300/60 dark:border-amber-700/50'
+                                              : app.status === 'hired'
+                                              ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300/60 dark:border-emerald-700/50'
+                                              : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
+                                          }`}>
+                                            {app.status}
+                                          </span>
+                                          {renderVenueBadge(app)}
+                                        </div>
                                       </td>
 
                                       <td className="py-3.5 px-4 sm:px-5">
@@ -2071,19 +2160,22 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                     </td>
 
                                     <td className="py-3.5 px-4 sm:px-5">
-                                      <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase border ${
-                                        app.status === 'new'
-                                          ? 'bg-blue-100 text-blue-900 dark:bg-blue-950/80 dark:text-blue-300 border-blue-300/60 dark:border-blue-700/50'
-                                          : app.status === 'shortlisted'
-                                          ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/80 dark:text-purple-300 border-purple-300/60 dark:border-purple-700/50'
-                                          : app.status === 'interviewed'
-                                          ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300/60 dark:border-amber-700/50'
-                                          : app.status === 'hired'
-                                          ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300/60 dark:border-emerald-700/50'
-                                          : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
-                                      }`}>
-                                        {app.status}
-                                      </span>
+                                      <div className="flex flex-col items-start">
+                                        <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase border ${
+                                          app.status === 'new'
+                                            ? 'bg-blue-100 text-blue-900 dark:bg-blue-950/80 dark:text-blue-300 border-blue-300/60 dark:border-blue-700/50'
+                                            : app.status === 'shortlisted'
+                                            ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/80 dark:text-purple-300 border-purple-300/60 dark:border-purple-700/50'
+                                            : app.status === 'interviewed'
+                                            ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 border-amber-300/60 dark:border-amber-700/50'
+                                            : app.status === 'hired'
+                                            ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-300 border-emerald-300/60 dark:border-emerald-700/50'
+                                            : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700'
+                                        }`}>
+                                          {app.status}
+                                        </span>
+                                        {renderVenueBadge(app)}
+                                      </div>
                                     </td>
 
                                     <td className="py-3.5 px-4 sm:px-5">
