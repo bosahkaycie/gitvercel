@@ -53,12 +53,10 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
   const [interviewMode, setInterviewMode] = useState<'virtual' | 'physical'>('virtual');
   const [meetingLink, setMeetingLink] = useState('https://meet.google.com/pigl-technical-interview');
   const [interviewLocation, setInterviewLocation] = useState(
-    'PIGL Operations Base, #3 Diamond Close, Castle & Green Estate, Off Eneka Link Road, Port Harcourt'
+    'PIGL Operations Base, #3 Diamond Close, Castle & Green Estate, Off Eneka Link Road, Port Harcourt.'
   );
-  const [interviewerNames, setInterviewerNames] = useState('Technical Screening Committee & Operations Team');
-  const [specialInstructions, setSpecialInstructions] = useState(
-    'Please ensure you have copies of your educational certificates, professional licenses (e.g., SURCON/COREN), and portfolio available.'
-  );
+  const [interviewerNames, setInterviewerNames] = useState('Recruitment and Technical Evaluation Team');
+  const [specialInstructions, setSpecialInstructions] = useState('');
 
   // Offer parameters
   const [startDate, setStartDate] = useState(() => {
@@ -110,12 +108,16 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
     const candidateName = app?.applicant_name
       ? app.applicant_name
       : (isBulk ? '{candidate_name}' : 'Candidate');
+    const uniqueRoles = Array.from(new Set(applications.map((a) => a.job_title).filter(Boolean)));
+    const resolvedRole = app?.job_title
+      ? app.job_title
+      : (isBulk && uniqueRoles.length === 1 ? uniqueRoles[0] : (isBulk ? '{job_title}' : 'Engineering Role'));
     return {
       type: emailType,
       applicationId: app?.id || 'preview',
       candidateName,
       candidateEmail: app?.applicant_email || '',
-      jobTitle: app?.job_title || 'Engineering Role',
+      jobTitle: resolvedRole,
       interviewDate,
       interviewTime,
       interviewMode,
@@ -712,7 +714,7 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
                       {/* Special Instructions */}
                       <div className="sm:col-span-2">
                         <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                          Special Candidate Instructions / What to Bring
+                          Custom Instructions (Optional — Leave blank for automatic role-specific text)
                         </label>
                         <textarea
                           rows={2}
@@ -721,7 +723,7 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
                             setSpecialInstructions(e.target.value);
                             setIsCustomEdited(false);
                           }}
-                          placeholder="Original certificates, licenses, portfolio..."
+                          placeholder="Leave blank to auto-tailor per role (certificates, certifications, portfolio)..."
                           className={`w-full px-3 py-2 rounded-xl text-xs font-medium border focus:ring-2 focus:ring-emerald-500 focus:outline-none ${
                             isDark
                               ? 'bg-slate-900 border-slate-700 text-white'
@@ -751,10 +753,10 @@ export const ApplicantEmailDrawer: React.FC<ApplicantEmailDrawerProps> = ({
                           />
                           <div className="text-xs">
                             <span className={`font-bold block ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                              Embed Venue Check-In QR Pass
+                              Embed Silent Reception Check-In QR Code
                             </span>
                             <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                              Adds a compact QR pass with candidate name, role &amp; interview time. Scanning at the venue automatically marks the candidate as arrived on the Admin Dashboard.
+                              Embeds only the clean QR code with no visible data. Scanning prompts for the Receptionist Access Code before admitting the candidate.
                             </span>
                           </div>
                         </label>

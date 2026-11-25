@@ -23,6 +23,12 @@ export interface VenueCheckInRecord {
   attendantNote?: string;
 }
 
+export interface ReceptionistGateCode {
+  accessCode: string;
+  generatedAt?: string | null;
+  generatedDisplay?: string | null;
+}
+
 const PASS_BASE_URL = 'https://polarisigl.com/interview-pass';
 const PROD_CHECKIN_API = 'https://polarisigl.com/api/interview-checkin.php';
 
@@ -111,5 +117,55 @@ export async function resetVenueCheckIn(applicationId: string): Promise<boolean>
   } catch (err) {
     console.warn('Could not reset venue check-in:', err);
     return false;
+  }
+}
+
+/**
+ * Fetches the current active admin-generated Receptionist Access Code.
+ */
+export async function fetchReceptionistGateCode(): Promise<ReceptionistGateCode | null> {
+  try {
+    const res = await fetch(`${getCheckInApiUrl()}?action=get-code&_t=${Date.now()}`, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data && data.success && data.accessCode) {
+      return {
+        accessCode: data.accessCode,
+        generatedAt: data.generatedAt || null,
+        generatedDisplay: data.generatedDisplay || null,
+      };
+    }
+    return null;
+  } catch (err) {
+    console.warn('Could not fetch receptionist access code:', err);
+    return null;
+  }
+}
+
+/**
+ * Generates and activates a new unique Receptionist Access Code (invalidating any old code).
+ */
+export async function generateNewReceptionistGateCode(): Promise<ReceptionistGateCode | null> {
+  try {
+    const res = await fetch(`${getCheckInApiUrl()}?action=generate-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data && data.success && data.accessCode) {
+      return {
+        accessCode: data.accessCode,
+        generatedAt: data.generatedAt || null,
+        generatedDisplay: data.generatedDisplay || null,
+      };
+    }
+    return null;
+  } catch (err) {
+    console.warn('Could not generate new receptionist access code:', err);
+    return null;
   }
 }

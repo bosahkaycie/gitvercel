@@ -61,40 +61,65 @@ export function getDefaultSubject(type: ApplicantEmailType, jobTitle: string, ca
   }
 }
 
+/**
+ * Returns a concise, role-specific preparation instruction for the interview email.
+ */
+export function getRolePreparationNote(jobTitle: string, interviewMode: 'virtual' | 'physical' = 'physical'): string {
+  const r = (jobTitle || '').toLowerCase();
+  const isOnline = interviewMode === 'virtual';
+  const prefix = isOnline ? 'Please have soft copies of' : 'Please come with copies of';
+  const suffix = isOnline ? ' ready for reference during the session.' : '.';
+
+  if (r.includes('survey') || r.includes('hydrographic') || r.includes('geophysical') || r.includes('marine') || r.includes('data processor')) {
+    return `${prefix} your educational certificates, relevant professional certifications (e.g., SURCON) and a summary of your survey project experience${suffix}`;
+  }
+  if (r.includes('civil') || r.includes('pipeline') || r.includes('geotechnical') || r.includes('facilities') || r.includes('engineer')) {
+    return `${prefix} your educational certificates, relevant professional certifications (e.g., COREN/NSE) and a portfolio of your engineering projects${suffix}`;
+  }
+  if (r.includes('project manager') || r.includes('manager')) {
+    return `${prefix} your educational certificates, relevant professional certifications and a portfolio of your work${suffix}`;
+  }
+  return `${prefix} your educational certificates, relevant professional certifications and a portfolio of your work${suffix}`;
+}
+
 export function getDefaultMessage(params: ApplicantEmailParams): string {
-  const { type, candidateName, jobTitle, interviewDate, interviewTime, interviewMode, meetingLink, interviewLocation, interviewerNames, specialInstructions, startDate, department } = params;
+  const { type, candidateName, jobTitle, interviewDate, interviewTime, interviewMode, meetingLink, interviewLocation, specialInstructions, startDate, department } = params;
   const role = jobTitle || 'the position';
   const formattedDate = formatReadableDate(interviewDate);
 
   switch (type) {
     case 'interview': {
-      const modeText = interviewMode === 'virtual' ? 'virtual video conference' : 'in-person meeting';
-      const venueText = interviewMode === 'virtual' 
-        ? (meetingLink ? `Meeting Link: ${meetingLink}` : 'A video conference link will be shared prior to the session.') 
-        : (interviewLocation || 'PIGL Corporate Operations Base, #3 Diamond Close, Castle & Green Estate, Off Eneka Link Road, Port Harcourt, Rivers State');
+      const isOnline = interviewMode === 'virtual';
+      const modePhrase = isOnline ? 'an online interview' : 'an in-person interview';
+      const venueLine = isOnline
+        ? `Meeting Link: ${meetingLink || 'A video meeting link will be shared prior to the session.'}`
+        : `Venue: ${interviewLocation || 'PIGL Operations Base, #3 Diamond Close, Castle & Green Estate, Off Eneka Link Road, Port Harcourt.'}`;
+      const prepLine = (specialInstructions && specialInstructions.trim())
+        ? specialInstructions.trim()
+        : getRolePreparationNote(role, isOnline ? 'virtual' : 'physical');
+      const closingLine = isOnline ? 'We look forward to speaking with you.' : 'We look forward to meeting you.';
 
       return `Dear ${candidateName},
 
-Thank you for your interest in joining Polaris Integrated & GeoSolutions Limited (PIGL) and for submitting your application for the ${role} position.
+Thank you for applying for the position of ${role} at Polaris Integrated & GeoSolutions Limited (PIGL).
 
-Following a thorough evaluation of your qualifications and experience, we are pleased to invite you for an interview (${modeText}) with our recruitment and technical evaluation panel.
+We are pleased to invite you for ${modePhrase} with our recruitment and technical evaluation team.
 
-Interview Details:
-• Date: ${formattedDate || '[Interview Date]'}
-• Time: ${interviewTime || '[Interview Time] (WAT)'}
-• Format: ${interviewMode === 'virtual' ? 'Virtual Video Conference' : 'In-Person Assessment'}
-• Location / Access: ${venueText}
-• Interview Panel: ${interviewerNames || 'Technical Assessment Committee & HR'}
+Interview Details
 
-${specialInstructions ? `Special Instructions / Requirements:\n${specialInstructions}\n` : `Please ensure you have copies of your educational certificates, professional licenses, and relevant project portfolio ready for discussion.`}
+Date: ${formattedDate || '[Interview Date]'}
+Time: ${interviewTime || '[Interview Time] (WAT)'}
+${venueLine}
 
-Please reply directly to this email to confirm your availability at the scheduled time. If you require any scheduling adjustments, let us know as soon as possible.
+${prepLine}
 
-We look forward to discussing how your background and skills align with our ongoing engineering and survey operations.
+Kindly reply to this email to confirm your availability. If you require an alternative interview time, please let us know.
 
-Warm regards,
+${closingLine}
+
+Kind regards,
 Recruitment & Human Resources Team
-Polaris Integrated & GeoSolutions Limited`;
+Polaris Integrated & GeoSolutions Limited (PIGL)`;
     }
 
     case 'shortlisted': {
@@ -203,26 +228,30 @@ export function generateApplicantEmailHtml(params: ApplicantEmailParams): string
   const formattedParagraphs = messageText
     .split('\n\n')
     .map(p => {
-      const escaped = p
+      const trimmed = p.trim();
+      const escaped = trimmed
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/\n/g, '<br/>');
+
+      if (trimmed === 'Interview Details' || trimmed === 'Offer Highlights:') {
+        return `<p style="margin: 20px 0 8px 0; font-size: 15px; font-weight: 700; color: #0f172a;">${escaped}</p>`;
+      }
       return `<p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.65; color: #1e293b;">${escaped}</p>`;
     })
     .join('');
 
   // Optional join button for virtual interviews
   const actionButtonHtml = (type === 'interview' && interviewMode === 'virtual' && meetingLink) ? `
-    <div style="margin: 20px 0 24px 0;">
+    <div style="margin: 18px 0 22px 0;">
       <a href="${meetingLink}" target="_blank" style="display: inline-block; background-color: #065f46; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 13.5px; padding: 10px 22px; border-radius: 4px;">
         Join Video Meeting &rarr;
       </a>
     </div>
   ` : '';
 
-  // Clean, uncluttered Venue Check-In QR Pass (only when enabled on interview invitations)
-  const formattedDate = formatReadableDate(interviewDate);
+  // Silent, unobtrusive embedded QR code (no text or data displayed alongside it; gated for office administrators)
   const qrPassHtml = (type === 'interview' && includeQrPass) ? (() => {
     const qrUrl = buildInterviewQrImageUrl({
       applicationId: applicationId || 'preview',
@@ -232,41 +261,10 @@ export function generateApplicantEmailHtml(params: ApplicantEmailParams): string
       interviewTime: interviewTime || '',
     }, 150);
 
-    const scheduleLine = [formattedDate, interviewTime].filter(Boolean).join(' • ') || 'As Scheduled';
-
     return `
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 24px 0 6px 0; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
-        <tr>
-          <td style="padding: 16px;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-              <tr>
-                <td width="116" valign="top" style="padding-right: 16px;">
-                  <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px; display: inline-block; line-height: 0;">
-                    <img src="${qrUrl}" alt="Interview Venue Check-In QR Code" width="104" height="104" style="display: block; width: 104px; height: 104px; border: 0;" />
-                  </div>
-                </td>
-                <td valign="middle" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-                  <p style="margin: 0 0 4px 0; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #065f46;">
-                    Interview Venue Check-In Pass
-                  </p>
-                  <p style="margin: 0 0 3px 0; font-size: 15px; font-weight: 700; color: #0f172a;">
-                    ${escapeHtml(candidateName || 'Candidate')}
-                  </p>
-                  <p style="margin: 0 0 4px 0; font-size: 13px; font-weight: 600; color: #334155;">
-                    ${escapeHtml(jobTitle || 'Role')}
-                  </p>
-                  <p style="margin: 0 0 8px 0; font-size: 12.5px; color: #475569;">
-                    ${escapeHtml(scheduleLine)}
-                  </p>
-                  <p style="margin: 0; font-size: 11.5px; color: #64748b; line-height: 1.45;">
-                    Present this QR code to the attendant at the interview venue upon arrival for quick check-in.
-                  </p>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
+      <div style="margin: 22px 0 4px 0; line-height: 0;">
+        <img src="${qrUrl}" alt="" width="96" height="96" style="display: block; width: 96px; height: 96px; border: 0;" />
+      </div>
     `;
   })() : '';
 

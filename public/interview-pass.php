@@ -1,7 +1,7 @@
 <?php
 /**
  * Polaris Integrated & GeoSolutions (PIGL)
- * Mobile Interview Check-In Pass Page (Scanned by Venue Attendant)
+ * Gated Mobile Interview Check-In Pass Page (Admin Access Code Required)
  */
 
 header("Cache-Control: no-cache, no-store, must-revalidate");
@@ -43,23 +43,11 @@ if (!empty($_GET['d'])) {
 
 $isValid = $candidate['n'] !== '' && $candidate['id'] !== '';
 
-// Format date cleanly if ISO YYYY-MM-DD
 $formattedDate = $candidate['dt'];
 if ($formattedDate !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $formattedDate)) {
     $dtObj = DateTime::createFromFormat('Y-m-d', $formattedDate);
     if ($dtObj) {
         $formattedDate = $dtObj->format('l, j F Y');
-    }
-}
-
-// Check current server check-in state directly so page renders instantly with real state
-$existingCheckin = null;
-$storeFile = __DIR__ . '/data/interview_checkins.json';
-if ($isValid && file_exists($storeFile)) {
-    $raw = @file_get_contents($storeFile);
-    $all = $raw ? json_decode($raw, true) : null;
-    if (is_array($all) && isset($all[$candidate['id']])) {
-        $existingCheckin = $all[$candidate['id']];
     }
 }
 
@@ -73,7 +61,7 @@ $esc = function($str) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Interview Check-In Pass — Polaris Integrated &amp; GeoSolutions</title>
+  <title>Reception Check-In — Polaris Integrated &amp; GeoSolutions</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -103,6 +91,7 @@ $esc = function($str) {
     .body {
       padding: 24px 22px 22px 22px;
     }
+    .hidden { display: none !important; }
     .eyebrow {
       display: inline-flex;
       align-items: center;
@@ -118,8 +107,45 @@ $esc = function($str) {
       border-radius: 999px;
       margin-bottom: 14px;
     }
+    .eyebrow-lock {
+      color: #1e293b;
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .gate-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+    .gate-desc {
+      font-size: 13.5px;
+      color: #475569;
+      line-height: 1.55;
+      margin-bottom: 18px;
+    }
+    .code-input {
+      width: 100%;
+      padding: 13px 14px;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-align: center;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      outline: none;
+      color: #0f172a;
+      background: #f8fafc;
+      margin-bottom: 12px;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .code-input:focus {
+      border-color: #065f46;
+      background: #ffffff;
+    }
     .candidate-name {
-      font-size: 24px;
+      font-size: 23px;
       font-weight: 800;
       color: #0f172a;
       line-height: 1.2;
@@ -168,7 +194,6 @@ $esc = function($str) {
       border: 1.5px solid #10b981;
       color: #065f46;
     }
-    .status-box.hidden { display: none; }
     .status-title {
       font-size: 15px;
       font-weight: 800;
@@ -195,14 +220,23 @@ $esc = function($str) {
     .btn:hover { background: #047857; }
     .btn:active { transform: scale(0.99); }
     .btn:disabled { opacity: 0.65; cursor: not-allowed; }
-    .btn.hidden { display: none; }
     .error-msg {
       margin-top: 10px;
       font-size: 12.5px;
       color: #b91c1c;
       text-align: center;
       font-weight: 600;
-      display: none;
+    }
+    .lock-link {
+      display: block;
+      margin: 14px auto 0 auto;
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
     }
     .footer {
       padding: 14px 22px;
@@ -234,58 +268,81 @@ $esc = function($str) {
     <div class="body">
       <?php if (!$isValid): ?>
         <div class="invalid">
-          <h2>Invalid Interview Pass</h2>
-          <p>This QR code does not contain a valid candidate pass. Please ask the candidate to show the QR code from their official PIGL interview invitation email.</p>
+          <h2>Invalid Code</h2>
+          <p>This QR code is not recognized. Please contact the office administrator for assistance.</p>
         </div>
       <?php else: ?>
-        <div class="eyebrow">Venue Check-In Pass</div>
-        <h1 class="candidate-name"><?php echo $esc($candidate['n']); ?></h1>
-        <p class="position"><?php echo $esc($candidate['r'] ?: 'Interview Candidate'); ?></p>
-
-        <div class="details">
-          <div class="detail-row">
-            <span class="detail-label">Position</span>
-            <span class="detail-value"><?php echo $esc($candidate['r'] ?: 'Specified Role'); ?></span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Interview Date</span>
-            <span class="detail-value"><?php echo $esc($formattedDate ?: 'Scheduled'); ?></span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Interview Time</span>
-            <span class="detail-value"><?php echo $esc($candidate['tm'] ?: 'As Scheduled'); ?></span>
-          </div>
+        <!-- STEP 1: ADMINISTRATIVE ACCESS CODE GATE -->
+        <div id="gateView">
+          <div class="eyebrow eyebrow-lock">Restricted Reception Access</div>
+          <h1 class="gate-title">Administrator Code Required</h1>
+          <p class="gate-desc">
+            Enter the unique receptionist access code provided by the office administrator to verify and admit this candidate.
+          </p>
+          <form id="codeForm">
+            <input
+              id="accessCodeInput"
+              type="text"
+              class="code-input"
+              placeholder="PIGL-XXXXXX"
+              autocomplete="off"
+              autocapitalize="characters"
+              required
+            />
+            <button id="verifyBtn" type="submit" class="btn">
+              Verify Code &amp; Continue
+            </button>
+          </form>
+          <p id="gateError" class="error-msg hidden"></p>
         </div>
 
-        <div id="checkedInBox" class="status-box <?php echo $existingCheckin ? '' : 'hidden'; ?>">
-          <div class="status-title">&#10003; Checked In at Venue</div>
-          <div id="checkedInMeta" class="status-sub">
-            <?php
-              if ($existingCheckin) {
-                $t = isset($existingCheckin['checkedInTimeDisplay']) ? $existingCheckin['checkedInTimeDisplay'] : '';
-                $d = isset($existingCheckin['checkedInDateDisplay']) ? $existingCheckin['checkedInDateDisplay'] : '';
-                echo $esc("Arrived at {$t}" . ($d ? " ({$d})" : ""));
-              }
-            ?>
+        <!-- STEP 2: UNLOCKED CANDIDATE ADMISSION PANEL -->
+        <div id="passView" class="hidden">
+          <div class="eyebrow">Authorized Venue Check-In</div>
+          <h1 class="candidate-name"><?php echo $esc($candidate['n']); ?></h1>
+          <p class="position"><?php echo $esc($candidate['r'] ?: 'Interview Candidate'); ?></p>
+
+          <div class="details">
+            <div class="detail-row">
+              <span class="detail-label">Position</span>
+              <span class="detail-value"><?php echo $esc($candidate['r'] ?: 'Specified Role'); ?></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Interview Date</span>
+              <span class="detail-value"><?php echo $esc($formattedDate ?: 'Scheduled'); ?></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Interview Time</span>
+              <span class="detail-value"><?php echo $esc($candidate['tm'] ?: 'As Scheduled'); ?></span>
+            </div>
           </div>
+
+          <div id="checkedInBox" class="status-box hidden">
+            <div class="status-title">&#10003; Checked In at Venue</div>
+            <div id="checkedInMeta" class="status-sub"></div>
+          </div>
+
+          <button id="checkInBtn" type="button" class="btn">
+            Admit Candidate (Check In)
+          </button>
+
+          <p id="passError" class="error-msg hidden"></p>
+
+          <button id="lockBtn" type="button" class="lock-link">
+            Lock Receptionist Session
+          </button>
         </div>
-
-        <button id="checkInBtn" type="button" class="btn <?php echo $existingCheckin ? 'hidden' : ''; ?>">
-          Confirm Candidate Arrival (Check In)
-        </button>
-
-        <p id="errorMsg" class="error-msg"></p>
       <?php endif; ?>
     </div>
     <div class="footer">
-      Polaris Integrated &amp; GeoSolutions Limited &bull; Reception Verification<br />
-      Check-ins sync immediately with the PIGL Admin Careers Dashboard.
+      Polaris Integrated &amp; GeoSolutions Limited &bull; Authorized Reception Portal
     </div>
   </div>
 
   <?php if ($isValid): ?>
   <script>
     (function () {
+      var STORAGE_KEY = 'pigl_reception_gate_code';
       var candidatePayload = <?php echo json_encode([
         'applicationId' => $candidate['id'],
         'candidateName' => $candidate['n'],
@@ -294,48 +351,149 @@ $esc = function($str) {
         'interviewTime' => $candidate['tm'],
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>;
 
-      var btn = document.getElementById('checkInBtn');
-      var box = document.getElementById('checkedInBox');
-      var meta = document.getElementById('checkedInMeta');
-      var errEl = document.getElementById('errorMsg');
+      var activeAccessCode = '';
 
-      function showCheckedIn(checkin) {
-        if (btn) btn.classList.add('hidden');
-        if (box) box.classList.remove('hidden');
-        if (meta && checkin) {
-          var t = checkin.checkedInTimeDisplay || '';
-          var d = checkin.checkedInDateDisplay || '';
-          meta.textContent = t ? ('Arrived at ' + t + (d ? ' (' + d + ')' : '')) : 'Recorded on Admin Dashboard';
+      var gateView = document.getElementById('gateView');
+      var passView = document.getElementById('passView');
+      var codeForm = document.getElementById('codeForm');
+      var codeInput = document.getElementById('accessCodeInput');
+      var verifyBtn = document.getElementById('verifyBtn');
+      var gateError = document.getElementById('gateError');
+
+      var checkInBtn = document.getElementById('checkInBtn');
+      var checkedInBox = document.getElementById('checkedInBox');
+      var checkedInMeta = document.getElementById('checkedInMeta');
+      var passError = document.getElementById('passError');
+      var lockBtn = document.getElementById('lockBtn');
+
+      function showGate(msg) {
+        activeAccessCode = '';
+        try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) {}
+        passView.classList.add('hidden');
+        gateView.classList.remove('hidden');
+        if (msg) {
+          gateError.textContent = msg;
+          gateError.classList.remove('hidden');
+        } else {
+          gateError.classList.add('hidden');
         }
       }
 
-      if (btn) {
-        btn.addEventListener('click', function () {
-          btn.disabled = true;
-          btn.textContent = 'Checking In...';
-          errEl.style.display = 'none';
-
-          fetch('/api/interview-checkin.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(candidatePayload)
-          })
-            .then(function (r) { return r.json(); })
-            .then(function (res) {
-              if (res && res.success) {
-                showCheckedIn(res.checkin);
-              } else {
-                throw new Error((res && res.error) || 'Failed to record check-in.');
-              }
-            })
-            .catch(function (err) {
-              btn.disabled = false;
-              btn.textContent = 'Confirm Candidate Arrival (Check In)';
-              errEl.textContent = err.message || 'Network error. Please try again.';
-              errEl.style.display = 'block';
-            });
-        });
+      function showCheckedIn(checkin) {
+        checkInBtn.classList.add('hidden');
+        checkedInBox.classList.remove('hidden');
+        if (checkin) {
+          var t = checkin.checkedInTimeDisplay || '';
+          var d = checkin.checkedInDateDisplay || '';
+          checkedInMeta.textContent = t ? ('Admitted at ' + t + (d ? ' (' + d + ')' : '')) : 'Recorded on Admin Dashboard';
+        }
       }
+
+      function showUnlocked(code, checkin) {
+        activeAccessCode = code;
+        try { sessionStorage.setItem(STORAGE_KEY, code); } catch (e) {}
+        gateView.classList.add('hidden');
+        passView.classList.remove('hidden');
+        passError.classList.add('hidden');
+        if (checkin) {
+          showCheckedIn(checkin);
+        } else {
+          checkedInBox.classList.add('hidden');
+          checkInBtn.classList.remove('hidden');
+          checkInBtn.disabled = false;
+          checkInBtn.textContent = 'Admit Candidate (Check In)';
+        }
+      }
+
+      function verifyCode(code, silent) {
+        var clean = (code || '').trim().toUpperCase();
+        if (!clean) return;
+
+        if (!silent) {
+          verifyBtn.disabled = true;
+          verifyBtn.textContent = 'Verifying...';
+          gateError.classList.add('hidden');
+        }
+
+        fetch('/api/interview-checkin.php?action=verify-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            accessCode: clean,
+            applicationId: candidatePayload.applicationId
+          })
+        })
+          .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+          .then(function (res) {
+            if (res.ok && res.data && res.data.verified) {
+              showUnlocked(clean, res.data.checkin || null);
+            } else {
+              if (silent) {
+                showGate('');
+              } else {
+                showGate((res.data && res.data.error) || 'Invalid administrative access code.');
+              }
+            }
+          })
+          .catch(function () {
+            if (!silent) {
+              showGate('Network error. Please try again.');
+            }
+          })
+          .finally(function () {
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = 'Verify Code & Continue';
+          });
+      }
+
+      // Auto-verify if receptionist already unlocked this session on their device
+      try {
+        var saved = sessionStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          verifyCode(saved, true);
+        }
+      } catch (e) {}
+
+      codeForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        verifyCode(codeInput.value, false);
+      });
+
+      checkInBtn.addEventListener('click', function () {
+        checkInBtn.disabled = true;
+        checkInBtn.textContent = 'Recording Admission...';
+        passError.classList.add('hidden');
+
+        var body = Object.assign({}, candidatePayload, { accessCode: activeAccessCode });
+        fetch('/api/interview-checkin.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        })
+          .then(function (r) { return r.json().then(function (d) { return { status: r.status, ok: r.ok, data: d }; }); })
+          .then(function (res) {
+            if (res.status === 403) {
+              showGate('Access code has changed or expired. Please enter the new code from the administrator.');
+              return;
+            }
+            if (res.ok && res.data && res.data.success) {
+              showCheckedIn(res.data.checkin);
+            } else {
+              throw new Error((res.data && res.data.error) || 'Failed to record admission.');
+            }
+          })
+          .catch(function (err) {
+            checkInBtn.disabled = false;
+            checkInBtn.textContent = 'Admit Candidate (Check In)';
+            passError.textContent = err.message || 'Network error. Please try again.';
+            passError.classList.remove('hidden');
+          });
+      });
+
+      lockBtn.addEventListener('click', function () {
+        codeInput.value = '';
+        showGate('');
+      });
     })();
   </script>
   <?php endif; ?>

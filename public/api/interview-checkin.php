@@ -1,8 +1,9 @@
 <?php
 /**
  * Polaris Integrated & GeoSolutions (PIGL)
- * Interview Venue Check-In API Handler for Hostinger
- * Stores live candidate venue arrivals in ../data/interview_checkins.json
+ * Gated Interview Venue Check-In API Handler for Hostinger
+ * - Stores live venue arrivals in ../data/interview_checkins.json
+ * - Stores admin-generated receptionist access code in ../data/checkin_config.json
  */
 
 header("Access-Control-Allow-Origin: *");
@@ -22,9 +23,10 @@ if (!is_dir($data_dir)) {
     @mkdir($data_dir, 0755, true);
 }
 
-$store_file = $data_dir . '/interview_checkins.json';
+$store_file  = $data_dir . '/interview_checkins.json';
+$config_file = $data_dir . '/checkin_config.json';
 
-function read_checkins($file) {
+function read_json_file($file) {
     if (!file_exists($file)) {
         return [];
     }
@@ -36,16 +38,134 @@ function read_checkins($file) {
     return is_array($decoded) ? $decoded : [];
 }
 
-function write_checkins($file, $data) {
+function write_json_file($file, $data) {
     $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     return @file_put_contents($file, $json, LOCK_EX) !== false;
 }
 
-$method = $_SERVER['REQUEST_METHOD'];
+function generate_access_code() {
+    // Unambiguous uppercase characters & digits (no 0/O, 1/I)
+    $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    $suffix = '';
+    for ($i = 0; $i < 6; $i++) {
+        $suffix .= $chars[random_int(0, strlen($chars) - 1)];
+    }
+    return 'PIGL-' . $suffix;
+}
 
-// GET: Fetch all check-ins or a specific candidate's check-in by ?id=...
+function get_or_init_code_config($config_file) {
+    $cfg = read_json_file($config_file);
+    if (!empty($cfg['accessCode'])) {
+        return $cfg;
+    }
+    $tz = new DateTimeZone('Africa/Lagos');
+    $now = new DateTime('now', $tz);
+    $cfg = [
+        'accessCode' => generate_access_code(),
+        'generatedAt' => $now->format(DateTime::ATOM),
+        'generatedDisplay' => $now->format('D, j M Y • g:i A') . ' WAT',
+    ];
+    write_json_file($config_file, $cfg);
+    return $cfg;
+}
+
+function is_valid_code($submitted, $config_file) {
+    $cfg = get_or_init_code_config($config_file);
+    $expected = strtoupper(trim((string)($cfg['accessCode'] ?? '')));
+    $actual   = strtoupper(trim((string)$submitted));
+    if ($expected === '' || $actual === '') {
+        return false;
+    }
+    return hash_equals($expected, $actual);
+}
+
+$method = $_SERVER['REQUEST_METHOD'];
+$action = isset($_GET['action']) ? trim((string)$_GET['action']) : '';
+
+// =============================================================================
+// ACTION: GET ACTIVE RECEPTIONIST CODE (Admin Dashboard)
+// =============================================================================
+if ($method === 'GET' && $action === 'get-code') {
+    $cfg = get_or_init_code_config($config_file);
+    echo json_encode([
+        'success' => true,
+        'accessCode' => $cfg['accessCode'],
+        'generatedAt' => $cfg['generatedAt'] ?? null,
+        'generatedDisplay' => $cfg['generatedDisplay'] ?? null,
+    ]);
+    exit();
+}
+
+// =============================================================================
+// ACTION: GENERATE / ROTATE RECEPTIONIST CODE (Admin Dashboard)
+// =============================================================================
+if ($method === 'POST' && $action === 'generate-code') {
+    $tz = new DateTimeZone('Africa/Lagos');
+    $now = new DateTime('now', $tz);
+    $cfg = [
+        'accessCode' => generate_access_code(),
+        'generatedAt' => $now->format(DateTime::ATOM),
+        'generatedDisplay' => $now->format('D, j M Y • g:i A') . ' WAT',
+    ];
+    if (!write_json_file($config_file, $cfg)) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => 'Failed to save new receptionist code.']);
+        exit();
+    }
+    echo json_encode([
+        'success' => true,
+        'accessCode' => $cfg['accessCode'],
+        'generatedAt' => $cfg['generatedAt'],
+        'generatedDisplay' => $cfg['generatedDisplay'],
+    ]);
+    exit();
+}
+
+// =============================================================================
+// ACTION: VERIFY RECEPTIONIST CODE & RETURN CANDIDATE CHECK-IN STATE
+// =============================================================================
+if ($method === 'POST' && $action === 'verify-code') {
+    $raw_input = file_get_contents('php://input');
+    $payload = json_decode($raw_input, true);
+    if (!is_array($payload)) {
+        $payload = $_POST;
+    }
+
+    $submitted_code = isset($payload['accessCode']) ? (string)$payload['accessCode'] : '';
+    $app_id = isset($payload['applicationId']) ? trim((string)$payload['applicationId']) : '';
+
+    if (!is_valid_code($submitted_code, $config_file)) {
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'verified' => false,
+            'error' => 'Invalid administrative access code. Please check with the office administrator.',
+        ]);
+        exit();
+    }
+
+    $checkin = null;
+    if ($app_id !== '') {
+        $checkins = read_json_file($store_file);
+        if (isset($checkins[$app_id])) {
+            $checkin = $checkins[$app_id];
+        }
+    }
+
+    echo json_encode([
+        'success' => true,
+        'verified' => true,
+        'checkedIn' => $checkin !== null,
+        'checkin' => $checkin,
+    ]);
+    exit();
+}
+
+// =============================================================================
+// GET: Fetch all check-ins (Admin Dashboard) or single record by ?id=...
+// =============================================================================
 if ($method === 'GET') {
-    $checkins = read_checkins($store_file);
+    $checkins = read_json_file($store_file);
     $id = isset($_GET['id']) ? trim((string)$_GET['id']) : '';
 
     if ($id !== '') {
@@ -66,12 +186,24 @@ if ($method === 'GET') {
     exit();
 }
 
-// POST: Record a candidate arrival / check-in at the interview venue
+// =============================================================================
+// POST: Gated Candidate Check-In (REQUIRES valid admin-generated accessCode)
+// =============================================================================
 if ($method === 'POST') {
     $raw_input = file_get_contents('php://input');
     $payload = json_decode($raw_input, true);
     if (!is_array($payload)) {
         $payload = $_POST;
+    }
+
+    $submitted_code = isset($payload['accessCode']) ? (string)$payload['accessCode'] : '';
+    if (!is_valid_code($submitted_code, $config_file)) {
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'error' => 'Unauthorized: A valid administrative access code is required to admit candidates.',
+        ]);
+        exit();
     }
 
     $app_id = isset($payload['applicationId']) ? trim((string)$payload['applicationId']) : '';
@@ -90,9 +222,8 @@ if ($method === 'POST') {
         exit();
     }
 
-    $checkins = read_checkins($store_file);
+    $checkins = read_json_file($store_file);
 
-    // If already checked in, preserve original arrival time unless forced
     if (isset($checkins[$app_id]) && empty($payload['force'])) {
         echo json_encode([
             'success' => true,
@@ -119,7 +250,7 @@ if ($method === 'POST') {
 
     $checkins[$app_id] = $record;
 
-    if (!write_checkins($store_file, $checkins)) {
+    if (!write_json_file($store_file, $checkins)) {
         http_response_code(500);
         echo json_encode([
             'success' => false,
@@ -136,7 +267,9 @@ if ($method === 'POST') {
     exit();
 }
 
-// DELETE: Reset / remove a candidate's venue check-in status (admin action)
+// =============================================================================
+// DELETE: Reset / remove a candidate's venue check-in status (Admin Dashboard)
+// =============================================================================
 if ($method === 'DELETE') {
     $id = isset($_GET['id']) ? trim((string)$_GET['id']) : '';
     if ($id === '') {
@@ -153,10 +286,10 @@ if ($method === 'DELETE') {
         exit();
     }
 
-    $checkins = read_checkins($store_file);
+    $checkins = read_json_file($store_file);
     if (isset($checkins[$id])) {
         unset($checkins[$id]);
-        write_checkins($store_file, $checkins);
+        write_json_file($store_file, $checkins);
     }
 
     echo json_encode(['success' => true, 'removedId' => $id]);

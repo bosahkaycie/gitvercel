@@ -2,7 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { JobApplication, JobOpening } from '../../types';
 import { useSiteSettings, extractCoverLetterMeta } from '../../hooks/useSupabaseData';
 import { downloadApplicationsZip, DownloadProgress } from '../../utils/cvDownloader';
-import { fetchVenueCheckIns, resetVenueCheckIn, VenueCheckInRecord } from '../../utils/interviewPass';
+import {
+  fetchVenueCheckIns,
+  resetVenueCheckIn,
+  VenueCheckInRecord,
+  fetchReceptionistGateCode,
+  generateNewReceptionistGateCode,
+  ReceptionistGateCode,
+} from '../../utils/interviewPass';
 import { ApplicantEmailDrawer } from '../../components/admin/ApplicantEmailDrawer';
 import {
   IconCareers,
@@ -72,6 +79,8 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
 
   // Live Venue Check-Ins synced from QR pass scans at the interview venue
   const [venueCheckIns, setVenueCheckIns] = useState<Record<string, VenueCheckInRecord>>({});
+  const [gateCode, setGateCode] = useState<ReceptionistGateCode | null>(null);
+  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
 
   const loadVenueCheckIns = async () => {
     const records = await fetchVenueCheckIns();
@@ -80,9 +89,39 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
 
   useEffect(() => {
     loadVenueCheckIns();
+    fetchReceptionistGateCode().then((c) => {
+      if (c) setGateCode(c);
+    });
     const interval = setInterval(loadVenueCheckIns, 15000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleGenerateGateCode = async () => {
+    setIsGeneratingCode(true);
+    try {
+      const nextCode = await generateNewReceptionistGateCode();
+      if (nextCode) {
+        setGateCode(nextCode);
+        setBulkActionToast({
+          message: `New Receptionist Access Code generated: ${nextCode.accessCode} (previous code invalidated)`,
+          type: 'success',
+        });
+        setTimeout(() => setBulkActionToast(null), 5000);
+      }
+    } finally {
+      setIsGeneratingCode(false);
+    }
+  };
+
+  const handleCopyGateCode = () => {
+    if (!gateCode?.accessCode) return;
+    navigator.clipboard.writeText(gateCode.accessCode);
+    setBulkActionToast({
+      message: `Copied Receptionist Code (${gateCode.accessCode}) to clipboard`,
+      type: 'info',
+    });
+    setTimeout(() => setBulkActionToast(null), 3000);
+  };
 
   const handleResetVenueCheckIn = async (appId: string, candidateName: string) => {
     const ok = await resetVenueCheckIn(appId);
@@ -937,6 +976,63 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
       {/* Applications View */}
       {activeTab === 'applications' && (
         <div className="space-y-5">
+          {/* Receptionist Venue Check-In Access Code Panel */}
+          <div className={`p-4 rounded-2xl border shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3 transition-colors ${
+            isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
+          }`}>
+            <div className="flex items-start sm:items-center space-x-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-base ${
+                isDark ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+              }`}>
+                🔐
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-sm font-bold tracking-tight">Receptionist QR Check-In Code</h3>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider ${
+                    isDark ? 'bg-slate-800 text-emerald-300 border border-slate-700' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  }`}>
+                    Gated Admissions
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Share this unique code with the venue receptionist. Scanning a candidate&apos;s email QR code requires this code before admission.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center flex-wrap gap-2 shrink-0 self-end md:self-center">
+              <div className={`px-3.5 py-2 rounded-xl border font-mono text-sm font-black tracking-widest select-all ${
+                isDark ? 'bg-slate-950 border-emerald-700/70 text-emerald-300' : 'bg-slate-50 border-emerald-300 text-emerald-900'
+              }`}>
+                {gateCode?.accessCode || 'Loading...'}
+              </div>
+              <button
+                type="button"
+                disabled={!gateCode?.accessCode}
+                onClick={handleCopyGateCode}
+                className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center space-x-1.5 transition-colors cursor-pointer disabled:opacity-50 ${
+                  isDark
+                    ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
+                    : 'bg-white hover:bg-slate-100 border-slate-300 text-slate-700'
+                }`}
+                title="Copy access code to send to receptionist"
+              >
+                <IconCopy className="w-3.5 h-3.5" />
+                <span>Copy</span>
+              </button>
+              <button
+                type="button"
+                disabled={isGeneratingCode}
+                onClick={handleGenerateGateCode}
+                className="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
+                title="Generate a brand-new code and immediately invalidate the old one"
+              >
+                {isGeneratingCode ? 'Generating...' : 'Generate New Code'}
+              </button>
+            </div>
+          </div>
+
           {/* Quick Metrics Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <div className={`p-4 rounded-2xl border shadow-2xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
