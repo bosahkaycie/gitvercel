@@ -1306,62 +1306,71 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
             </div>
           )}
 
-          {/* Prominent In-Page Sticky Bulk Actions Toolbar */}
+          {/* Clean Single-Row Sticky Bulk Actions Toolbar */}
           {selectedAppIds.size > 0 && (
-            <div className="sticky top-2 z-40 mb-4 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950 text-white border-2 border-emerald-500 shadow-2xl flex flex-wrap items-center justify-between gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
-              <div className="flex items-center space-x-3">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-slate-950 font-black text-xs shadow-md">
+            <div className={`sticky top-2 z-30 px-4 py-2.5 rounded-xl border shadow-sm flex flex-wrap items-center justify-between gap-2.5 transition-colors ${
+              isDark
+                ? 'bg-slate-900/95 border-emerald-800/70 text-slate-100 backdrop-blur-sm'
+                : 'bg-white/95 border-emerald-200 text-slate-800 backdrop-blur-sm'
+            }`}>
+              <div className="flex items-center gap-2.5">
+                <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-md bg-emerald-600 text-white text-xs font-bold">
                   {selectedAppIds.size}
                 </span>
-                <div>
-                  <div className="text-sm font-black text-white flex items-center gap-2">
-                    <span>{selectedAppIds.size} Candidate{selectedAppIds.size > 1 ? 's' : ''} Selected</span>
-                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-emerald-300 bg-emerald-950/90 px-2 py-0.5 rounded-full border border-emerald-700/60">
-                      Batch Actions Ready
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-300">Choose an action to execute across all marked candidates:</p>
-                </div>
+                <span className="text-xs sm:text-sm font-semibold">
+                  {selectedAppIds.size === 1 ? 'candidate selected' : 'candidates selected'}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleClearSelection}
+                  className="text-xs font-medium text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 underline underline-offset-2 cursor-pointer ml-1"
+                >
+                  Clear
+                </button>
               </div>
 
               <div className="flex items-center gap-2 flex-wrap">
-                {/* 1. SHORTLIST SELECTED */}
                 <button
                   type="button"
                   disabled={isBulkUpdating}
                   onClick={() => handleBulkStatusChange('shortlisted')}
-                  className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 rounded-xl text-xs font-black flex items-center space-x-1.5 shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer transition-all disabled:opacity-50"
-                  title="Mark all marked candidates as Shortlisted in batch"
+                  className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                  title="Mark selected candidates as Shortlisted"
                 >
-                  <span className="text-sm">⭐</span>
-                  <span>{isBulkUpdating ? 'Updating...' : `Shortlist Selected (${selectedAppIds.size})`}</span>
+                  <IconCheck className="w-3.5 h-3.5" />
+                  <span>{isBulkUpdating ? 'Updating...' : 'Shortlist'}</span>
                 </button>
 
-                {/* 2. EMAIL SELECTED */}
                 <button
                   type="button"
                   disabled={isBulkUpdating}
                   onClick={handleOpenEmailForSelected}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white rounded-xl text-xs font-black flex items-center space-x-1.5 shadow-lg shadow-blue-500/20 active:scale-95 cursor-pointer transition-all disabled:opacity-50"
-                  title="Compose and send personalized emails to all selected candidates"
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold border flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 ${
+                    isDark
+                      ? 'bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-300 border-emerald-800'
+                      : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                  }`}
+                  title="Send personalized email to selected candidates"
                 >
-                  <IconMail className="w-4 h-4" />
-                  <span>Email Selected ({selectedAppIds.size})</span>
+                  <IconMail className="w-3.5 h-3.5" />
+                  <span>Email</span>
                 </button>
 
-                {/* 3. DOWNLOAD CVS */}
                 <button
                   type="button"
                   disabled={isBulkUpdating || isDownloadingZip}
                   onClick={handleDownloadSelectedCVs}
-                  className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded-xl text-xs font-bold flex items-center space-x-1.5 cursor-pointer transition-all disabled:opacity-50"
-                  title="Download ZIP archive of selected candidates' CVs"
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold border flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 ${
+                    isDark
+                      ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                      : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                  }`}
+                  title="Download ZIP of selected candidates' CVs"
                 >
                   <IconDownload className="w-3.5 h-3.5" />
                   <span>Download CVs</span>
                 </button>
 
-                {/* 4. OTHER STATUS DROPDOWN */}
                 <select
                   disabled={isBulkUpdating}
                   onChange={(e) => {
@@ -1371,35 +1380,33 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                     }
                   }}
                   defaultValue=""
-                  className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded-xl text-xs font-bold cursor-pointer transition-all focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:opacity-50 ${
+                    isDark
+                      ? 'bg-slate-800 border-slate-700 text-slate-200'
+                      : 'bg-white border-slate-200 text-slate-700'
+                  }`}
                 >
-                  <option value="" disabled>Change Status ▾</option>
-                  <option value="shortlisted" className="bg-slate-900 text-white">⭐ Shortlist</option>
-                  <option value="interviewed" className="bg-slate-900 text-white">📅 Mark as Interviewed</option>
-                  <option value="hired" className="bg-slate-900 text-white">🎉 Mark as Hired</option>
-                  <option value="rejected" className="bg-slate-900 text-white">📁 Talent Pool / Rejected</option>
-                  <option value="new" className="bg-slate-900 text-white">🔄 Reset to New</option>
+                  <option value="" disabled>Set Status...</option>
+                  <option value="shortlisted">Shortlisted</option>
+                  <option value="interviewed">Interviewed</option>
+                  <option value="hired">Hired</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="new">New</option>
                 </select>
 
-                {/* 5. DELETE */}
                 <button
                   type="button"
                   disabled={isBulkUpdating}
                   onClick={() => setIsBulkDeleteModalOpen(true)}
-                  className="px-3 py-2 bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/80 rounded-xl text-xs font-bold flex items-center space-x-1 cursor-pointer transition-all disabled:opacity-50"
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold border flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 ${
+                    isDark
+                      ? 'bg-rose-950/50 hover:bg-rose-900/60 text-rose-300 border-rose-800/70'
+                      : 'bg-white hover:bg-rose-50 text-rose-600 border-rose-200'
+                  }`}
                   title="Delete selected candidates"
                 >
                   <IconTrash className="w-3.5 h-3.5" />
                   <span>Delete</span>
-                </button>
-
-                {/* 6. DESELECT ALL */}
-                <button
-                  type="button"
-                  onClick={handleClearSelection}
-                  className="px-2.5 py-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 text-xs font-bold cursor-pointer transition-colors"
-                >
-                  ✕ Deselect
                 </button>
               </div>
             </div>
@@ -1431,47 +1438,6 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                     <thead className={`border-b text-xs font-bold uppercase tracking-wider ${
                       isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
                     }`}>
-                      {selectedAppIds.size > 0 && (
-                        <tr className="bg-gradient-to-r from-emerald-950 to-slate-900 text-white border-b border-emerald-700/60">
-                          <td colSpan={7} className="py-2.5 px-4">
-                            <div className="flex items-center justify-between flex-wrap gap-2">
-                              <div className="flex items-center space-x-2 text-xs font-bold">
-                                <span className="bg-emerald-500 text-slate-950 px-2 py-0.5 rounded-full text-xs font-black">
-                                  {selectedAppIds.size}
-                                </span>
-                                <span>Candidates Selected</span>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <button
-                                  type="button"
-                                  disabled={isBulkUpdating}
-                                  onClick={() => handleBulkStatusChange('shortlisted')}
-                                  className="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-xs font-black flex items-center space-x-1 shadow-xs cursor-pointer"
-                                >
-                                  <span>⭐</span>
-                                  <span>Shortlist ({selectedAppIds.size})</span>
-                                </button>
-                                <button
-                                  type="button"
-                                  disabled={isBulkUpdating}
-                                  onClick={handleOpenEmailForSelected}
-                                  className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-black flex items-center space-x-1 shadow-xs cursor-pointer"
-                                >
-                                  <IconMail className="w-3.5 h-3.5" />
-                                  <span>Email ({selectedAppIds.size})</span>
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={handleClearSelection}
-                                  className="text-slate-400 hover:text-white text-xs underline cursor-pointer ml-2"
-                                >
-                                  Deselect
-                                </button>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
                       <tr>
                         <th className="py-3.5 px-3 sm:px-4 w-10 text-center">
                           <input
@@ -1869,40 +1835,6 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                                 <thead className={`border-b text-xs font-bold uppercase tracking-wider ${
                                   isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
                                 }`}>
-                                  {jobApps.some((a) => selectedAppIds.has(a.id)) && (
-                                    <tr className="bg-gradient-to-r from-emerald-950 to-slate-900 text-white border-b border-emerald-700/60">
-                                      <td colSpan={6} className="py-2 px-4">
-                                        <div className="flex items-center justify-between flex-wrap gap-2">
-                                          <div className="flex items-center space-x-2 text-xs font-bold">
-                                            <span className="bg-emerald-500 text-slate-950 px-2 py-0.5 rounded-full text-xs font-black">
-                                              {jobApps.filter((a) => selectedAppIds.has(a.id)).length}
-                                            </span>
-                                            <span>selected in this role</span>
-                                          </div>
-                                          <div className="flex items-center space-x-2">
-                                            <button
-                                              type="button"
-                                              disabled={isBulkUpdating}
-                                              onClick={() => handleBulkStatusChange('shortlisted')}
-                                              className="px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-xs font-black flex items-center space-x-1 shadow-xs cursor-pointer"
-                                            >
-                                              <span>⭐</span>
-                                              <span>Shortlist Selected</span>
-                                            </button>
-                                            <button
-                                              type="button"
-                                              disabled={isBulkUpdating}
-                                              onClick={handleOpenEmailForSelected}
-                                              className="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-black flex items-center space-x-1 shadow-xs cursor-pointer"
-                                            >
-                                              <IconMail className="w-3.5 h-3.5" />
-                                              <span>Email Selected</span>
-                                            </button>
-                                          </div>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  )}
                                   <tr>
                                     <th className="py-3 px-3 sm:px-4 w-10 text-center">
                                       <input
@@ -2163,40 +2095,6 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
                               <thead className={`border-b text-xs font-bold uppercase tracking-wider ${
                                 isDark ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
                               }`}>
-                                {generalApps.some((a) => selectedAppIds.has(a.id)) && (
-                                  <tr className="bg-gradient-to-r from-emerald-950 to-slate-900 text-white border-b border-emerald-700/60">
-                                    <td colSpan={7} className="py-2 px-4">
-                                      <div className="flex items-center justify-between flex-wrap gap-2">
-                                        <div className="flex items-center space-x-2 text-xs font-bold">
-                                          <span className="bg-emerald-500 text-slate-950 px-2 py-0.5 rounded-full text-xs font-black">
-                                            {generalApps.filter((a) => selectedAppIds.has(a.id)).length}
-                                          </span>
-                                          <span>selected in general talent</span>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                          <button
-                                            type="button"
-                                            disabled={isBulkUpdating}
-                                            onClick={() => handleBulkStatusChange('shortlisted')}
-                                            className="px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-xs font-black flex items-center space-x-1 shadow-xs cursor-pointer"
-                                          >
-                                            <span>⭐</span>
-                                            <span>Shortlist Selected</span>
-                                          </button>
-                                          <button
-                                            type="button"
-                                            disabled={isBulkUpdating}
-                                            onClick={handleOpenEmailForSelected}
-                                            className="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-black flex items-center space-x-1 shadow-xs cursor-pointer"
-                                          >
-                                            <IconMail className="w-3.5 h-3.5" />
-                                            <span>Email Selected</span>
-                                          </button>
-                                        </div>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                )}
                                 <tr>
                                   <th className="py-3 px-3 sm:px-4 w-10 text-center">
                                     <input
@@ -3496,101 +3394,6 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
               alt="Hiring Flyer"
               className="max-h-[85vh] w-auto object-contain rounded-2xl shadow-2xl border border-white/10"
             />
-          </div>
-        </div>
-      )}
-
-      {/* Floating Bulk Actions Bar */}
-      {selectedAppIds.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <div className="bg-slate-900/95 dark:bg-slate-900/95 text-white backdrop-blur-md px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/80 flex items-center gap-3 sm:gap-4 flex-wrap max-w-[95vw]">
-            <div className="flex items-center gap-2 border-r border-slate-700 pr-3 sm:pr-4">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white shadow-xs">
-                {selectedAppIds.size}
-              </span>
-              <span className="text-xs font-bold whitespace-nowrap">
-                {selectedAppIds.size === 1 ? 'Candidate' : 'Candidates'} Selected
-              </span>
-            </div>
-
-            {/* Quick Shortlist Button (Bulk) */}
-            <button
-              type="button"
-              disabled={isBulkUpdating}
-              onClick={() => handleBulkStatusChange('shortlisted')}
-              className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 rounded-xl text-xs font-extrabold flex items-center space-x-1.5 transition-all shadow-md cursor-pointer disabled:opacity-50"
-              title="Shortlist selected candidates in bulk"
-            >
-              <span>⭐</span>
-              <span>Shortlist Selected</span>
-            </button>
-
-            {/* Change Status Dropdown */}
-            <div className="relative group">
-              <select
-                disabled={isBulkUpdating}
-                value=""
-                onChange={(e) => {
-                  if (e.target.value) {
-                    handleBulkStatusChange(e.target.value as JobApplication['status']);
-                  }
-                }}
-                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer disabled:opacity-50"
-              >
-                <option value="" disabled>Change Status to...</option>
-                <option value="new">Mark as New</option>
-                <option value="shortlisted">⭐ Shortlist</option>
-                <option value="interviewed">🎙️ Interviewed</option>
-                <option value="hired">🎉 Hired</option>
-                <option value="rejected">❌ Rejected</option>
-              </select>
-            </div>
-
-            {/* Download Selected CVs */}
-            <button
-              type="button"
-              disabled={isBulkUpdating || isDownloadingZip}
-              onClick={handleDownloadSelectedCVs}
-              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all shadow-sm cursor-pointer disabled:opacity-50"
-              title="Download ZIP of all selected candidate CVs"
-            >
-              <IconDownload className="w-3.5 h-3.5" />
-              <span>Download CVs ({selectedAppIds.size})</span>
-            </button>
-
-            {/* Email Selected Candidates */}
-            <button
-              type="button"
-              disabled={isBulkUpdating}
-              onClick={handleOpenEmailForSelected}
-              className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all shadow-sm cursor-pointer disabled:opacity-50"
-              title="Compose and send personalized emails to all selected candidates"
-            >
-              <IconMail className="w-3.5 h-3.5" />
-              <span>Email ({selectedAppIds.size})</span>
-            </button>
-
-            {/* Delete Selected */}
-            <button
-              type="button"
-              disabled={isBulkUpdating}
-              onClick={() => setIsBulkDeleteModalOpen(true)}
-              className="p-1.5 sm:px-2.5 sm:py-1.5 bg-rose-950/60 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded-xl text-xs font-semibold flex items-center space-x-1 transition-all cursor-pointer disabled:opacity-50"
-              title="Delete selected candidates"
-            >
-              <IconTrash className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Delete</span>
-            </button>
-
-            {/* Deselect All */}
-            <button
-              type="button"
-              onClick={handleClearSelection}
-              className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
-              title="Clear selection"
-            >
-              <IconClose className="w-4 h-4" />
-            </button>
           </div>
         </div>
       )}
