@@ -933,38 +933,16 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
         </div>
       )}
 
-      {/* General Application Toggle Switch Banner */}
-      <div className={`p-4 sm:p-5 rounded-2xl border shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors ${
+      {/* Compact Utility Strip: General Talent Toggle + Receptionist Gate Code */}
+      <div className={`px-4 py-3 rounded-xl border shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3 transition-colors ${
         isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
       }`}>
-        <div className="flex items-start sm:items-center space-x-3.5">
-          <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-            generalAppEnabled
-              ? isDark ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-              : isDark ? 'bg-slate-800 text-slate-400 border border-slate-700' : 'bg-slate-100 text-slate-500 border border-slate-200'
-          }`}>
-            <IconFileText className="w-5 h-5" />
+        {/* General Talent Network Toggle */}
+        <div className="flex items-center justify-between lg:justify-start gap-3">
+          <div className="flex items-center gap-2.5">
+            <IconFileText className="w-4 h-4 text-slate-400 shrink-0" />
+            <span className="text-xs sm:text-sm font-semibold">General Talent Pool</span>
           </div>
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-sm font-bold tracking-tight">General Talent Network Application</h3>
-              <span className={`px-2 py-0.5 rounded text-[11px] font-black uppercase tracking-wider ${
-                generalAppEnabled
-                  ? isDark ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/50' : 'bg-emerald-100 text-emerald-900'
-                  : isDark ? 'bg-amber-950/80 text-amber-300 border border-amber-800/50' : 'bg-amber-100 text-amber-900'
-              }`}>
-                {generalAppEnabled ? 'Active / Visible' : 'Off / Hidden'}
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 max-w-2xl">
-              {generalAppEnabled
-                ? 'The General Talent Network Submission card is currently visible at the bottom of the careers page.'
-                : 'Turned off. Candidates will focus exclusively on active listed job postings.'}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-3 shrink-0 self-end md:self-center pt-2 md:pt-0">
           <label className="relative inline-flex items-center cursor-pointer">
             <input
               type="checkbox"
@@ -973,334 +951,231 @@ const AdminCareers: React.FC<AdminCareersProps> = ({
               disabled={isTogglingGeneralApp}
               className="sr-only peer"
             />
-            <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+            <div className="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
           </label>
-          <span className="text-xs font-bold text-slate-700 dark:text-slate-300 select-none">
-            {generalAppEnabled ? 'Enabled' : 'Disabled'}
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 select-none">
+            {generalAppEnabled ? 'Visible' : 'Hidden'}
           </span>
         </div>
+
+        {/* Receptionist Check-In Code (Applications Tab Only) */}
+        {activeTab === 'applications' && (
+          <div className={`flex flex-wrap items-center justify-between lg:justify-end gap-2 pt-2.5 lg:pt-0 border-t lg:border-t-0 lg:border-l lg:pl-4 ${
+            isDark ? 'border-slate-800' : 'border-slate-200'
+          }`}>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              Receptionist Code:
+            </span>
+            <code className={`px-2.5 py-1 rounded-lg border font-mono text-xs font-bold tracking-wider select-all ${
+              isDark ? 'bg-slate-950 border-slate-700 text-emerald-300' : 'bg-slate-50 border-slate-200 text-slate-800'
+            }`}>
+              {gateCode?.accessCode || '—'}
+            </code>
+            <button
+              type="button"
+              disabled={!gateCode?.accessCode}
+              onClick={handleCopyGateCode}
+              className={`px-2.5 py-1 rounded-lg border text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer disabled:opacity-50 ${
+                isDark
+                  ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
+                  : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
+              }`}
+              title="Copy code for venue receptionist"
+            >
+              <IconCopy className="w-3.5 h-3.5" />
+              <span>Copy</span>
+            </button>
+            <button
+              type="button"
+              disabled={isGeneratingCode}
+              onClick={handleGenerateGateCode}
+              className={`px-2.5 py-1 rounded-lg border text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50 ${
+                isDark
+                  ? 'bg-emerald-950/60 hover:bg-emerald-900/60 border-emerald-800 text-emerald-300'
+                  : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-800'
+              }`}
+              title="Generate a new code and invalidate the previous one"
+            >
+              {isGeneratingCode ? 'Generating...' : 'New Code'}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Applications View */}
       {activeTab === 'applications' && (
-        <div className="space-y-5">
-          {/* Receptionist Venue Check-In Access Code Panel */}
-          <div className={`p-4 rounded-2xl border shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3 transition-colors ${
-            isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
-          }`}>
-            <div className="flex items-start sm:items-center space-x-3">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-base ${
-                isDark ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-              }`}>
-                🔐
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-sm font-bold tracking-tight">Receptionist QR Check-In Code</h3>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider ${
-                    isDark ? 'bg-slate-800 text-emerald-300 border border-slate-700' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                  }`}>
-                    Gated Admissions
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Share this unique code with the venue receptionist. Scanning a candidate&apos;s email QR code requires this code before admission.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center flex-wrap gap-2 shrink-0 self-end md:self-center">
-              <div className={`px-3.5 py-2 rounded-xl border font-mono text-sm font-black tracking-widest select-all ${
-                isDark ? 'bg-slate-950 border-emerald-700/70 text-emerald-300' : 'bg-slate-50 border-emerald-300 text-emerald-900'
-              }`}>
-                {gateCode?.accessCode || 'Loading...'}
-              </div>
-              <button
-                type="button"
-                disabled={!gateCode?.accessCode}
-                onClick={handleCopyGateCode}
-                className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center space-x-1.5 transition-colors cursor-pointer disabled:opacity-50 ${
-                  isDark
-                    ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
-                    : 'bg-white hover:bg-slate-100 border-slate-300 text-slate-700'
-                }`}
-                title="Copy access code to send to receptionist"
-              >
-                <IconCopy className="w-3.5 h-3.5" />
-                <span>Copy</span>
-              </button>
-              <button
-                type="button"
-                disabled={isGeneratingCode}
-                onClick={handleGenerateGateCode}
-                className="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
-                title="Generate a brand-new code and immediately invalidate the old one"
-              >
-                {isGeneratingCode ? 'Generating...' : 'Generate New Code'}
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Metrics Cards */}
+        <div className="space-y-4">
+          {/* Clean Compact Metrics Strip */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className={`p-4 rounded-2xl border shadow-2xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Live Submissions</div>
-              <div className="text-xl sm:text-2xl font-black mt-1 text-emerald-500">{applications.length}</div>
-              <div className="text-[11px] text-slate-500 mt-0.5">Recorded in portal database</div>
+            <div className={`px-4 py-3 rounded-xl border shadow-2xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'}`}>
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Total Submissions</div>
+              <div className="text-xl font-bold mt-0.5 text-emerald-600 dark:text-emerald-400">{applications.length}</div>
             </div>
-            <div className={`p-4 rounded-2xl border shadow-2xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Direct Vacancies</div>
-              <div className="text-xl sm:text-2xl font-black mt-1 text-blue-500">{applications.length - generalAppCount}</div>
-              <div className="text-[11px] text-slate-500 mt-0.5">Applied to active roles</div>
+            <div className={`px-4 py-3 rounded-xl border shadow-2xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'}`}>
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Direct Vacancies</div>
+              <div className="text-xl font-bold mt-0.5 text-slate-800 dark:text-white">{applications.length - generalAppCount}</div>
             </div>
-            <div className={`p-4 rounded-2xl border shadow-2xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">General Talent Pool</div>
-              <div className="text-xl sm:text-2xl font-black mt-1 text-purple-500">{generalAppCount}</div>
-              <div className="text-[11px] text-slate-500 mt-0.5">Spontaneous applications</div>
+            <div className={`px-4 py-3 rounded-xl border shadow-2xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'}`}>
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">General Talent</div>
+              <div className="text-xl font-bold mt-0.5 text-slate-800 dark:text-white">{generalAppCount}</div>
             </div>
-            <div className={`p-4 rounded-2xl border shadow-2xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">New / Unreviewed</div>
-              <div className="text-xl sm:text-2xl font-black mt-1 text-amber-500">{applications.filter(a => a.status === 'new').length}</div>
-              <div className="text-[11px] text-slate-500 mt-0.5">Candidates awaiting action</div>
-            </div>
-          </div>
-          {/* Active Job Postings Horizontal Filter Chips */}
-          <div className="space-y-2">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs px-1">
-              <span className={`font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Filter by Vacancy Posting:
-              </span>
-              <div className="flex items-center space-x-2.5">
-                <span className="text-slate-400 font-mono text-[11px]">
-                  {applications.length} Total Applications Recorded
-                </span>
-                {/* 1-Click Category Download Button */}
-                {(() => {
-                  const catApps = getAppsForCategory(selectedPostingFilter);
-                  const cvCount = catApps.filter((a) => a.resume_url).length;
-                  const catTitle = getCategoryTitle(selectedPostingFilter);
-                  return (
-                    <button
-                      type="button"
-                      onClick={() => handleDownloadCVs(catApps, catTitle)}
-                      disabled={isDownloadingZip || cvCount === 0}
-                      className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 border shadow-2xs ${
-                        cvCount === 0
-                          ? 'opacity-40 cursor-not-allowed border-slate-300 dark:border-slate-700 text-slate-400'
-                          : isDark
-                          ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300 hover:bg-emerald-900/60 cursor-pointer'
-                          : 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100 cursor-pointer'
-                      }`}
-                      title={`Download all CVs for ${catTitle} in a ZIP file`}
-                    >
-                      <IconDownload className="w-3.5 h-3.5" />
-                      <span>Download {selectedPostingFilter === 'All' ? 'All' : catTitle} CVs ({cvCount})</span>
-                    </button>
-                  );
-                })()}
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-thin">
-              <button
-                type="button"
-                onClick={() => setSelectedPostingFilter('All')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center space-x-2 border cursor-pointer ${
-                  selectedPostingFilter === 'All'
-                    ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
-                    : isDark ? 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-                }`}
-              >
-                <span>All Postings</span>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
-                  selectedPostingFilter === 'All'
-                    ? 'bg-emerald-900 text-emerald-100'
-                    : isDark ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'
-                }`}>
-                  {applications.length}
-                </span>
-              </button>
-
-              {jobs.map((job) => {
-                const count = getPostingAppCount(job.id);
-                const isSelected = selectedPostingFilter === job.id;
-                return (
-                  <button
-                    key={job.id}
-                    type="button"
-                    onClick={() => setSelectedPostingFilter(job.id)}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center space-x-2 border cursor-pointer ${
-                      isSelected
-                        ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
-                        : isDark ? 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-                    }`}
-                  >
-                    <span className="truncate max-w-[220px]">{job.title}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
-                      count > 0 
-                        ? (isSelected ? 'bg-emerald-900 text-emerald-100' : 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300/60 dark:border-emerald-800/50') 
-                        : (isSelected ? 'bg-emerald-900 text-emerald-200' : isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600')
-                    }`}>
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
-
-              <button
-                type="button"
-                onClick={() => setSelectedPostingFilter('general')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center space-x-2 border cursor-pointer ${
-                  selectedPostingFilter === 'general'
-                    ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
-                    : isDark ? 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-                }`}
-              >
-                <span>General Submissions</span>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
-                  selectedPostingFilter === 'general'
-                    ? 'bg-emerald-900 text-emerald-100'
-                    : isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600'
-                }`}>
-                  {generalAppCount}
-                </span>
-              </button>
+            <div className={`px-4 py-3 rounded-xl border shadow-2xs ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'}`}>
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">New / Unreviewed</div>
+              <div className="text-xl font-bold mt-0.5 text-amber-600 dark:text-amber-400">{applications.filter(a => a.status === 'new').length}</div>
             </div>
           </div>
 
-          {/* Filter Toolbar & View Mode Switcher */}
-          <div className={`p-4 rounded-2xl border shadow-xs flex flex-col lg:flex-row gap-4 items-center justify-between transition-colors ${
+          {/* Unified Search, Position Dropdown, Status Filter & View Switcher */}
+          <div className={`p-3 rounded-xl border shadow-2xs flex flex-col lg:flex-row gap-2.5 items-stretch lg:items-center justify-between transition-colors ${
             isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/90'
           }`}>
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-              <div className="relative w-full sm:w-80">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500 dark:text-slate-400">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1">
+              {/* Search */}
+              <div className="relative flex-1 sm:max-w-xs">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                   <IconSearch className="w-4 h-4" />
                 </span>
                 <input
                   type="text"
-                  placeholder="Search candidate name, email, phone, or role..."
+                  placeholder="Search candidate, email, or phone..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm border rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all ${
-                    isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-500'
+                  className={`w-full pl-9 pr-3 py-2 text-xs sm:text-sm border rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all ${
+                    isDark ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400'
                   }`}
                 />
               </div>
 
-              {/* Status Filter Buttons */}
-              <div className="flex items-center space-x-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-                {['All', 'new', 'shortlisted', 'interviewed', 'hired', 'rejected'].map((st) => (
-                  <button
-                    key={st}
-                    onClick={() => setStatusFilter(st)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize whitespace-nowrap transition-all cursor-pointer ${
-                      statusFilter === st
-                        ? 'bg-emerald-600 text-white shadow-xs'
-                        : isDark ? 'text-slate-300 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
+              {/* Clean Position Dropdown (Replaces Horizontal Chip Slider) */}
+              <select
+                value={selectedPostingFilter}
+                onChange={(e) => setSelectedPostingFilter(e.target.value)}
+                aria-label="Filter by job position"
+                className={`px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer sm:max-w-[240px] ${
+                  isDark ? 'bg-slate-800 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
+                }`}
+              >
+                <option value="All">All Positions ({applications.length})</option>
+                {jobs.map((job) => (
+                  <option key={job.id} value={job.id}>
+                    {job.title} ({getPostingAppCount(job.id)})
+                  </option>
+                ))}
+                <option value="general">General Submissions ({generalAppCount})</option>
+              </select>
+
+              {/* Status Dropdown */}
+              {(() => {
+                const checkedInCount = safeApps.filter((a) => Boolean(venueCheckIns[a.id])).length;
+                return (
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    aria-label="Filter by candidate status"
+                    className={`px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer ${
+                      isDark ? 'bg-slate-800 border-slate-700 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
                     }`}
                   >
-                    {st}
+                    <option value="All">All Statuses</option>
+                    <option value="new">New</option>
+                    <option value="shortlisted">Shortlisted</option>
+                    <option value="interviewed">Interviewed</option>
+                    <option value="hired">Hired</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="at_venue">At Venue ({checkedInCount})</option>
+                  </select>
+                );
+              })()}
+
+              {/* Quick At-Venue Indicator Pill (only when someone has arrived at the venue) */}
+              {(() => {
+                const checkedInCount = safeApps.filter((a) => Boolean(venueCheckIns[a.id])).length;
+                if (checkedInCount === 0) return null;
+                return (
+                  <button
+                    type="button"
+                    onClick={() => setStatusFilter(statusFilter === 'at_venue' ? 'All' : 'at_venue')}
+                    className={`px-2.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer flex items-center justify-center gap-1.5 border ${
+                      statusFilter === 'at_venue'
+                        ? 'bg-emerald-600 border-emerald-600 text-white'
+                        : isDark
+                        ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300 hover:bg-emerald-900/60'
+                        : 'bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100'
+                    }`}
+                    title="Show candidates currently checked in at the interview venue"
+                  >
+                    <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>At Venue ({checkedInCount})</span>
                   </button>
-                ))}
-                {(() => {
-                  const checkedInCount = safeApps.filter((a) => Boolean(venueCheckIns[a.id])).length;
-                  return (
-                    <button
-                      type="button"
-                      onClick={() => setStatusFilter('at_venue')}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center space-x-1.5 border ${
-                        statusFilter === 'at_venue'
-                          ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
-                          : checkedInCount > 0
-                          ? isDark
-                            ? 'bg-emerald-950/60 border-emerald-700/70 text-emerald-300 hover:bg-emerald-900/60'
-                            : 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100'
-                          : isDark
-                          ? 'border-slate-700 text-slate-400 hover:bg-slate-800'
-                          : 'border-slate-200 text-slate-500 hover:bg-slate-100'
-                      }`}
-                      title="Filter candidates who have been scanned & checked in at the interview venue"
-                    >
-                      <span className={`inline-block w-2 h-2 rounded-full ${checkedInCount > 0 ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'}`} />
-                      <span>At Venue ({checkedInCount})</span>
-                    </button>
-                  );
-                })()}
-              </div>
+                );
+              })()}
             </div>
 
             {/* View Mode Switcher */}
-            <div className="flex items-center space-x-2 shrink-0 self-end lg:self-center">
-              <div className={`p-1 rounded-xl border flex items-center space-x-1 ${
-                isDark ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-100 border-slate-200'
-              }`}>
-                <button
-                  type="button"
-                  onClick={() => setAppsViewMode('grouped')}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
-                    appsViewMode === 'grouped'
-                      ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                  title="Group applications into actively listed job postings"
-                >
-                  <IconCareers className="w-3.5 h-3.5" />
-                  <span>Grouped by Role</span>
-                </button>
+            <div className={`p-0.5 rounded-lg border flex items-center self-end lg:self-center shrink-0 ${
+              isDark ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-100 border-slate-200'
+            }`}>
+              <button
+                type="button"
+                onClick={() => setAppsViewMode('grouped')}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  appsViewMode === 'grouped'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <IconCareers className="w-3.5 h-3.5" />
+                <span>Grouped</span>
+              </button>
 
-                <button
-                  type="button"
-                  onClick={() => setAppsViewMode('table')}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
-                    appsViewMode === 'table'
-                      ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                  title="View flat table of all candidate submissions"
-                >
-                  <IconFileText className="w-3.5 h-3.5" />
-                  <span>All Table</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setAppsViewMode('table')}
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  appsViewMode === 'table'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-2xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <IconFileText className="w-3.5 h-3.5" />
+                <span>Table</span>
+              </button>
             </div>
           </div>
 
-          {/* Group Sorting & Bulk Controls (Only in Grouped Mode) */}
+          {/* Subtle Group Sort & Expand/Collapse Line (Only in Grouped Mode) */}
           {appsViewMode === 'grouped' && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs px-1">
-              <div className="flex items-center space-x-2.5">
-                <span className={`font-semibold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                  Sort Vacancy Groups:
-                </span>
+            <div className="flex items-center justify-between gap-3 text-xs px-1">
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 font-medium">Sort:</span>
                 <select
                   value={postingSort}
                   onChange={(e) => setPostingSort(e.target.value as any)}
-                  className={`px-3 py-1.5 rounded-xl border font-bold text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer ${
-                    isDark ? 'bg-slate-900 border-slate-700 text-slate-200' : 'bg-white border-slate-200 text-slate-800'
+                  className={`px-2.5 py-1 rounded-lg border font-medium text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer ${
+                    isDark ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
                   }`}
                 >
-                  <option value="most_applicants">Most Candidates First</option>
-                  <option value="title_asc">Alphabetical (A - Z)</option>
-                  <option value="default">Default Listing Order</option>
+                  <option value="most_applicants">Most Candidates</option>
+                  <option value="title_asc">Alphabetical (A – Z)</option>
+                  <option value="default">Default Order</option>
                 </select>
               </div>
 
-              <div className="flex items-center space-x-3 text-xs font-bold">
+              <div className="flex items-center gap-2.5 text-xs font-medium text-slate-500">
                 <button
                   type="button"
                   onClick={expandAllPostings}
-                  className="text-slate-500 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors cursor-pointer"
+                  className="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors cursor-pointer"
                 >
-                  Expand All Groups
+                  Expand All
                 </button>
-                <span className="text-slate-300 dark:text-slate-700">•</span>
+                <span className="text-slate-300 dark:text-slate-700">·</span>
                 <button
                   type="button"
                   onClick={collapseAllPostings}
-                  className="text-slate-500 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors cursor-pointer"
+                  className="hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors cursor-pointer"
                 >
-                  Collapse All Groups
+                  Collapse All
                 </button>
               </div>
             </div>
